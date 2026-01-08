@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Vacantes</title>
+    
+    <link rel="icon" href="favicon.png" type="image/png">
+
+    <meta property="og:title" content="¿Estás buscando trabajo?">
+    <meta property="og:description" content="Échale un vistazo !! Vacantes disponibles en TuChamba Express.">
+    <meta property="og:image" content="https://tuchamba-express.netlify.app/banner_1.png">
+    <meta property="og:url" content="https://tuchamba-express.netlify.app/">
+    <meta property="og:type" content="website">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+      body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-image: 
+                linear-gradient(to bottom, rgba(240, 242, 245, 0.92), rgba(227, 242, 253, 0.95)),
+                url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;       
+            background-position: center;  
+            background-attachment: fixed; 
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* --- TOAST NOTIFICATION REFORZADO --- */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px; /* Centrar */
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 50px;
+            padding: 16px;
+            position: fixed;
+            z-index: 2147483647 !important; /* Z-Index Supremo + Important */
+            left: 50%;
+            bottom: 30px;
+            font-size: 15px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s;
+        }
+        #toast.show {
+            visibility: visible !important;
+            opacity: 1 !important;
+            bottom: 50px !important;
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #dbe4f1;
+            color: #666;
+            font-size: 12px;
+        }
+        .footer-link {
+            color: #0a66c2;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .footer-link:hover { text-decoration: underline; }
+        
+        .legal-note {
+            color: #888;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* --- SKELETON LOADING --- */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        .skeleton {
+            background: #f6f7f8;
+            background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+            background-repeat: no-repeat;
+            background-size: 1000px 100%; 
+            display: inline-block;
+            position: relative; 
+            animation: shimmer 2s infinite linear forwards;
+            border-radius: 4px;
+        }
+        .skeleton-card {
+            background: white; border-radius: 16px; padding: 25px; 
+            border: 1px solid #f0f0f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            height: 200px; display: flex; flex-direction: column; gap: 15px;
+        }
+        .sk-title { width: 70%; height: 24px; }
+        .sk-text { width: 90%; height: 16px; }
+        .sk-tag { width: 30%; height: 20px; border-radius: 20px; }
+
+        /* --- BIENVENIDA --- */
+        .welcome-container {
+            max-width: 480px; margin: 60px auto; background: white; padding: 50px 30px;
+            border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center;
+        }
+        .welcome-title { font-size: 28px; color: #1a1a1a; margin-bottom: 10px; font-weight: 800; }
+        .welcome-subtitle { color: #666; margin-bottom: 40px; font-size: 16px; }
+
+        .btn-big-guest {
+            background: #0a66c2; color: white; border: none; padding: 16px; width: 100%;
+            border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 4px 12px rgba(10, 102, 194, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-big-guest:hover { background: #004182; transform: translateY(-2px); }
+
+        .admin-toggle-link { display: block; margin-top: 30px; color: #999; font-size: 13px; text-decoration: underline; cursor: pointer; }
+        .admin-login-form { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: left; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- LAYOUT --- */
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .header {
+            background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .header h1 { font-size: 24px; color: #333; font-weight: 800; }
+
+        #recruiterBanner {
+            background: #e3f2fd !important; 
+            color: #0d47a1 !important; 
+            padding: 12px 15px; 
+            border-radius: 8px;
+            margin-bottom: 15px; 
+            font-size: 14px; 
+            display: flex !important; 
+            align-items: center; 
+            gap: 10px;
+            border: 1px solid #bbdefb; 
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #recruiterBanner:hover {
+            background: #bbdefb !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- FILTROS --- */
+        .filter-container {
+            background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;
+            display: flex; gap: 15px; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .filter-group { flex: 1; min-width: 200px; }
+        .filter-group label { display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px; }
+        .filter-input { width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
+
+        /* NUEVO BOTON TOGGLE SOLO MOVIL */
+        #mobileFilterToggle {
+            display: none; 
+            width: 100%;
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            border-radius: 8px;
+            color: #555;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        #mobileFilterToggle:hover { background: #f9f9f9; }
+
+        .btn-primary, .admin-btn { background: #0a66c2; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+        .add-job-btn { background: #10a37f; padding: 12px 24px; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        .tool-btn { background: #2c3e50; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .metrics-btn { background: #7b1fa2; } 
+        .team-btn { background: #e65100; }
+        .settings-btn { background: #607d8b; }
+
+        /* Botones de Peligro */
+        .danger-section {
+            background: #ffebee; 
+            padding: 15px; 
+            border-radius: 8px; 
+            border: 1px solid #ef9a9a; 
+            margin-top: 25px;
+        }
+        .danger-btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .danger-btn:hover { background: #b71c1c; }
+
+        /* Boton Ver Más */
+        .load-more-container { text-align: center; margin-top: 30px; margin-bottom: 40px; }
+        .btn-load-more { background: white; color: #0a66c2; border: 2px solid #0a66c2; padding: 12px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 16px; transition: all 0.2s; }
+        .btn-load-more:hover { background: #e3f2fd; }
+
+        .whatsapp-btn {
+            display: flex !important; 
+            align-items: center; 
+            justify-content: center;
+            background-color: #25D366 !important; 
+            color: white !important; 
+            padding: 14px 24px;
+            border-radius: 8px; 
+            text-decoration: none !important; 
+            font-weight: bold;
+            margin-top: 10px; 
+            transition: background 0.3s; 
+            border: none; 
+            cursor: pointer;
+            font-size: 16px; 
+            width: 100%; 
+            box-shadow: 0 4px 6px rgba(37, 211, 102, 0.2);
+        }
+        .whatsapp-btn:hover { background-color: #128C7E !important; transform: translateY(-1px); }
+        .whatsapp-icon { margin-right: 8px; font-size: 22px; }
+
+        .share-btn { background: #25D366; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-right: 10px; }
+        .share-btn:hover { background: #128C7E; }
+
+        .admin-controls-wrapper { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .metrics-card { background: white; color: #333; padding: 10px 20px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .metric-val { color: #0a66c2; font-weight: 800; margin-left: 4px; margin-right: 12px; }
+        .admin-mode-indicator { background: #ffe0b2; color: #e65100; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ffcc80; }
+
+        /* CARDS */
+        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        
+        .job-card {
+            background: white; border-radius: 16px; padding: 25px; cursor: pointer;
+            transition: all 0.3s; border: 1px solid #f0f0f0; position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .job-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.08); transform: translateY(-4px); border-color: #dbe4f1; }
+        .job-card.hidden { display: none; }
+
+        .job-title { font-size: 20px; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; line-height: 1.3; }
+        .company-name { font-size: 15px; color: #0a66c2; font-weight: 600; }
+        .location { font-size: 14px; color: #555; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+        
+        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+        .status-vigente { background-color: #2ecc71; box-shadow: 0 0 4px #2ecc71; }
+        .status-no-vigente { background-color: #e74c3c; }
+
+        .company-logo {
+            width: 54px; height: 54px; background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 24px; box-shadow: 0 4px 10px rgba(10, 102, 194, 0.2);
+        }
+
+        .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
+        .tag { background: #f3f2ef; color: #444; padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+
+        .job-details { margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0; display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .detail-item { font-size: 14px; color: #444; display: flex; align-items: center; gap: 6px; }
+
+        .more-btn { position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 24px; color: #ccc; cursor: pointer; width: 30px; height: 30px; }
+        .more-btn:hover { color: #333; }
+        .admin-actions { display: none; position: absolute; top: 45px; right: 15px; background: white; border: 1px solid #eee; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 20; }
+        .admin-actions.active { display: block; }
+        .admin-action { padding: 10px 20px; width: 100%; text-align: left; border: none; background: none; cursor: pointer; }
+        .admin-action:hover { background: #f9f9f9; }
+        .admin-action.delete { color: #d32f2f; }
+
+        /* MODALES */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; border-radius: 16px; max-width: 800px; width: 100%; padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+        .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+        
+        .location-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        @media (max-width: 500px) { .location-grid { grid-template-columns: 1fr; } }
+
+        .view-count-badge { background: #e3f2fd; color: #0277bd; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid #bbdefb; margin-right: 5px; }
+        .agency-badge { background: #fff3e0; color: #ef6c00; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid #ffe0b2; }
+
+        .section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px; margin-top: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px; display: inline-block; }
+        .item-list li { background: #f9f9f9; padding: 8px 12px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; }
+
+        .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .recruiters-table th, .recruiters-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        .recruiters-table th { background: #f9f9f9; color: #555; }
+        .copy-btn { background: #f0f2f5; border: 1px solid #ddd; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .copy-btn:hover { background: #e0e0e0; }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            #mobileFilterToggle { display: flex; } 
+            .filter-container { display: none; flex-direction: column; } 
+            .filter-container.active { display: flex; } 
+            .admin-controls-wrapper button { flex: 1; min-width: 45%; }
+            .job-title { font-size: 22px !important; margin-bottom: 6px; }
+            .location { font-size: 16px !important; color: #333 !important; margin-top: 8px; }
+            .job-card { padding: 20px !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loginScreen" class="welcome-container">
+        <div style="font-size: 50px; margin-bottom: 10px;">💼</div>
+        <h1 class="welcome-title">TuChamba Express</h1>
+        <p class="welcome-subtitle">Conectamos tu talento al instante. Sin registros complicados.</p>
+        <button class="btn-big-guest" onclick="enterAsGuest()">🔍 Ver Vacantes Disponibles</button>
+        <div class="admin-toggle-link" onclick="toggleAdminLogin()">¿Eres Reclutador? Ingresa aquí</div>
+        <div id="adminForm" class="admin-login-form">
+            <div class="form-group"><label>Correo de Acceso</label><input type="email" id="adminEmail" placeholder="admin@empresa.com" autocomplete="off"></div>
+            <div class="form-group"><label>Contraseña</label><input type="password" id="adminPassword" placeholder="******" autocomplete="off"></div>
+            <button class="btn-primary" style="width: 100%;" onclick="login()">Entrar al Panel</button>
+        </div>
+    </div>
+
+    <div id="mainApp" style="display: none;">
+        <div class="container">
+            <div class="header">
+                <h1>Portal de Vacantes</h1>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <button class="share-btn" onclick="shareApp()">📤 Compartir</button>
+                    <span id="modeIndicator"></span>
+                    <button class="admin-btn" style="background: #333;" onclick="logout()">Salir</button>
+                </div>
+            </div>
+
+            <div id="recruiterBanner" onclick="contactCentralOffice()">
+                👤 Asistido por: <span id="recruiterNameDisplay">Oficina Central</span> (Clic para contacto)
+            </div>
+
+            <div id="adminControls" style="display: none;">
+                <div class="admin-controls-wrapper">
+                    <div class="metrics-card">
+                        🌎 <span class="metric-val" id="totalVisits">...</span>
+                        📅 Mes: <span class="metric-val" id="monthlyVisits">...</span>
+                    </div>
+                    <button class="add-job-btn" onclick="openJobForm()">➕ Nueva</button>
+                    <button class="tool-btn" onclick="exportToExcel()">📦 Respaldo</button> 
+                    <button class="tool-btn metrics-btn" onclick="exportMetrics()">📊 Métricas</button>
+                    <button class="tool-btn team-btn" onclick="openTeamModal()">👥 Equipo</button>
+                    <button class="tool-btn settings-btn" onclick="openSettingsModal()">⚙️ Ajustes</button>
+                    
+                    <button class="tool-btn" onclick="document.getElementById('excelFile').click()">📤 Cargar</button>
+                    <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
+                    <button class="tool-btn" onclick="downloadTemplate()">📋 Plantilla</button>
+                </div>
+            </div>
+
+            <button id="mobileFilterToggle" onclick="toggleMobileFilters()">
+                🔍 Filtros de Búsqueda <span>▼</span>
+            </button>
+
+            <div class="filter-container" id="filterContainer">
+                <div class="filter-group"><label>🔍 Puesto o Empresa</label><input type="text" class="filter-input" id="filterTitle" placeholder="Ej. Ventas..." onkeyup="filterJobs()" autocomplete="off"></div>
+                <div class="filter-group"><label>📍 Ubicación</label><input type="text" class="filter-input" id="filterLocation" placeholder="Ej. CDMX..." onkeyup="filterJobs()" autocomplete="off"></div>
+                <div class="filter-group"><label>💰 Salario</label><input type="text" class="filter-input" id="filterSalary" placeholder="Ej. 10000..." onkeyup="filterJobs()" autocomplete="off"></div>
+            </div>
+
+            <div class="grid-header"><div class="job-counter" id="jobCounter"></div></div>
+            
+            <div id="skeletonLoader" class="job-grid">
+                <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-text"></div><div class="skeleton sk-text"></div><div class="skeleton sk-tag"></div></div>
+                <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-text"></div><div class="skeleton sk-text"></div><div class="skeleton sk-tag"></div></div>
+                <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-text"></div><div class="skeleton sk-text"></div><div class="skeleton sk-tag"></div></div>
+                <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-text"></div><div class="skeleton sk-text"></div><div class="skeleton sk-tag"></div></div>
+            </div>
+
+            <div class="job-grid" id="jobGrid" style="display: none;"></div>
+            
+            <div id="loadMoreContainer" class="load-more-container" style="display:none;">
+                <button class="btn-load-more" onclick="loadMoreJobs()">⬇️ Ver más vacantes</button>
+            </div>
+
+            <div class="footer">
+                <p>TuChamba Express &copy; 2024. Todos los derechos reservados.</p>
+                <div class="legal-note">Aviso: Algunas empresas pueden solicitar examen médico y/o antidoping.</div>
+                <div style="margin-top:10px;">
+                    <a class="footer-link" onclick="openPrivacyModal()">🔒 Aviso de Privacidad</a>
+                </div>
+            </div>
+
+            <div id="emptyState" class="welcome-container" style="display: none; padding: 30px; margin-top: 20px;">
+                <h3>No hay vacantes publicadas 😢</h3><p>Intenta más tarde o ajusta los filtros.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <div class="modal" id="viewModal"><div class="modal-content"><button class="close-btn" onclick="closeViewModal()">×</button><div id="viewModalBody"></div></div></div>
+
+    <div class="modal" id="formModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeFormModal()">×</button>
+            <h2 id="formTitle">Gestionar Vacante</h2>
+            <form id="jobForm" onsubmit="saveJob(event)">
+                <div class="form-group"><label>Estatus</label><select id="jobStatus"><option value="Vigente">Vigente (Verde)</option><option value="No Vigente">No Vigente (Rojo)</option></select></div>
+                
+                <div class="form-group"><label>¿Mostrar nombre de empresa al público?</label><select id="jobShowCompany"><option value="true">SÍ (Visible para todos)</option><option value="false">NO (Confidencial / Solo Admin)</option></select></div>
+                
+                <div class="form-group" style="background: #fff3e0; padding: 10px; border-radius: 8px; border: 1px dashed #ef6c00;">
+                    <label style="color: #e65100;">🏢 Tipo de Servicio o Agencia (Interno)</label>
+                    <input type="text" id="jobAgency" placeholder="Ej. Agencia Norte - Solo visible para Reclutador">
+                </div>
+                <div class="form-group"><label>Título *</label><input type="text" id="jobTitle" required></div>
+                <div class="form-group"><label>Empresa (Nombre Real) *</label><input type="text" id="jobCompany" required placeholder="Escribe el nombre real aquí"></div>
+                
+                <div class="form-group">
+                    <label>Ubicación Detallada *</label>
+                    <div class="location-grid">
+                        <input type="text" id="jobState" placeholder="Estado (Ej. CDMX)" required>
+                        <input type="text" id="jobCity" placeholder="Municipio (Ej. Coyoacán)" required>
+                        <input type="text" id="jobZone" placeholder="Colonia/Zona (Ej. Centro)" required>
+                    </div>
+                </div>
+
+                <div class="form-group"><label>Salario</label><input type="text" id="jobSalary" placeholder="$8,500/mes"></div>
+                <div class="form-group"><label>Descripción *</label><textarea id="jobDescription" required></textarea></div>
+                <div class="form-group"><label>Jornada / Horario</label><input type="text" id="jobSchedule" placeholder="Ej. Lunes a Viernes 9 a 6"></div>
+                
+                <div class="form-group"><label>Etiquetas</label><input type="text" id="jobTags" placeholder="#Ventas, #Seguros"></div>
+                <div class="form-group"><label>Requisitos</label><div class="list-input"><input type="text" id="reqInput"><button type="button" class="tool-btn" style="background:#0a66c2" onclick="addItem('req')">+</button></div><ul class="item-list" id="reqList"></ul></div>
+                <div class="form-group"><label>Beneficios</label><div class="list-input"><input type="text" id="benInput"><button type="button" class="tool-btn" style="background:#0a66c2" onclick="addItem('ben')">+</button></div><ul class="item-list" id="benList"></ul></div>
+                <div class="form-group"><label>WhatsApp Contacto (Número Real)</label><textarea id="jobContact" placeholder="5255..."></textarea></div>
+                <div class="form-actions"><button type="button" class="tool-btn" style="background:#666; width:100%" onclick="closeFormModal()">Cancelar</button><button type="submit" class="btn-primary" style="width:100%">Guardar</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="teamModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeTeamModal()">×</button>
+            <h2>👥 Gestión de Reclutadores</h2>
+            <p style="color:#666; font-size:13px; margin-bottom:15px;">Crea o edita enlaces únicos.</p>
+            
+            <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #eee;">
+                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+                    <input type="hidden" id="recIdEdit"> 
+                    <div style="flex:1; min-width:150px;">
+                        <label style="font-size:12px; font-weight:bold; color:#555;">Nombre</label>
+                        <input type="text" id="recName" placeholder="Ej. Juan Pérez" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    </div>
+                    <div style="flex:1; min-width:150px;">
+                        <label style="font-size:12px; font-weight:bold; color:#555;">WhatsApp</label>
+                        <input type="text" id="recPhone" placeholder="Ej. 55..." style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    </div>
+                    <div style="width:120px;">
+                        <label style="font-size:12px; font-weight:bold; color:#555;">Código</label>
+                        <input type="text" id="recCode" placeholder="Ej. JUAN" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; text-transform:uppercase;">
+                    </div>
+                    <button type="button" id="btnSaveRecruiter" class="btn-primary" style="padding:9px 15px; margin-bottom:1px;" onclick="saveRecruiter()">Agregar</button>
+                    <button type="button" id="btnCancelRecruiter" class="tool-btn" style="display:none; background:#999; padding:9px 15px; margin-bottom:1px;" onclick="resetRecruiterForm()">Cancelar</button>
+                </div>
+            </div>
+            
+            <table class="recruiters-table">
+                <thead><tr><th>Nombre</th><th>Código</th><th>Link</th><th>Acciones</th></tr></thead>
+                <tbody id="recruitersList"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeSettingsModal()">×</button>
+            <h2>⚙️ Ajustes del Sistema</h2>
+            
+            <div style="background:#e3f2fd; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #bbdefb;">
+                <h3 style="font-size:16px; margin-bottom:10px; color:#0d47a1;">📞 Teléfono Oficina Central (Respaldo)</h3>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    <button id="btnSaveCentral" class="btn-primary" onclick="saveCentralConfig()">Guardar</button>
+                </div>
+            </div>
+
+            <div class="danger-section">
+                <h3 style="font-size:16px; margin-bottom:10px; color:#d32f2f;">⚠️ Zona de Peligro (Admin)</h3>
+                <p style="font-size:12px; color:#666;">Acciones irreversibles protegidas por contraseña.</p>
+                
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="danger-btn" onclick="requestPassword('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button>
+                    <button class="danger-btn" onclick="requestPassword('deleteJobs')">🔥 Borrar TODAS las Vacantes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="passwordModal">
+        <div class="modal-content" style="max-width:400px; text-align:center;">
+            <button class="close-btn" onclick="closePasswordModal()">×</button>
+            <div style="font-size:40px; margin-bottom:10px;">🔒</div>
+            <h3 style="margin-bottom:15px;">Acción Protegida</h3>
+            <p style="margin-bottom:20px; color:#666;">Ingresa la contraseña de administrador:</p>
+            
+            <input type="password" id="adminPasswordInput" placeholder="Contraseña..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:20px; font-size:16px;">
+            
+            <div style="display:flex; gap:10px;">
+                <button class="tool-btn" style="flex:1; justify-content:center; background:#999;" onclick="closePasswordModal()">Cancelar</button>
+                <button class="btn-primary" style="flex:1; justify-content:center;" onclick="submitPassword()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="privacyModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closePrivacyModal()">×</button>
+            <h2 style="margin-bottom:20px;">🔒 Aviso de Privacidad</h2>
+            <div style="font-size:14px; color:#444; line-height:1.6; max-height:60vh; overflow-y:auto; padding-right:10px;">
+                <p><strong>Última actualización: Enero 2026</strong></p>
+                <br><p>En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, TuChamba Express informa:</p>
+                <br><p><strong>1. Responsable de los datos:</strong><br>TuChamba Express actúa como enlace entre candidatos y empresas reclutadoras.</p>
+                <br><p><strong>2. Datos recopilados:</strong><br>Podemos recopilar datos de contacto (como número telefónico) con el único fin de facilitar la comunicación para procesos de reclutamiento.</p>
+                <br><p><strong>3. Uso de la información:</strong><br>Los datos proporcionados serán utilizados exclusivamente para:<br>- Contactar al candidato respecto a la vacante de interés.<br>- Agendar entrevistas laborales.<br>- Procesos internos de selección.</p>
+                <br><p><strong>4. Compartir datos:</strong><br>Su información de contacto será compartida únicamente con la empresa o reclutador responsable de la vacante a la que usted decida postularse voluntariamente.</p>
+                <br><p><strong>5. Examen Médico:</strong><br>Al utilizar esta plataforma, usted reconoce que algunas empresas contratantes pueden requerir, como parte de su proceso de selección y conforme a la ley, la realización de exámenes médicos y/o pruebas de detección de sustancias.</p>
+            </div>
+            <div style="margin-top:20px; text-align:right;">
+                <button class="btn-primary" onclick="closePrivacyModal()">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, set, onValue, remove, runTransaction, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyB1k1lnQjQXiGYJRT9E9-KYzGSBBmrQGFI",
+          authDomain: "vacancy-page-v2.firebaseapp.com",
+          databaseURL: "https://vacancy-page-v2-default-rtdb.firebaseio.com",
+          projectId: "vacancy-page-v2",
+          storageBucket: "vacancy-page-v2.firebasestorage.app",
+          messagingSenderId: "242419485392",
+          appId: "1:242419485392:web:c486a767a1810ada876cd5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let isAdmin = false;
+        let currentEditId = null;
+        let jobs = {};
+        let jobStats = {}; 
+        let recruiters = {}; 
+        let clickLogs = {};
+        
+        let activeRecruiter = null; 
+        let centralPhone = ''; 
+        let editingRecruiterId = null; 
+        
+        // VARIABLE PARA CONTROLAR ACCIÓN PENDIENTE EN MODAL PASSWORD
+        let pendingAction = null; 
+
+        let tempReqs = [];
+        let tempBens = [];
+        let displayLimit = 20; 
+        let currentFilteredJobs = []; 
+
+        const today = new Date();
+        const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        
+        if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) { isAdmin = true; setAdminMode(true); } 
+            else {
+                if (sessionStorage.getItem('isGuest') === 'true' || refCode) { isAdmin = false; setAdminMode(false); } 
+                else { showLogin(); }
+            }
+        });
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+            document.querySelectorAll('.admin-actions').forEach(m => m.classList.remove('active'));
+        }
+
+        // FUNCIONES MODALES
+        window.openPrivacyModal = function() { document.getElementById('privacyModal').classList.add('active'); }
+        window.closePrivacyModal = function() { document.getElementById('privacyModal').classList.remove('active'); }
+        window.openSettingsModal = function() { document.getElementById('settingsModal').classList.add('active'); if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone; }
+        window.closeSettingsModal = function() { document.getElementById('settingsModal').classList.remove('active'); }
+
+        // FUNCIONES MODAL PASSWORD (CORREGIDO)
+        window.requestPassword = function(action) {
+            pendingAction = action;
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('passwordModal').classList.add('active');
+            setTimeout(() => document.getElementById('adminPasswordInput').focus(), 100);
+        }
+
+        window.closePasswordModal = function() {
+            document.getElementById('passwordModal').classList.remove('active');
+            pendingAction = null;
+        }
+
+        window.submitPassword = function() {
+            const pass = document.getElementById('adminPasswordInput').value;
+            if (pass === "Adm1n*+-2025") {
+                const actionToRun = pendingAction; // Guardamos la acción antes de borrar
+                
+                // CONFIRMACIÓN DE SEGURIDAD EXTRA
+                if(confirm("¿Estás seguro de que quieres realizar esta acción? Es irreversible.")) {
+                    if (actionToRun === 'resetMetrics') resetMetrics();
+                    if (actionToRun === 'deleteJobs') deleteAllJobs();
+                    window.closePasswordModal(); // Cerramos al final
+                }
+            } else {
+                window.showToast("⛔ Contraseña incorrecta");
+                document.getElementById('adminPasswordInput').value = '';
+            }
+        }
+
+        // TOAST NOTIFICATION REFORZADO
+        window.showToast = function(message) {
+            const x = document.getElementById("toast");
+            if(x) {
+                x.textContent = message;
+                x.className = "show";
+                setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+            }
+        }
+
+        function resetMetrics() {
+            remove(ref(db, 'siteStats'));
+            remove(ref(db, 'jobStats'));
+            remove(ref(db, 'clickLogs'));
+            window.showToast("✅ Métricas reseteadas a 0");
+        }
+
+        function deleteAllJobs() {
+            remove(ref(db, 'jobs')).then(() => {
+                window.showToast("🔥 Todas las vacantes eliminadas");
+            });
+        }
+
+        // FUNCION TOGGLE MOVIL
+        window.toggleMobileFilters = function() {
+            const container = document.getElementById('filterContainer');
+            container.classList.toggle('active');
+        }
+
+        window.toggleAdminLogin = function() { const f = document.getElementById('adminForm'); f.style.display = (f.style.display==='none'||f.style.display==='') ? 'block' : 'none'; }
+        window.login = async function() {
+            try { await setPersistence(auth, browserSessionPersistence); await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value); sessionStorage.removeItem('isGuest'); } catch (error) { alert("Error: " + error.message); }
+        }
+        window.enterAsGuest = function() { sessionStorage.setItem('isGuest', 'true'); isAdmin = false; setAdminMode(false); }
+        window.logout = function() { signOut(auth).then(() => { sessionStorage.removeItem('isGuest'); isAdmin = false; showLogin(); }); }
+
+        function showLogin() { document.getElementById('loginScreen').style.display = 'block'; document.getElementById('mainApp').style.display = 'none'; document.getElementById('adminForm').style.display = 'none'; }
+        function setAdminMode(enableAdmin) {
+            document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('filterTitle').value = ''; document.getElementById('filterLocation').value = ''; document.getElementById('filterSalary').value = '';
+            const isRefMode = !!refCode;
+            if (enableAdmin && !isRefMode) {
+                document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator">Super Admin</span>';
+                document.getElementById('adminControls').style.display = 'block';
+            } else {
+                document.getElementById('modeIndicator').innerHTML = '';
+                document.getElementById('adminControls').style.display = 'none';
+            }
+            loadData();
+        }
+
+        function loadData() {
+            onValue(ref(db, 'jobs'), (s) => { 
+                jobs = s.val() || {}; 
+                document.getElementById('skeletonLoader').style.display = 'none'; 
+                document.getElementById('jobGrid').style.display = 'grid';
+                renderJobs(); 
+            });
+            onValue(ref(db, 'jobStats'), (s) => { jobStats = s.val() || {}; });
+            onValue(ref(db, 'clickLogs'), (s) => { clickLogs = s.val() || {}; });
+            
+            onValue(ref(db, 'recruiters'), (s) => { 
+                recruiters = s.val() || {}; 
+                checkActiveRecruiter(); 
+                if(isAdmin) renderRecruitersTable(); 
+            });
+            
+            onValue(ref(db, 'settings/centralPhone'), (s) => { 
+                centralPhone = s.val() || '';
+                if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone;
+                updateBanner();
+            });
+        }
+
+        function checkActiveRecruiter() {
+            const savedCode = sessionStorage.getItem('recruiterCode');
+            activeRecruiter = null; 
+            if (savedCode && recruiters) {
+                const foundKey = Object.keys(recruiters).find(key => recruiters[key].code.toLowerCase() === savedCode);
+                if (foundKey) { 
+                    activeRecruiter = recruiters[foundKey]; 
+                }
+            }
+            updateBanner();
+        }
+
+        function updateBanner() {
+            const bannerName = document.getElementById('recruiterNameDisplay');
+            if(activeRecruiter) {
+                bannerName.textContent = activeRecruiter.name;
+            } else {
+                bannerName.textContent = "Oficina Central";
+            }
+        }
+
+        window.contactCentralOffice = function() {
+            let phoneToContact = '';
+            if(activeRecruiter) {
+                phoneToContact = activeRecruiter.phone;
+            } else {
+                phoneToContact = centralPhone;
+            }
+
+            if(phoneToContact) {
+                const cleanPhone = phoneToContact.replace(/\D/g, '');
+                window.open(`https://wa.me/${cleanPhone}?text=Hola,%20necesito%20ayuda%20general`, '_blank');
+            } else {
+                alert("No hay un número de contacto general configurado.");
+            }
+        }
+
+        /* --- AQUÍ ESTÁ LA MAGIA DEL BOTÓN DE GUARDADO --- */
+        window.saveCentralConfig = function() {
+            const val = document.getElementById('settingsPhoneInput').value.trim();
+            const btn = document.getElementById('btnSaveCentral');
+            const originalText = btn.textContent;
+            
+            // Efecto visual instantáneo en el botón
+            btn.textContent = "Guardando...";
+            
+            set(ref(db, 'settings/centralPhone'), val)
+                .then(() => {
+                    // Éxito
+                    window.showToast('✅ Teléfono de Oficina Central actualizado.');
+                    btn.style.backgroundColor = '#2ecc71'; // Verde
+                    btn.textContent = '✅ ¡Guardado!';
+                    setTimeout(() => {
+                        btn.style.backgroundColor = '#0a66c2'; // Azul original
+                        btn.textContent = originalText;
+                    }, 2000);
+                })
+                .catch((error) => {
+                    // Error
+                    window.showToast('❌ Error al guardar: ' + error.message);
+                    btn.style.backgroundColor = '#e74c3c'; // Rojo
+                    btn.textContent = 'Error';
+                    setTimeout(() => {
+                        btn.style.backgroundColor = '#0a66c2'; 
+                        btn.textContent = originalText;
+                    }, 2000);
+                });
+        }
+
+        window.openTeamModal = function() { document.getElementById('teamModal').classList.add('active'); resetRecruiterForm(); }
+        window.closeTeamModal = function() { document.getElementById('teamModal').classList.remove('active'); }
+
+        window.saveRecruiter = function() {
+            const name = document.getElementById('recName').value.trim();
+            const phone = document.getElementById('recPhone').value.replace(/\D/g, '');
+            const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
+
+            if(!name || !phone || !code) return alert('Por favor, llena todos los campos.');
+
+            const duplicateCheck = Object.entries(recruiters).find(([key, r]) => {
+                return r.code === code && key !== editingRecruiterId;
+            });
+
+            if (duplicateCheck) {
+                return alert(`⚠️ ERROR: El código '${code}' ya está siendo usado por ${duplicateCheck[1].name}. Usa otro.`);
+            }
+
+            const idToSave = editingRecruiterId || 'rec-' + Date.now();
+            
+            set(ref(db, 'recruiters/' + idToSave), { name, phone, code }).then(() => {
+                window.showToast(editingRecruiterId ? '✅ Reclutador actualizado' : '✅ Reclutador agregado');
+                resetRecruiterForm();
+            });
+        }
+
+        window.editRecruiter = function(id) {
+            const r = recruiters[id];
+            if(!r) return;
+            
+            document.getElementById('recName').value = r.name;
+            document.getElementById('recPhone').value = r.phone;
+            document.getElementById('recCode').value = r.code;
+            
+            editingRecruiterId = id;
+            
+            const btn = document.getElementById('btnSaveRecruiter');
+            btn.textContent = "Guardar Cambios";
+            btn.style.backgroundColor = "#f57c00"; 
+            
+            document.getElementById('btnCancelRecruiter').style.display = 'block';
+        }
+
+        window.resetRecruiterForm = function() {
+            document.getElementById('recName').value = '';
+            document.getElementById('recPhone').value = '';
+            document.getElementById('recCode').value = '';
+            editingRecruiterId = null;
+            
+            const btn = document.getElementById('btnSaveRecruiter');
+            btn.textContent = "Agregar";
+            btn.style.backgroundColor = "#0a66c2"; 
+            
+            document.getElementById('btnCancelRecruiter').style.display = 'none';
+        }
+
+        window.deleteRecruiter = function(id) { 
+            if(confirm('¿Seguro que quieres eliminar a este reclutador?')) {
+                remove(ref(db, 'recruiters/' + id));
+                if(editingRecruiterId === id) resetRecruiterForm();
+            }
+        }
+        
+        window.copyLink = function(code) { const link = `https://tuchamba-express.netlify.app/?ref=${code}`; navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); }
+        
+        function renderRecruitersTable() {
+            const list = document.getElementById('recruitersList');
+            if(Object.keys(recruiters).length === 0) { list.innerHTML = '<tr><td colspan="4" style="text-align:center;">No hay reclutadores</td></tr>'; return; }
+            list.innerHTML = Object.keys(recruiters).map(key => { 
+                const r = recruiters[key]; 
+                return `
+                <tr>
+                    <td>${r.name}</td>
+                    <td><b>${r.code}</b></td>
+                    <td><button class="copy-btn" onclick="copyLink('${r.code}')">Copiar</button></td>
+                    <td>
+                        <button onclick="editRecruiter('${key}')" style="cursor:pointer; border:none; background:none;">✏️</button>
+                        <button onclick="deleteRecruiter('${key}')" style="cursor:pointer; border:none; background:none;">🗑️</button>
+                    </td>
+                </tr>`; 
+            }).join('');
+        }
+
+        window.registerClick = function(jobId, recruiterName) {
+            runTransaction(ref(db, `jobStats/${jobId}/whatsappClicks`), (c) => (c || 0) + 1);
+            push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
+        }
+
+        const visitsRef = ref(db, 'siteStats/visits');
+        const monthlyRef = ref(db, `siteStats/monthly/${currentMonthKey}`);
+        if (!sessionStorage.getItem('visited')) { runTransaction(visitsRef, (c) => (c || 0) + 1); runTransaction(monthlyRef, (c) => (c || 0) + 1); sessionStorage.setItem('visited', 'true'); }
+        onValue(visitsRef, (s) => { if(document.getElementById('totalVisits')) document.getElementById('totalVisits').innerText = s.val() || 0; });
+        onValue(monthlyRef, (s) => { if(document.getElementById('monthlyVisits')) document.getElementById('monthlyVisits').innerText = s.val() || 0; });
+
+        window.saveJob = function(e) {
+            e.preventDefault();
+            const jobData = {
+                title: document.getElementById('jobTitle').value,
+                company: document.getElementById('jobCompany').value,
+                showCompany: document.getElementById('jobShowCompany').value === 'true', 
+                state: document.getElementById('jobState').value,
+                city: document.getElementById('jobCity').value,
+                zone: document.getElementById('jobZone').value,
+                location: `${document.getElementById('jobCity').value}, ${document.getElementById('jobState').value}`,
+                salary: document.getElementById('jobSalary').value,
+                description: document.getElementById('jobDescription').value,
+                schedule: document.getElementById('jobSchedule').value, 
+                tags: document.getElementById('jobTags').value,
+                contact: document.getElementById('jobContact').value,
+                status: document.getElementById('jobStatus').value,
+                agency: document.getElementById('jobAgency').value,
+                requirements: tempReqs,
+                benefits: tempBens
+            };
+            const id = currentEditId || 'job-' + Date.now();
+            set(ref(db, 'jobs/' + id), jobData).then(() => {
+                window.showToast("✅ Vacante guardada");
+                window.closeFormModal();
+            });
+        }
+
+        window.deleteJob = function(id) { if(confirm('¿Borrar vacante?')) remove(ref(db, 'jobs/' + id)); }
+
+        function normalizeText(text) {
+            return text ? text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
+        }
+
+        function renderJobs() {
+            let keys = Object.keys(jobs);
+            keys.sort((a, b) => {
+                const jobA = jobs[a]; const jobB = jobs[b];
+                const statusA = jobA.status === 'No Vigente' ? 1 : 0;
+                const statusB = jobB.status === 'No Vigente' ? 1 : 0;
+                if (statusA !== statusB) return statusA - statusB;
+                const locA = (jobA.city || '').toLowerCase(); const locB = (jobB.city || '').toLowerCase();
+                if (locA < locB) return -1; if (locA > locB) return 1;
+                return b.localeCompare(a); 
+            });
+
+            currentFilteredJobs = keys; 
+            applyFilterAndRender();
+        }
+
+        function applyFilterAndRender() {
+            const t = normalizeText(document.getElementById('filterTitle').value);
+            const l = normalizeText(document.getElementById('filterLocation').value);
+            const s = normalizeText(document.getElementById('filterSalary').value);
+
+            const matchedKeys = currentFilteredJobs.filter(id => {
+                const j = jobs[id];
+                
+                // NUEVA LÓGICA: Ocultar si no es Admin y la vacante no es vigente
+                if (!isAdmin && j.status === 'No Vigente') return false;
+
+                const titleStr = normalizeText(j.title + ' ' + j.company);
+                const locStr = normalizeText(j.state + ' ' + j.city + ' ' + j.zone + ' ' + (j.location||''));
+                const salStr = normalizeText(j.salary);
+                return titleStr.includes(t) && locStr.includes(l) && salStr.includes(s);
+            });
+
+            document.getElementById('jobCounter').textContent = `${matchedKeys.length} vacantes encontradas`;
+            
+            if (matchedKeys.length === 0) {
+                document.getElementById('jobGrid').innerHTML = '';
+                document.getElementById('loadMoreContainer').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+            document.getElementById('emptyState').style.display = 'none';
+
+            const visibleKeys = matchedKeys.slice(0, displayLimit);
+            const showLoadMore = matchedKeys.length > displayLimit;
+
+            const grid = document.getElementById('jobGrid');
+            grid.innerHTML = visibleKeys.map(id => {
+                const j = jobs[id];
+                const tags = j.tags ? j.tags.split(',').map(t => t.trim()).filter(t => t) : [];
+                const isVigente = j.status !== 'No Vigente';
+                const statusClass = isVigente ? 'status-vigente' : 'status-no-vigente';
+                const showAdminButtons = isAdmin && !refCode;
+
+                const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
+                const finalCompanyName = (isAdmin && !refCode) || showNamePublicly ? j.company : "Empresa Confidencial";
+                let displayLocation = j.location;
+                if (j.city && j.state) displayLocation = `${j.city}, ${j.state}`;
+
+                return `
+                    <div class="job-card" onclick="window.openViewModal('${id}')">
+                        ${showAdminButtons ? `<button class="more-btn" onclick="event.stopPropagation(); window.toggleMenu('${id}')">⋮</button>
+                        <div class="admin-actions" id="menu-${id}">
+                            <button class="admin-action" onclick="event.stopPropagation(); window.editJob('${id}')">✏️ Editar</button>
+                            <button class="admin-action delete" onclick="event.stopPropagation(); window.deleteJob('${id}')">🗑️ Eliminar</button>
+                        </div>` : ''}
+                        
+                        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                            <div class="company-logo">${j.company.charAt(0)}</div>
+                            <div>
+                                <div class="job-title">${j.title}</div>
+                                <div class="company-name">${finalCompanyName}</div>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                             <span class="status-dot ${statusClass}"></span>
+                             <span style="font-size:12px; color:#999">${isVigente ? 'Activa' : 'Inactiva'}</span>
+                        </div>
+                        
+                        <div class="location">📍 ${displayLocation}</div>
+                        <div class="location">💰 ${j.salary || 'A convenir'}</div>
+                        
+                        ${tags.length > 0 ? `<div class="tags">${tags.slice(0,3).map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('loadMoreContainer').style.display = showLoadMore ? 'block' : 'none';
+        }
+
+        window.filterJobs = function() {
+            displayLimit = 20; 
+            applyFilterAndRender();
+        }
+
+        window.loadMoreJobs = function() {
+            displayLimit += 20;
+            applyFilterAndRender();
+        }
+
+        window.toggleMenu = function(id) { 
+            document.querySelectorAll('.admin-actions').forEach(m => m.classList.remove('active')); 
+            document.getElementById(`menu-${id}`).classList.toggle('active'); 
+        }
+
+        window.openViewModal = function(id) {
+            const j = jobs[id];
+            const isRefMode = !!refCode;
+
+            if (!isAdmin || isRefMode) {
+                runTransaction(ref(db, `jobStats/${id}/totalViews`), (c) => (c || 0) + 1);
+                runTransaction(ref(db, `jobStats/${id}/monthlyViews/${currentMonthKey}`), (c) => (c || 0) + 1);
+            }
+            
+            const stats = jobStats[id] || {};
+            const totalViews = stats.totalViews || 0;
+            const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
+            const companyDisplay = (isAdmin && !isRefMode) || showNamePublicly ? j.company : "Empresa Confidencial";
+            
+            let contactHtml = '';
+            let targetPhone = '';
+            let isReferral = false;
+
+            if (activeRecruiter) { 
+                targetPhone = activeRecruiter.phone; 
+                isReferral = true; 
+            } else if (j.contact) { 
+                targetPhone = j.contact.replace(/\D/g, ''); 
+            } else if (centralPhone) {
+                targetPhone = centralPhone.replace(/\D/g, '');
+            }
+
+            if (targetPhone) {
+                let msg = `Hola, vi la vacante ${j.title} (Cód: ${id})`;
+                if(isReferral) msg += ` (Referido por ${activeRecruiter.name})`;
+                const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
+                const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
+                contactHtml = `<a href="${waLink}" target="_blank" class="whatsapp-btn" onclick="window.registerClick('${id}', '${recNameSafe}')">
+                                    <span class="whatsapp-icon">📲</span> Postularme por WhatsApp
+                               </a>`;
+            }
+
+            let adminInfoHtml = '';
+            if (isAdmin && !isRefMode) {
+                adminInfoHtml = `<div style="display:flex; flex-wrap:wrap; gap:10px;">
+                        <div class="view-count-badge">👁️ ${totalViews} Vistas</div>
+                        <div class="agency-badge">${j.agency || 'Sin asignar'}</div>
+                    </div>`;
+            }
+
+            let locationDetail = j.location;
+            if (j.state && j.city) locationDetail = `${j.city}, ${j.state} ${j.zone ? '('+j.zone+')' : ''}`;
+
+            document.getElementById('viewModalBody').innerHTML = `
+                ${adminInfoHtml}
+                <h2 style="font-size: 26px; margin-bottom: 5px; color:#333;">${j.title}</h2>
+                <div style="font-size: 18px; color: #0a66c2; margin-bottom: 20px;">${companyDisplay}</div>
+
+                <div class="job-details">
+                    <div class="detail-item">📍 ${locationDetail}</div>
+                    <div class="detail-item">💰 ${j.salary || 'A convenir'}</div>
+                    <div class="detail-item">🕒 ${j.schedule || 'Horario a definir'}</div>
+                </div>
+
+                <div class="section-title">Descripción</div>
+                <p style="color: #444; line-height: 1.6;">${j.description}</p>
+                ${(j.requirements||[]).length ? `<div class="section-title">Requisitos</div><ul class="item-list">${j.requirements.map(r=>`<li>${r}</li>`).join('')}</ul>` : ''}
+                ${(j.benefits||[]).length ? `<div class="section-title">Beneficios</div><ul class="item-list">${j.benefits.map(b=>`<li>${b}</li>`).join('')}</ul>` : ''}
+                
+                ${contactHtml ? `
+                    <div class="section-title">Contacto</div>
+                    <p style="font-size:12px; color:#888; font-style:italic; margin-bottom:5px;">⚠️ Nota: Algunas empresas pueden solicitar examen médico y/o antidoping.</p>
+                    ${contactHtml}
+                ` : ''}
+            `;
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        window.closeViewModal = function() { document.getElementById('viewModal').classList.remove('active'); }
+        window.closeFormModal = function() { document.getElementById('formModal').classList.remove('active'); }
+        window.closeTeamModal = function() { document.getElementById('teamModal').classList.remove('active'); }
+        
+        window.openJobForm = function() {
+            currentEditId = null; document.getElementById('formTitle').textContent = 'Nueva Vacante'; document.getElementById('jobForm').reset();
+            tempReqs = []; tempBens = []; updateList('reqList', tempReqs, 'req'); updateList('benList', tempBens, 'ben');
+            document.getElementById('jobShowCompany').value = 'true';
+            document.getElementById('formModal').classList.add('active');
+        }
+
+        window.editJob = function(id) {
+            currentEditId = id; const j = jobs[id];
+            document.getElementById('formTitle').textContent = 'Editar Vacante';
+            document.getElementById('jobTitle').value = j.title; document.getElementById('jobCompany').value = j.company;
+            document.getElementById('jobShowCompany').value = (j.showCompany === false || j.showCompany === 'false') ? 'false' : 'true';
+            document.getElementById('jobState').value = j.state || '';
+            document.getElementById('jobCity').value = j.city || '';
+            document.getElementById('jobZone').value = j.zone || '';
+            if(!j.city && j.location) document.getElementById('jobCity').value = j.location;
+            document.getElementById('jobSalary').value = j.salary||'';
+            document.getElementById('jobDescription').value = j.description; document.getElementById('jobStatus').value = j.status||'Vigente';
+            document.getElementById('jobAgency').value = j.agency||'';
+            document.getElementById('jobContact').value = j.contact||'';
+            document.getElementById('jobSchedule').value = j.schedule||''; 
+            tempReqs = j.requirements||[]; tempBens = j.benefits||[];
+            updateList('reqList', tempReqs, 'req'); updateList('benList', tempBens, 'ben');
+            document.getElementById('formModal').classList.add('active');
+        }
+
+        window.addItem = function(type) {
+            const val = document.getElementById(type+'Input').value.trim();
+            if(val) { (type==='req'?tempReqs:tempBens).push(val); updateList(type+'List', (type==='req'?tempReqs:tempBens), type); document.getElementById(type+'Input').value=''; }
+        }
+        window.removeItem = function(type, i) { (type==='req'?tempReqs:tempBens).splice(i,1); updateList(type+'List', (type==='req'?tempReqs:tempBens), type); }
+        function updateList(id, arr, type) { document.getElementById(id).innerHTML = arr.map((item,i)=>`<li>${item}<button onclick="removeItem('${type}',${i})" style="color:red;border:none;background:none;cursor:pointer">×</button></li>`).join(''); }
+
+        window.exportToExcel = function() {
+            if(!Object.keys(jobs).length) return alert('Sin datos');
+            const data = Object.keys(jobs).map(id => {
+                const j = jobs[id];
+                return { 
+                    'ID': id, 'Título': j.title, 'Empresa': j.company, 
+                    'Mostrar Empresa Publicamente': (j.showCompany === true || j.showCompany === 'true') ? 'SI' : 'NO',
+                    'Estado': j.state, 'Municipio': j.city, 'Zona': j.zone, 
+                    'Salario': j.salary, 'Descripción': j.description, 
+                    'Jornada': j.schedule, 
+                    'Etiquetas': j.tags,
+                    'Requisitos': (j.requirements||[]).join(' | '), 
+                    'Beneficios': (j.benefits||[]).join(' | '),
+                    'Contacto': j.contact, 'Estatus': j.status, 'Tipo de Servicio o Agencia': j.agency
+                };
+            });
+            const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Vacantes"); XLSX.writeFile(wb, "Respaldo_Completo.xlsx");
+        }
+
+        window.exportMetrics = function() {
+             if(!Object.keys(jobs).length) return alert('Sin datos para métricas');
+            const generalData = Object.keys(jobs).map(id => {
+                const j = jobs[id]; const stats = jobStats[id] || {};
+                return {
+                    'ID Vacante': id, 'Puesto': j.title, 'Empresa': j.company, 'Vistas Totales': stats.totalViews || 0, 'Clics WhatsApp': stats.whatsappClicks || 0
+                };
+            });
+            const breakdown = {};
+            Object.values(clickLogs).forEach(log => {
+                const key = (log.recruiter||'Desc') + '|' + log.jobId;
+                if(!breakdown[key]) breakdown[key] = { rec: log.recruiter, jId: log.jobId, clicks: 0 };
+                breakdown[key].clicks++;
+            });
+            const recruiterData = Object.values(breakdown).map(i => ({ 'Reclutador': i.rec, 'ID': i.jId, 'Clics': i.clicks }));
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(generalData), "General_KPIs"); 
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(recruiterData), "Desempeño_Reclutadores");
+            XLSX.writeFile(wb, `Reporte_Metricas_${currentMonthKey}.xlsx`);
+        }
+
+        window.downloadTemplate = function() {
+            const data = [{
+                'ID': 'ej-1', 'Título': 'Ejemplo', 'Empresa': 'Empresa', 'Mostrar Empresa Publicamente': 'SI',
+                'Estado': 'CDMX', 'Municipio': 'Coyoacán', 'Zona': 'Centro',
+                'Salario': '10000', 'Descripción': 'Desc...', 
+                'Jornada': 'Lunes a Viernes', 'Etiquetas': '#Ventas', 
+                'Requisitos': 'Req 1 | Req 2', 'Beneficios': 'Ben 1 | Ben 2', 'Contacto': '55...', 'Estatus': 'Vigente',
+                'Tipo de Servicio o Agencia': 'Agencia Interna'
+            }];
+            const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); XLSX.writeFile(wb, 'plantilla.xlsx');
+        }
+
+        window.shareApp = async function() {
+             const data = { title: 'TuChamba', text: 'Busca chamba aquí:', url: 'https://tuchamba-express.netlify.app/' };
+             if(navigator.share) await navigator.share(data); else window.open(`https://wa.me/?text=${encodeURIComponent(data.text+' '+data.url)}`);
+        }
+        
+        window.importFromExcel = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const wb = XLSX.read(data, {type:'array'});
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(ws);
+                    if(!json.length) { alert('Archivo vacío'); return; }
+                    let count = 0;
+                    json.forEach((row, i) => {
+                         if(!row['Título'] || !row['Empresa']) return;
+                         const id = row['ID'] || 'job-'+Date.now()+'-'+i;
+                         const state = row['Estado'] || ''; const city = row['Municipio'] || ''; const zone = row['Zona'] || '';
+                         const legacyLoc = row['Ubicación'] || ''; 
+
+                         const jobData = {
+                             title: row['Título'], company: row['Empresa'], 
+                             showCompany: (row['Mostrar Empresa Publicamente'] || 'SI').toUpperCase() === 'SI',
+                             state: state, city: city, zone: zone,
+                             location: (city && state) ? `${city}, ${state}` : legacyLoc, 
+                             salary: row['Salario']||'', description: row['Descripción']||'',
+                             schedule: row['Jornada']||'Horario a definir',
+                             tags: row['Etiquetas']||'',
+                             requirements: row['Requisitos']?row['Requisitos'].split(' | '):[],
+                             benefits: row['Beneficios'] ? row['Beneficios'].split(/\s*\|\s*/) : [],
+                             contact: row['Contacto']||'', status: row['Estatus']||'Vigente',
+                             agency: row['Tipo de Servicio o Agencia'] || '' 
+                         };
+                         set(ref(db, 'jobs/' + id), jobData);
+                         count++;
+                    });
+                    window.showToast(`✅ ${count} vacantes cargadas`);
+                } catch(err) { alert('Error: ' + err.message); }
+                e.target.value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+    </script>
+</body>
+</html>
