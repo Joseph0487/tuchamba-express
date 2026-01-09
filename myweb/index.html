@@ -20,7 +20,6 @@
         
       body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            /* CAMBIO: Fondo Industrial Oscuro */
             background-image: 
                 linear-gradient(to bottom, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)),
                 url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
@@ -31,7 +30,6 @@
             min-height: 100vh;
         }
 
-        /* --- TOAST NOTIFICATION --- */
         #toast {
             visibility: hidden; min-width: 250px; margin-left: -125px; background-color: #333; color: #fff;
             text-align: center; border-radius: 50px; padding: 16px; position: fixed; z-index: 2147483647 !important;
@@ -40,18 +38,15 @@
         }
         #toast.show { visibility: visible !important; opacity: 1 !important; bottom: 50px !important; }
 
-        /* --- FOOTER --- */
         .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #ccc; font-size: 12px; }
         .footer-link { color: #fff; text-decoration: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
         .legal-note { color: #999; margin-top: 8px; font-style: italic; }
 
-        /* --- SKELETON LOADING --- */
         @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
         .skeleton { background: #f6f7f8; background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%); background-repeat: no-repeat; background-size: 1000px 100%; display: inline-block; position: relative; animation: shimmer 2s infinite linear forwards; border-radius: 4px; }
         .skeleton-card { background: white; border-radius: 16px; padding: 25px; height: 200px; display: flex; flex-direction: column; gap: 15px; }
         .sk-title { width: 70%; height: 24px; } .sk-text { width: 90%; height: 16px; } .sk-tag { width: 30%; height: 20px; border-radius: 20px; }
 
-        /* --- BIENVENIDA --- */
         .welcome-container { max-width: 480px; margin: 60px auto; background: white; padding: 50px 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; }
         .welcome-title { font-size: 28px; color: #1a1a1a; margin-bottom: 10px; font-weight: 800; }
         .welcome-subtitle { color: #666; margin-bottom: 40px; font-size: 16px; }
@@ -61,8 +56,7 @@
         .admin-login-form { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: left; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- LAYOUT --- */
-        .container { max-width: 800px; margin: 0 auto; } /* Ajustado para móvil */
+        .container { max-width: 1000px; margin: 0 auto; } /* Ancho para 3 columnas en PC */
 
         .header { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .header h1 { font-size: 24px; color: #333; font-weight: 800; }
@@ -70,7 +64,6 @@
         #recruiterBanner { background: #e3f2fd !important; color: #0d47a1 !important; padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: flex !important; align-items: center; gap: 10px; border: 1px solid #bbdefb; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         #recruiterBanner:hover { background: #bbdefb !important; }
 
-        /* --- FILTROS NUEVOS (Dropdowns) --- */
         .filter-container { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .filter-select { flex: 1; min-width: 140px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; outline: none; }
 
@@ -87,7 +80,6 @@
         .load-more-container { text-align: center; margin-top: 30px; margin-bottom: 40px; }
         .btn-load-more { background: white; color: #0a66c2; border: 2px solid #0a66c2; padding: 12px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 16px; }
 
-        /* STICKY FOOTER PARA WHATSAPP EN MODAL */
         .sticky-footer { position: sticky; bottom: 0; background: white; padding: 15px 20px 20px; margin: 20px -30px -30px; border-top: 1px solid #eee; text-align: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100; }
         .whatsapp-btn-large { display: block; width: 100%; background-color: #25D366; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); transition: transform 0.1s; }
         .whatsapp-btn-large:active { transform: scale(0.98); }
@@ -98,14 +90,26 @@
         .metric-val { color: #0a66c2; font-weight: 800; margin-left: 4px; margin-right: 12px; }
         .admin-mode-indicator { background: #ffe0b2; color: #e65100; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ffcc80; }
 
-        /* CARDS */
-        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        /* --- CARDS (GRID RESTAURADO: 3 COLUMNAS EN PC) --- */
+        .job-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* PC: 3 columnas, Movil: 1 */
+            gap: 20px; 
+        }
+        
         .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .job-card:hover { transform: translateY(-4px); }
         .job-card.hidden { display: none; }
 
-        /* ESTILOS NUEVOS: VIGENTE Y FECHA */
-        .card-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        /* --- FECHA Y 3 PUNTOS (MARGEN DE SEGURIDAD EN CARD) --- */
+        .card-top-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 10px;
+            margin-right: 35px; /* Evita choque con los 3 puntos en la tarjeta */
+        }
+        
         .badge-vigente { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
         .badge-closed { background: #ffebee; color: #c62828; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
         .job-date { font-size: 0.75rem; color: #888; background: #f5f5f5; padding: 2px 8px; border-radius: 4px; }
@@ -114,7 +118,6 @@
         .company-name { font-size: 0.9rem; color: #0a66c2; font-weight: 600; }
         .location { font-size: 0.9rem; color: #555; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
         
-        /* CAMBIO: SUELDO ROJO */
         .salary-text { color: #d32f2f; font-weight: 800; font-size: 1.1rem; margin-top: 5px; }
 
         .company-logo { width: 48px; height: 48px; background: linear-gradient(135deg, #0a66c2 0%, #004182 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; }
@@ -122,13 +125,12 @@
         .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
         .tag { background: #f3f2ef; color: #444; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
 
-        .more-btn { position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 24px; color: #ccc; cursor: pointer; width: 30px; height: 30px; }
+        .more-btn { position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 24px; color: #ccc; cursor: pointer; width: 30px; height: 30px; z-index: 5; }
         .admin-actions { display: none; position: absolute; top: 45px; right: 15px; background: white; border: 1px solid #eee; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 20; }
         .admin-actions.active { display: block; }
         .admin-action { padding: 10px 20px; width: 100%; text-align: left; border: none; background: none; cursor: pointer; }
         .admin-action:hover { background: #f9f9f9; }
 
-        /* MODALES */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
         .modal.active { display: flex; align-items: center; justify-content: center; }
         .modal-content { background: white; border-radius: 16px; max-width: 600px; width: 100%; padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; padding-bottom: 0; }
@@ -140,6 +142,10 @@
         .location-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         @media (max-width: 500px) { .location-grid { grid-template-columns: 1fr; } }
         
+        /* --- ESTILOS ADMIN (VISTAS/AGENCIA) --- */
+        .view-count-badge { background: #e3f2fd; color: #0277bd; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid #bbdefb; margin-right: 5px; }
+        .agency-badge { background: #fff3e0; color: #ef6c00; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid #ffe0b2; }
+
         .section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px; margin-top: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px; display: inline-block; }
         .item-list li { background: #f9f9f9; padding: 8px 12px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; }
         .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -207,10 +213,10 @@
 
             <div class="filter-container" id="filterContainer">
                 <select id="stateFilter" class="filter-select" onchange="filterJobs()">
-                    <option value="">📍 Todo el Estado</option>
+                    <option value="">📍 Estado</option>
                 </select>
                 <select id="cityFilter" class="filter-select" onchange="filterJobs()">
-                    <option value="">🏙️ Todo el Municipio</option>
+                    <option value="">🏙️ Municipio</option>
                 </select>
             </div>
 
@@ -472,12 +478,12 @@
             const currState = stateSelect.value;
             const currCity = citySelect.value;
 
-            stateSelect.innerHTML = '<option value="">📍 Todo el Estado</option>';
+            stateSelect.innerHTML = '<option value="">📍 Estado</option>';
             uniqueStates.forEach(s => {
                 stateSelect.innerHTML += `<option value="${s}">${s}</option>`;
             });
 
-            citySelect.innerHTML = '<option value="">🏙️ Todo el Municipio</option>';
+            citySelect.innerHTML = '<option value="">🏙️ Municipio</option>';
             uniqueCities.forEach(c => {
                  citySelect.innerHTML += `<option value="${c}">${c}</option>`;
             });
@@ -793,7 +799,7 @@
             document.getElementById('viewModalBody').innerHTML = `
                 ${adminInfoHtml}
                 
-                <div class="card-top-row" style="margin-top:10px;">
+                <div class="card-top-row" style="margin-top:10px; margin-right:40px;">
                     ${badgeHtml}
                     ${dateHtml}
                 </div>
@@ -803,7 +809,7 @@
 
                 <div class="job-details">
                     <div class="detail-item">📍 ${locationDetail}</div>
-                    <div class="detail-item salary-text">💰 ${j.salary || 'A convenir'}</div>
+                    <div class="detail-item salary-text" style="margin-bottom:12px;">💰 ${j.salary || 'A convenir'}</div>
                     <div class="detail-item">🕒 ${j.schedule || 'Horario a definir'}</div>
                 </div>
 
