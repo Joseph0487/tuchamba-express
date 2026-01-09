@@ -21,10 +21,10 @@
       body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             
-            /* CAMBIO 1: IMAGEN DE OBREROS + FILTRO AZUL TRANSPARENTE (NO NEGRO) */
+            /* FONDO DE FÁBRICA CON FILTRO AZUL (Igual que antes) */
             background-image: 
-                linear-gradient(to bottom, rgba(10, 30, 60, 0.7), rgba(10, 30, 60, 0.8)), /* Azul marino translúcido */
-                url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'); /* Obreros en fábrica */
+                linear-gradient(to bottom, rgba(10, 30, 60, 0.75), rgba(10, 30, 60, 0.85)),
+                url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
             
             background-size: cover;       
             background-position: center;  
@@ -50,33 +50,50 @@
         .skeleton-card { background: white; border-radius: 16px; padding: 25px; height: 200px; display: flex; flex-direction: column; gap: 15px; }
         .sk-title { width: 70%; height: 24px; } .sk-text { width: 90%; height: 16px; } .sk-tag { width: 30%; height: 20px; border-radius: 20px; }
 
-        /* CAMBIO 2: EFECTO DE VIDRIO (GLASSMORPHISM) PARA EL INICIO */
+        /* --- CUADRO DE BIENVENIDA (ESTILO INDUSTRIAL GLASS) --- */
         .welcome-container { 
             max-width: 480px; 
             margin: 60px auto; 
             
-            /* Magia del vidrio: */
-            background: rgba(255, 255, 255, 0.85); /* Blanco semi-transparente */
-            backdrop-filter: blur(12px);            /* Desenfoque de lo que hay atrás */
-            -webkit-backdrop-filter: blur(12px);    /* Para Safari */
-            border: 1px solid rgba(255, 255, 255, 0.6); /* Borde sutil */
+            /* Transparencia para ver el fondo */
+            background: rgba(255, 255, 255, 0.15); 
+            backdrop-filter: blur(8px);            
+            -webkit-backdrop-filter: blur(8px);    
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            
+            /* Franja de Seguridad Amarilla */
+            border-top: 5px solid #ffc107; 
             
             padding: 50px 30px; 
             border-radius: 20px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
             text-align: center; 
         }
         
-        .welcome-title { font-size: 28px; color: #1a1a1a; margin-bottom: 10px; font-weight: 800; }
-        .welcome-subtitle { color: #444; margin-bottom: 40px; font-size: 16px; font-weight: 500; }
+        /* Texto blanco con sombra para leerse sobre la foto */
+        .welcome-title { 
+            font-size: 28px; 
+            color: #ffffff; 
+            margin-bottom: 10px; 
+            font-weight: 800; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+        }
+        .welcome-subtitle { 
+            color: #f0f0f0; 
+            margin-bottom: 40px; 
+            font-size: 16px; 
+            font-weight: 500; 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
         
-        .btn-big-guest { background: #0a66c2; color: white; border: none; padding: 16px; width: 100%; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.2s, background 0.2s; box-shadow: 0 4px 12px rgba(10, 102, 194, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-big-guest { background: #0a66c2; color: white; border: none; padding: 16px; width: 100%; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.2s, background 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-big-guest:hover { background: #004182; transform: translateY(-2px); }
-        .admin-toggle-link { display: block; margin-top: 30px; color: #666; font-size: 13px; text-decoration: underline; cursor: pointer; }
-        .admin-login-form { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.1); text-align: left; animation: fadeIn 0.5s; }
+        
+        .admin-toggle-link { display: block; margin-top: 30px; color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: underline; cursor: pointer; }
+        .admin-login-form { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); text-align: left; animation: fadeIn 0.5s; color: white; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .container { max-width: 1000px; margin: 0 auto; } /* PC 3 columnas */
+        .container { max-width: 1000px; margin: 0 auto; } /* PC: 3 columnas */
 
         .header { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .header h1 { font-size: 24px; color: #333; font-weight: 800; }
@@ -86,7 +103,6 @@
 
         .filter-container { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,0.05); align-items: center; }
         
-        /* Icono de filtro al lado */
         .filter-icon-box {
             display: flex; align-items: center; justify-content: center;
             background: #f0f2f5; padding: 10px; border-radius: 8px;
@@ -95,7 +111,7 @@
 
         .filter-select { flex: 1; min-width: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; outline: none; height: 45px; }
 
-        #mobileFilterToggle { display: none; } /* Oculto en móvil, se muestran directos */
+        #mobileFilterToggle { display: none; } 
 
         .btn-primary, .admin-btn { background: #0a66c2; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
         .add-job-btn { background: #10a37f; padding: 12px 24px; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
@@ -118,7 +134,7 @@
         .metric-val { color: #0a66c2; font-weight: 800; margin-left: 4px; margin-right: 12px; }
         .admin-mode-indicator { background: #ffe0b2; color: #e65100; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ffcc80; }
 
-        /* CARDS - PC: 3 columnas, Movil: 1 */
+        /* GRID: PC 3 columnas, Movil 1 */
         .job-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
@@ -130,11 +146,8 @@
         .job-card.hidden { display: none; }
 
         .card-top-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 10px;
-            margin-right: 35px; /* Margen seguridad */
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 10px; margin-right: 35px; 
         }
         
         .badge-vigente { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
@@ -163,12 +176,7 @@
         .modal-content { background: white; border-radius: 16px; max-width: 600px; width: 100%; padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; padding-bottom: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
         
-        /* ESPACIADO SIMÉTRICO EN MODAL */
-        .job-details { 
-            display: grid; 
-            gap: 15px; 
-            margin-bottom: 20px; 
-        }
+        .job-details { display: grid; gap: 15px; margin-bottom: 20px; }
         .detail-item { font-size: 15px; }
 
         .form-group { margin-bottom: 20px; }
@@ -185,11 +193,13 @@
         .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .recruiters-table th, .recruiters-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
 
+        /* CAMBIO: Texto del contador en blanco */
+        .job-counter { color: white; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 10px; display: block; }
+
         @media (max-width: 768px) {
             body { padding: 10px; }
             .header { flex-direction: column; align-items: flex-start; }
             .admin-controls-wrapper button { flex: 1; min-width: 45%; }
-            /* Filtros móviles responsivos */
             .filter-container { flex-wrap: nowrap; overflow-x: auto; padding: 10px; }
             .filter-select { flex: 1; min-width: auto; }
         }
@@ -198,14 +208,14 @@
 <body>
 
     <div id="loginScreen" class="welcome-container">
-        <div style="font-size: 50px; margin-bottom: 10px;">💼</div>
+        <div style="font-size: 50px; margin-bottom: 10px;">🚀</div>
         <h1 class="welcome-title">TuChamba Express</h1>
         <p class="welcome-subtitle">Conectamos tu talento al instante. Sin registros complicados.</p>
         <button class="btn-big-guest" onclick="enterAsGuest()">🔍 Ver Vacantes Disponibles</button>
         <div class="admin-toggle-link" onclick="toggleAdminLogin()">¿Eres Reclutador? Ingresa aquí</div>
         <div id="adminForm" class="admin-login-form">
-            <div class="form-group"><label>Correo de Acceso</label><input type="email" id="adminEmail" placeholder="admin@empresa.com" autocomplete="off"></div>
-            <div class="form-group"><label>Contraseña</label><input type="password" id="adminPassword" placeholder="******" autocomplete="off"></div>
+            <div class="form-group"><label style="color:white;">Correo de Acceso</label><input type="email" id="adminEmail" placeholder="admin@empresa.com" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
+            <div class="form-group"><label style="color:white;">Contraseña</label><input type="password" id="adminPassword" placeholder="******" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
             <button class="btn-primary" style="width: 100%;" onclick="login()">Entrar al Panel</button>
         </div>
     </div>
