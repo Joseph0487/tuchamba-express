@@ -624,7 +624,7 @@
         }
 
         window.deleteRecruiter = function(id) { if(confirm('¿Seguro que quieres eliminar a este reclutador?')) { remove(ref(db, 'recruiters/' + id)); if(editingRecruiterId === id) resetRecruiterForm(); } }
-        window.copyLink = function(code) { const link = `https://tuchamba-express.netlify.app/?ref=${code}`; navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); }
+        window.copyLink = function(code) { const link = `https://tuchamba-express.vercel.app/?ref=${code}`; navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); }
         
         function renderRecruitersTable() {
             const list = document.getElementById('recruitersList');
@@ -968,7 +968,7 @@
         }
 
         window.shareApp = async function() {
-             const data = { title: 'TuChamba', text: 'Busca chamba aquí:', url: 'https://tuchamba-express.netlify.app/' };
+             const data = { title: 'TuChamba', text: 'Busca chamba aquí:', url: 'https://tuchamba-express.vercel.app/' };
              if(navigator.share) await navigator.share(data); else window.open(`https://wa.me/?text=${encodeURIComponent(data.text+' '+data.url)}`);
         }
         
@@ -1016,3 +1016,4 @@
     </script>
 </body>
 </html>
+
