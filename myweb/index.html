@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>TuChamba Express | Vacantes Urgentes en CDMX, Monterrey y EdoMex 2026</title>
     
@@ -31,7 +31,7 @@
             background-size: cover;       
             background-position: center;  
             background-attachment: fixed; 
-            padding: 20px;
+            padding: 15px; /* Reducido ligeramente para ganar espacio */
             min-height: 100vh;
         }
 
@@ -60,14 +60,14 @@
             -webkit-backdrop-filter: blur(8px);    
             border: 1px solid rgba(255, 255, 255, 0.2); 
             border-top: 5px solid #ffc107; 
-            padding: 50px 30px; 
+            padding: 40px 25px; 
             border-radius: 20px; 
             box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
             text-align: center; 
         }
         
         .welcome-title { font-size: 28px; color: #ffffff; margin-bottom: 10px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
-        .welcome-subtitle { color: #f0f0f0; margin-bottom: 40px; font-size: 16px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .welcome-subtitle { color: #f0f0f0; margin-bottom: 30px; font-size: 16px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.5); line-height: 1.5; }
         
         .btn-big-guest { background: #0a66c2; color: white; border: none; padding: 16px; width: 100%; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.2s, background 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-big-guest:hover { background: #004182; transform: translateY(-2px); }
@@ -78,20 +78,68 @@
 
         .container { max-width: 1000px; margin: 0 auto; }
 
-        .header { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .header h1 { font-size: 24px; color: #333; font-weight: 800; }
+        /* HEADER MEJORADO Y COMPACTO */
+        .header { 
+            background: white; 
+            padding: 12px 15px; /* Reducido para compactar */
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap; /* Permite wrap en pantallas muy pequeñas */
+            gap: 10px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+        }
+        .header h1 { 
+            font-size: 20px; /* Un poco más pequeño pero legible */
+            color: #333; 
+            font-weight: 800; 
+            margin: 0;
+            line-height: 1.2;
+        }
+        .header-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
 
-        #recruiterBanner { background: #e3f2fd !important; color: #0d47a1 !important; padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: flex !important; align-items: center; gap: 10px; border: 1px solid #bbdefb; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        /* BANNER RECLUTADOR COMPACTO */
+        #recruiterBanner { 
+            background: #e3f2fd !important; 
+            color: #0d47a1 !important; 
+            padding: 8px 12px; /* Más delgado */
+            border-radius: 8px; 
+            margin-bottom: 10px; 
+            font-size: 13px; /* Letra ligeramente más chica pero clara */
+            display: flex !important; 
+            align-items: center; 
+            gap: 10px; 
+            border: 1px solid #bbdefb; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
         #recruiterBanner:hover { background: #bbdefb !important; }
 
-        .filter-container { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,0.05); align-items: center; }
+        /* FILTROS SIMÉTRICOS CON GRID */
+        .filter-container { 
+            background: white; 
+            padding: 10px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            display: flex; 
+            gap: 10px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+            align-items: center; 
+        }
         
-        .filter-icon-box { display: flex; align-items: center; justify-content: center; background: #f0f2f5; padding: 10px; border-radius: 8px; border: 1px solid #ddd; height: 45px; width: 45px; flex-shrink: 0; }
-        .filter-select { flex: 1; min-width: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; outline: none; height: 45px; }
+        .filter-icon-box { display: flex; align-items: center; justify-content: center; background: #f0f2f5; padding: 10px; border-radius: 8px; border: 1px solid #ddd; height: 42px; width: 42px; flex-shrink: 0; }
+        .filter-select { flex: 1; min-width: 0; padding: 0 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; outline: none; height: 42px; }
 
         #mobileFilterToggle { display: none; } 
 
-        .btn-primary, .admin-btn { background: #0a66c2; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+        .btn-primary, .admin-btn { background: #0a66c2; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; font-size: 14px; }
         .add-job-btn { background: #10a37f; padding: 12px 24px; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
         
         .tool-btn { background: #2c3e50; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; }
@@ -106,7 +154,7 @@
         .whatsapp-btn-large { display: block; width: 100%; background-color: #25D366; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); transition: transform 0.1s; }
         .whatsapp-btn-large:active { transform: scale(0.98); }
 
-        .share-btn { background: #25D366; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-right: 10px; }
+        .share-btn { background: #25D366; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
         .admin-controls-wrapper { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .metrics-card { background: white; color: #333; padding: 10px 20px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; font-size: 14px; }
         .metric-val { color: #0a66c2; font-weight: 800; margin-left: 4px; margin-right: 12px; }
@@ -163,12 +211,30 @@
 
         .job-counter { color: white; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 10px; display: block; }
 
+        /* ESTILOS ESPECÍFICOS PARA MÓVIL (Hacen la magia) */
         @media (max-width: 768px) {
             body { padding: 10px; }
-            .header { flex-direction: column; align-items: flex-start; }
+            .header { 
+                flex-direction: row; /* Fuerza fila */
+                justify-content: space-between; 
+                align-items: center;
+                gap: 5px;
+            }
+            .header h1 {
+                font-size: 17px; /* Título compacto */
+                max-width: 50%; /* Evita que empuje los botones */
+                line-height: 1.1;
+            }
+            .filter-container { 
+                display: grid; 
+                grid-template-columns: auto 1fr 1fr; /* SIMETRÍA PERFECTA: Icono - 50% - 50% */
+                gap: 8px;
+                overflow-x: visible; /* Quita el scroll lateral */
+            }
+            .filter-icon-box { height: 40px; width: 40px; }
+            .filter-select { height: 40px; font-size: 13px; padding: 5px; }
+            
             .admin-controls-wrapper button { flex: 1; min-width: 45%; }
-            .filter-container { flex-wrap: nowrap; overflow-x: auto; padding: 10px; }
-            .filter-select { flex: 1; min-width: auto; }
         }
     </style>
 </head>
@@ -177,7 +243,10 @@
     <div id="loginScreen" class="welcome-container">
         <div style="font-size: 50px; margin-bottom: 10px;">🚀</div>
         <h1 class="welcome-title">TuChamba Express</h1>
-        <p class="welcome-subtitle">Tu nueva chamba a un mensaje de distancia. Sin registros complicados.</p>
+        <p class="welcome-subtitle">
+            Tu nueva chamba a un mensaje de distancia.<br>
+            Sin registros complicados.
+        </p>
         <button class="btn-big-guest" onclick="enterAsGuest()">🔍 Ver Vacantes Disponibles</button>
         <div class="admin-toggle-link" onclick="toggleAdminLogin()">¿Eres Reclutador? Ingresa aquí</div>
         <div id="adminForm" class="admin-login-form">
@@ -189,9 +258,10 @@
 
     <div id="mainApp" style="display: none;">
         <div class="container">
+            
             <div class="header">
                 <h1>Portal de Vacantes</h1>
-                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <div class="header-buttons">
                     <button class="share-btn" onclick="shareApp()">📤 Compartir</button>
                     <span id="modeIndicator"></span>
                     <button class="admin-btn" style="background: #333;" onclick="logout()">Salir</button>
@@ -978,27 +1048,6 @@
             XLSX.utils.book_append_sheet(wb, ws, "Vacantes"); XLSX.writeFile(wb, "Respaldo_Completo.xlsx");
         }
 
-        window.exportMetrics = function() {
-             if(!Object.keys(jobs).length) return alert('Sin datos para métricas');
-            const generalData = Object.keys(jobs).map(id => {
-                const j = jobs[id]; const stats = jobStats[id] || {};
-                return {
-                    'ID Vacante': id, 'Puesto': j.title, 'Empresa': j.company, 'Vistas Totales': stats.totalViews || 0, 'Clics WhatsApp': stats.whatsappClicks || 0
-                };
-            });
-            const breakdown = {};
-            Object.values(clickLogs).forEach(log => {
-                const key = (log.recruiter||'Desc') + '|' + log.jobId;
-                if(!breakdown[key]) breakdown[key] = { rec: log.recruiter, jId: log.jobId, clicks: 0 };
-                breakdown[key].clicks++;
-            });
-            const recruiterData = Object.values(breakdown).map(i => ({ 'Reclutador': i.rec, 'ID': i.jId, 'Clics': i.clicks }));
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(generalData), "General_KPIs"); 
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(recruiterData), "Desempeño_Reclutadores");
-            XLSX.writeFile(wb, `Reporte_Metricas_${currentMonthKey}.xlsx`);
-        }
-
         // CAMBIO: NUEVA PLANTILLA CON CABECERAS EN MAYÚSCULAS Y ORDEN ESPECÍFICO
         window.downloadTemplate = function() {
             const data = [{
@@ -1093,7 +1142,3 @@
     </script>
 </body>
 </html>
-}
-
-
-
