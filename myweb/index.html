@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Vacantes</title>
+    
+    <title>TuChamba Express | Vacantes Urgentes en CDMX, Nuevo León, Monterrey y Edomex | estado de mexico</title>
     
     <link rel="icon" href="favicon.png" type="image/png">
 
-    <meta property="og:title" content="¿Estás buscando trabajo?">
-    <meta property="og:description" content="Échale un vistazo !! Vacantes disponibles en TuChamba Express.">
-    <meta property="og:image" content="banner_1.png"> 
+    <meta name="description" content="Encuentra trabajo sin experiencia y de contratación inmediata en Nuevo León, CDMX y Estado de México. ¡Sin registros! Contacta directo al reclutador por WhatsApp.">
+    
+    <meta name="keywords" content="bolsa de trabajo, vacantes cdmx, empleo nuevo leon, trabajo edomex, sin experiencia, lunes a viernes, contratación inmediata, valle de chalco, monterrey">
+
+    <meta property="og:title" content="¿Buscas chamba urgente? Vacantes en CDMX, NL y Edomex 🚀">
+    <meta property="og:description" content="Sin correos ni registros. Clic y directo al WhatsApp del reclutador. ¡Entra ya!">
+    <meta property="og:image" content="https://tuchamba-express.vercel.app/banner_1.png">
+    <meta property="og:url" content="https://tuchamba-express.vercel.app/">
     <meta property="og:type" content="website">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -780,7 +786,8 @@
                 let displayLocation = j.location;
                 if (j.city && j.state) displayLocation = `${j.city}, ${j.state}`;
 
-                const dateHtml = j.fecha ? `<span class="job-date">📅 ${j.fecha}</span>` : '';
+                // CAMBIO VISUAL: "Publicación" en lugar de "Alta"
+                const dateHtml = j.fecha ? `<span class="job-date">📅 Publicación: ${j.fecha}</span>` : '';
 
                 return `
                     <div class="job-card" onclick="window.openViewModal('${id}')">
@@ -878,7 +885,9 @@
             
             const isVigente = j.status !== 'No Vigente';
             const badgeHtml = isVigente ? '<span class="badge-vigente">🟢 Vigente</span>' : '<span class="badge-closed">Cerrada</span>';
-            const dateHtml = j.fecha ? `<span style="font-size:0.8rem; color:#888;">Alta: ${j.fecha}</span>` : '';
+            
+            // CAMBIO VISUAL: "Publicación" en lugar de "Alta"
+            const dateHtml = j.fecha ? `<span style="font-size:0.8rem; color:#888;">Publicación: ${j.fecha}</span>` : '';
 
             document.getElementById('viewModalBody').innerHTML = `
                 ${adminInfoHtml}
@@ -990,6 +999,7 @@
             XLSX.writeFile(wb, `Reporte_Metricas_${currentMonthKey}.xlsx`);
         }
 
+        // CAMBIO: NUEVA PLANTILLA CON CABECERAS EN MAYÚSCULAS Y ORDEN ESPECÍFICO
         window.downloadTemplate = function() {
             const data = [{
                 'ID': 'ej-1', 
@@ -1014,12 +1024,17 @@
             XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); XLSX.writeFile(wb, 'plantilla.xlsx');
         }
 
-        // CORRECCIÓN DINÁMICA DE LINKS (Para que funcionen en Vercel, Netlify o .com)
+        // CORRECCIÓN DINÁMICA DE LINKS (Para que funcionen en Vercel, Netlify o .com) + TEXTO VIRAL
         window.shareApp = async function() {
-             const data = { title: 'TuChamba', text: 'Busca chamba aquí:', url: window.location.href };
+             const data = { 
+                 title: 'TuChamba', 
+                 text: '¡Checa esta vacante! Contratación rápida en CDMX, NL y EdoMex. Detalles aquí:', 
+                 url: window.location.href 
+             };
              if(navigator.share) await navigator.share(data); else window.open(`https://wa.me/?text=${encodeURIComponent(data.text+' '+data.url)}`);
         }
         
+        // CAMBIO: FUNCIÓN IMPORTAR ACTUALIZADA PARA LEER MAYÚSCULAS (COMPATIBILIDAD CON NUEVA PLANTILLA)
         window.importFromExcel = function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1033,6 +1048,7 @@
                     if(!json.length) { alert('Archivo vacío'); return; }
                     let count = 0;
                     json.forEach((row, i) => {
+                         // Busca TÍTULO o Título (para compatibilidad)
                          const title = row['TÍTULO'] || row['Título'];
                          const company = row['EMPRESA'] || row['Empresa'];
                          
@@ -1042,6 +1058,8 @@
                          const state = row['ESTADO'] || row['Estado'] || ''; 
                          const city = row['MUNICIPIO'] || row['Municipio'] || ''; 
                          const zone = row['ZONA'] || row['Zona'] || '';
+                         
+                         // Legacy support
                          const legacyLoc = row['Ubicación'] || ''; 
 
                          const showCompanyRaw = row['MOSTRAR EMPRESA PUBLICAMENTE'] || row['Mostrar Empresa Publicamente'] || 'SI';
