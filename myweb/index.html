@@ -20,12 +20,10 @@
         
       body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            
             /* FONDO DE FÁBRICA CON FILTRO AZUL */
             background-image: 
                 linear-gradient(to bottom, rgba(10, 30, 60, 0.75), rgba(10, 30, 60, 0.85)),
                 url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
-            
             background-size: cover;       
             background-position: center;  
             background-attachment: fixed; 
@@ -306,10 +304,90 @@
         </div>
     </div>
 
-    <div class="modal" id="teamModal"><div class="modal-content"><button class="close-btn" onclick="closeTeamModal()">×</button><h2>👥 Gestión de Reclutadores</h2><div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #eee;"><div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;"><input type="hidden" id="recIdEdit"> <div style="flex:1; min-width:150px;"><label style="font-size:12px; font-weight:bold; color:#555;">Nombre</label><input type="text" id="recName" placeholder="Ej. Juan Pérez" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;"></div><div style="flex:1; min-width:150px;"><label style="font-size:12px; font-weight:bold; color:#555;">WhatsApp</label><input type="text" id="recPhone" placeholder="Ej. 55..." style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;"></div><div style="width:120px;"><label style="font-size:12px; font-weight:bold; color:#555;">Código</label><input type="text" id="recCode" placeholder="Ej. JUAN" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; text-transform:uppercase;"></div><button type="button" id="btnSaveRecruiter" class="btn-primary" style="padding:9px 15px; margin-bottom:1px;" onclick="saveRecruiter()">Agregar</button><button type="button" id="btnCancelRecruiter" class="tool-btn" style="display:none; background:#999; padding:9px 15px; margin-bottom:1px;" onclick="resetRecruiterForm()">Cancelar</button></div></div><table class="recruiters-table"><thead><tr><th>Nombre</th><th>Código</th><th>Link</th><th>Acciones</th></tr></thead><tbody id="recruitersList"></tbody></table></div></div>
-    <div class="modal" id="settingsModal"><div class="modal-content"><button class="close-btn" onclick="closeSettingsModal()">×</button><h2>⚙️ Ajustes del Sistema</h2><div style="background:#e3f2fd; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #bbdefb;"><h3 style="font-size:16px; margin-bottom:10px; color:#0d47a1;">📞 Teléfono Oficina Central (Respaldo)</h3><div style="display:flex; gap:10px;"><input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:4px;"><button id="btnSaveCentral" class="btn-primary" onclick="saveCentralConfig()">Guardar</button></div></div><div class="danger-section"><h3 style="font-size:16px; margin-bottom:10px; color:#d32f2f;">⚠️ Zona de Peligro (Admin)</h3><p style="font-size:12px; color:#666;">Acciones irreversibles protegidas por contraseña.</p><div style="display:flex; gap:10px; flex-wrap:wrap;"><button class="danger-btn" onclick="requestPassword('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button><button class="danger-btn" onclick="requestPassword('deleteJobs')">🔥 Borrar TODAS las Vacantes</button></div></div></div></div>
-    <div class="modal" id="passwordModal"><div class="modal-content" style="max-width:400px; text-align:center;"><button class="close-btn" onclick="closePasswordModal()">×</button><div style="font-size:40px; margin-bottom:10px;">🔒</div><h3 style="margin-bottom:15px;">Acción Protegida</h3><p style="margin-bottom:20px; color:#666;">Ingresa la contraseña de administrador:</p><input type="password" id="adminPasswordInput" placeholder="Contraseña..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:20px; font-size:16px;"><div style="display:flex; gap:10px;"><button class="tool-btn" style="flex:1; justify-content:center; background:#999;" onclick="closePasswordModal()">Cancelar</button><button class="btn-primary" style="flex:1; justify-content:center;" onclick="submitPassword()">Confirmar</button></div></div></div>
-    <div class="modal" id="privacyModal"><div class="modal-content"><button class="close-btn" onclick="closePrivacyModal()">×</button><h2 style="margin-bottom:20px;">🔒 Aviso de Privacidad</h2><div style="font-size:14px; color:#444; line-height:1.6; max-height:60vh; overflow-y:auto; padding-right:10px;"><p><strong>Última actualización: Enero 2026</strong></p><br><p>En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, TuChamba Express informa:</p><br><p><strong>1. Responsable de los datos:</strong><br>TuChamba Express actúa como enlace entre candidatos y empresas reclutadoras.</p><br><p><strong>2. Datos recopilados:</strong><br>Podemos recopilar datos de contacto (como número telefónico) con el único fin de facilitar la comunicación para procesos de reclutamiento.</p><br><p><strong>3. Uso de la información:</strong><br>Los datos proporcionados serán utilizados exclusivamente para:<br>- Contactar al candidato respecto a la vacante de interés.<br>- Agendar entrevistas laborales.<br>- Procesos internos de selección.</p><br><p><strong>4. Compartir datos:</strong><br>Su información de contacto será compartida únicamente con la empresa o reclutador responsable de la vacante a la que usted decida postularse voluntariamente.</p><br><p><strong>5. Examen Médico:</strong><br>Al utilizar esta plataforma, usted reconoce que algunas empresas contratantes pueden requerir, como parte de su proceso de selección y conforme a la ley, la realización de exámenes médicos y/o pruebas de detección de sustancias.</p></div><div style="margin-top:20px; text-align:right;"><button class="btn-primary" onclick="closePrivacyModal()">Entendido</button></div></div></div>
+    <div class="modal" id="teamModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeTeamModal()">×</button>
+            <h2>👥 Gestión de Reclutadores</h2>
+            <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #eee;">
+                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+                    <input type="hidden" id="recIdEdit"> 
+                    <div style="flex:1; min-width:150px;">
+                        <label style="font-size:12px; font-weight:bold; color:#555;">Nombre</label>
+                        <input type="text" id="recName" placeholder="Ej. Juan Pérez" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    </div>
+                    <div style="flex:1; min-width:150px;">
+                        <label style="font-size:12px; font-weight:bold; color:#555;">WhatsApp</label>
+                        <input type="text" id="recPhone" placeholder="Ej. 55..." style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    </div>
+                    <div style="width:120px;">
+                        <label style="font-size:12px; font-weight:bold; color:#555;">Código</label>
+                        <input type="text" id="recCode" placeholder="Ej. JUAN" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; text-transform:uppercase;">
+                    </div>
+                    <button type="button" id="btnSaveRecruiter" class="btn-primary" style="padding:9px 15px; margin-bottom:1px;" onclick="saveRecruiter()">Agregar</button>
+                    <button type="button" id="btnCancelRecruiter" class="tool-btn" style="display:none; background:#999; padding:9px 15px; margin-bottom:1px;" onclick="resetRecruiterForm()">Cancelar</button>
+                </div>
+            </div>
+            <table class="recruiters-table">
+                <thead><tr><th>Nombre</th><th>Código</th><th>Link</th><th>Acciones</th></tr></thead>
+                <tbody id="recruitersList"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeSettingsModal()">×</button>
+            <h2>⚙️ Ajustes del Sistema</h2>
+            <div style="background:#e3f2fd; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #bbdefb;">
+                <h3 style="font-size:16px; margin-bottom:10px; color:#0d47a1;">📞 Teléfono Oficina Central (Respaldo)</h3>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    <button id="btnSaveCentral" class="btn-primary" onclick="saveCentralConfig()">Guardar</button>
+                </div>
+            </div>
+            <div class="danger-section">
+                <h3 style="font-size:16px; margin-bottom:10px; color:#d32f2f;">⚠️ Zona de Peligro (Admin)</h3>
+                <p style="font-size:12px; color:#666;">Acciones irreversibles protegidas por contraseña.</p>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="danger-btn" onclick="requestPassword('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button>
+                    <button class="danger-btn" onclick="requestPassword('deleteJobs')">🔥 Borrar TODAS las Vacantes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="passwordModal">
+        <div class="modal-content" style="max-width:400px; text-align:center;">
+            <button class="close-btn" onclick="closePasswordModal()">×</button>
+            <div style="font-size:40px; margin-bottom:10px;">🔒</div>
+            <h3 style="margin-bottom:15px;">Acción Protegida</h3>
+            <p style="margin-bottom:20px; color:#666;">Ingresa la contraseña de administrador:</p>
+            <input type="password" id="adminPasswordInput" placeholder="Contraseña..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:20px; font-size:16px;">
+            <div style="display:flex; gap:10px;">
+                <button class="tool-btn" style="flex:1; justify-content:center; background:#999;" onclick="closePasswordModal()">Cancelar</button>
+                <button class="btn-primary" style="flex:1; justify-content:center;" onclick="submitPassword()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="privacyModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closePrivacyModal()">×</button>
+            <h2 style="margin-bottom:20px;">🔒 Aviso de Privacidad</h2>
+            <div style="font-size:14px; color:#444; line-height:1.6; max-height:60vh; overflow-y:auto; padding-right:10px;">
+                <p><strong>Última actualización: Enero 2026</strong></p><br>
+                <p>En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, TuChamba Express informa:</p><br>
+                <p><strong>1. Responsable de los datos:</strong><br>TuChamba Express actúa como enlace entre candidatos y empresas reclutadoras.</p><br>
+                <p><strong>2. Datos recopilados:</strong><br>Podemos recopilar datos de contacto (como número telefónico) con el único fin de facilitar la comunicación para procesos de reclutamiento.</p><br>
+                <p><strong>3. Uso de la información:</strong><br>Los datos proporcionados serán utilizados exclusivamente para:<br>- Contactar al candidato respecto a la vacante de interés.<br>- Agendar entrevistas laborales.<br>- Procesos internos de selección.</p><br>
+                <p><strong>4. Compartir datos:</strong><br>Su información de contacto será compartida únicamente con la empresa o reclutador responsable de la vacante a la que usted decida postularse voluntariamente.</p><br>
+                <p><strong>5. Examen Médico:</strong><br>Al utilizar esta plataforma, usted reconoce que algunas empresas contratantes pueden requerir, como parte de su proceso de selección y conforme a la ley, la realización de exámenes médicos y/o pruebas de detección de sustancias.</p>
+            </div>
+            <div style="margin-top:20px; text-align:right;">
+                <button class="btn-primary" onclick="closePrivacyModal()">Entendido</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
