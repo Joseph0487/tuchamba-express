@@ -9,8 +9,7 @@
 
     <meta property="og:title" content="¿Estás buscando trabajo?">
     <meta property="og:description" content="Échale un vistazo !! Vacantes disponibles en TuChamba Express.">
-    <meta property="og:image" content="https://tuchamba-express.vercel.app/banner_1.png">
-    <meta property="og:url" content="https://tuchamba-express.vercel.app/">
+    <meta property="og:image" content="banner_1.png"> 
     <meta property="og:type" content="website">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -20,7 +19,6 @@
         
       body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            /* FONDO DE FÁBRICA CON FILTRO AZUL */
             background-image: 
                 linear-gradient(to bottom, rgba(10, 30, 60, 0.75), rgba(10, 30, 60, 0.85)),
                 url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
@@ -48,7 +46,6 @@
         .skeleton-card { background: white; border-radius: 16px; padding: 25px; height: 200px; display: flex; flex-direction: column; gap: 15px; }
         .sk-title { width: 70%; height: 24px; } .sk-text { width: 90%; height: 16px; } .sk-tag { width: 30%; height: 20px; border-radius: 20px; }
 
-        /* --- CUADRO DE BIENVENIDA (ESTILO INDUSTRIAL GLASS) --- */
         .welcome-container { 
             max-width: 480px; 
             margin: 60px auto; 
@@ -665,7 +662,12 @@
         }
 
         window.deleteRecruiter = function(id) { if(confirm('¿Seguro que quieres eliminar a este reclutador?')) { remove(ref(db, 'recruiters/' + id)); if(editingRecruiterId === id) resetRecruiterForm(); } }
-        window.copyLink = function(code) { const link = `https://tuchamba-express.netlify.app/?ref=${code}`; navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); }
+        
+        // CORRECCIÓN DINÁMICA DE LINKS (Para que funcionen en Vercel, Netlify o .com)
+        window.copyLink = function(code) { 
+            const link = `${window.location.origin}/?ref=${code}`; 
+            navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); 
+        }
         
         function renderRecruitersTable() {
             const list = document.getElementById('recruitersList');
@@ -988,7 +990,6 @@
             XLSX.writeFile(wb, `Reporte_Metricas_${currentMonthKey}.xlsx`);
         }
 
-        // CAMBIO: NUEVA PLANTILLA CON CABECERAS EN MAYÚSCULAS Y ORDEN ESPECÍFICO
         window.downloadTemplate = function() {
             const data = [{
                 'ID': 'ej-1', 
@@ -1013,12 +1014,12 @@
             XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); XLSX.writeFile(wb, 'plantilla.xlsx');
         }
 
+        // CORRECCIÓN DINÁMICA DE LINKS (Para que funcionen en Vercel, Netlify o .com)
         window.shareApp = async function() {
-             const data = { title: 'TuChamba', text: 'Busca chamba aquí:', url: 'https://tuchamba-express.netlify.app/' };
+             const data = { title: 'TuChamba', text: 'Busca chamba aquí:', url: window.location.href };
              if(navigator.share) await navigator.share(data); else window.open(`https://wa.me/?text=${encodeURIComponent(data.text+' '+data.url)}`);
         }
         
-        // CAMBIO: FUNCIÓN IMPORTAR ACTUALIZADA PARA LEER MAYÚSCULAS (COMPATIBILIDAD CON NUEVA PLANTILLA)
         window.importFromExcel = function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1032,7 +1033,6 @@
                     if(!json.length) { alert('Archivo vacío'); return; }
                     let count = 0;
                     json.forEach((row, i) => {
-                         // Busca TÍTULO o Título (para compatibilidad)
                          const title = row['TÍTULO'] || row['Título'];
                          const company = row['EMPRESA'] || row['Empresa'];
                          
@@ -1042,8 +1042,6 @@
                          const state = row['ESTADO'] || row['Estado'] || ''; 
                          const city = row['MUNICIPIO'] || row['Municipio'] || ''; 
                          const zone = row['ZONA'] || row['Zona'] || '';
-                         
-                         // Legacy support
                          const legacyLoc = row['Ubicación'] || ''; 
 
                          const showCompanyRaw = row['MOSTRAR EMPRESA PUBLICAMENTE'] || row['Mostrar Empresa Publicamente'] || 'SI';
