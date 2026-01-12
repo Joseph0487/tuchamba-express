@@ -31,7 +31,7 @@
             background-size: cover;       
             background-position: center;  
             background-attachment: fixed; 
-            padding: 15px; /* Reducido ligeramente para ganar espacio */
+            padding: 15px;
             min-height: 100vh;
         }
 
@@ -78,21 +78,20 @@
 
         .container { max-width: 1000px; margin: 0 auto; }
 
-        /* HEADER MEJORADO Y COMPACTO */
         .header { 
             background: white; 
-            padding: 12px 15px; /* Reducido para compactar */
+            padding: 12px 15px; 
             border-radius: 12px; 
             margin-bottom: 15px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            flex-wrap: wrap; /* Permite wrap en pantallas muy pequeñas */
+            flex-wrap: wrap; 
             gap: 10px; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
         }
         .header h1 { 
-            font-size: 20px; /* Un poco más pequeño pero legible */
+            font-size: 20px; 
             color: #333; 
             font-weight: 800; 
             margin: 0;
@@ -104,14 +103,13 @@
             align-items: center;
         }
 
-        /* BANNER RECLUTADOR COMPACTO */
         #recruiterBanner { 
             background: #e3f2fd !important; 
             color: #0d47a1 !important; 
-            padding: 8px 12px; /* Más delgado */
+            padding: 8px 12px; 
             border-radius: 8px; 
             margin-bottom: 10px; 
-            font-size: 13px; /* Letra ligeramente más chica pero clara */
+            font-size: 13px; 
             display: flex !important; 
             align-items: center; 
             gap: 10px; 
@@ -122,7 +120,6 @@
         }
         #recruiterBanner:hover { background: #bbdefb !important; }
 
-        /* FILTROS SIMÉTRICOS CON GRID */
         .filter-container { 
             background: white; 
             padding: 10px; 
@@ -151,8 +148,10 @@
         .btn-load-more { background: white; color: #0a66c2; border: 2px solid #0a66c2; padding: 12px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 16px; }
 
         .sticky-footer { position: sticky; bottom: 0; background: white; padding: 15px 20px 20px; margin: 20px -30px -30px; border-top: 1px solid #eee; text-align: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100; }
-        .whatsapp-btn-large { display: block; width: 100%; background-color: #25D366; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); transition: transform 0.1s; }
+        
+        .whatsapp-btn-large { display: flex; align-items: center; justify-content: center; width: 100%; background-color: #25D366; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); transition: transform 0.1s, background-color 0.3s; border: none; cursor: pointer; }
         .whatsapp-btn-large:active { transform: scale(0.98); }
+        .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; }
 
         .share-btn { background: #25D366; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
         .admin-controls-wrapper { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -199,6 +198,11 @@
         .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px; }
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
         .location-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        
+        /* ESTILO PARA INPUT DE TELÉFONO INTERNACIONAL */
+        .phone-group { display: flex; gap: 10px; }
+        .phone-select { width: 110px; flex-shrink: 0; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; }
+        
         @media (max-width: 500px) { .location-grid { grid-template-columns: 1fr; } }
         
         .view-count-badge { background: #e3f2fd; color: #0277bd; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid #bbdefb; margin-right: 5px; }
@@ -211,25 +215,24 @@
 
         .job-counter { color: white; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 10px; display: block; }
 
-        /* ESTILOS ESPECÍFICOS PARA MÓVIL (Hacen la magia) */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .header { 
-                flex-direction: row; /* Fuerza fila */
+                flex-direction: row; 
                 justify-content: space-between; 
                 align-items: center;
                 gap: 5px;
             }
             .header h1 {
-                font-size: 17px; /* Título compacto */
-                max-width: 50%; /* Evita que empuje los botones */
+                font-size: 17px; 
+                max-width: 50%; 
                 line-height: 1.1;
             }
             .filter-container { 
                 display: grid; 
-                grid-template-columns: auto 1fr 1fr; /* SIMETRÍA PERFECTA: Icono - 50% - 50% */
+                grid-template-columns: auto 1fr 1fr; 
                 gap: 8px;
-                overflow-x: visible; /* Quita el scroll lateral */
+                overflow-x: visible; 
             }
             .filter-icon-box { height: 40px; width: 40px; }
             .filter-select { height: 40px; font-size: 13px; padding: 5px; }
@@ -362,7 +365,7 @@
                     </div>
                 </div>
 
-                <div class="form-group"><label>Fecha de Alta (Opcional)</label><input type="text" id="jobDate" placeholder="Ej. 10 Ene"></div>
+                <div class="form-group"><label>Fecha de Publicación</label><input type="date" id="jobDate"></div>
                 
                 <div class="form-group"><label>Salario</label><input type="text" id="jobSalary" placeholder="$8,500/mes"></div>
                 <div class="form-group"><label>Descripción *</label><textarea id="jobDescription" required></textarea></div>
@@ -371,7 +374,22 @@
                 <div class="form-group"><label>Etiquetas</label><input type="text" id="jobTags" placeholder="#Ventas, #Seguros"></div>
                 <div class="form-group"><label>Requisitos</label><div class="list-input"><input type="text" id="reqInput"><button type="button" class="tool-btn" style="background:#0a66c2" onclick="addItem('req')">+</button></div><ul class="item-list" id="reqList"></ul></div>
                 <div class="form-group"><label>Beneficios</label><div class="list-input"><input type="text" id="benInput"><button type="button" class="tool-btn" style="background:#0a66c2" onclick="addItem('ben')">+</button></div><ul class="item-list" id="benList"></ul></div>
-                <div class="form-group"><label>WhatsApp Contacto (Número Real)</label><textarea id="jobContact" placeholder="5255..."></textarea></div>
+                
+                <div class="form-group">
+                    <label>WhatsApp Contacto (Número Real)</label>
+                    <div class="phone-group">
+                        <select id="jobPhoneCode" class="phone-select">
+                            <option value="+52">🇲🇽 +52</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+57">🇨🇴 +57</option>
+                            <option value="+54">🇦🇷 +54</option>
+                            <option value="+51">🇵🇪 +51</option>
+                            <option value="+34">🇪🇸 +34</option>
+                        </select>
+                        <input type="text" id="jobContact" placeholder="10 dígitos (Ej. 5512345678)" style="flex:1;">
+                    </div>
+                </div>
+
                 <div class="form-actions"><button type="button" class="tool-btn" style="background:#666; width:100%" onclick="closeFormModal()">Cancelar</button><button type="submit" class="btn-primary" style="width:100%">Guardar</button></div>
             </form>
         </div>
@@ -382,22 +400,38 @@
             <button class="close-btn" onclick="closeTeamModal()">×</button>
             <h2>👥 Gestión de Reclutadores</h2>
             <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #eee;">
-                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+                <div style="display:flex; flex-direction:column; gap:10px;">
                     <input type="hidden" id="recIdEdit"> 
-                    <div style="flex:1; min-width:150px;">
-                        <label style="font-size:12px; font-weight:bold; color:#555;">Nombre</label>
-                        <input type="text" id="recName" placeholder="Ej. Juan Pérez" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                         <div style="flex:1; min-width:150px;">
+                            <label style="font-size:12px; font-weight:bold; color:#555;">Nombre</label>
+                            <input type="text" id="recName" placeholder="Ej. Juan Pérez" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
+                        <div style="width:120px;">
+                            <label style="font-size:12px; font-weight:bold; color:#555;">Código</label>
+                            <input type="text" id="recCode" placeholder="Ej. JUAN" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; text-transform:uppercase;">
+                        </div>
                     </div>
-                    <div style="flex:1; min-width:150px;">
+                    
+                    <div>
                         <label style="font-size:12px; font-weight:bold; color:#555;">WhatsApp</label>
-                        <input type="text" id="recPhone" placeholder="Ej. 55..." style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        <div class="phone-group">
+                            <select id="recPhoneCode" class="phone-select" style="padding:8px; height:36px;">
+                                <option value="+52">🇲🇽 +52</option>
+                                <option value="+1">🇺🇸 +1</option>
+                                <option value="+57">🇨🇴 +57</option>
+                                <option value="+54">🇦🇷 +54</option>
+                                <option value="+51">🇵🇪 +51</option>
+                                <option value="+34">🇪🇸 +34</option>
+                            </select>
+                            <input type="text" id="recPhone" placeholder="10 dígitos" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                        </div>
                     </div>
-                    <div style="width:120px;">
-                        <label style="font-size:12px; font-weight:bold; color:#555;">Código</label>
-                        <input type="text" id="recCode" placeholder="Ej. JUAN" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; text-transform:uppercase;">
+
+                    <div style="display:flex; gap:10px; margin-top:5px;">
+                        <button type="button" id="btnSaveRecruiter" class="btn-primary" style="flex:1; padding:9px 15px;" onclick="saveRecruiter()">Agregar</button>
+                        <button type="button" id="btnCancelRecruiter" class="tool-btn" style="flex:0; display:none; background:#999;" onclick="resetRecruiterForm()">Cancelar</button>
                     </div>
-                    <button type="button" id="btnSaveRecruiter" class="btn-primary" style="padding:9px 15px; margin-bottom:1px;" onclick="saveRecruiter()">Agregar</button>
-                    <button type="button" id="btnCancelRecruiter" class="tool-btn" style="display:none; background:#999; padding:9px 15px; margin-bottom:1px;" onclick="resetRecruiterForm()">Cancelar</button>
                 </div>
             </div>
             <table class="recruiters-table">
@@ -715,18 +749,35 @@
 
         window.saveRecruiter = function() {
             const name = document.getElementById('recName').value.trim();
-            const phone = document.getElementById('recPhone').value.replace(/\D/g, '');
+            const rawPhone = document.getElementById('recPhone').value.trim();
+            const phoneCode = document.getElementById('recPhoneCode').value;
             const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
-            if(!name || !phone || !code) return alert('Por favor, llena todos los campos.');
+            
+            if(!name || !rawPhone || !code) return alert('Por favor, llena todos los campos.');
+            
+            // VALIDACIÓN Y LIMPIEZA DE TELÉFONO
+            const cleanPhone = rawPhone.replace(/\D/g, '');
+            const finalPhone = phoneCode + cleanPhone;
+
             const duplicateCheck = Object.entries(recruiters).find(([key, r]) => { return r.code === code && key !== editingRecruiterId; });
             if (duplicateCheck) { return alert(`⚠️ ERROR: El código '${code}' ya está siendo usado por ${duplicateCheck[1].name}. Usa otro.`); }
+            
             const idToSave = editingRecruiterId || 'rec-' + Date.now();
-            set(ref(db, 'recruiters/' + idToSave), { name, phone, code }).then(() => { window.showToast(editingRecruiterId ? '✅ Reclutador actualizado' : '✅ Reclutador agregado'); resetRecruiterForm(); });
+            set(ref(db, 'recruiters/' + idToSave), { name, phone: finalPhone, code }).then(() => { window.showToast(editingRecruiterId ? '✅ Reclutador actualizado' : '✅ Reclutador agregado'); resetRecruiterForm(); });
         }
 
         window.editRecruiter = function(id) {
             const r = recruiters[id]; if(!r) return;
-            document.getElementById('recName').value = r.name; document.getElementById('recPhone').value = r.phone; document.getElementById('recCode').value = r.code;
+            document.getElementById('recName').value = r.name; 
+            
+            // SEPARAR LADA DE NUMERO PARA EDICION (BÁSICO)
+            let phoneVal = r.phone;
+            if(phoneVal.startsWith('+52')) { document.getElementById('recPhoneCode').value = '+52'; phoneVal = phoneVal.replace('+52',''); }
+            else if(phoneVal.startsWith('+1')) { document.getElementById('recPhoneCode').value = '+1'; phoneVal = phoneVal.replace('+1',''); }
+            // Agrega más si necesitas, por defecto deja el numero entero si no coincide
+            document.getElementById('recPhone').value = phoneVal; 
+
+            document.getElementById('recCode').value = r.code;
             editingRecruiterId = id; const btn = document.getElementById('btnSaveRecruiter'); btn.textContent = "Guardar Cambios"; btn.style.backgroundColor = "#f57c00"; 
             document.getElementById('btnCancelRecruiter').style.display = 'block';
         }
@@ -754,6 +805,28 @@
             }).join('');
         }
 
+        // FUNCIÓN MEJORADA: REGISTER CLICK (ANTI DOBLE CLICK)
+        window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
+            // Desactiva el botón visualmente
+            btn.disabled = true;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '🔄 Abriendo...';
+            
+            // Registra el clic
+            window.registerClick(jobId, recruiterName);
+            
+            // Abre WhatsApp en nueva pestaña
+            setTimeout(() => {
+                window.open(link, '_blank');
+            }, 300); // Pequeño delay para UX
+
+            // Reactiva el botón después de 3 segundos
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }, 3000);
+        }
+
         window.registerClick = function(jobId, recruiterName) {
             runTransaction(ref(db, `jobStats/${jobId}/whatsappClicks`), (c) => (c || 0) + 1);
             push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
@@ -767,6 +840,13 @@
 
         window.saveJob = function(e) {
             e.preventDefault();
+            
+            // CONCATENAR TELEFONO JOB
+            const phoneCode = document.getElementById('jobPhoneCode').value;
+            const rawPhone = document.getElementById('jobContact').value.trim();
+            const cleanPhone = rawPhone.replace(/\D/g, '');
+            const finalPhone = cleanPhone ? (phoneCode + cleanPhone) : '';
+
             const jobData = {
                 title: document.getElementById('jobTitle').value,
                 company: document.getElementById('jobCompany').value,
@@ -775,12 +855,15 @@
                 city: document.getElementById('jobCity').value,
                 zone: document.getElementById('jobZone').value,
                 location: `${document.getElementById('jobCity').value}, ${document.getElementById('jobState').value}`,
-                fecha: document.getElementById('jobDate').value,
+                
+                // FECHA REAL
+                fecha: document.getElementById('jobDate').value, 
+                
                 salary: document.getElementById('jobSalary').value,
                 description: document.getElementById('jobDescription').value,
                 schedule: document.getElementById('jobSchedule').value, 
                 tags: document.getElementById('jobTags').value,
-                contact: document.getElementById('jobContact').value,
+                contact: finalPhone, // GUARDA CON LADA
                 status: document.getElementById('jobStatus').value,
                 agency: document.getElementById('jobAgency').value,
                 requirements: tempReqs,
@@ -797,6 +880,17 @@
 
         function normalizeText(text) { return text ? text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : ""; }
 
+        // HELPER PARA FECHAS BONITAS
+        function formatDateFriendly(dateString) {
+            if(!dateString) return '';
+            // Si viene formato YYYY-MM-DD
+            if(dateString.includes('-')) {
+                const parts = dateString.split('-');
+                if(parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            return dateString; // Fallback para datos viejos
+        }
+
         function renderJobs() {
             let keys = Object.keys(jobs);
             keys.sort((a, b) => {
@@ -804,8 +898,11 @@
                 const statusA = jobA.status === 'No Vigente' ? 1 : 0;
                 const statusB = jobB.status === 'No Vigente' ? 1 : 0;
                 if (statusA !== statusB) return statusA - statusB;
-                const locA = (jobA.city || '').toLowerCase(); const locB = (jobB.city || '').toLowerCase();
-                if (locA < locB) return -1; if (locA > locB) return 1;
+                
+                // ORDENAR POR FECHA (SI EXISTE)
+                if(jobA.fecha && jobB.fecha) {
+                    return jobB.fecha.localeCompare(jobA.fecha); // Más reciente primero
+                }
                 return b.localeCompare(a); 
             });
 
@@ -856,8 +953,9 @@
                 let displayLocation = j.location;
                 if (j.city && j.state) displayLocation = `${j.city}, ${j.state}`;
 
-                // CAMBIO VISUAL: "Publicación" en lugar de "Alta"
-                const dateHtml = j.fecha ? `<span class="job-date">📅 Publicación: ${j.fecha}</span>` : '';
+                // FECHA FORMATEADA
+                const niceDate = formatDateFriendly(j.fecha);
+                const dateHtml = niceDate ? `<span class="job-date">📅 Publicación: ${niceDate}</span>` : '';
 
                 return `
                     <div class="job-card" onclick="window.openViewModal('${id}')">
@@ -934,11 +1032,12 @@
                 const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                 const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                 
+                // BOTÓN WHATSAPP MEJORADO (ANTI DOBLE CLICK)
                 contactHtml = `<div class="sticky-footer">
                                     <p style="font-size:12px; color:#666; margin-bottom:5px;">👇 Respuesta Inmediata 👇</p>
-                                    <a href="${waLink}" target="_blank" class="whatsapp-btn-large" onclick="window.registerClick('${id}', '${recNameSafe}')">
+                                    <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
                                         📅 Agenda Entrevista Ahora 📲
-                                    </a>
+                                    </button>
                                </div>`;
             }
 
@@ -956,8 +1055,8 @@
             const isVigente = j.status !== 'No Vigente';
             const badgeHtml = isVigente ? '<span class="badge-vigente">🟢 Vigente</span>' : '<span class="badge-closed">Cerrada</span>';
             
-            // CAMBIO VISUAL: "Publicación" en lugar de "Alta"
-            const dateHtml = j.fecha ? `<span class="job-date">📅 Publicación: ${j.fecha}</span>` : '';
+            const niceDate = formatDateFriendly(j.fecha);
+            const dateHtml = niceDate ? `<span style="font-size:0.8rem; color:#888;">Publicación: ${niceDate}</span>` : '';
 
             document.getElementById('viewModalBody').innerHTML = `
                 ${adminInfoHtml}
@@ -994,7 +1093,10 @@
         
         window.openJobForm = function() {
             currentEditId = null; document.getElementById('formTitle').textContent = 'Nueva Vacante'; document.getElementById('jobForm').reset();
-            document.getElementById('jobDate').value = ''; 
+            // FECHA HOY POR DEFECTO
+            const todayISO = new Date().toISOString().split('T')[0];
+            document.getElementById('jobDate').value = todayISO; 
+            
             tempReqs = []; tempBens = []; updateList('reqList', tempReqs, 'req'); updateList('benList', tempBens, 'ben');
             document.getElementById('jobShowCompany').value = 'true';
             document.getElementById('formModal').classList.add('active');
@@ -1008,12 +1110,23 @@
             document.getElementById('jobState').value = j.state || '';
             document.getElementById('jobCity').value = j.city || '';
             document.getElementById('jobZone').value = j.zone || '';
+            
+            // ASIGNAR FECHA AL INPUT DATE
             document.getElementById('jobDate').value = j.fecha || ''; 
+
             if(!j.city && j.location) document.getElementById('jobCity').value = j.location;
             document.getElementById('jobSalary').value = j.salary||'';
             document.getElementById('jobDescription').value = j.description; document.getElementById('jobStatus').value = j.status||'Vigente';
             document.getElementById('jobAgency').value = j.agency||'';
-            document.getElementById('jobContact').value = j.contact||'';
+            
+            // SEPARAR LADA DE CONTACTO PARA EDICION
+            let contactVal = j.contact || '';
+            let codeVal = '+52';
+            if(contactVal.startsWith('+52')) { codeVal = '+52'; contactVal = contactVal.replace('+52',''); }
+            else if(contactVal.startsWith('+1')) { codeVal = '+1'; contactVal = contactVal.replace('+1',''); }
+            document.getElementById('jobPhoneCode').value = codeVal;
+            document.getElementById('jobContact').value = contactVal;
+
             document.getElementById('jobSchedule').value = j.schedule||''; 
             tempReqs = j.requirements||[]; tempBens = j.benefits||[];
             updateList('reqList', tempReqs, 'req'); updateList('benList', tempBens, 'ben');
@@ -1048,11 +1161,32 @@
             XLSX.utils.book_append_sheet(wb, ws, "Vacantes"); XLSX.writeFile(wb, "Respaldo_Completo.xlsx");
         }
 
+        window.exportMetrics = function() {
+             if(!Object.keys(jobs).length) return alert('Sin datos para métricas');
+            const generalData = Object.keys(jobs).map(id => {
+                const j = jobs[id]; const stats = jobStats[id] || {};
+                return {
+                    'ID Vacante': id, 'Puesto': j.title, 'Empresa': j.company, 'Vistas Totales': stats.totalViews || 0, 'Clics WhatsApp': stats.whatsappClicks || 0
+                };
+            });
+            const breakdown = {};
+            Object.values(clickLogs).forEach(log => {
+                const key = (log.recruiter||'Desc') + '|' + log.jobId;
+                if(!breakdown[key]) breakdown[key] = { rec: log.recruiter, jId: log.jobId, clicks: 0 };
+                breakdown[key].clicks++;
+            });
+            const recruiterData = Object.values(breakdown).map(i => ({ 'Reclutador': i.rec, 'ID': i.jId, 'Clics': i.clicks }));
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(generalData), "General_KPIs"); 
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(recruiterData), "Desempeño_Reclutadores");
+            XLSX.writeFile(wb, `Reporte_Metricas_${currentMonthKey}.xlsx`);
+        }
+
         // CAMBIO: NUEVA PLANTILLA CON CABECERAS EN MAYÚSCULAS Y ORDEN ESPECÍFICO
         window.downloadTemplate = function() {
             const data = [{
                 'ID': 'ej-1', 
-                'FECHA': '10 Ene',
+                'FECHA': '2026-01-12', // Formato YYYY-MM-DD
                 'TÍTULO': 'Ejemplo', 
                 'EMPRESA': 'Empresa', 
                 'MOSTRAR EMPRESA PUBLICAMENTE': 'SI',
@@ -1065,7 +1199,7 @@
                 'ETIQUETAS': '#Ventas', 
                 'REQUISITOS': 'Req 1 | Req 2', 
                 'BENEFICIOS': 'Ben 1 | Ben 2', 
-                'CONTACTO': '55...', 
+                'CONTACTO': '5512345678', // Sin Lada, el sistema asume +52 si faltan dígitos
                 'ESTATUS': 'Vigente',
                 'TIPO DE SERVICIO O AGENCIA': 'Agencia Interna'
             }];
@@ -1073,7 +1207,6 @@
             XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); XLSX.writeFile(wb, 'plantilla.xlsx');
         }
 
-        // CORRECCIÓN DINÁMICA DE LINKS (Para que funcionen en Vercel, Netlify o .com) + TEXTO VIRAL
         window.shareApp = async function() {
              const data = { 
                  title: 'TuChamba', 
@@ -1083,7 +1216,7 @@
              if(navigator.share) await navigator.share(data); else window.open(`https://wa.me/?text=${encodeURIComponent(data.text+' '+data.url)}`);
         }
         
-        // CAMBIO: FUNCIÓN IMPORTAR ACTUALIZADA PARA LEER MAYÚSCULAS (COMPATIBILIDAD CON NUEVA PLANTILLA)
+        // FUNCIÓN IMPORTAR INTELIGENTE (CASE INSENSITIVE + FECHA)
         window.importFromExcel = function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1096,39 +1229,53 @@
                     const json = XLSX.utils.sheet_to_json(ws);
                     if(!json.length) { alert('Archivo vacío'); return; }
                     let count = 0;
+                    
+                    // Helper para encontrar keys sin importar mayusculas
+                    const findKey = (row, keyName) => {
+                        return Object.keys(row).find(k => k.toLowerCase() === keyName.toLowerCase());
+                    };
+
                     json.forEach((row, i) => {
-                         // Busca TÍTULO o Título (para compatibilidad)
-                         const title = row['TÍTULO'] || row['Título'];
-                         const company = row['EMPRESA'] || row['Empresa'];
+                         const titleKey = findKey(row, 'título') || findKey(row, 'titulo');
+                         const companyKey = findKey(row, 'empresa');
+                         
+                         const title = titleKey ? row[titleKey] : null;
+                         const company = companyKey ? row[companyKey] : null;
                          
                          if(!title || !company) return;
                          
                          const id = row['ID'] || 'job-'+Date.now()+'-'+i;
-                         const state = row['ESTADO'] || row['Estado'] || ''; 
-                         const city = row['MUNICIPIO'] || row['Municipio'] || ''; 
-                         const zone = row['ZONA'] || row['Zona'] || '';
-                         
-                         // Legacy support
+                         const state = row[findKey(row, 'estado')] || ''; 
+                         const city = row[findKey(row, 'municipio')] || ''; 
+                         const zone = row[findKey(row, 'zona')] || '';
                          const legacyLoc = row['Ubicación'] || ''; 
 
-                         const showCompanyRaw = row['MOSTRAR EMPRESA PUBLICAMENTE'] || row['Mostrar Empresa Publicamente'] || 'SI';
+                         const showCompKey = findKey(row, 'mostrar empresa publicamente');
+                         const showCompanyRaw = showCompKey ? row[showCompKey] : 'SI';
+
+                         // Limpieza de contacto desde Excel
+                         let contactRaw = row[findKey(row, 'contacto')] || '';
+                         contactRaw = String(contactRaw).replace(/\D/g, ''); // Solo numeros
+                         if(contactRaw.length === 10) contactRaw = '+52' + contactRaw; // Asume MX si son 10
 
                          const jobData = {
                              title: title, 
                              company: company, 
-                             showCompany: showCompanyRaw.toUpperCase() === 'SI',
+                             showCompany: String(showCompanyRaw).toUpperCase() === 'SI',
                              state: state, city: city, zone: zone,
                              location: (city && state) ? `${city}, ${state}` : legacyLoc, 
-                             fecha: row['FECHA'] || row['Fecha'] || '', 
-                             salary: row['SALARIO'] || row['Salario'] || '', 
-                             description: row['DESCRIPCIÓN'] || row['Descripción'] || '',
-                             schedule: row['JORNADA'] || row['Jornada'] || 'Horario a definir',
-                             tags: row['ETIQUETAS'] || row['Etiquetas'] || '',
-                             requirements: (row['REQUISITOS'] || row['Requisitos']) ? (row['REQUISITOS'] || row['Requisitos']).split(' | ') : [],
-                             benefits: (row['BENEFICIOS'] || row['Beneficios']) ? (row['BENEFICIOS'] || row['Beneficios']).split(/\s*\|\s*/) : [],
-                             contact: row['CONTACTO'] || row['Contacto'] || '', 
-                             status: row['ESTATUS'] || row['Estatus'] || 'Vigente',
-                             agency: row['TIPO DE SERVICIO O AGENCIA'] || row['Tipo de Servicio o Agencia'] || '' 
+                             
+                             fecha: row[findKey(row, 'fecha')] || '', 
+                             
+                             salary: row[findKey(row, 'salario')] || '', 
+                             description: row[findKey(row, 'descripción')] || row[findKey(row, 'descripcion')] || '',
+                             schedule: row[findKey(row, 'jornada')] || 'Horario a definir',
+                             tags: row[findKey(row, 'etiquetas')] || '',
+                             requirements: (row[findKey(row, 'requisitos')]) ? String(row[findKey(row, 'requisitos')]).split(' | ') : [],
+                             benefits: (row[findKey(row, 'beneficios')]) ? String(row[findKey(row, 'beneficios')]).split(/\s*\|\s*/) : [],
+                             contact: contactRaw, 
+                             status: row[findKey(row, 'estatus')] || 'Vigente',
+                             agency: row[findKey(row, 'tipo de servicio o agencia')] || '' 
                          };
                          set(ref(db, 'jobs/' + id), jobData);
                          count++;
