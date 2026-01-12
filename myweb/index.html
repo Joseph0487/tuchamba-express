@@ -21,7 +21,7 @@
       body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             
-            /* FONDO DE FÁBRICA CON FILTRO AZUL (Igual que antes) */
+            /* FONDO DE FÁBRICA CON FILTRO AZUL */
             background-image: 
                 linear-gradient(to bottom, rgba(10, 30, 60, 0.75), rgba(10, 30, 60, 0.85)),
                 url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
@@ -54,37 +54,19 @@
         .welcome-container { 
             max-width: 480px; 
             margin: 60px auto; 
-            
-            /* Transparencia para ver el fondo */
             background: rgba(255, 255, 255, 0.15); 
             backdrop-filter: blur(8px);            
             -webkit-backdrop-filter: blur(8px);    
             border: 1px solid rgba(255, 255, 255, 0.2); 
-            
-            /* Franja de Seguridad Amarilla */
             border-top: 5px solid #ffc107; 
-            
             padding: 50px 30px; 
             border-radius: 20px; 
             box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
             text-align: center; 
         }
         
-        /* Texto blanco con sombra para leerse sobre la foto */
-        .welcome-title { 
-            font-size: 28px; 
-            color: #ffffff; 
-            margin-bottom: 10px; 
-            font-weight: 800; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-        }
-        .welcome-subtitle { 
-            color: #f0f0f0; 
-            margin-bottom: 40px; 
-            font-size: 16px; 
-            font-weight: 500; 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
+        .welcome-title { font-size: 28px; color: #ffffff; margin-bottom: 10px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
+        .welcome-subtitle { color: #f0f0f0; margin-bottom: 40px; font-size: 16px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
         
         .btn-big-guest { background: #0a66c2; color: white; border: none; padding: 16px; width: 100%; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.2s, background 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-big-guest:hover { background: #004182; transform: translateY(-2px); }
@@ -93,7 +75,7 @@
         .admin-login-form { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); text-align: left; animation: fadeIn 0.5s; color: white; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .container { max-width: 1000px; margin: 0 auto; } /* PC: 3 columnas */
+        .container { max-width: 1000px; margin: 0 auto; }
 
         .header { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .header h1 { font-size: 24px; color: #333; font-weight: 800; }
@@ -103,12 +85,7 @@
 
         .filter-container { background: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,0.05); align-items: center; }
         
-        .filter-icon-box {
-            display: flex; align-items: center; justify-content: center;
-            background: #f0f2f5; padding: 10px; border-radius: 8px;
-            border: 1px solid #ddd; height: 45px; width: 45px; flex-shrink: 0;
-        }
-
+        .filter-icon-box { display: flex; align-items: center; justify-content: center; background: #f0f2f5; padding: 10px; border-radius: 8px; border: 1px solid #ddd; height: 45px; width: 45px; flex-shrink: 0; }
         .filter-select { flex: 1; min-width: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; outline: none; height: 45px; }
 
         #mobileFilterToggle { display: none; } 
@@ -134,21 +111,12 @@
         .metric-val { color: #0a66c2; font-weight: 800; margin-left: 4px; margin-right: 12px; }
         .admin-mode-indicator { background: #ffe0b2; color: #e65100; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ffcc80; }
 
-        /* GRID: PC 3 columnas, Movil 1 */
-        .job-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-            gap: 20px; 
-        }
-        
+        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .job-card:hover { transform: translateY(-4px); }
         .job-card.hidden { display: none; }
 
-        .card-top-row { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 10px; margin-right: 35px; 
-        }
+        .card-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; margin-right: 35px; }
         
         .badge-vigente { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
         .badge-closed { background: #ffebee; color: #c62828; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
@@ -157,7 +125,6 @@
         .job-title { font-size: 1.2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; line-height: 1.3; }
         .company-name { font-size: 0.9rem; color: #0a66c2; font-weight: 600; }
         .location { font-size: 0.9rem; color: #555; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
-        
         .salary-text { color: #d32f2f; font-weight: 800; font-size: 1.1rem; margin-top: 5px; }
 
         .company-logo { width: 48px; height: 48px; background: linear-gradient(135deg, #0a66c2 0%, #004182 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; }
@@ -193,7 +160,6 @@
         .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .recruiters-table th, .recruiters-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
 
-        /* CAMBIO: Texto del contador en blanco */
         .job-counter { color: white; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 10px; display: block; }
 
         @media (max-width: 768px) {
@@ -321,7 +287,7 @@
                     <div class="location-grid">
                         <input type="text" id="jobState" placeholder="Estado (Ej. CDMX)" required>
                         <input type="text" id="jobCity" placeholder="Municipio (Ej. Coyoacán)" required>
-                        <input type="text" id="jobZone" placeholder="Colonia/Zona (Ej. Centro)" required>
+                        <input type="text" id="jobZone" placeholder="Colonia/Zona (Ej. Centro)">
                     </div>
                 </div>
 
@@ -492,7 +458,7 @@
                 jobs = s.val() || {}; 
                 document.getElementById('skeletonLoader').style.display = 'none'; 
                 document.getElementById('jobGrid').style.display = 'grid';
-                populateFilters(jobs); // CAMBIO: Llenar filtros al cargar
+                populateFilters(jobs); 
                 renderJobs(); 
             });
             onValue(ref(db, 'jobStats'), (s) => { jobStats = s.val() || {}; });
@@ -511,7 +477,6 @@
             });
         }
 
-        // CAMBIO: Llenado de Filtros de Estado y Municipio
         function populateFilters(jobsData) {
             const allJobsArr = Object.values(jobsData);
             const stateSelect = document.getElementById('stateFilter');
@@ -520,7 +485,6 @@
             const uniqueStates = [...new Set(allJobsArr.map(j => j.state).filter(Boolean))].sort();
             const uniqueCities = [...new Set(allJobsArr.map(j => j.city).filter(Boolean))].sort();
             
-            // Guardar selección
             const currState = stateSelect.value;
             const currCity = citySelect.value;
 
@@ -534,7 +498,6 @@
                  citySelect.innerHTML += `<option value="${c}">${c}</option>`;
             });
             
-            // Restaurar selección si existe
             if(uniqueStates.includes(currState)) stateSelect.value = currState;
             if(uniqueCities.includes(currCity)) citySelect.value = currCity;
         }
@@ -624,7 +587,7 @@
         }
 
         window.deleteRecruiter = function(id) { if(confirm('¿Seguro que quieres eliminar a este reclutador?')) { remove(ref(db, 'recruiters/' + id)); if(editingRecruiterId === id) resetRecruiterForm(); } }
-        window.copyLink = function(code) { const link = `https://tuchamba-express.vercel.app/?ref=${code}`; navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); }
+        window.copyLink = function(code) { const link = `https://tuchamba-express.netlify.app/?ref=${code}`; navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); }
         
         function renderRecruitersTable() {
             const list = document.getElementById('recruitersList');
@@ -656,7 +619,7 @@
                 city: document.getElementById('jobCity').value,
                 zone: document.getElementById('jobZone').value,
                 location: `${document.getElementById('jobCity').value}, ${document.getElementById('jobState').value}`,
-                fecha: document.getElementById('jobDate').value, // NUEVO CAMPO FECHA
+                fecha: document.getElementById('jobDate').value,
                 salary: document.getElementById('jobSalary').value,
                 description: document.getElementById('jobDescription').value,
                 schedule: document.getElementById('jobSchedule').value, 
@@ -694,7 +657,6 @@
             applyFilterAndRender();
         }
 
-        // CAMBIO: Filtro usando Dropdowns
         function applyFilterAndRender() {
             const stateVal = document.getElementById('stateFilter').value;
             const cityVal = document.getElementById('cityFilter').value;
@@ -729,7 +691,6 @@
                 const tags = j.tags ? j.tags.split(',').map(t => t.trim()).filter(t => t) : [];
                 const isVigente = j.status !== 'No Vigente';
                 
-                // CAMBIO: Lógica para Badge Vigente
                 let statusBadge = '<span class="badge-closed">Cerrada</span>';
                 if(isVigente) statusBadge = '<span class="badge-vigente">🟢 Vigente</span>';
 
@@ -739,7 +700,6 @@
                 let displayLocation = j.location;
                 if (j.city && j.state) displayLocation = `${j.city}, ${j.state}`;
 
-                // CAMBIO: Agregar Fecha en la tarjeta
                 const dateHtml = j.fecha ? `<span class="job-date">📅 ${j.fecha}</span>` : '';
 
                 return `
@@ -817,7 +777,6 @@
                 const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                 const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                 
-                // CAMBIO: Botón Sticky (Se mueve fuera del contenedor normal al sticky footer)
                 contactHtml = `<div class="sticky-footer">
                                     <p style="font-size:12px; color:#666; margin-bottom:5px;">👇 Respuesta Inmediata 👇</p>
                                     <a href="${waLink}" target="_blank" class="whatsapp-btn-large" onclick="window.registerClick('${id}', '${recNameSafe}')">
@@ -839,7 +798,6 @@
             
             const isVigente = j.status !== 'No Vigente';
             const badgeHtml = isVigente ? '<span class="badge-vigente">🟢 Vigente</span>' : '<span class="badge-closed">Cerrada</span>';
-            // CAMBIO: Fecha dentro del modal con margen derecho
             const dateHtml = j.fecha ? `<span style="font-size:0.8rem; color:#888;">Alta: ${j.fecha}</span>` : '';
 
             document.getElementById('viewModalBody').innerHTML = `
@@ -877,7 +835,6 @@
         
         window.openJobForm = function() {
             currentEditId = null; document.getElementById('formTitle').textContent = 'Nueva Vacante'; document.getElementById('jobForm').reset();
-            // Limpiar fecha manual al abrir nueva
             document.getElementById('jobDate').value = ''; 
             tempReqs = []; tempBens = []; updateList('reqList', tempReqs, 'req'); updateList('benList', tempBens, 'ben');
             document.getElementById('jobShowCompany').value = 'true';
@@ -892,7 +849,7 @@
             document.getElementById('jobState').value = j.state || '';
             document.getElementById('jobCity').value = j.city || '';
             document.getElementById('jobZone').value = j.zone || '';
-            document.getElementById('jobDate').value = j.fecha || ''; // CAMBIO: Cargar fecha al editar
+            document.getElementById('jobDate').value = j.fecha || ''; 
             if(!j.city && j.location) document.getElementById('jobCity').value = j.location;
             document.getElementById('jobSalary').value = j.salary||'';
             document.getElementById('jobDescription').value = j.description; document.getElementById('jobStatus').value = j.status||'Vigente';
@@ -919,7 +876,7 @@
                     'ID': id, 'Título': j.title, 'Empresa': j.company, 
                     'Mostrar Empresa Publicamente': (j.showCompany === true || j.showCompany === 'true') ? 'SI' : 'NO',
                     'Estado': j.state, 'Municipio': j.city, 'Zona': j.zone, 
-                    'Fecha': j.fecha, // CAMBIO: Exportar Fecha
+                    'Fecha': j.fecha, 
                     'Salario': j.salary, 'Descripción': j.description, 
                     'Jornada': j.schedule, 
                     'Etiquetas': j.tags,
@@ -953,25 +910,37 @@
             XLSX.writeFile(wb, `Reporte_Metricas_${currentMonthKey}.xlsx`);
         }
 
+        // CAMBIO: NUEVA PLANTILLA CON CABECERAS EN MAYÚSCULAS Y ORDEN ESPECÍFICO
         window.downloadTemplate = function() {
             const data = [{
-                'ID': 'ej-1', 'Título': 'Ejemplo', 'Empresa': 'Empresa', 'Mostrar Empresa Publicamente': 'SI',
-                'Estado': 'CDMX', 'Municipio': 'Coyoacán', 'Zona': 'Centro',
-                'Fecha': '10 Ene', // CAMBIO: Columna Fecha en Template
-                'Salario': '10000', 'Descripción': 'Desc...', 
-                'Jornada': 'Lunes a Viernes', 'Etiquetas': '#Ventas', 
-                'Requisitos': 'Req 1 | Req 2', 'Beneficios': 'Ben 1 | Ben 2', 'Contacto': '55...', 'Estatus': 'Vigente',
-                'Tipo de Servicio o Agencia': 'Agencia Interna'
+                'ID': 'ej-1', 
+                'FECHA': '10 Ene',
+                'TÍTULO': 'Ejemplo', 
+                'EMPRESA': 'Empresa', 
+                'MOSTRAR EMPRESA PUBLICAMENTE': 'SI',
+                'ESTADO': 'CDMX', 
+                'MUNICIPIO': 'Coyoacán', 
+                'ZONA': 'Centro',
+                'SALARIO': '10000', 
+                'DESCRIPCIÓN': 'Desc...', 
+                'JORNADA': 'Lunes a Viernes', 
+                'ETIQUETAS': '#Ventas', 
+                'REQUISITOS': 'Req 1 | Req 2', 
+                'BENEFICIOS': 'Ben 1 | Ben 2', 
+                'CONTACTO': '55...', 
+                'ESTATUS': 'Vigente',
+                'TIPO DE SERVICIO O AGENCIA': 'Agencia Interna'
             }];
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); XLSX.writeFile(wb, 'plantilla.xlsx');
         }
 
         window.shareApp = async function() {
-             const data = { title: 'TuChamba', text: 'Busca chamba aquí:', url: 'https://tuchamba-express.vercel.app/' };
+             const data = { title: 'TuChamba', text: 'Busca chamba aquí:', url: 'https://tuchamba-express.netlify.app/' };
              if(navigator.share) await navigator.share(data); else window.open(`https://wa.me/?text=${encodeURIComponent(data.text+' '+data.url)}`);
         }
         
+        // CAMBIO: FUNCIÓN IMPORTAR ACTUALIZADA PARA LEER MAYÚSCULAS (COMPATIBILIDAD CON NUEVA PLANTILLA)
         window.importFromExcel = function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -985,24 +954,38 @@
                     if(!json.length) { alert('Archivo vacío'); return; }
                     let count = 0;
                     json.forEach((row, i) => {
-                         if(!row['Título'] || !row['Empresa']) return;
+                         // Busca TÍTULO o Título (para compatibilidad)
+                         const title = row['TÍTULO'] || row['Título'];
+                         const company = row['EMPRESA'] || row['Empresa'];
+                         
+                         if(!title || !company) return;
+                         
                          const id = row['ID'] || 'job-'+Date.now()+'-'+i;
-                         const state = row['Estado'] || ''; const city = row['Municipio'] || ''; const zone = row['Zona'] || '';
+                         const state = row['ESTADO'] || row['Estado'] || ''; 
+                         const city = row['MUNICIPIO'] || row['Municipio'] || ''; 
+                         const zone = row['ZONA'] || row['Zona'] || '';
+                         
+                         // Legacy support
                          const legacyLoc = row['Ubicación'] || ''; 
 
+                         const showCompanyRaw = row['MOSTRAR EMPRESA PUBLICAMENTE'] || row['Mostrar Empresa Publicamente'] || 'SI';
+
                          const jobData = {
-                             title: row['Título'], company: row['Empresa'], 
-                             showCompany: (row['Mostrar Empresa Publicamente'] || 'SI').toUpperCase() === 'SI',
+                             title: title, 
+                             company: company, 
+                             showCompany: showCompanyRaw.toUpperCase() === 'SI',
                              state: state, city: city, zone: zone,
                              location: (city && state) ? `${city}, ${state}` : legacyLoc, 
-                             fecha: row['Fecha'] || row['fecha'] || '', // CAMBIO: Importar Fecha (y minúsculas por si acaso)
-                             salary: row['Salario']||'', description: row['Descripción']||'',
-                             schedule: row['Jornada']||'Horario a definir',
-                             tags: row['Etiquetas']||'',
-                             requirements: row['Requisitos']?row['Requisitos'].split(' | '):[],
-                             benefits: row['Beneficios'] ? row['Beneficios'].split(/\s*\|\s*/) : [],
-                             contact: row['Contacto']||'', status: row['Estatus']||'Vigente',
-                             agency: row['Tipo de Servicio o Agencia'] || '' 
+                             fecha: row['FECHA'] || row['Fecha'] || '', 
+                             salary: row['SALARIO'] || row['Salario'] || '', 
+                             description: row['DESCRIPCIÓN'] || row['Descripción'] || '',
+                             schedule: row['JORNADA'] || row['Jornada'] || 'Horario a definir',
+                             tags: row['ETIQUETAS'] || row['Etiquetas'] || '',
+                             requirements: (row['REQUISITOS'] || row['Requisitos']) ? (row['REQUISITOS'] || row['Requisitos']).split(' | ') : [],
+                             benefits: (row['BENEFICIOS'] || row['Beneficios']) ? (row['BENEFICIOS'] || row['Beneficios']).split(/\s*\|\s*/) : [],
+                             contact: row['CONTACTO'] || row['Contacto'] || '', 
+                             status: row['ESTATUS'] || row['Estatus'] || 'Vigente',
+                             agency: row['TIPO DE SERVICIO O AGENCIA'] || row['Tipo de Servicio o Agencia'] || '' 
                          };
                          set(ref(db, 'jobs/' + id), jobData);
                          count++;
@@ -1016,4 +999,3 @@
     </script>
 </body>
 </html>
-
