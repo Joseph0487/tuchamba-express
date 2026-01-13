@@ -149,9 +149,10 @@
 
         .sticky-footer { position: sticky; bottom: 0; background: white; padding: 15px 20px 20px; margin: 20px -30px -30px; border-top: 1px solid #eee; text-align: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100; }
         
-        .whatsapp-btn-large { display: flex; align-items: center; justify-content: center; width: 100%; background-color: #25D366; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); transition: transform 0.1s, background-color 0.3s; border: none; cursor: pointer; }
+        /* BOTÓN WHATSAPP CON MEJORAS VISUALES (DISABLED STATE) */
+        .whatsapp-btn-large { display: flex; align-items: center; justify-content: center; width: 100%; background-color: #25D366; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); transition: transform 0.1s, background-color 0.3s, opacity 0.3s; border: none; cursor: pointer; }
         .whatsapp-btn-large:active { transform: scale(0.98); }
-        .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; }
+        .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; opacity: 0.7; }
 
         .share-btn { background: #25D366; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
         .admin-controls-wrapper { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -501,7 +502,6 @@
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getDatabase, ref, set, onValue, remove, runTransaction, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // TUS CLAVES (NO TOCAR)
         const firebaseConfig = {
           apiKey: "AIzaSyB1k1lnQjQXiGYJRT9E9-KYzGSBBmrQGFI",
           authDomain: "vacancy-page-v2.firebaseapp.com",
@@ -556,7 +556,6 @@
             document.querySelectorAll('.admin-actions').forEach(m => m.classList.remove('active'));
         }
 
-        // FUNCIONES MODALES
         window.openPrivacyModal = function() { document.getElementById('privacyModal').classList.add('active'); }
         window.closePrivacyModal = function() { document.getElementById('privacyModal').classList.remove('active'); }
         window.openSettingsModal = function() { document.getElementById('settingsModal').classList.add('active'); if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone; }
@@ -755,11 +754,8 @@
             
             if(!name || !rawPhone || !code) return alert('Por favor, llena todos los campos.');
             
-            // VALIDACIÓN Y LIMPIEZA DE TELÉFONO MEJORADA (EVITA DOBLE PREFIJO)
             let cleanPhone = rawPhone.replace(/\D/g, '');
-            
-            // Si el usuario pegó el número con el código de país (ej. 5255...), lo quitamos para no duplicar
-            const codeDigits = phoneCode.replace('+', ''); // ej. "52"
+            const codeDigits = phoneCode.replace('+', '');
             if (cleanPhone.startsWith(codeDigits)) {
                 cleanPhone = cleanPhone.substring(codeDigits.length);
             }
@@ -778,10 +774,8 @@
             document.getElementById('recName').value = r.name; 
             
             let phoneVal = r.phone;
-            // Detección automática básica de lada
             if(phoneVal.startsWith('+52')) { document.getElementById('recPhoneCode').value = '+52'; phoneVal = phoneVal.replace('+52',''); }
             else if(phoneVal.startsWith('+1')) { document.getElementById('recPhoneCode').value = '+1'; phoneVal = phoneVal.replace('+1',''); }
-            // ... otros códigos
             document.getElementById('recPhone').value = phoneVal; 
 
             document.getElementById('recCode').value = r.code;
@@ -797,7 +791,6 @@
 
         window.deleteRecruiter = function(id) { if(confirm('¿Seguro que quieres eliminar a este reclutador?')) { remove(ref(db, 'recruiters/' + id)); if(editingRecruiterId === id) resetRecruiterForm(); } }
         
-        // CORRECCIÓN DINÁMICA DE LINKS (Para que funcionen en Vercel, Netlify o .com)
         window.copyLink = function(code) { 
             const link = `${window.location.origin}/?ref=${code}`; 
             navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); 
@@ -812,7 +805,6 @@
             }).join('');
         }
 
-        // REGISTER CLICK (ANTI DOBLE CLICK) - CONFIRMADO QUE ESTÁ AQUÍ
         window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
             btn.disabled = true;
             const originalText = btn.innerHTML;
@@ -839,7 +831,6 @@
             const phoneCode = document.getElementById('jobPhoneCode').value;
             const rawPhone = document.getElementById('jobContact').value.trim();
             
-            // VALIDACIÓN Y LIMPIEZA PARA JOB CONTACT
             let cleanPhone = rawPhone.replace(/\D/g, '');
             const codeDigits = phoneCode.replace('+', '');
             if (cleanPhone.startsWith(codeDigits)) {
@@ -886,7 +877,7 @@
                 const parts = dateString.split('-');
                 if(parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
             }
-            return dateString; // Si es legacy o texto libre, lo muestra tal cual
+            return dateString;
         }
 
         function renderJobs() {
@@ -1105,6 +1096,8 @@
             document.getElementById('jobCity').value = j.city || '';
             document.getElementById('jobZone').value = j.zone || '';
             
+            // INTENTO DE COMPATIBILIDAD CON FECHAS VIEJAS
+            // Si el input date falla al recibir "12/01/2026", lo dejamos pasar y que el usuario lo corrija si quiere
             document.getElementById('jobDate').value = j.fecha || ''; 
 
             if(!j.city && j.location) document.getElementById('jobCity').value = j.location;
@@ -1153,25 +1146,37 @@
             XLSX.utils.book_append_sheet(wb, ws, "Vacantes"); XLSX.writeFile(wb, "Respaldo_Completo.xlsx");
         }
 
+        // CAMBIO: FILTRADO POR MES ACTUAL EN MÉTRICAS
         window.exportMetrics = function() {
              if(!Object.keys(jobs).length) return alert('Sin datos para métricas');
+            
             const generalData = Object.keys(jobs).map(id => {
                 const j = jobs[id]; const stats = jobStats[id] || {};
                 return {
-                    'ID Vacante': id, 'Puesto': j.title, 'Empresa': j.company, 'Vistas Totales': stats.totalViews || 0, 'Clics WhatsApp': stats.whatsappClicks || 0
+                    'ID Vacante': id, 'Puesto': j.title, 'Empresa': j.company, 'Vistas Totales': stats.totalViews || 0, 'Clics WhatsApp Total': stats.whatsappClicks || 0
                 };
             });
+
             const breakdown = {};
+            // Filtrar solo los logs que coincidan con el mes actual en el timestamp o date_readable
+            // Usamos una lógica simple de string matching con YYYY-MM
+            const currentMonthStr = new Date().toISOString().slice(0, 7); // "2026-01"
+
             Object.values(clickLogs).forEach(log => {
-                const key = (log.recruiter||'Desc') + '|' + log.jobId;
-                if(!breakdown[key]) breakdown[key] = { rec: log.recruiter, jId: log.jobId, clicks: 0 };
-                breakdown[key].clicks++;
+                // Si el log tiene timestamp y coincide con el mes actual
+                if (log.timestamp && log.timestamp.startsWith(currentMonthStr)) {
+                    const key = (log.recruiter||'Orgánico') + '|' + log.jobId;
+                    if(!breakdown[key]) breakdown[key] = { rec: log.recruiter, jId: log.jobId, clicks: 0 };
+                    breakdown[key].clicks++;
+                }
             });
-            const recruiterData = Object.values(breakdown).map(i => ({ 'Reclutador': i.rec, 'ID': i.jId, 'Clics': i.clicks }));
+
+            const recruiterData = Object.values(breakdown).map(i => ({ 'Reclutador': i.rec, 'ID': i.jId, 'Clics (Mes Actual)': i.clicks }));
+            
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(generalData), "General_KPIs"); 
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(recruiterData), "Desempeño_Reclutadores");
-            XLSX.writeFile(wb, `Reporte_Metricas_${currentMonthKey}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(recruiterData), "Desempeño_Mes_Actual");
+            XLSX.writeFile(wb, `Reporte_Metricas_${currentMonthStr}.xlsx`);
         }
 
         window.downloadTemplate = function() {
@@ -1198,10 +1203,11 @@
             XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); XLSX.writeFile(wb, 'plantilla.xlsx');
         }
 
-        // CAMBIO IMPORTANTE: TRACKING EN SHARE
         window.shareApp = async function() {
              const refCode = sessionStorage.getItem('recruiterCode');
-             const url = refCode ? `${window.location.origin}/?ref=${refCode}` : window.location.href;
+             // Encode para evitar romper URL si el código tiene caracteres raros
+             const encodedRef = refCode ? encodeURIComponent(refCode) : '';
+             const url = encodedRef ? `${window.location.origin}/?ref=${encodedRef}` : window.location.href;
              
              const data = { 
                  title: 'TuChamba', 
@@ -1211,6 +1217,7 @@
              if(navigator.share) await navigator.share(data); else window.open(`https://wa.me/?text=${encodeURIComponent(data.text+' '+data.url)}`);
         }
         
+        // FUNCIÓN IMPORTAR ULTIMATE (NORMALIZACIÓN COMPLETA)
         window.importFromExcel = function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1224,12 +1231,15 @@
                     if(!json.length) { alert('Archivo vacío'); return; }
                     let count = 0;
                     
+                    // Helper para normalizar (quita acentos y mayúsculas)
+                    const normalizeKey = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
                     const findKey = (row, keyName) => {
-                        return Object.keys(row).find(k => k.toLowerCase() === keyName.toLowerCase());
+                        return Object.keys(row).find(k => normalizeKey(k) === normalizeKey(keyName));
                     };
 
                     json.forEach((row, i) => {
-                         const titleKey = findKey(row, 'título') || findKey(row, 'titulo');
+                         const titleKey = findKey(row, 'título');
                          const companyKey = findKey(row, 'empresa');
                          
                          const title = titleKey ? row[titleKey] : null;
@@ -1248,7 +1258,15 @@
 
                          let contactRaw = row[findKey(row, 'contacto')] || '';
                          contactRaw = String(contactRaw).replace(/\D/g, ''); 
-                         if(contactRaw.length === 10) contactRaw = '+52' + contactRaw; 
+                         
+                         // LÓGICA DE TELÉFONO EN IMPORTACIÓN
+                         // Asumimos MX (+52) si son 10 dígitos exactos. 
+                         // Si ya trae lada (12 o 13 dígitos), lo dejamos tal cual o le agregamos +
+                         if(contactRaw.length === 10) {
+                             contactRaw = '+52' + contactRaw;
+                         } else if (contactRaw.length > 10 && !contactRaw.startsWith('+')) {
+                             contactRaw = '+' + contactRaw;
+                         }
 
                          const jobData = {
                              title: title, 
@@ -1260,7 +1278,7 @@
                              fecha: row[findKey(row, 'fecha')] || '', 
                              
                              salary: row[findKey(row, 'salario')] || '', 
-                             description: row[findKey(row, 'descripción')] || row[findKey(row, 'descripcion')] || '',
+                             description: row[findKey(row, 'descripción')] || '',
                              schedule: row[findKey(row, 'jornada')] || 'Horario a definir',
                              tags: row[findKey(row, 'etiquetas')] || '',
                              requirements: (row[findKey(row, 'requisitos')]) ? String(row[findKey(row, 'requisitos')]).split(' | ') : [],
