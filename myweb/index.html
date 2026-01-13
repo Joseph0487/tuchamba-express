@@ -755,8 +755,15 @@
             
             if(!name || !rawPhone || !code) return alert('Por favor, llena todos los campos.');
             
-            // VALIDACIÓN Y LIMPIEZA DE TELÉFONO
-            const cleanPhone = rawPhone.replace(/\D/g, '');
+            // VALIDACIÓN Y LIMPIEZA DE TELÉFONO MEJORADA (EVITA DOBLE PREFIJO)
+            let cleanPhone = rawPhone.replace(/\D/g, '');
+            
+            // Si el usuario pegó el número con el código de país (ej. 5255...), lo quitamos para no duplicar
+            const codeDigits = phoneCode.replace('+', ''); // ej. "52"
+            if (cleanPhone.startsWith(codeDigits)) {
+                cleanPhone = cleanPhone.substring(codeDigits.length);
+            }
+            
             const finalPhone = phoneCode + cleanPhone;
 
             const duplicateCheck = Object.entries(recruiters).find(([key, r]) => { return r.code === code && key !== editingRecruiterId; });
@@ -770,11 +777,11 @@
             const r = recruiters[id]; if(!r) return;
             document.getElementById('recName').value = r.name; 
             
-            // SEPARAR LADA DE NUMERO PARA EDICION (BÁSICO)
             let phoneVal = r.phone;
+            // Detección automática básica de lada
             if(phoneVal.startsWith('+52')) { document.getElementById('recPhoneCode').value = '+52'; phoneVal = phoneVal.replace('+52',''); }
             else if(phoneVal.startsWith('+1')) { document.getElementById('recPhoneCode').value = '+1'; phoneVal = phoneVal.replace('+1',''); }
-            // Agrega más si necesitas, por defecto deja el numero entero si no coincide
+            // ... otros códigos
             document.getElementById('recPhone').value = phoneVal; 
 
             document.getElementById('recCode').value = r.code;
@@ -805,26 +812,14 @@
             }).join('');
         }
 
-        // FUNCIÓN MEJORADA: REGISTER CLICK (ANTI DOBLE CLICK)
+        // REGISTER CLICK (ANTI DOBLE CLICK) - CONFIRMADO QUE ESTÁ AQUÍ
         window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
-            // Desactiva el botón visualmente
             btn.disabled = true;
             const originalText = btn.innerHTML;
             btn.innerHTML = '🔄 Abriendo...';
-            
-            // Registra el clic
             window.registerClick(jobId, recruiterName);
-            
-            // Abre WhatsApp en nueva pestaña
-            setTimeout(() => {
-                window.open(link, '_blank');
-            }, 300); // Pequeño delay para UX
-
-            // Reactiva el botón después de 3 segundos
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }, 3000);
+            setTimeout(() => { window.open(link, '_blank'); }, 300); 
+            setTimeout(() => { btn.disabled = false; btn.innerHTML = originalText; }, 3000);
         }
 
         window.registerClick = function(jobId, recruiterName) {
@@ -841,10 +836,15 @@
         window.saveJob = function(e) {
             e.preventDefault();
             
-            // CONCATENAR TELEFONO JOB
             const phoneCode = document.getElementById('jobPhoneCode').value;
             const rawPhone = document.getElementById('jobContact').value.trim();
-            const cleanPhone = rawPhone.replace(/\D/g, '');
+            
+            // VALIDACIÓN Y LIMPIEZA PARA JOB CONTACT
+            let cleanPhone = rawPhone.replace(/\D/g, '');
+            const codeDigits = phoneCode.replace('+', '');
+            if (cleanPhone.startsWith(codeDigits)) {
+                cleanPhone = cleanPhone.substring(codeDigits.length);
+            }
             const finalPhone = cleanPhone ? (phoneCode + cleanPhone) : '';
 
             const jobData = {
@@ -856,14 +856,13 @@
                 zone: document.getElementById('jobZone').value,
                 location: `${document.getElementById('jobCity').value}, ${document.getElementById('jobState').value}`,
                 
-                // FECHA REAL
                 fecha: document.getElementById('jobDate').value, 
                 
                 salary: document.getElementById('jobSalary').value,
                 description: document.getElementById('jobDescription').value,
                 schedule: document.getElementById('jobSchedule').value, 
                 tags: document.getElementById('jobTags').value,
-                contact: finalPhone, // GUARDA CON LADA
+                contact: finalPhone, 
                 status: document.getElementById('jobStatus').value,
                 agency: document.getElementById('jobAgency').value,
                 requirements: tempReqs,
@@ -880,15 +879,14 @@
 
         function normalizeText(text) { return text ? text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : ""; }
 
-        // HELPER PARA FECHAS BONITAS
         function formatDateFriendly(dateString) {
             if(!dateString) return '';
-            // Si viene formato YYYY-MM-DD
+            // Si viene YYYY-MM-DD
             if(dateString.includes('-')) {
                 const parts = dateString.split('-');
                 if(parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
             }
-            return dateString; // Fallback para datos viejos
+            return dateString; // Si es legacy o texto libre, lo muestra tal cual
         }
 
         function renderJobs() {
@@ -899,9 +897,8 @@
                 const statusB = jobB.status === 'No Vigente' ? 1 : 0;
                 if (statusA !== statusB) return statusA - statusB;
                 
-                // ORDENAR POR FECHA (SI EXISTE)
                 if(jobA.fecha && jobB.fecha) {
-                    return jobB.fecha.localeCompare(jobA.fecha); // Más reciente primero
+                    return jobB.fecha.localeCompare(jobA.fecha); 
                 }
                 return b.localeCompare(a); 
             });
@@ -953,7 +950,6 @@
                 let displayLocation = j.location;
                 if (j.city && j.state) displayLocation = `${j.city}, ${j.state}`;
 
-                // FECHA FORMATEADA
                 const niceDate = formatDateFriendly(j.fecha);
                 const dateHtml = niceDate ? `<span class="job-date">📅 Publicación: ${niceDate}</span>` : '';
 
@@ -1032,7 +1028,6 @@
                 const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                 const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                 
-                // BOTÓN WHATSAPP MEJORADO (ANTI DOBLE CLICK)
                 contactHtml = `<div class="sticky-footer">
                                     <p style="font-size:12px; color:#666; margin-bottom:5px;">👇 Respuesta Inmediata 👇</p>
                                     <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
@@ -1093,7 +1088,6 @@
         
         window.openJobForm = function() {
             currentEditId = null; document.getElementById('formTitle').textContent = 'Nueva Vacante'; document.getElementById('jobForm').reset();
-            // FECHA HOY POR DEFECTO
             const todayISO = new Date().toISOString().split('T')[0];
             document.getElementById('jobDate').value = todayISO; 
             
@@ -1111,7 +1105,6 @@
             document.getElementById('jobCity').value = j.city || '';
             document.getElementById('jobZone').value = j.zone || '';
             
-            // ASIGNAR FECHA AL INPUT DATE
             document.getElementById('jobDate').value = j.fecha || ''; 
 
             if(!j.city && j.location) document.getElementById('jobCity').value = j.location;
@@ -1119,7 +1112,6 @@
             document.getElementById('jobDescription').value = j.description; document.getElementById('jobStatus').value = j.status||'Vigente';
             document.getElementById('jobAgency').value = j.agency||'';
             
-            // SEPARAR LADA DE CONTACTO PARA EDICION
             let contactVal = j.contact || '';
             let codeVal = '+52';
             if(contactVal.startsWith('+52')) { codeVal = '+52'; contactVal = contactVal.replace('+52',''); }
@@ -1182,11 +1174,10 @@
             XLSX.writeFile(wb, `Reporte_Metricas_${currentMonthKey}.xlsx`);
         }
 
-        // CAMBIO: NUEVA PLANTILLA CON CABECERAS EN MAYÚSCULAS Y ORDEN ESPECÍFICO
         window.downloadTemplate = function() {
             const data = [{
                 'ID': 'ej-1', 
-                'FECHA': '2026-01-12', // Formato YYYY-MM-DD
+                'FECHA': '2026-01-12', 
                 'TÍTULO': 'Ejemplo', 
                 'EMPRESA': 'Empresa', 
                 'MOSTRAR EMPRESA PUBLICAMENTE': 'SI',
@@ -1199,7 +1190,7 @@
                 'ETIQUETAS': '#Ventas', 
                 'REQUISITOS': 'Req 1 | Req 2', 
                 'BENEFICIOS': 'Ben 1 | Ben 2', 
-                'CONTACTO': '5512345678', // Sin Lada, el sistema asume +52 si faltan dígitos
+                'CONTACTO': '5512345678', 
                 'ESTATUS': 'Vigente',
                 'TIPO DE SERVICIO O AGENCIA': 'Agencia Interna'
             }];
@@ -1207,16 +1198,19 @@
             XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); XLSX.writeFile(wb, 'plantilla.xlsx');
         }
 
+        // CAMBIO IMPORTANTE: TRACKING EN SHARE
         window.shareApp = async function() {
+             const refCode = sessionStorage.getItem('recruiterCode');
+             const url = refCode ? `${window.location.origin}/?ref=${refCode}` : window.location.href;
+             
              const data = { 
                  title: 'TuChamba', 
                  text: '¡Checa esta vacante! Contratación rápida en CDMX, NL y EdoMex. Detalles aquí:', 
-                 url: window.location.href 
+                 url: url 
              };
              if(navigator.share) await navigator.share(data); else window.open(`https://wa.me/?text=${encodeURIComponent(data.text+' '+data.url)}`);
         }
         
-        // FUNCIÓN IMPORTAR INTELIGENTE (CASE INSENSITIVE + FECHA)
         window.importFromExcel = function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1230,7 +1224,6 @@
                     if(!json.length) { alert('Archivo vacío'); return; }
                     let count = 0;
                     
-                    // Helper para encontrar keys sin importar mayusculas
                     const findKey = (row, keyName) => {
                         return Object.keys(row).find(k => k.toLowerCase() === keyName.toLowerCase());
                     };
@@ -1253,10 +1246,9 @@
                          const showCompKey = findKey(row, 'mostrar empresa publicamente');
                          const showCompanyRaw = showCompKey ? row[showCompKey] : 'SI';
 
-                         // Limpieza de contacto desde Excel
                          let contactRaw = row[findKey(row, 'contacto')] || '';
-                         contactRaw = String(contactRaw).replace(/\D/g, ''); // Solo numeros
-                         if(contactRaw.length === 10) contactRaw = '+52' + contactRaw; // Asume MX si son 10
+                         contactRaw = String(contactRaw).replace(/\D/g, ''); 
+                         if(contactRaw.length === 10) contactRaw = '+52' + contactRaw; 
 
                          const jobData = {
                              title: title, 
