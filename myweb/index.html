@@ -580,25 +580,21 @@
             const listDiv = document.getElementById('metricsMonthList');
             listDiv.innerHTML = '';
 
-            // 1. Encontrar meses disponibles en el historial
             const availableMonths = new Set();
             Object.values(clickLogs).forEach(log => {
                 if(log.timestamp) {
-                    const monthStr = log.timestamp.slice(0, 7); // "YYYY-MM"
+                    const monthStr = log.timestamp.slice(0, 7); 
                     availableMonths.add(monthStr);
                 }
             });
 
-            // Si no hay datos, mostrar mensaje
             if (availableMonths.size === 0) {
                 listDiv.innerHTML = '<p style="text-align:center; color:#666;">No hay datos de historial aún.</p>';
                 return;
             }
 
-            // 2. Ordenar meses (más reciente primero)
             const sortedMonths = Array.from(availableMonths).sort().reverse();
 
-            // 3. Crear checkboxes
             sortedMonths.forEach(month => {
                 const row = document.createElement('div');
                 row.style.marginBottom = '8px';
@@ -613,7 +609,6 @@
                 checkbox.style.width = '18px';
                 checkbox.style.height = '18px';
                 
-                // Pre-seleccionar el mes actual
                 if (month === currentMonthKey) checkbox.checked = true;
 
                 const label = document.createElement('label');
@@ -632,20 +627,17 @@
         window.closeMetricsModal = function() { document.getElementById('metricsModal').classList.remove('active'); }
 
         window.downloadSelectedMetrics = function() {
-            // 1. Obtener meses seleccionados
             const checkboxes = document.querySelectorAll('#metricsMonthList input[type="checkbox"]:checked');
             const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
 
             if (selectedMonths.length === 0) return alert('Por favor selecciona al menos un mes.');
 
-            // 2. Filtrar logs
             const consolidatedData = [];
             
             Object.values(clickLogs).forEach(log => {
                 if (log.timestamp) {
                     const logMonth = log.timestamp.slice(0, 7);
                     if (selectedMonths.includes(logMonth)) {
-                        // Buscar info de la vacante para enriquecer el dato
                         const jobInfo = jobs[log.jobId] || { title: 'Borrada', company: 'N/A' };
                         
                         consolidatedData.push({
@@ -663,15 +655,10 @@
 
             if (consolidatedData.length === 0) return alert('No se encontraron datos para los meses seleccionados.');
 
-            // 3. Generar Excel "Pro"
             const wb = XLSX.utils.book_new();
-            
-            // Hoja 1: Data Cruda Consolidada (Ideal para Tablas Dinámicas)
             const wsData = XLSX.utils.json_to_sheet(consolidatedData);
             XLSX.utils.book_append_sheet(wb, wsData, "Data_Consolidada");
 
-            // Hoja 2: Resumen Rápido (Opcional, pero útil)
-            // Agrupar por reclutador y mes
             const summary = {};
             consolidatedData.forEach(row => {
                 const key = `${row['Mes Reporte']} - ${row['Reclutador / Fuente']}`;
@@ -740,9 +727,17 @@
         }
 
         window.toggleAdminLogin = function() { const f = document.getElementById('adminForm'); f.style.display = (f.style.display==='none'||f.style.display==='') ? 'block' : 'none'; }
+        
         window.login = async function() {
-            try { await setPersistence(auth, browserSessionPersistence); await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value); sessionStorage.removeItem('isGuest'); } catch (error) { alert("Error: " + error.message); }
+            try { 
+                await setPersistence(auth, browserSessionPersistence); 
+                await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value); 
+                sessionStorage.removeItem('isGuest'); 
+                // ACTIVAR MODO FANTASMA
+                localStorage.setItem('iamsuperadmin', 'true'); 
+            } catch (error) { alert("Error: " + error.message); }
         }
+        
         window.enterAsGuest = function() { sessionStorage.setItem('isGuest', 'true'); isAdmin = false; setAdminMode(false); }
         window.logout = function() { signOut(auth).then(() => { sessionStorage.removeItem('isGuest'); isAdmin = false; showLogin(); }); }
 
@@ -945,7 +940,17 @@
 
         const visitsRef = ref(db, 'siteStats/visits');
         const monthlyRef = ref(db, `siteStats/monthly/${currentMonthKey}`);
-        if (!sessionStorage.getItem('visited')) { runTransaction(visitsRef, (c) => (c || 0) + 1); runTransaction(monthlyRef, (c) => (c || 0) + 1); sessionStorage.setItem('visited', 'true'); }
+        
+        // CONTADOR INTELIGENTE + MODO FANTASMA
+        const isMyDevice = localStorage.getItem('iamsuperadmin');
+        const alreadyVisited = localStorage.getItem('visited_v2');
+
+        if (!alreadyVisited && !isMyDevice) { 
+            runTransaction(visitsRef, (c) => (c || 0) + 1); 
+            runTransaction(monthlyRef, (c) => (c || 0) + 1); 
+            localStorage.setItem('visited_v2', 'true'); 
+        }
+        
         onValue(visitsRef, (s) => { if(document.getElementById('totalVisits')) document.getElementById('totalVisits').innerText = s.val() || 0; });
         onValue(monthlyRef, (s) => { if(document.getElementById('monthlyVisits')) document.getElementById('monthlyVisits').innerText = s.val() || 0; });
 
