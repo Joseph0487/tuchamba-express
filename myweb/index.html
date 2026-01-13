@@ -43,7 +43,7 @@
         }
         #toast.show { visibility: visible !important; opacity: 1 !important; bottom: 50px !important; }
 
-        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #ccc; font-size: 12px; }
+        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #ccc; font-size: 12px; line-height: 1.6; }
         .footer-link { color: #fff; text-decoration: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
         .legal-note { color: #999; margin-top: 8px; font-style: italic; }
 
@@ -149,7 +149,6 @@
 
         .sticky-footer { position: sticky; bottom: 0; background: white; padding: 15px 20px 20px; margin: 20px -30px -30px; border-top: 1px solid #eee; text-align: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100; }
         
-        /* BOTÓN WHATSAPP CON MEJORAS VISUALES (DISABLED STATE) */
         .whatsapp-btn-large { display: flex; align-items: center; justify-content: center; width: 100%; background-color: #25D366; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); transition: transform 0.1s, background-color 0.3s, opacity 0.3s; border: none; cursor: pointer; }
         .whatsapp-btn-large:active { transform: scale(0.98); }
         .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; opacity: 0.7; }
@@ -284,7 +283,9 @@
                     </div>
                     <button class="add-job-btn" onclick="openJobForm()">➕ Nueva</button>
                     <button class="tool-btn" onclick="exportToExcel()">📦 Respaldo</button> 
-                    <button class="tool-btn metrics-btn" onclick="exportMetrics()">📊 Métricas</button>
+                    
+                    <button class="tool-btn metrics-btn" onclick="openMetricsModal()">📊 Métricas</button>
+                    
                     <button class="tool-btn team-btn" onclick="openTeamModal()">👥 Equipo</button>
                     <button class="tool-btn settings-btn" onclick="openSettingsModal()">⚙️ Ajustes</button>
                     
@@ -324,8 +325,8 @@
             </div>
 
             <div class="footer">
-                <p>TuChamba Express &copy; 2024. Todos los derechos reservados.</p>
-                <div class="legal-note">Aviso: Algunas empresas pueden solicitar examen médico y/o antidoping.</div>
+                <p>TuChamba Express &copy; 2024. Todos los derechos reservados.<br>
+                Aviso: Algunas empresas pueden solicitar examen médico y/o antidoping.</p>
                 <div style="margin-top:10px;">
                     <a class="footer-link" onclick="openPrivacyModal()">🔒 Aviso de Privacidad</a>
                 </div>
@@ -393,6 +394,18 @@
 
                 <div class="form-actions"><button type="button" class="tool-btn" style="background:#666; width:100%" onclick="closeFormModal()">Cancelar</button><button type="submit" class="btn-primary" style="width:100%">Guardar</button></div>
             </form>
+        </div>
+    </div>
+
+    <div class="modal" id="metricsModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeMetricsModal()">×</button>
+            <h2>📊 Exportar Métricas</h2>
+            <p style="margin-bottom:10px; color:#666;">Selecciona los meses que deseas incluir en el reporte:</p>
+            <div id="metricsMonthList" style="margin: 15px 0; max-height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px; background:#f9f9f9;">
+                <p style="text-align:center; color:#999;">Cargando historial...</p>
+            </div>
+            <button class="btn-primary" style="width:100%" onclick="downloadSelectedMetrics()">📥 Descargar Excel Consolidado</button>
         </div>
     </div>
 
@@ -560,6 +573,117 @@
         window.closePrivacyModal = function() { document.getElementById('privacyModal').classList.remove('active'); }
         window.openSettingsModal = function() { document.getElementById('settingsModal').classList.add('active'); if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone; }
         window.closeSettingsModal = function() { document.getElementById('settingsModal').classList.remove('active'); }
+
+        // FUNCIONES NUEVAS MODAL MÉTRICAS
+        window.openMetricsModal = function() {
+            document.getElementById('metricsModal').classList.add('active');
+            const listDiv = document.getElementById('metricsMonthList');
+            listDiv.innerHTML = '';
+
+            // 1. Encontrar meses disponibles en el historial
+            const availableMonths = new Set();
+            Object.values(clickLogs).forEach(log => {
+                if(log.timestamp) {
+                    const monthStr = log.timestamp.slice(0, 7); // "YYYY-MM"
+                    availableMonths.add(monthStr);
+                }
+            });
+
+            // Si no hay datos, mostrar mensaje
+            if (availableMonths.size === 0) {
+                listDiv.innerHTML = '<p style="text-align:center; color:#666;">No hay datos de historial aún.</p>';
+                return;
+            }
+
+            // 2. Ordenar meses (más reciente primero)
+            const sortedMonths = Array.from(availableMonths).sort().reverse();
+
+            // 3. Crear checkboxes
+            sortedMonths.forEach(month => {
+                const row = document.createElement('div');
+                row.style.marginBottom = '8px';
+                row.style.display = 'flex';
+                row.style.alignItems = 'center';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = month;
+                checkbox.id = 'chk-' + month;
+                checkbox.style.marginRight = '10px';
+                checkbox.style.width = '18px';
+                checkbox.style.height = '18px';
+                
+                // Pre-seleccionar el mes actual
+                if (month === currentMonthKey) checkbox.checked = true;
+
+                const label = document.createElement('label');
+                label.htmlFor = 'chk-' + month;
+                label.textContent = month;
+                label.style.fontWeight = 'bold';
+                label.style.fontSize = '16px';
+                label.style.color = '#333';
+
+                row.appendChild(checkbox);
+                row.appendChild(label);
+                listDiv.appendChild(row);
+            });
+        }
+
+        window.closeMetricsModal = function() { document.getElementById('metricsModal').classList.remove('active'); }
+
+        window.downloadSelectedMetrics = function() {
+            // 1. Obtener meses seleccionados
+            const checkboxes = document.querySelectorAll('#metricsMonthList input[type="checkbox"]:checked');
+            const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
+
+            if (selectedMonths.length === 0) return alert('Por favor selecciona al menos un mes.');
+
+            // 2. Filtrar logs
+            const consolidatedData = [];
+            
+            Object.values(clickLogs).forEach(log => {
+                if (log.timestamp) {
+                    const logMonth = log.timestamp.slice(0, 7);
+                    if (selectedMonths.includes(logMonth)) {
+                        // Buscar info de la vacante para enriquecer el dato
+                        const jobInfo = jobs[log.jobId] || { title: 'Borrada', company: 'N/A' };
+                        
+                        consolidatedData.push({
+                            'Fecha Exacta': new Date(log.timestamp).toLocaleString(),
+                            'Mes Reporte': logMonth,
+                            'Reclutador / Fuente': log.recruiter || 'Orgánico',
+                            'ID Vacante': log.jobId,
+                            'Puesto': jobInfo.title,
+                            'Empresa': jobInfo.company,
+                            'Tipo': 'Clic WhatsApp'
+                        });
+                    }
+                }
+            });
+
+            if (consolidatedData.length === 0) return alert('No se encontraron datos para los meses seleccionados.');
+
+            // 3. Generar Excel "Pro"
+            const wb = XLSX.utils.book_new();
+            
+            // Hoja 1: Data Cruda Consolidada (Ideal para Tablas Dinámicas)
+            const wsData = XLSX.utils.json_to_sheet(consolidatedData);
+            XLSX.utils.book_append_sheet(wb, wsData, "Data_Consolidada");
+
+            // Hoja 2: Resumen Rápido (Opcional, pero útil)
+            // Agrupar por reclutador y mes
+            const summary = {};
+            consolidatedData.forEach(row => {
+                const key = `${row['Mes Reporte']} - ${row['Reclutador / Fuente']}`;
+                if (!summary[key]) summary[key] = { Mes: row['Mes Reporte'], Reclutador: row['Reclutador / Fuente'], Clics: 0 };
+                summary[key].Clics++;
+            });
+            const wsSummary = XLSX.utils.json_to_sheet(Object.values(summary));
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Resumen_Ejecutivo");
+
+            XLSX.writeFile(wb, `Reporte_Metricas_Consolidado.xlsx`);
+            window.closeMetricsModal();
+        }
 
         window.requestPassword = function(action) {
             pendingAction = action;
@@ -1066,8 +1190,6 @@
                 ${(j.requirements||[]).length ? `<div class="section-title">Requisitos</div><ul class="item-list">${j.requirements.map(r=>`<li>${r}</li>`).join('')}</ul>` : ''}
                 ${(j.benefits||[]).length ? `<div class="section-title">Beneficios</div><ul class="item-list">${j.benefits.map(b=>`<li>${b}</li>`).join('')}</ul>` : ''}
                 
-                <p style="font-size:12px; color:#888; font-style:italic; margin-top:20px;">⚠️ Nota: Algunas empresas pueden solicitar examen médico y/o antidoping.</p>
-                
                 ${contactHtml}
             `;
             document.getElementById('viewModal').classList.add('active');
@@ -1096,8 +1218,6 @@
             document.getElementById('jobCity').value = j.city || '';
             document.getElementById('jobZone').value = j.zone || '';
             
-            // INTENTO DE COMPATIBILIDAD CON FECHAS VIEJAS
-            // Si el input date falla al recibir "12/01/2026", lo dejamos pasar y que el usuario lo corrija si quiere
             document.getElementById('jobDate').value = j.fecha || ''; 
 
             if(!j.city && j.location) document.getElementById('jobCity').value = j.location;
@@ -1146,39 +1266,6 @@
             XLSX.utils.book_append_sheet(wb, ws, "Vacantes"); XLSX.writeFile(wb, "Respaldo_Completo.xlsx");
         }
 
-        // CAMBIO: FILTRADO POR MES ACTUAL EN MÉTRICAS
-        window.exportMetrics = function() {
-             if(!Object.keys(jobs).length) return alert('Sin datos para métricas');
-            
-            const generalData = Object.keys(jobs).map(id => {
-                const j = jobs[id]; const stats = jobStats[id] || {};
-                return {
-                    'ID Vacante': id, 'Puesto': j.title, 'Empresa': j.company, 'Vistas Totales': stats.totalViews || 0, 'Clics WhatsApp Total': stats.whatsappClicks || 0
-                };
-            });
-
-            const breakdown = {};
-            // Filtrar solo los logs que coincidan con el mes actual en el timestamp o date_readable
-            // Usamos una lógica simple de string matching con YYYY-MM
-            const currentMonthStr = new Date().toISOString().slice(0, 7); // "2026-01"
-
-            Object.values(clickLogs).forEach(log => {
-                // Si el log tiene timestamp y coincide con el mes actual
-                if (log.timestamp && log.timestamp.startsWith(currentMonthStr)) {
-                    const key = (log.recruiter||'Orgánico') + '|' + log.jobId;
-                    if(!breakdown[key]) breakdown[key] = { rec: log.recruiter, jId: log.jobId, clicks: 0 };
-                    breakdown[key].clicks++;
-                }
-            });
-
-            const recruiterData = Object.values(breakdown).map(i => ({ 'Reclutador': i.rec, 'ID': i.jId, 'Clics (Mes Actual)': i.clicks }));
-            
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(generalData), "General_KPIs"); 
-            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(recruiterData), "Desempeño_Mes_Actual");
-            XLSX.writeFile(wb, `Reporte_Metricas_${currentMonthStr}.xlsx`);
-        }
-
         window.downloadTemplate = function() {
             const data = [{
                 'ID': 'ej-1', 
@@ -1196,7 +1283,7 @@
                 'REQUISITOS': 'Req 1 | Req 2', 
                 'BENEFICIOS': 'Ben 1 | Ben 2', 
                 'CONTACTO': '5512345678', 
-                'ESTATUS': 'Vigente',
+                'ESTATUS': 'Vigente', 
                 'TIPO DE SERVICIO O AGENCIA': 'Agencia Interna'
             }];
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
@@ -1205,7 +1292,6 @@
 
         window.shareApp = async function() {
              const refCode = sessionStorage.getItem('recruiterCode');
-             // Encode para evitar romper URL si el código tiene caracteres raros
              const encodedRef = refCode ? encodeURIComponent(refCode) : '';
              const url = encodedRef ? `${window.location.origin}/?ref=${encodedRef}` : window.location.href;
              
@@ -1217,7 +1303,6 @@
              if(navigator.share) await navigator.share(data); else window.open(`https://wa.me/?text=${encodeURIComponent(data.text+' '+data.url)}`);
         }
         
-        // FUNCIÓN IMPORTAR ULTIMATE (NORMALIZACIÓN COMPLETA)
         window.importFromExcel = function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1231,7 +1316,6 @@
                     if(!json.length) { alert('Archivo vacío'); return; }
                     let count = 0;
                     
-                    // Helper para normalizar (quita acentos y mayúsculas)
                     const normalizeKey = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
                     const findKey = (row, keyName) => {
@@ -1259,9 +1343,6 @@
                          let contactRaw = row[findKey(row, 'contacto')] || '';
                          contactRaw = String(contactRaw).replace(/\D/g, ''); 
                          
-                         // LÓGICA DE TELÉFONO EN IMPORTACIÓN
-                         // Asumimos MX (+52) si son 10 dígitos exactos. 
-                         // Si ya trae lada (12 o 13 dígitos), lo dejamos tal cual o le agregamos +
                          if(contactRaw.length === 10) {
                              contactRaw = '+52' + contactRaw;
                          } else if (contactRaw.length > 10 && !contactRaw.startsWith('+')) {
