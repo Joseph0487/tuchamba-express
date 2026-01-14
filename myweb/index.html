@@ -76,7 +76,8 @@
         .admin-login-form { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); text-align: left; animation: fadeIn 0.5s; color: white; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .container { max-width: 1000px; margin: 0 auto; }
+        /* CAMBIO 1: CONTENEDOR MÁS ANCHO (DE 1000px a 1250px) */
+        .container { max-width: 1250px; margin: 0 auto; }
 
         .header { 
             background: white; 
@@ -159,7 +160,9 @@
         .metric-val { color: #0a66c2; font-weight: 800; margin-left: 4px; margin-right: 12px; }
         .admin-mode-indicator { background: #ffe0b2; color: #e65100; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ffcc80; }
 
-        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        /* CAMBIO 2: GRID MÁS ANCHO (Min 350px en lugar de 300px) */
+        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        
         .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .job-card:hover { transform: translateY(-4px); }
         .job-card.hidden { display: none; }
@@ -1171,7 +1174,7 @@
             const badgeHtml = isVigente ? '<span class="badge-vigente">🟢 Vigente</span>' : '<span class="badge-closed">Cerrada</span>';
             
             const niceDate = formatDateFriendly(j.fecha);
-            const dateHtml = niceDate ? `<span style="font-size:0.8rem; color:#888;">Publicación: ${niceDate}</span>` : '';
+            const dateHtml = niceDate ? `<span class="job-date">📅 Publicación: ${niceDate}</span>` : '';
 
             document.getElementById('viewModalBody').innerHTML = `
                 ${adminInfoHtml}
