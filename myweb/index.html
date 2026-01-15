@@ -123,15 +123,14 @@
         }
         #recruiterBanner:hover { background: #bbdefb !important; }
 
-        /* V16.11: SEARCH BAR MEJORADO CON BOTÓN CLEAR */
         .search-container {
             width: 100%;
             margin-bottom: 10px;
-            position: relative; /* Para posicionar el tache */
+            position: relative;
         }
         .search-input {
             width: 100%;
-            padding: 12px 40px 12px 15px; /* Espacio extra a la derecha para el botón */
+            padding: 12px 40px 12px 15px;
             border-radius: 8px;
             border: 1px solid #ddd;
             font-size: 15px;
@@ -153,7 +152,7 @@
             width: 24px;
             height: 24px;
             cursor: pointer;
-            display: none; /* Oculto por defecto */
+            display: none;
             align-items: center;
             justify-content: center;
             font-size: 14px;
@@ -499,9 +498,9 @@
         
         if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
 
-        // V16.11 FIX: DEEP LINK AHORA SÍ SALTA EL LOBBY
+        // V16.12: DEEP LINK PROTEGIDO (VALIDA VIGENCIA)
         onAuthStateChanged(auth, (user) => {
-            const urlJobId = urlParams.get('id'); // Checamos ID aquí
+            const urlJobId = urlParams.get('id'); 
             
             if (user) { 
                 isAdmin = true; 
@@ -510,7 +509,6 @@
             } else {
                 isAdmin = false;
                 currentUserEmail = "";
-                // AGREGADO: || urlJobId para dejar pasar si trae ID
                 if (sessionStorage.getItem('isGuest') === 'true' || refCode || urlJobId) { 
                     setAdminMode(false); 
                 } 
@@ -598,6 +596,20 @@
             loadData();
         }
 
+        // V16.12: HELPER PARA PARSEAR FECHAS REALES (SORTING FIX)
+        function parseJobDate(dateString) {
+            if (!dateString) return 0;
+            let jobDate;
+            if (dateString.includes('/')) { // DD/MM/YYYY
+                const parts = dateString.split('/');
+                if (parts.length === 3) jobDate = new Date(parts[2], parts[1] - 1, parts[0]);
+            } else if (dateString.includes('-')) { // YYYY-MM-DD
+                const parts = dateString.split('-');
+                if (parts.length === 3) jobDate = new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+            return jobDate && !isNaN(jobDate.getTime()) ? jobDate.getTime() : 0;
+        }
+
         function loadData() {
             onValue(ref(db, 'jobs'), (s) => { 
                 jobs = s.val() || {}; 
@@ -606,15 +618,20 @@
                 populateFilters(jobs); 
                 renderJobs(); 
                 
-                // V16.11: DEEP LINKING LÓGICA DE APERTURA
+                // V16.12: DEEP LINKING CON VALIDACIÓN DE VIGENCIA
                 const urlJobId = urlParams.get('id');
                 if (urlJobId && jobs[urlJobId]) {
-                    // Aseguramos que la UI correcta esté visible
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('mainApp').style.display = 'block';
-                    
-                    if(!isAdmin) sessionStorage.setItem('isGuest', 'true');
-                    window.openViewModal(urlJobId);
+                    const job = jobs[urlJobId];
+                    // Si es admin, entra. Si no, debe estar Vigente.
+                    if (job.status !== 'No Vigente' || isAdmin) {
+                        document.getElementById('loginScreen').style.display = 'none';
+                        document.getElementById('mainApp').style.display = 'block';
+                        if(!isAdmin) sessionStorage.setItem('isGuest', 'true');
+                        window.openViewModal(urlJobId);
+                    } else {
+                        window.showToast("⚠️ Esta vacante ya no está disponible.");
+                    }
+                    // Limpiar URL siempre para evitar bucles
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             });
@@ -886,23 +903,29 @@
 
         function renderJobs() {
             let keys = Object.keys(jobs);
+            
+            // V16.12: ORDENAMIENTO POR FECHA REAL (NUMÉRICA)
             keys.sort((a, b) => {
                 const jobA = jobs[a]; const jobB = jobs[b];
                 const statusA = jobA.status === 'No Vigente' ? 1 : 0;
                 const statusB = jobB.status === 'No Vigente' ? 1 : 0;
                 if (statusA !== statusB) return statusA - statusB;
                 
-                if(jobA.fecha && jobB.fecha) {
-                    return jobB.fecha.localeCompare(jobA.fecha); 
+                // Convertir fecha a timestamp para comparar números reales
+                const dateA = parseJobDate(jobA.fecha);
+                const dateB = parseJobDate(jobB.fecha);
+                
+                if (dateA !== dateB) {
+                    return dateB - dateA; // Descendente (Más nueva primero)
                 }
-                return b.localeCompare(a); 
+                
+                return b.localeCompare(a); // Fallback: ID más nuevo
             });
 
             currentFilteredJobs = keys; 
             applyFilterAndRender();
         }
 
-        // V16.11: CLEAR SEARCH FUNCTION
         window.clearSearch = function() {
             document.getElementById('searchInput').value = '';
             filterJobs();
@@ -915,7 +938,6 @@
             const searchInput = document.getElementById('searchInput');
             const searchText = normalizeText(searchInput.value);
             
-            // V16.11: Mostrar/Ocultar botón X
             const clearBtn = document.getElementById('clearSearchBtn');
             clearBtn.style.display = searchText.length > 0 ? 'flex' : 'none';
 
@@ -1037,9 +1059,24 @@
             let targetPhone = '';
             let isReferral = false;
 
-            if (activeRecruiter) { targetPhone = activeRecruiter.phone; isReferral = true; } 
-            else if (j.contact) { targetPhone = j.contact.replace(/\D/g, ''); } 
-            else if (centralPhone) { targetPhone = centralPhone.replace(/\D/g, ''); }
+            // V16.12: VALIDACIÓN DE WHATSAPP ROBUSTA
+            // Limpiamos el contacto del Excel
+            let excelContact = j.contact ? j.contact.replace(/\D/g, '') : '';
+            // Validamos si tiene al menos 10 dígitos (para evitar números basura como "123")
+            let isExcelContactValid = excelContact.length >= 10;
+
+            if (activeRecruiter) { 
+                targetPhone = activeRecruiter.phone; 
+                isReferral = true; 
+            } 
+            else if (isExcelContactValid) { 
+                // Usamos el del Excel SOLO si es válido
+                targetPhone = excelContact; 
+            } 
+            else if (centralPhone) { 
+                // Fallback a Central si el Excel está vacío O es inválido
+                targetPhone = centralPhone.replace(/\D/g, ''); 
+            }
 
             if (targetPhone) {
                 let msg = `Hola, vi la vacante ${j.title} (Cód: ${id})`;
