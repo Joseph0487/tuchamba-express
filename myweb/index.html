@@ -43,7 +43,7 @@
         }
         #toast.show { visibility: visible !important; opacity: 1 !important; bottom: 50px !important; }
 
-        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #ccc; font-size: 12px; line-height: 1.6; }
+        .footer { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #ccc; font-size: 12px; line-height: 1.6; }
         .footer-link { color: #fff; text-decoration: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
         .legal-note { color: #999; margin-top: 8px; font-style: italic; }
 
@@ -76,7 +76,7 @@
         .admin-login-form { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); text-align: left; animation: fadeIn 0.5s; color: white; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* CAMBIO 1: CONTENEDOR MÁS ANCHO (DE 1000px a 1250px) */
+        /* V16.6: Contenedor ancho para Desktop */
         .container { max-width: 1250px; margin: 0 auto; }
 
         .header { 
@@ -104,22 +104,43 @@
             align-items: center;
         }
 
+        /* BANNER RECLUTADOR (Ahora irá al fondo) */
         #recruiterBanner { 
             background: #e3f2fd !important; 
             color: #0d47a1 !important; 
-            padding: 8px 12px; 
+            padding: 10px 15px; 
             border-radius: 8px; 
+            margin-top: 30px; 
             margin-bottom: 10px; 
             font-size: 13px; 
             display: flex !important; 
             align-items: center; 
+            justify-content: center;
             gap: 10px; 
             border: 1px solid #bbdefb; 
             font-weight: 600; 
             cursor: pointer; 
             transition: all 0.2s; 
+            text-align: center;
         }
         #recruiterBanner:hover { background: #bbdefb !important; }
+
+        /* V16.7: NUEVO SEARCH BAR */
+        .search-container {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 15px;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: border 0.2s;
+        }
+        .search-input:focus { border-color: #0a66c2; }
 
         .filter-container { 
             background: white; 
@@ -160,7 +181,7 @@
         .metric-val { color: #0a66c2; font-weight: 800; margin-left: 4px; margin-right: 12px; }
         .admin-mode-indicator { background: #ffe0b2; color: #e65100; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ffcc80; }
 
-        /* CAMBIO 2: GRID MÁS ANCHO (Min 350px en lugar de 300px) */
+        /* V16.6: Tarjetas más anchas para que quepa la fecha */
         .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         
         .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -171,6 +192,10 @@
         
         .badge-vigente { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
         .badge-closed { background: #ffebee; color: #c62828; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
+        
+        /* V16.7: Badge NUEVA */
+        .badge-new { background: #fff3e0; color: #e65100; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; margin-left: 5px; border: 1px solid #ffcc80; }
+
         .job-date { font-size: 0.75rem; color: #888; background: #f5f5f5; padding: 2px 8px; border-radius: 4px; }
 
         .job-title { font-size: 1.2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; line-height: 1.3; }
@@ -274,10 +299,6 @@
                 </div>
             </div>
 
-            <div id="recruiterBanner" onclick="contactCentralOffice()">
-                👤 Asistido por: <span id="recruiterNameDisplay">Oficina Central</span> (Clic para contacto)
-            </div>
-
             <div id="adminControls" style="display: none;">
                 <div class="admin-controls-wrapper">
                     <div class="metrics-card">
@@ -286,9 +307,7 @@
                     </div>
                     <button class="add-job-btn" onclick="openJobForm()">➕ Nueva</button>
                     <button class="tool-btn" onclick="exportToExcel()">📦 Respaldo</button> 
-                    
                     <button class="tool-btn metrics-btn" onclick="openMetricsModal()">📊 Métricas</button>
-                    
                     <button class="tool-btn team-btn" onclick="openTeamModal()">👥 Equipo</button>
                     <button class="tool-btn settings-btn" onclick="openSettingsModal()">⚙️ Ajustes</button>
                     
@@ -301,6 +320,10 @@
             <button id="mobileFilterToggle" onclick="toggleMobileFilters()">
                 🔍 Filtros de Búsqueda <span>▼</span>
             </button>
+
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar vacante, empresa, palabras clave..." onkeyup="filterJobs()">
+            </div>
 
             <div class="filter-container" id="filterContainer">
                 <div class="filter-icon-box">
@@ -325,6 +348,10 @@
             
             <div id="loadMoreContainer" class="load-more-container" style="display:none;">
                 <button class="btn-load-more" onclick="loadMoreJobs()">⬇️ Ver más vacantes</button>
+            </div>
+
+            <div id="recruiterBanner" onclick="contactCentralOffice()">
+                👤 Asistido por: <span id="recruiterNameDisplay">Oficina Central</span> (Clic para contacto)
             </div>
 
             <div class="footer">
@@ -473,23 +500,9 @@
                 <h3 style="font-size:16px; margin-bottom:10px; color:#d32f2f;">⚠️ Zona de Peligro (Admin)</h3>
                 <p style="font-size:12px; color:#666;">Acciones irreversibles protegidas por contraseña.</p>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <button class="danger-btn" onclick="requestPassword('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button>
-                    <button class="danger-btn" onclick="requestPassword('deleteJobs')">🔥 Borrar TODAS las Vacantes</button>
+                    <button class="danger-btn" onclick="performSafeAction('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button>
+                    <button class="danger-btn" onclick="performSafeAction('deleteJobs')">🔥 Borrar TODAS las Vacantes</button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="passwordModal">
-        <div class="modal-content" style="max-width:400px; text-align:center;">
-            <button class="close-btn" onclick="closePasswordModal()">×</button>
-            <div style="font-size:40px; margin-bottom:10px;">🔒</div>
-            <h3 style="margin-bottom:15px;">Acción Protegida</h3>
-            <p style="margin-bottom:20px; color:#666;">Ingresa la contraseña de administrador:</p>
-            <input type="password" id="adminPasswordInput" placeholder="Contraseña..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-bottom:20px; font-size:16px;">
-            <div style="display:flex; gap:10px;">
-                <button class="tool-btn" style="flex:1; justify-content:center; background:#999;" onclick="closePasswordModal()">Cancelar</button>
-                <button class="btn-primary" style="flex:1; justify-content:center;" onclick="submitPassword()">Confirmar</button>
             </div>
         </div>
     </div>
@@ -533,6 +546,7 @@
         const db = getDatabase(app);
 
         let isAdmin = false;
+        let currentUserEmail = ""; // V16.7: Para seguridad
         let currentEditId = null;
         let jobs = {};
         let jobStats = {}; 
@@ -542,8 +556,6 @@
         let activeRecruiter = null; 
         let centralPhone = ''; 
         let editingRecruiterId = null; 
-        
-        let pendingAction = null; 
 
         let tempReqs = [];
         let tempBens = [];
@@ -558,9 +570,14 @@
         if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
 
         onAuthStateChanged(auth, (user) => {
-            if (user) { isAdmin = true; setAdminMode(true); } 
-            else {
-                if (sessionStorage.getItem('isGuest') === 'true' || refCode) { isAdmin = false; setAdminMode(false); } 
+            if (user) { 
+                isAdmin = true; 
+                currentUserEmail = user.email; // Guardamos el email
+                setAdminMode(true); 
+            } else {
+                isAdmin = false;
+                currentUserEmail = "";
+                if (sessionStorage.getItem('isGuest') === 'true' || refCode) { setAdminMode(false); } 
                 else { showLogin(); }
             }
         });
@@ -577,128 +594,16 @@
         window.openSettingsModal = function() { document.getElementById('settingsModal').classList.add('active'); if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone; }
         window.closeSettingsModal = function() { document.getElementById('settingsModal').classList.remove('active'); }
 
-        // FUNCIONES NUEVAS MODAL MÉTRICAS
-        window.openMetricsModal = function() {
-            document.getElementById('metricsModal').classList.add('active');
-            const listDiv = document.getElementById('metricsMonthList');
-            listDiv.innerHTML = '';
-
-            const availableMonths = new Set();
-            Object.values(clickLogs).forEach(log => {
-                if(log.timestamp) {
-                    const monthStr = log.timestamp.slice(0, 7); 
-                    availableMonths.add(monthStr);
-                }
-            });
-
-            if (availableMonths.size === 0) {
-                listDiv.innerHTML = '<p style="text-align:center; color:#666;">No hay datos de historial aún.</p>';
+        // V16.7: SEGURIDAD REAL (Sin contraseña escrita)
+        window.performSafeAction = function(action) {
+            if (!isAdmin || !currentUserEmail) {
+                alert("Acceso denegado. Debes ser administrador.");
                 return;
             }
-
-            const sortedMonths = Array.from(availableMonths).sort().reverse();
-
-            sortedMonths.forEach(month => {
-                const row = document.createElement('div');
-                row.style.marginBottom = '8px';
-                row.style.display = 'flex';
-                row.style.alignItems = 'center';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.value = month;
-                checkbox.id = 'chk-' + month;
-                checkbox.style.marginRight = '10px';
-                checkbox.style.width = '18px';
-                checkbox.style.height = '18px';
-                
-                if (month === currentMonthKey) checkbox.checked = true;
-
-                const label = document.createElement('label');
-                label.htmlFor = 'chk-' + month;
-                label.textContent = month;
-                label.style.fontWeight = 'bold';
-                label.style.fontSize = '16px';
-                label.style.color = '#333';
-
-                row.appendChild(checkbox);
-                row.appendChild(label);
-                listDiv.appendChild(row);
-            });
-        }
-
-        window.closeMetricsModal = function() { document.getElementById('metricsModal').classList.remove('active'); }
-
-        window.downloadSelectedMetrics = function() {
-            const checkboxes = document.querySelectorAll('#metricsMonthList input[type="checkbox"]:checked');
-            const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
-
-            if (selectedMonths.length === 0) return alert('Por favor selecciona al menos un mes.');
-
-            const consolidatedData = [];
             
-            Object.values(clickLogs).forEach(log => {
-                if (log.timestamp) {
-                    const logMonth = log.timestamp.slice(0, 7);
-                    if (selectedMonths.includes(logMonth)) {
-                        const jobInfo = jobs[log.jobId] || { title: 'Borrada', company: 'N/A' };
-                        
-                        consolidatedData.push({
-                            'Fecha Exacta': new Date(log.timestamp).toLocaleString(),
-                            'Mes Reporte': logMonth,
-                            'Reclutador / Fuente': log.recruiter || 'Orgánico',
-                            'ID Vacante': log.jobId,
-                            'Puesto': jobInfo.title,
-                            'Empresa': jobInfo.company,
-                            'Tipo': 'Clic WhatsApp'
-                        });
-                    }
-                }
-            });
-
-            if (consolidatedData.length === 0) return alert('No se encontraron datos para los meses seleccionados.');
-
-            const wb = XLSX.utils.book_new();
-            const wsData = XLSX.utils.json_to_sheet(consolidatedData);
-            XLSX.utils.book_append_sheet(wb, wsData, "Data_Consolidada");
-
-            const summary = {};
-            consolidatedData.forEach(row => {
-                const key = `${row['Mes Reporte']} - ${row['Reclutador / Fuente']}`;
-                if (!summary[key]) summary[key] = { Mes: row['Mes Reporte'], Reclutador: row['Reclutador / Fuente'], Clics: 0 };
-                summary[key].Clics++;
-            });
-            const wsSummary = XLSX.utils.json_to_sheet(Object.values(summary));
-            XLSX.utils.book_append_sheet(wb, wsSummary, "Resumen_Ejecutivo");
-
-            XLSX.writeFile(wb, `Reporte_Metricas_Consolidado.xlsx`);
-            window.closeMetricsModal();
-        }
-
-        window.requestPassword = function(action) {
-            pendingAction = action;
-            document.getElementById('adminPasswordInput').value = '';
-            document.getElementById('passwordModal').classList.add('active');
-            setTimeout(() => document.getElementById('adminPasswordInput').focus(), 100);
-        }
-
-        window.closePasswordModal = function() {
-            document.getElementById('passwordModal').classList.remove('active');
-            pendingAction = null;
-        }
-
-        window.submitPassword = function() {
-            const pass = document.getElementById('adminPasswordInput').value;
-            if (pass === "Adm1n*+-2025") {
-                const actionToRun = pendingAction; 
-                if(confirm("¿Estás seguro de que quieres realizar esta acción? Es irreversible.")) {
-                    if (actionToRun === 'resetMetrics') resetMetrics();
-                    if (actionToRun === 'deleteJobs') deleteAllJobs();
-                    window.closePasswordModal(); 
-                }
-            } else {
-                window.showToast("⛔ Contraseña incorrecta");
-                document.getElementById('adminPasswordInput').value = '';
+            if(confirm("⚠️ ¿ESTÁS SEGURO? Esta acción es irreversible.")) {
+                if (action === 'resetMetrics') resetMetrics();
+                if (action === 'deleteJobs') deleteAllJobs();
             }
         }
 
@@ -736,7 +641,6 @@
                 await setPersistence(auth, browserSessionPersistence); 
                 await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value); 
                 sessionStorage.removeItem('isGuest'); 
-                // ACTIVAR MODO FANTASMA
                 localStorage.setItem('iamsuperadmin', 'true'); 
             } catch (error) { alert("Error: " + error.message); }
         }
@@ -766,6 +670,14 @@
                 document.getElementById('jobGrid').style.display = 'grid';
                 populateFilters(jobs); 
                 renderJobs(); 
+                
+                // V16.7: DEEP LINKING CHECK
+                const urlJobId = urlParams.get('id');
+                if (urlJobId && jobs[urlJobId]) {
+                    window.openViewModal(urlJobId);
+                    // Limpiar URL para que no se reabra al refrescar
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
             });
             onValue(ref(db, 'jobStats'), (s) => { jobStats = s.val() || {}; });
             onValue(ref(db, 'clickLogs'), (s) => { clickLogs = s.val() || {}; });
@@ -913,6 +825,7 @@
 
         window.deleteRecruiter = function(id) { if(confirm('¿Seguro que quieres eliminar a este reclutador?')) { remove(ref(db, 'recruiters/' + id)); if(editingRecruiterId === id) resetRecruiterForm(); } }
         
+        // V16.7: COPY LINK CON DEEP LINKING
         window.copyLink = function(code) { 
             const link = `${window.location.origin}/?ref=${code}`; 
             navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); 
@@ -944,7 +857,6 @@
         const visitsRef = ref(db, 'siteStats/visits');
         const monthlyRef = ref(db, `siteStats/monthly/${currentMonthKey}`);
         
-        // CONTADOR INTELIGENTE + MODO FANTASMA
         const isMyDevice = localStorage.getItem('iamsuperadmin');
         const alreadyVisited = localStorage.getItem('visited_v2');
 
@@ -1004,12 +916,20 @@
 
         function formatDateFriendly(dateString) {
             if(!dateString) return '';
-            // Si viene YYYY-MM-DD
             if(dateString.includes('-')) {
                 const parts = dateString.split('-');
                 if(parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
             }
             return dateString;
+        }
+
+        // V16.7: HELPER PARA SABER SI ES NUEVA (3 Días)
+        function isNewJob(dateString) {
+            if(!dateString || !dateString.includes('-')) return false;
+            const oneDay = 24 * 60 * 60 * 1000;
+            const pubDate = new Date(dateString);
+            const diffDays = Math.round(Math.abs((new Date() - pubDate) / oneDay));
+            return diffDays <= 3;
         }
 
         function renderJobs() {
@@ -1033,6 +953,9 @@
         function applyFilterAndRender() {
             const stateVal = document.getElementById('stateFilter').value;
             const cityVal = document.getElementById('cityFilter').value;
+            
+            // V16.7: LÓGICA DE BUSCADOR
+            const searchText = normalizeText(document.getElementById('searchInput').value);
 
             const matchedKeys = currentFilteredJobs.filter(id => {
                 const j = jobs[id];
@@ -1041,8 +964,15 @@
 
                 const matchState = stateVal === '' || j.state === stateVal;
                 const matchCity = cityVal === '' || j.city === cityVal;
+                
+                // Búsqueda por texto (Título, Empresa, Tags)
+                let matchSearch = true;
+                if(searchText) {
+                    const fullText = normalizeText(`${j.title} ${j.company} ${j.tags} ${j.description}`);
+                    matchSearch = fullText.includes(searchText);
+                }
 
-                return matchState && matchCity;
+                return matchState && matchCity && matchSearch;
             });
 
             document.getElementById('jobCounter').textContent = `${matchedKeys.length} vacantes encontradas`;
@@ -1075,6 +1005,9 @@
 
                 const niceDate = formatDateFriendly(j.fecha);
                 const dateHtml = niceDate ? `<span class="job-date">📅 Publicación: ${niceDate}</span>` : '';
+                
+                // V16.7: BADGE NUEVO AUTOMÁTICO
+                const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
 
                 return `
                     <div class="job-card" onclick="window.openViewModal('${id}')">
@@ -1085,7 +1018,10 @@
                         </div>` : ''}
                         
                         <div class="card-top-row">
-                            ${statusBadge}
+                            <div>
+                                ${statusBadge}
+                                ${newBadge}
+                            </div>
                             ${dateHtml}
                         </div>
                         
@@ -1172,19 +1108,30 @@
             
             const isVigente = j.status !== 'No Vigente';
             const badgeHtml = isVigente ? '<span class="badge-vigente">🟢 Vigente</span>' : '<span class="badge-closed">Cerrada</span>';
-            
             const niceDate = formatDateFriendly(j.fecha);
-            const dateHtml = niceDate ? `<span class="job-date">📅 Publicación: ${niceDate}</span>` : '';
+            const dateHtml = niceDate ? `<span style="font-size:0.8rem; color:#888;">Publicación: ${niceDate}</span>` : '';
+            const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
 
+            // V16.7: SHARE BUTTON PARA VACANTE INDIVIDUAL
+            // Genera link directo con ?id=xxx
+            const shareUrl = `${window.location.origin}/?id=${id}${refCode ? '&ref='+refCode : ''}`;
+            
             document.getElementById('viewModalBody').innerHTML = `
                 ${adminInfoHtml}
                 
                 <div class="card-top-row" style="margin-top:10px; margin-right:40px;">
-                    ${badgeHtml}
+                    <div>
+                        ${badgeHtml}
+                        ${newBadge}
+                    </div>
                     ${dateHtml}
                 </div>
 
-                <h2 style="font-size: 24px; margin-bottom: 5px; color:#333;">${j.title}</h2>
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <h2 style="font-size: 24px; margin-bottom: 5px; color:#333; flex:1;">${j.title}</h2>
+                    <button class="tool-btn" onclick="navigator.clipboard.writeText('${shareUrl}').then(() => window.showToast('🔗 Link copiado'))" style="padding: 5px 10px; font-size: 12px;">🔗 Copiar Link</button>
+                </div>
+                
                 <div style="font-size: 18px; color: #0a66c2; margin-bottom: 20px;">${companyDisplay}</div>
 
                 <div class="job-details">
@@ -1272,6 +1219,103 @@
             });
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Vacantes"); XLSX.writeFile(wb, "Respaldo_Completo.xlsx");
+        }
+
+        window.openMetricsModal = function() {
+            document.getElementById('metricsModal').classList.add('active');
+            const listDiv = document.getElementById('metricsMonthList');
+            listDiv.innerHTML = '';
+
+            const availableMonths = new Set();
+            Object.values(clickLogs).forEach(log => {
+                if(log.timestamp) {
+                    const monthStr = log.timestamp.slice(0, 7); 
+                    availableMonths.add(monthStr);
+                }
+            });
+
+            if (availableMonths.size === 0) {
+                listDiv.innerHTML = '<p style="text-align:center; color:#666;">No hay datos de historial aún.</p>';
+                return;
+            }
+
+            const sortedMonths = Array.from(availableMonths).sort().reverse();
+
+            sortedMonths.forEach(month => {
+                const row = document.createElement('div');
+                row.style.marginBottom = '8px';
+                row.style.display = 'flex';
+                row.style.alignItems = 'center';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = month;
+                checkbox.id = 'chk-' + month;
+                checkbox.style.marginRight = '10px';
+                checkbox.style.width = '18px';
+                checkbox.style.height = '18px';
+                
+                if (month === currentMonthKey) checkbox.checked = true;
+
+                const label = document.createElement('label');
+                label.htmlFor = 'chk-' + month;
+                label.textContent = month;
+                label.style.fontWeight = 'bold';
+                label.style.fontSize = '16px';
+                label.style.color = '#333';
+
+                row.appendChild(checkbox);
+                row.appendChild(label);
+                listDiv.appendChild(row);
+            });
+        }
+
+        window.closeMetricsModal = function() { document.getElementById('metricsModal').classList.remove('active'); }
+
+        window.downloadSelectedMetrics = function() {
+            const checkboxes = document.querySelectorAll('#metricsMonthList input[type="checkbox"]:checked');
+            const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
+
+            if (selectedMonths.length === 0) return alert('Por favor selecciona al menos un mes.');
+
+            const consolidatedData = [];
+            
+            Object.values(clickLogs).forEach(log => {
+                if (log.timestamp) {
+                    const logMonth = log.timestamp.slice(0, 7);
+                    if (selectedMonths.includes(logMonth)) {
+                        const jobInfo = jobs[log.jobId] || { title: 'Borrada', company: 'N/A' };
+                        
+                        consolidatedData.push({
+                            'Fecha Exacta': new Date(log.timestamp).toLocaleString(),
+                            'Mes Reporte': logMonth,
+                            'Reclutador / Fuente': log.recruiter || 'Orgánico',
+                            'ID Vacante': log.jobId,
+                            'Puesto': jobInfo.title,
+                            'Empresa': jobInfo.company,
+                            'Tipo': 'Clic WhatsApp'
+                        });
+                    }
+                }
+            });
+
+            if (consolidatedData.length === 0) return alert('No se encontraron datos para los meses seleccionados.');
+
+            const wb = XLSX.utils.book_new();
+            const wsData = XLSX.utils.json_to_sheet(consolidatedData);
+            XLSX.utils.book_append_sheet(wb, wsData, "Data_Consolidada");
+
+            const summary = {};
+            consolidatedData.forEach(row => {
+                const key = `${row['Mes Reporte']} - ${row['Reclutador / Fuente']}`;
+                if (!summary[key]) summary[key] = { Mes: row['Mes Reporte'], Reclutador: row['Reclutador / Fuente'], Clics: 0 };
+                summary[key].Clics++;
+            });
+            const wsSummary = XLSX.utils.json_to_sheet(Object.values(summary));
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Resumen_Ejecutivo");
+
+            XLSX.writeFile(wb, `Reporte_Metricas_Consolidado.xlsx`);
+            window.closeMetricsModal();
         }
 
         window.downloadTemplate = function() {
