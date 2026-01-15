@@ -76,7 +76,6 @@
         .admin-login-form { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); text-align: left; animation: fadeIn 0.5s; color: white; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* V16.6: Contenedor ancho para Desktop */
         .container { max-width: 1250px; margin: 0 auto; }
 
         .header { 
@@ -104,7 +103,6 @@
             align-items: center;
         }
 
-        /* BANNER RECLUTADOR (Ahora irá al fondo) */
         #recruiterBanner { 
             background: #e3f2fd !important; 
             color: #0d47a1 !important; 
@@ -125,7 +123,6 @@
         }
         #recruiterBanner:hover { background: #bbdefb !important; }
 
-        /* V16.7: NUEVO SEARCH BAR */
         .search-container {
             width: 100%;
             margin-bottom: 10px;
@@ -181,7 +178,6 @@
         .metric-val { color: #0a66c2; font-weight: 800; margin-left: 4px; margin-right: 12px; }
         .admin-mode-indicator { background: #ffe0b2; color: #e65100; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ffcc80; }
 
-        /* V16.6: Tarjetas más anchas para que quepa la fecha */
         .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         
         .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -193,7 +189,7 @@
         .badge-vigente { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
         .badge-closed { background: #ffebee; color: #c62828; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
         
-        /* V16.7: Badge NUEVA */
+        /* V16.9: Badge NUEVA REUBICADO */
         .badge-new { background: #fff3e0; color: #e65100; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; margin-left: 5px; border: 1px solid #ffcc80; }
 
         .job-date { font-size: 0.75rem; color: #888; background: #f5f5f5; padding: 2px 8px; border-radius: 4px; }
@@ -439,93 +435,6 @@
         </div>
     </div>
 
-    <div class="modal" id="teamModal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeTeamModal()">×</button>
-            <h2>👥 Gestión de Reclutadores</h2>
-            <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #eee;">
-                <div style="display:flex; flex-direction:column; gap:10px;">
-                    <input type="hidden" id="recIdEdit"> 
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                         <div style="flex:1; min-width:150px;">
-                            <label style="font-size:12px; font-weight:bold; color:#555;">Nombre</label>
-                            <input type="text" id="recName" placeholder="Ej. Juan Pérez" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                        </div>
-                        <div style="width:120px;">
-                            <label style="font-size:12px; font-weight:bold; color:#555;">Código</label>
-                            <input type="text" id="recCode" placeholder="Ej. JUAN" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; text-transform:uppercase;">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label style="font-size:12px; font-weight:bold; color:#555;">WhatsApp</label>
-                        <div class="phone-group">
-                            <select id="recPhoneCode" class="phone-select" style="padding:8px; height:36px;">
-                                <option value="+52">🇲🇽 +52</option>
-                                <option value="+1">🇺🇸 +1</option>
-                                <option value="+57">🇨🇴 +57</option>
-                                <option value="+54">🇦🇷 +54</option>
-                                <option value="+51">🇵🇪 +51</option>
-                                <option value="+34">🇪🇸 +34</option>
-                            </select>
-                            <input type="text" id="recPhone" placeholder="10 dígitos" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                        </div>
-                    </div>
-
-                    <div style="display:flex; gap:10px; margin-top:5px;">
-                        <button type="button" id="btnSaveRecruiter" class="btn-primary" style="flex:1; padding:9px 15px;" onclick="saveRecruiter()">Agregar</button>
-                        <button type="button" id="btnCancelRecruiter" class="tool-btn" style="flex:0; display:none; background:#999;" onclick="resetRecruiterForm()">Cancelar</button>
-                    </div>
-                </div>
-            </div>
-            <table class="recruiters-table">
-                <thead><tr><th>Nombre</th><th>Código</th><th>Link</th><th>Acciones</th></tr></thead>
-                <tbody id="recruitersList"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="modal" id="settingsModal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeSettingsModal()">×</button>
-            <h2>⚙️ Ajustes del Sistema</h2>
-            <div style="background:#e3f2fd; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #bbdefb;">
-                <h3 style="font-size:16px; margin-bottom:10px; color:#0d47a1;">📞 Teléfono Oficina Central (Respaldo)</h3>
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:4px;">
-                    <button id="btnSaveCentral" class="btn-primary" onclick="saveCentralConfig()">Guardar</button>
-                </div>
-            </div>
-            <div class="danger-section">
-                <h3 style="font-size:16px; margin-bottom:10px; color:#d32f2f;">⚠️ Zona de Peligro (Admin)</h3>
-                <p style="font-size:12px; color:#666;">Acciones irreversibles protegidas por contraseña.</p>
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <button class="danger-btn" onclick="performSafeAction('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button>
-                    <button class="danger-btn" onclick="performSafeAction('deleteJobs')">🔥 Borrar TODAS las Vacantes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="privacyModal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closePrivacyModal()">×</button>
-            <h2 style="margin-bottom:20px;">🔒 Aviso de Privacidad</h2>
-            <div style="font-size:14px; color:#444; line-height:1.6; max-height:60vh; overflow-y:auto; padding-right:10px;">
-                <p><strong>Última actualización: Enero 2026</strong></p><br>
-                <p>En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, TuChamba Express informa:</p><br>
-                <p><strong>1. Responsable de los datos:</strong><br>TuChamba Express actúa como enlace entre candidatos y empresas reclutadoras.</p><br>
-                <p><strong>2. Datos recopilados:</strong><br>Podemos recopilar datos de contacto (como número telefónico) con el único fin de facilitar la comunicación para procesos de reclutamiento.</p><br>
-                <p><strong>3. Uso de la información:</strong><br>Los datos proporcionados serán utilizados exclusivamente para:<br>- Contactar al candidato respecto a la vacante de interés.<br>- Agendar entrevistas laborales.<br>- Procesos internos de selección.</p><br>
-                <p><strong>4. Compartir datos:</strong><br>Su información de contacto será compartida únicamente con la empresa o reclutador responsable de la vacante a la que usted decida postularse voluntariamente.</p><br>
-                <p><strong>5. Examen Médico:</strong><br>Al utilizar esta plataforma, usted reconoce que algunas empresas contratantes pueden requerir, como parte de su proceso de selección y conforme a la ley, la realización de exámenes médicos y/o pruebas de detección de sustancias.</p>
-            </div>
-            <div style="margin-top:20px; text-align:right;">
-                <button class="btn-primary" onclick="closePrivacyModal()">Entendido</button>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -546,7 +455,7 @@
         const db = getDatabase(app);
 
         let isAdmin = false;
-        let currentUserEmail = ""; // V16.7: Para seguridad
+        let currentUserEmail = ""; 
         let currentEditId = null;
         let jobs = {};
         let jobStats = {}; 
@@ -572,7 +481,7 @@
         onAuthStateChanged(auth, (user) => {
             if (user) { 
                 isAdmin = true; 
-                currentUserEmail = user.email; // Guardamos el email
+                currentUserEmail = user.email; 
                 setAdminMode(true); 
             } else {
                 isAdmin = false;
@@ -594,7 +503,6 @@
         window.openSettingsModal = function() { document.getElementById('settingsModal').classList.add('active'); if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone; }
         window.closeSettingsModal = function() { document.getElementById('settingsModal').classList.remove('active'); }
 
-        // V16.7: SEGURIDAD REAL (Sin contraseña escrita)
         window.performSafeAction = function(action) {
             if (!isAdmin || !currentUserEmail) {
                 alert("Acceso denegado. Debes ser administrador.");
@@ -671,11 +579,13 @@
                 populateFilters(jobs); 
                 renderJobs(); 
                 
-                // V16.7: DEEP LINKING CHECK
+                // V16.8 FIX: DEEP LINKING SALTA EL LOBBY
                 const urlJobId = urlParams.get('id');
                 if (urlJobId && jobs[urlJobId]) {
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'block';
+                    if(!isAdmin) sessionStorage.setItem('isGuest', 'true');
                     window.openViewModal(urlJobId);
-                    // Limpiar URL para que no se reabra al refrescar
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             });
@@ -825,7 +735,6 @@
 
         window.deleteRecruiter = function(id) { if(confirm('¿Seguro que quieres eliminar a este reclutador?')) { remove(ref(db, 'recruiters/' + id)); if(editingRecruiterId === id) resetRecruiterForm(); } }
         
-        // V16.7: COPY LINK CON DEEP LINKING
         window.copyLink = function(code) { 
             const link = `${window.location.origin}/?ref=${code}`; 
             navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); 
@@ -915,20 +824,38 @@
         function normalizeText(text) { return text ? text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : ""; }
 
         function formatDateFriendly(dateString) {
-            if(!dateString) return '';
-            if(dateString.includes('-')) {
-                const parts = dateString.split('-');
-                if(parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
-            return dateString;
+            return dateString || '';
         }
 
-        // V16.7: HELPER PARA SABER SI ES NUEVA (3 Días)
+        // V16.9 FIX: SOPORTE TOTAL PARA FECHAS DD/MM/YYYY Y YYYY-MM-DD
         function isNewJob(dateString) {
-            if(!dateString || !dateString.includes('-')) return false;
-            const oneDay = 24 * 60 * 60 * 1000;
-            const pubDate = new Date(dateString);
-            const diffDays = Math.round(Math.abs((new Date() - pubDate) / oneDay));
+            if (!dateString) return false;
+            let jobDate;
+            
+            // Intento 1: Formato DD/MM/YYYY (Excel/Mexicano)
+            if (dateString.includes('/')) {
+                const parts = dateString.split('/');
+                if (parts.length === 3) {
+                    // new Date(año, mes-1, dia)
+                    jobDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                }
+            } 
+            // Intento 2: Formato YYYY-MM-DD (ISO/Programador)
+            else if (dateString.includes('-')) {
+                const parts = dateString.split('-');
+                if (parts.length === 3) {
+                    jobDate = new Date(parts[0], parts[1] - 1, parts[2]);
+                }
+            }
+
+            if (!jobDate || isNaN(jobDate.getTime())) return false;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); 
+
+            const diffTime = Math.abs(today - jobDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
             return diffDays <= 3;
         }
 
@@ -954,7 +881,6 @@
             const stateVal = document.getElementById('stateFilter').value;
             const cityVal = document.getElementById('cityFilter').value;
             
-            // V16.7: LÓGICA DE BUSCADOR
             const searchText = normalizeText(document.getElementById('searchInput').value);
 
             const matchedKeys = currentFilteredJobs.filter(id => {
@@ -965,7 +891,6 @@
                 const matchState = stateVal === '' || j.state === stateVal;
                 const matchCity = cityVal === '' || j.city === cityVal;
                 
-                // Búsqueda por texto (Título, Empresa, Tags)
                 let matchSearch = true;
                 if(searchText) {
                     const fullText = normalizeText(`${j.title} ${j.company} ${j.tags} ${j.description}`);
@@ -1006,7 +931,7 @@
                 const niceDate = formatDateFriendly(j.fecha);
                 const dateHtml = niceDate ? `<span class="job-date">📅 Publicación: ${niceDate}</span>` : '';
                 
-                // V16.7: BADGE NUEVO AUTOMÁTICO
+                // V16.9: BADGE NUEVA
                 const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
 
                 return `
@@ -1018,7 +943,7 @@
                         </div>` : ''}
                         
                         <div class="card-top-row">
-                            <div>
+                            <div style="display:flex; align-items:center;">
                                 ${statusBadge}
                                 ${newBadge}
                             </div>
@@ -1112,15 +1037,13 @@
             const dateHtml = niceDate ? `<span style="font-size:0.8rem; color:#888;">Publicación: ${niceDate}</span>` : '';
             const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
 
-            // V16.7: SHARE BUTTON PARA VACANTE INDIVIDUAL
-            // Genera link directo con ?id=xxx
             const shareUrl = `${window.location.origin}/?id=${id}${refCode ? '&ref='+refCode : ''}`;
             
             document.getElementById('viewModalBody').innerHTML = `
                 ${adminInfoHtml}
                 
                 <div class="card-top-row" style="margin-top:10px; margin-right:40px;">
-                    <div>
+                    <div style="display:flex; align-items:center;">
                         ${badgeHtml}
                         ${newBadge}
                     </div>
@@ -1221,107 +1144,10 @@
             XLSX.utils.book_append_sheet(wb, ws, "Vacantes"); XLSX.writeFile(wb, "Respaldo_Completo.xlsx");
         }
 
-        window.openMetricsModal = function() {
-            document.getElementById('metricsModal').classList.add('active');
-            const listDiv = document.getElementById('metricsMonthList');
-            listDiv.innerHTML = '';
-
-            const availableMonths = new Set();
-            Object.values(clickLogs).forEach(log => {
-                if(log.timestamp) {
-                    const monthStr = log.timestamp.slice(0, 7); 
-                    availableMonths.add(monthStr);
-                }
-            });
-
-            if (availableMonths.size === 0) {
-                listDiv.innerHTML = '<p style="text-align:center; color:#666;">No hay datos de historial aún.</p>';
-                return;
-            }
-
-            const sortedMonths = Array.from(availableMonths).sort().reverse();
-
-            sortedMonths.forEach(month => {
-                const row = document.createElement('div');
-                row.style.marginBottom = '8px';
-                row.style.display = 'flex';
-                row.style.alignItems = 'center';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.value = month;
-                checkbox.id = 'chk-' + month;
-                checkbox.style.marginRight = '10px';
-                checkbox.style.width = '18px';
-                checkbox.style.height = '18px';
-                
-                if (month === currentMonthKey) checkbox.checked = true;
-
-                const label = document.createElement('label');
-                label.htmlFor = 'chk-' + month;
-                label.textContent = month;
-                label.style.fontWeight = 'bold';
-                label.style.fontSize = '16px';
-                label.style.color = '#333';
-
-                row.appendChild(checkbox);
-                row.appendChild(label);
-                listDiv.appendChild(row);
-            });
-        }
-
-        window.closeMetricsModal = function() { document.getElementById('metricsModal').classList.remove('active'); }
-
-        window.downloadSelectedMetrics = function() {
-            const checkboxes = document.querySelectorAll('#metricsMonthList input[type="checkbox"]:checked');
-            const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
-
-            if (selectedMonths.length === 0) return alert('Por favor selecciona al menos un mes.');
-
-            const consolidatedData = [];
-            
-            Object.values(clickLogs).forEach(log => {
-                if (log.timestamp) {
-                    const logMonth = log.timestamp.slice(0, 7);
-                    if (selectedMonths.includes(logMonth)) {
-                        const jobInfo = jobs[log.jobId] || { title: 'Borrada', company: 'N/A' };
-                        
-                        consolidatedData.push({
-                            'Fecha Exacta': new Date(log.timestamp).toLocaleString(),
-                            'Mes Reporte': logMonth,
-                            'Reclutador / Fuente': log.recruiter || 'Orgánico',
-                            'ID Vacante': log.jobId,
-                            'Puesto': jobInfo.title,
-                            'Empresa': jobInfo.company,
-                            'Tipo': 'Clic WhatsApp'
-                        });
-                    }
-                }
-            });
-
-            if (consolidatedData.length === 0) return alert('No se encontraron datos para los meses seleccionados.');
-
-            const wb = XLSX.utils.book_new();
-            const wsData = XLSX.utils.json_to_sheet(consolidatedData);
-            XLSX.utils.book_append_sheet(wb, wsData, "Data_Consolidada");
-
-            const summary = {};
-            consolidatedData.forEach(row => {
-                const key = `${row['Mes Reporte']} - ${row['Reclutador / Fuente']}`;
-                if (!summary[key]) summary[key] = { Mes: row['Mes Reporte'], Reclutador: row['Reclutador / Fuente'], Clics: 0 };
-                summary[key].Clics++;
-            });
-            const wsSummary = XLSX.utils.json_to_sheet(Object.values(summary));
-            XLSX.utils.book_append_sheet(wb, wsSummary, "Resumen_Ejecutivo");
-
-            XLSX.writeFile(wb, `Reporte_Metricas_Consolidado.xlsx`);
-            window.closeMetricsModal();
-        }
-
         window.downloadTemplate = function() {
             const data = [{
                 'ID': 'ej-1', 
-                'FECHA': '2026-01-12', 
+                'FECHA': '15/01/2026', 
                 'TÍTULO': 'Ejemplo', 
                 'EMPRESA': 'Empresa', 
                 'MOSTRAR EMPRESA PUBLICAMENTE': 'SI',
