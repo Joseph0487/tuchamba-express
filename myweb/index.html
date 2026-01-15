@@ -123,13 +123,15 @@
         }
         #recruiterBanner:hover { background: #bbdefb !important; }
 
+        /* V16.11: SEARCH BAR MEJORADO CON BOTÓN CLEAR */
         .search-container {
             width: 100%;
             margin-bottom: 10px;
+            position: relative; /* Para posicionar el tache */
         }
         .search-input {
             width: 100%;
-            padding: 12px 15px;
+            padding: 12px 40px 12px 15px; /* Espacio extra a la derecha para el botón */
             border-radius: 8px;
             border: 1px solid #ddd;
             font-size: 15px;
@@ -138,6 +140,26 @@
             transition: border 0.2s;
         }
         .search-input:focus { border-color: #0a66c2; }
+        
+        .search-clear-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ddd;
+            color: #666;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: none; /* Oculto por defecto */
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .search-clear-btn:hover { background: #ccc; }
 
         .filter-container { 
             background: white; 
@@ -184,7 +206,6 @@
         .job-card:hover { transform: translateY(-4px); }
         .job-card.hidden { display: none; }
 
-        /* V16.10: Header de tarjeta dividido en 2 filas */
         .card-header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; margin-right: 35px; }
         .card-header-date { font-size: 0.75rem; color: #888; background: #f5f5f5; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 12px; }
         
@@ -318,6 +339,7 @@
 
             <div class="search-container">
                 <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar vacante, empresa, palabras clave..." onkeyup="filterJobs()">
+                <button id="clearSearchBtn" class="search-clear-btn" onclick="clearSearch()">✕</button>
             </div>
 
             <div class="filter-container" id="filterContainer">
@@ -477,7 +499,10 @@
         
         if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
 
+        // V16.11 FIX: DEEP LINK AHORA SÍ SALTA EL LOBBY
         onAuthStateChanged(auth, (user) => {
+            const urlJobId = urlParams.get('id'); // Checamos ID aquí
+            
             if (user) { 
                 isAdmin = true; 
                 currentUserEmail = user.email; 
@@ -485,7 +510,10 @@
             } else {
                 isAdmin = false;
                 currentUserEmail = "";
-                if (sessionStorage.getItem('isGuest') === 'true' || refCode) { setAdminMode(false); } 
+                // AGREGADO: || urlJobId para dejar pasar si trae ID
+                if (sessionStorage.getItem('isGuest') === 'true' || refCode || urlJobId) { 
+                    setAdminMode(false); 
+                } 
                 else { showLogin(); }
             }
         });
@@ -578,11 +606,13 @@
                 populateFilters(jobs); 
                 renderJobs(); 
                 
-                // V16.8 FIX: DEEP LINKING SALTA EL LOBBY
+                // V16.11: DEEP LINKING LÓGICA DE APERTURA
                 const urlJobId = urlParams.get('id');
                 if (urlJobId && jobs[urlJobId]) {
+                    // Aseguramos que la UI correcta esté visible
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('mainApp').style.display = 'block';
+                    
                     if(!isAdmin) sessionStorage.setItem('isGuest', 'true');
                     window.openViewModal(urlJobId);
                     window.history.replaceState({}, document.title, window.location.pathname);
@@ -826,20 +856,16 @@
             return dateString || '';
         }
 
-        // V16.9 FIX: SOPORTE TOTAL PARA FECHAS DD/MM/YYYY Y YYYY-MM-DD
         function isNewJob(dateString) {
             if (!dateString) return false;
             let jobDate;
             
-            // Intento 1: Formato DD/MM/YYYY (Excel/Mexicano)
             if (dateString.includes('/')) {
                 const parts = dateString.split('/');
                 if (parts.length === 3) {
-                    // new Date(año, mes-1, dia)
                     jobDate = new Date(parts[2], parts[1] - 1, parts[0]);
                 }
             } 
-            // Intento 2: Formato YYYY-MM-DD (ISO/Programador)
             else if (dateString.includes('-')) {
                 const parts = dateString.split('-');
                 if (parts.length === 3) {
@@ -876,11 +902,22 @@
             applyFilterAndRender();
         }
 
+        // V16.11: CLEAR SEARCH FUNCTION
+        window.clearSearch = function() {
+            document.getElementById('searchInput').value = '';
+            filterJobs();
+            document.getElementById('searchInput').focus();
+        }
+
         function applyFilterAndRender() {
             const stateVal = document.getElementById('stateFilter').value;
             const cityVal = document.getElementById('cityFilter').value;
+            const searchInput = document.getElementById('searchInput');
+            const searchText = normalizeText(searchInput.value);
             
-            const searchText = normalizeText(document.getElementById('searchInput').value);
+            // V16.11: Mostrar/Ocultar botón X
+            const clearBtn = document.getElementById('clearSearchBtn');
+            clearBtn.style.display = searchText.length > 0 ? 'flex' : 'none';
 
             const matchedKeys = currentFilteredJobs.filter(id => {
                 const j = jobs[id];
@@ -930,7 +967,6 @@
                 const niceDate = formatDateFriendly(j.fecha);
                 const dateHtml = niceDate ? `<span class="card-header-date">📅 Publicación: ${niceDate}</span>` : '';
                 
-                // V16.10: BADGE NUEVA REUBICADO
                 const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
 
                 return `
