@@ -268,9 +268,11 @@
         .admin-action { padding: 10px 20px; width: 100%; text-align: left; border: none; background: none; cursor: pointer; }
         .admin-action:hover { background: #f9f9f9; }
 
+        /* V16.17: MODALES MÁS AMPLIOS (UI MEJORADA) */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
         .modal.active { display: flex; align-items: center; justify-content: center; }
-        .modal-content { background: white; border-radius: 16px; max-width: 600px; width: 100%; padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; padding-bottom: 0; }
+        /* Se aumentó max-width a 650px y padding a 45px */
+        .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 45px; position: relative; max-height: 90vh; overflow-y: auto; padding-bottom: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
         
         .job-details { display: grid; gap: 15px; margin-bottom: 20px; }
@@ -903,6 +905,79 @@
             }).join('');
         }
 
+        // V16.17 FIX: MÉTRICAS BLINDADAS ANTI-ERROR
+        function populateMetricsList() {
+            const list = document.getElementById('metricsMonthList');
+            if(!jobStats) { list.innerHTML = 'No hay datos'; return; }
+            
+            const months = new Set();
+            // Wrap in try-catch/checks to prevent freeze if data is bad
+            Object.values(clickLogs).forEach(log => {
+                if(log && log.timestamp && typeof log.timestamp === 'string') {
+                    try { months.add(log.timestamp.substring(0, 7)); } catch(e){}
+                }
+            });
+            
+            Object.values(jobStats).forEach(stat => {
+                if(stat && stat.monthlyViews) {
+                    Object.keys(stat.monthlyViews).forEach(m => months.add(m));
+                }
+            });
+
+            if(months.size === 0) months.add(currentMonthKey);
+
+            const sortedMonths = Array.from(months).sort().reverse();
+            
+            list.innerHTML = sortedMonths.map(m => 
+                `<label style="display:block; padding:5px; border-bottom:1px solid #eee;">
+                    <input type="checkbox" value="${m}" checked> ${m}
+                </label>`
+            ).join('');
+        }
+
+        window.downloadSelectedMetrics = function() {
+            const checkboxes = document.querySelectorAll('#metricsMonthList input:checked');
+            const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
+            
+            if(selectedMonths.length === 0) return alert("Selecciona al menos un mes");
+
+            const dataRows = [];
+            
+            Object.keys(jobs).forEach(jobId => {
+                const j = jobs[jobId];
+                const s = jobStats[jobId] || {};
+                
+                let totalViews = 0;
+                let totalClicks = 0;
+
+                selectedMonths.forEach(m => {
+                    if(s.monthlyViews && s.monthlyViews[m]) {
+                        totalViews += s.monthlyViews[m];
+                    }
+                });
+                
+                const clicksInMonths = Object.values(clickLogs).filter(l => 
+                    l && l.jobId === jobId && 
+                    l.timestamp && typeof l.timestamp === 'string' &&
+                    selectedMonths.includes(l.timestamp.substring(0,7))
+                ).length;
+
+                dataRows.push({
+                    'ID Vacante': jobId,
+                    'Título': j.title,
+                    'Empresa': j.company,
+                    'Vistas (Meses selecc.)': totalViews,
+                    'Clics WhatsApp (Meses selecc.)': clicksInMonths,
+                    'Estatus': j.status
+                });
+            });
+
+            const ws = XLSX.utils.json_to_sheet(dataRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+            XLSX.writeFile(wb, `Metricas_${selectedMonths.join('_')}.xlsx`);
+        }
+
         window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
             btn.disabled = true;
             const originalText = btn.innerHTML;
@@ -1191,7 +1266,6 @@
                 runTransaction(ref(db, `jobStats/${id}/monthlyViews/${currentMonthKey}`), (c) => (c || 0) + 1);
             }
             
-            // V16.17 SEO: Cambio Dinámico de Título
             document.title = `Trabajo en ${j.city || 'México'} - ${j.title} | TuChamba`;
 
             const stats = jobStats[id] || {};
@@ -1285,7 +1359,6 @@
         }
 
         window.closeViewModal = function() { 
-            // V16.17 SEO: Restaurar Título Original
             document.title = "TuChamba Express | Vacantes Urgentes en CDMX, Monterrey y EdoMex 2026";
             document.getElementById('viewModal').classList.remove('active'); 
         }
