@@ -184,8 +184,48 @@
         .danger-section { background: #ffebee; padding: 15px; border-radius: 8px; border: 1px solid #ef9a9a; margin-top: 25px; }
         .danger-btn { background: #d32f2f; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
 
-        .load-more-container { text-align: center; margin-top: 30px; margin-bottom: 40px; }
-        .btn-load-more { background: white; color: #0a66c2; border: 2px solid #0a66c2; padding: 12px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        /* V16.16: Paginación */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin-top: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .page-btn {
+            background: white;
+            border: 1px solid #ddd;
+            color: #0a66c2;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .page-btn:hover {
+            background: #f0f2f5;
+            border-color: #0a66c2;
+        }
+        .page-btn.active {
+            background: #0a66c2;
+            color: white;
+            border-color: #0a66c2;
+        }
+        .page-btn:disabled {
+            background: #f9f9f9;
+            color: #ccc;
+            cursor: not-allowed;
+            border-color: #eee;
+        }
+        .page-info {
+            width: 100%;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            margin-top: 10px;
+        }
 
         .sticky-footer { position: sticky; bottom: 0; background: white; padding: 15px 20px 20px; margin: 20px -30px -30px; border-top: 1px solid #eee; text-align: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100; }
         
@@ -242,7 +282,6 @@
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
         .location-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         
-        /* ESTILO PARA INPUT DE TELÉFONO INTERNACIONAL (V16.14 FIX) */
         .phone-group { display: flex; gap: 8px; align-items: center; }
         .phone-select { width: auto; min-width: 100px; max-width: 120px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #f0f2f5; cursor:pointer; }
         
@@ -254,7 +293,6 @@
         .section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px; margin-top: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px; display: inline-block; }
         .item-list li { background: #f9f9f9; padding: 8px 12px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; }
         
-        /* ESTILOS DE TABLA MEJORADOS V16.14 */
         .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .recruiters-table th, .recruiters-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
         .recruiters-table th { background: #f9fafb; color: #666; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -366,9 +404,7 @@
 
             <div class="job-grid" id="jobGrid" style="display: none;"></div>
             
-            <div id="loadMoreContainer" class="load-more-container" style="display:none;">
-                <button class="btn-load-more" onclick="loadMoreJobs()">⬇️ Ver más vacantes</button>
-            </div>
+            <div id="paginationContainer" class="pagination-container" style="display:none;"></div>
 
             <div id="recruiterBanner" onclick="contactCentralOffice()">
                 👤 Asistido por: <span id="recruiterNameDisplay">Oficina Central</span> (Clic para contacto)
@@ -556,7 +592,10 @@
 
         let tempReqs = [];
         let tempBens = [];
-        let displayLimit = 20; 
+        
+        // V16.16: CONFIGURACIÓN DE PAGINACIÓN
+        let currentPage = 1;
+        const itemsPerPage = 15;
         let currentFilteredJobs = []; 
 
         const today = new Date();
@@ -566,7 +605,6 @@
         
         if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
 
-        // V16.15 FIX: SOLO VACANTE ID SALTA EL LOBBY, NO RECRUITER CODE
         onAuthStateChanged(auth, (user) => {
             const urlJobId = urlParams.get('id'); 
             if (user) { 
@@ -576,7 +614,6 @@
             } else {
                 isAdmin = false;
                 currentUserEmail = "";
-                // Cambio V16.15: Quitamos '|| refCode'
                 if (sessionStorage.getItem('isGuest') === 'true' || urlJobId) { 
                     setAdminMode(false); 
                 } 
@@ -1039,25 +1076,23 @@
         function renderJobs() {
             let keys = Object.keys(jobs);
             
-            // V16.12: ORDENAMIENTO POR FECHA REAL (NUMÉRICA)
             keys.sort((a, b) => {
                 const jobA = jobs[a]; const jobB = jobs[b];
                 const statusA = jobA.status === 'No Vigente' ? 1 : 0;
                 const statusB = jobB.status === 'No Vigente' ? 1 : 0;
                 if (statusA !== statusB) return statusA - statusB;
                 
-                // Convertir fecha a timestamp para comparar números reales
                 const dateA = parseJobDate(jobA.fecha);
                 const dateB = parseJobDate(jobB.fecha);
                 
                 if (dateA !== dateB) {
-                    return dateB - dateA; // Descendente (Más nueva primero)
+                    return dateB - dateA; 
                 }
-                
-                return b.localeCompare(a); // Fallback: ID más nuevo
+                return b.localeCompare(a); 
             });
 
             currentFilteredJobs = keys; 
+            currentPage = 1; // Reset a primera página al reordenar o cargar
             applyFilterAndRender();
         }
 
@@ -1078,7 +1113,6 @@
 
             const matchedKeys = currentFilteredJobs.filter(id => {
                 const j = jobs[id];
-                
                 if (!isAdmin && j.status === 'No Vigente') return false;
 
                 const matchState = stateVal === '' || j.state === stateVal;
@@ -1097,14 +1131,19 @@
             
             if (matchedKeys.length === 0) {
                 document.getElementById('jobGrid').innerHTML = '';
-                document.getElementById('loadMoreContainer').style.display = 'none';
+                document.getElementById('paginationContainer').style.display = 'none';
                 document.getElementById('emptyState').style.display = 'block';
                 return;
             }
             document.getElementById('emptyState').style.display = 'none';
 
-            const visibleKeys = matchedKeys.slice(0, displayLimit);
-            const showLoadMore = matchedKeys.length > displayLimit;
+            // V16.16: LÓGICA DE PAGINACIÓN
+            const totalPages = Math.ceil(matchedKeys.length / itemsPerPage);
+            if(currentPage > totalPages) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const visibleKeys = matchedKeys.slice(startIndex, endIndex);
 
             const grid = document.getElementById('jobGrid');
             grid.innerHTML = visibleKeys.map(id => {
@@ -1123,7 +1162,6 @@
 
                 const niceDate = formatDateFriendly(j.fecha);
                 const dateHtml = niceDate ? `<span class="card-header-date">📅 Publicación: ${niceDate}</span>` : '';
-                
                 const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
 
                 return `
@@ -1158,11 +1196,50 @@
                 `;
             }).join('');
 
-            document.getElementById('loadMoreContainer').style.display = showLoadMore ? 'block' : 'none';
+            renderPaginationControls(totalPages);
+        }
+
+        // V16.16: RENDERIZAR CONTROLES DE PÁGINA
+        function renderPaginationControls(totalPages) {
+            const container = document.getElementById('paginationContainer');
+            if (totalPages <= 1) {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'flex';
+            
+            let html = '';
+            
+            // Botón Anterior
+            html += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>&laquo; Anterior</button>`;
+            
+            // Números de página (lógica simple para no saturar si son muchas)
+            // Mostramos siempre página 1, última, y cercanas a la actual
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    html += `<span style="color:#999;">...</span>`;
+                }
+            }
+
+            // Botón Siguiente
+            html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Siguiente &raquo;</button>`;
+            
+            html += `<div class="page-info">Página ${currentPage} de ${totalPages}</div>`;
+            
+            container.innerHTML = html;
+        }
+
+        window.changePage = function(newPage) {
+            currentPage = newPage;
+            applyFilterAndRender();
+            // Scroll suave al inicio de la lista
+            document.querySelector('.search-container').scrollIntoView({ behavior: 'smooth' });
         }
 
         window.filterJobs = function() {
-            displayLimit = 20; 
+            currentPage = 1; // Al filtrar, volvemos a la página 1
             applyFilterAndRender();
         }
 
@@ -1194,10 +1271,7 @@
             let targetPhone = '';
             let isReferral = false;
 
-            // V16.12: VALIDACIÓN DE WHATSAPP ROBUSTA
-            // Limpiamos el contacto del Excel
             let excelContact = j.contact ? j.contact.replace(/\D/g, '') : '';
-            // Validamos si tiene al menos 10 dígitos (para evitar números basura como "123")
             let isExcelContactValid = excelContact.length >= 10;
 
             if (activeRecruiter) { 
@@ -1205,11 +1279,9 @@
                 isReferral = true; 
             } 
             else if (isExcelContactValid) { 
-                // Usamos el del Excel SOLO si es válido
                 targetPhone = excelContact; 
             } 
             else if (centralPhone) { 
-                // Fallback a Central si el Excel está vacío O es inválido
                 targetPhone = centralPhone.replace(/\D/g, ''); 
             }
 
