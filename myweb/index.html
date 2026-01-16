@@ -566,6 +566,7 @@
         
         if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
 
+        // V16.15 FIX: SOLO VACANTE ID SALTA EL LOBBY, NO RECRUITER CODE
         onAuthStateChanged(auth, (user) => {
             const urlJobId = urlParams.get('id'); 
             if (user) { 
@@ -575,7 +576,8 @@
             } else {
                 isAdmin = false;
                 currentUserEmail = "";
-                if (sessionStorage.getItem('isGuest') === 'true' || refCode || urlJobId) { 
+                // Cambio V16.15: Quitamos '|| refCode'
+                if (sessionStorage.getItem('isGuest') === 'true' || urlJobId) { 
                     setAdminMode(false); 
                 } 
                 else { showLogin(); }
@@ -589,10 +591,9 @@
             document.querySelectorAll('.admin-actions').forEach(m => m.classList.remove('active'));
         }
 
-        // FUNCIONES DE MODALES (RECUPERADAS)
         window.openMetricsModal = function() {
             document.getElementById('metricsModal').classList.add('active');
-            populateMetricsList(); // Ahora sí existe
+            populateMetricsList(); 
         }
         window.closeMetricsModal = function() { document.getElementById('metricsModal').classList.remove('active'); }
 
@@ -867,19 +868,14 @@
             }).join('');
         }
 
-        // LÓGICA DE MÉTRICAS (RECUPERADA)
         function populateMetricsList() {
             const list = document.getElementById('metricsMonthList');
             if(!jobStats) { list.innerHTML = 'No hay datos'; return; }
             
-            // Recopilar meses disponibles de clickLogs y views
             const months = new Set();
-            // ... (Lógica simplificada para mostrar todos los meses que tengan datos)
-            // Para V16.13 usaremos el mes actual y pasados si existen en logs
             Object.values(clickLogs).forEach(log => {
-                if(log.timestamp) months.add(log.timestamp.substring(0, 7)); // YYYY-MM
+                if(log.timestamp) months.add(log.timestamp.substring(0, 7)); 
             });
-            // También revisar vistas
             Object.values(jobStats).forEach(stat => {
                 if(stat.monthlyViews) Object.keys(stat.monthlyViews).forEach(m => months.add(m));
             });
@@ -903,7 +899,6 @@
 
             const dataRows = [];
             
-            // Generar reporte
             Object.keys(jobs).forEach(jobId => {
                 const j = jobs[jobId];
                 const s = jobStats[jobId] || {};
@@ -915,7 +910,6 @@
                     totalViews += (s.monthlyViews && s.monthlyViews[m]) ? s.monthlyViews[m] : 0;
                 });
                 
-                // Clics filtrados por mes (aprox)
                 const clicksInMonths = Object.values(clickLogs).filter(l => 
                     l.jobId === jobId && selectedMonths.includes(l.timestamp.substring(0,7))
                 ).length;
