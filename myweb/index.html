@@ -184,7 +184,6 @@
         .danger-section { background: #ffebee; padding: 15px; border-radius: 8px; border: 1px solid #ef9a9a; margin-top: 25px; }
         .danger-btn { background: #d32f2f; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
 
-        /* V16.16: Paginación */
         .pagination-container {
             display: flex;
             justify-content: center;
@@ -593,7 +592,6 @@
         let tempReqs = [];
         let tempBens = [];
         
-        // V16.16: CONFIGURACIÓN DE PAGINACIÓN
         let currentPage = 1;
         const itemsPerPage = 15;
         let currentFilteredJobs = []; 
@@ -905,68 +903,6 @@
             }).join('');
         }
 
-        function populateMetricsList() {
-            const list = document.getElementById('metricsMonthList');
-            if(!jobStats) { list.innerHTML = 'No hay datos'; return; }
-            
-            const months = new Set();
-            Object.values(clickLogs).forEach(log => {
-                if(log.timestamp) months.add(log.timestamp.substring(0, 7)); 
-            });
-            Object.values(jobStats).forEach(stat => {
-                if(stat.monthlyViews) Object.keys(stat.monthlyViews).forEach(m => months.add(m));
-            });
-
-            if(months.size === 0) months.add(currentMonthKey);
-
-            const sortedMonths = Array.from(months).sort().reverse();
-            
-            list.innerHTML = sortedMonths.map(m => 
-                `<label style="display:block; padding:5px; border-bottom:1px solid #eee;">
-                    <input type="checkbox" value="${m}" checked> ${m}
-                </label>`
-            ).join('');
-        }
-
-        window.downloadSelectedMetrics = function() {
-            const checkboxes = document.querySelectorAll('#metricsMonthList input:checked');
-            const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
-            
-            if(selectedMonths.length === 0) return alert("Selecciona al menos un mes");
-
-            const dataRows = [];
-            
-            Object.keys(jobs).forEach(jobId => {
-                const j = jobs[jobId];
-                const s = jobStats[jobId] || {};
-                
-                let totalViews = 0;
-                let totalClicks = 0;
-
-                selectedMonths.forEach(m => {
-                    totalViews += (s.monthlyViews && s.monthlyViews[m]) ? s.monthlyViews[m] : 0;
-                });
-                
-                const clicksInMonths = Object.values(clickLogs).filter(l => 
-                    l.jobId === jobId && selectedMonths.includes(l.timestamp.substring(0,7))
-                ).length;
-
-                dataRows.push({
-                    'ID Vacante': jobId,
-                    'Título': j.title,
-                    'Empresa': j.company,
-                    'Vistas (Meses selecc.)': totalViews,
-                    'Clics WhatsApp (Meses selecc.)': clicksInMonths,
-                    'Estatus': j.status
-                });
-            });
-
-            const ws = XLSX.utils.json_to_sheet(dataRows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
-            XLSX.writeFile(wb, `Metricas_${selectedMonths.join('_')}.xlsx`);
-        }
-
         window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
             btn.disabled = true;
             const originalText = btn.innerHTML;
@@ -1092,7 +1028,7 @@
             });
 
             currentFilteredJobs = keys; 
-            currentPage = 1; // Reset a primera página al reordenar o cargar
+            currentPage = 1; 
             applyFilterAndRender();
         }
 
@@ -1137,7 +1073,6 @@
             }
             document.getElementById('emptyState').style.display = 'none';
 
-            // V16.16: LÓGICA DE PAGINACIÓN
             const totalPages = Math.ceil(matchedKeys.length / itemsPerPage);
             if(currentPage > totalPages) currentPage = 1;
 
@@ -1199,7 +1134,6 @@
             renderPaginationControls(totalPages);
         }
 
-        // V16.16: RENDERIZAR CONTROLES DE PÁGINA
         function renderPaginationControls(totalPages) {
             const container = document.getElementById('paginationContainer');
             if (totalPages <= 1) {
@@ -1210,11 +1144,8 @@
             
             let html = '';
             
-            // Botón Anterior
             html += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>&laquo; Anterior</button>`;
             
-            // Números de página (lógica simple para no saturar si son muchas)
-            // Mostramos siempre página 1, última, y cercanas a la actual
             for (let i = 1; i <= totalPages; i++) {
                 if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
                     html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
@@ -1223,7 +1154,6 @@
                 }
             }
 
-            // Botón Siguiente
             html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Siguiente &raquo;</button>`;
             
             html += `<div class="page-info">Página ${currentPage} de ${totalPages}</div>`;
@@ -1234,12 +1164,11 @@
         window.changePage = function(newPage) {
             currentPage = newPage;
             applyFilterAndRender();
-            // Scroll suave al inicio de la lista
             document.querySelector('.search-container').scrollIntoView({ behavior: 'smooth' });
         }
 
         window.filterJobs = function() {
-            currentPage = 1; // Al filtrar, volvemos a la página 1
+            currentPage = 1; 
             applyFilterAndRender();
         }
 
@@ -1262,6 +1191,9 @@
                 runTransaction(ref(db, `jobStats/${id}/monthlyViews/${currentMonthKey}`), (c) => (c || 0) + 1);
             }
             
+            // V16.17 SEO: Cambio Dinámico de Título
+            document.title = `Trabajo en ${j.city || 'México'} - ${j.title} | TuChamba`;
+
             const stats = jobStats[id] || {};
             const totalViews = stats.totalViews || 0;
             const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
@@ -1352,7 +1284,11 @@
             document.getElementById('viewModal').classList.add('active');
         }
 
-        window.closeViewModal = function() { document.getElementById('viewModal').classList.remove('active'); }
+        window.closeViewModal = function() { 
+            // V16.17 SEO: Restaurar Título Original
+            document.title = "TuChamba Express | Vacantes Urgentes en CDMX, Monterrey y EdoMex 2026";
+            document.getElementById('viewModal').classList.remove('active'); 
+        }
         window.closeFormModal = function() { document.getElementById('formModal').classList.remove('active'); }
         window.closeTeamModal = function() { document.getElementById('teamModal').classList.remove('active'); }
         
