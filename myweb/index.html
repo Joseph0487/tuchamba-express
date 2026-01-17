@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>TuChamba Express | Vacantes Urgentes en Nuevo Léon, CDMX y EdoMex 2026</title>
+    <title>TuChamba Express | Vacantes Urgentes en CDMX, Monterrey y EdoMex 2026</title>
     
     <link rel="icon" href="favicon.png" type="image/png">
 
@@ -12,7 +12,7 @@
     
     <meta name="keywords" content="bolsa de trabajo 2026, trabajo ixtapaluca, vacantes chalco, empleo valle de chalco, trabajo sin experiencia, cdmx, monterrey, nuevo leon, lunes a viernes, contratación inmediata, ayudante general, ventas, atención a clientes">
 
-    <meta property="og:title" content="¿Buscas chamba urgente? Vacantes en Nuevo León, CDMX y EdoMex 🚀">
+    <meta property="og:title" content="¿Buscas chamba urgente? Vacantes en CDMX, NL y EdoMex 🚀">
     <meta property="og:description" content="Sin correos ni registros. Clic y directo al WhatsApp del reclutador. ¡Entra ya!">
     <meta property="og:image" content="https://tuchamba-express.vercel.app/banner_1.png">
     <meta property="og:url" content="https://tuchamba-express.vercel.app/">
@@ -935,47 +935,109 @@
             ).join('');
         }
 
+        // V16.18: REPORTE INTELIGENTE MULTI-HOJA
         window.downloadSelectedMetrics = function() {
             const checkboxes = document.querySelectorAll('#metricsMonthList input:checked');
             const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
             
             if(selectedMonths.length === 0) return alert("Selecciona al menos un mes");
 
-            const dataRows = [];
-            
+            // --- 1. DATA SHEET 1: VACANTES ---
+            const vacancyRows = [];
+            let grandTotalViews = 0;
+            let grandTotalClicks = 0;
+            let bestJob = { title: 'N/A', clicks: -1 };
+
             Object.keys(jobs).forEach(jobId => {
                 const j = jobs[jobId];
                 const s = jobStats[jobId] || {};
                 
-                let totalViews = 0;
-                let totalClicks = 0;
-
+                let views = 0;
+                // Sumar vistas solo de meses seleccionados
                 selectedMonths.forEach(m => {
-                    if(s.monthlyViews && s.monthlyViews[m]) {
-                        totalViews += s.monthlyViews[m];
-                    }
+                    if(s.monthlyViews && s.monthlyViews[m]) views += s.monthlyViews[m];
                 });
-                
-                const clicksInMonths = Object.values(clickLogs).filter(l => 
+
+                // Contar clics reales en logs filtrados por fecha
+                const jobLogs = Object.values(clickLogs).filter(l => 
                     l && l.jobId === jobId && 
                     l.timestamp && typeof l.timestamp === 'string' &&
                     selectedMonths.includes(l.timestamp.substring(0,7))
-                ).length;
+                );
+                const clicks = jobLogs.length;
 
-                dataRows.push({
-                    'ID Vacante': jobId,
+                // Cálculo de CTR (Conversión)
+                const ctr = views > 0 ? ((clicks / views) * 100).toFixed(2) + '%' : '0.00%';
+
+                vacancyRows.push({
+                    'ID': jobId,
                     'Título': j.title,
                     'Empresa': j.company,
-                    'Vistas (Meses selecc.)': totalViews,
-                    'Clics WhatsApp (Meses selecc.)': clicksInMonths,
+                    'Municipio': j.city,
+                    'Vistas': views,
+                    'Clics': clicks,
+                    'CTR %': ctr,
                     'Estatus': j.status
                 });
+
+                grandTotalViews += views;
+                grandTotalClicks += clicks;
+
+                if(clicks > bestJob.clicks) {
+                    bestJob = { title: j.title, clicks: clicks };
+                }
             });
 
-            const ws = XLSX.utils.json_to_sheet(dataRows);
+            // --- 2. DATA SHEET 2: RECLUTADORES ---
+            const recruiterMap = {};
+            let totalRecruiterClicks = 0;
+
+            Object.values(clickLogs).forEach(l => {
+                if(l && l.timestamp && typeof l.timestamp === 'string' && selectedMonths.includes(l.timestamp.substring(0,7))) {
+                    const recName = l.recruiter || 'Orgánico';
+                    if(!recruiterMap[recName]) recruiterMap[recName] = 0;
+                    recruiterMap[recName]++;
+                    totalRecruiterClicks++;
+                }
+            });
+
+            const recruiterRows = Object.keys(recruiterMap).map(name => {
+                const count = recruiterMap[name];
+                const percentage = totalRecruiterClicks > 0 ? ((count / totalRecruiterClicks) * 100).toFixed(2) + '%' : '0%';
+                return {
+                    'Reclutador': name,
+                    'Clics Generados': count,
+                    '% del Total': percentage
+                };
+            });
+
+            // Ordenar por quién trajo más gente
+            recruiterRows.sort((a, b) => b['Clics Generados'] - a['Clics Generados']);
+            const bestRecruiter = recruiterRows.length > 0 ? recruiterRows[0]['Reclutador'] : 'N/A';
+
+            // --- 3. DATA SHEET 3: RESUMEN GLOBAL ---
+            const summaryRows = [
+                { 'Métrica': 'Periodo Analizado', 'Valor': selectedMonths.join(', ') },
+                { 'Métrica': 'Total Vistas', 'Valor': grandTotalViews },
+                { 'Métrica': 'Total Clics (Leads)', 'Valor': grandTotalClicks },
+                { 'Métrica': 'Tasa de Conversión Global (CTR)', 'Valor': grandTotalViews > 0 ? ((grandTotalClicks / grandTotalViews) * 100).toFixed(2) + '%' : '0%' },
+                { 'Métrica': 'Vacante Estrella', 'Valor': bestJob.title },
+                { 'Métrica': 'Reclutador MVP', 'Valor': bestRecruiter }
+            ];
+
+            // --- GENERAR ARCHIVO MULTI-HOJA ---
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
-            XLSX.writeFile(wb, `Metricas_${selectedMonths.join('_')}.xlsx`);
+            
+            const ws1 = XLSX.utils.json_to_sheet(vacancyRows);
+            XLSX.utils.book_append_sheet(wb, ws1, "Desempeño Vacantes");
+
+            const ws2 = XLSX.utils.json_to_sheet(recruiterRows);
+            XLSX.utils.book_append_sheet(wb, ws2, "Rendimiento Equipo");
+
+            const ws3 = XLSX.utils.json_to_sheet(summaryRows);
+            XLSX.utils.book_append_sheet(wb, ws3, "Resumen Global");
+
+            XLSX.writeFile(wb, `Reporte_TuChamba_${selectedMonths.join('_')}.xlsx`);
         }
 
         window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
@@ -1546,4 +1608,3 @@
     </script>
 </body>
 </html>
-
