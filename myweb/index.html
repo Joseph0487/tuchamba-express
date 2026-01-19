@@ -269,10 +269,10 @@
         .admin-action { padding: 10px 20px; width: 100%; text-align: left; border: none; background: none; cursor: pointer; }
         .admin-action:hover { background: #f9f9f9; }
 
-        /* V16.22: AJUSTE DE MODALES (Márgenes optimizados para que no se vea amontonado) */
+        /* V16.22: AJUSTE DE MODALES (Márgenes optimizados) */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
         .modal.active { display: flex; align-items: center; justify-content: center; }
-        /* Reduced padding from 45px to 25px */
+        /* Reduced padding to 25px */
         .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; padding-bottom: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
         
@@ -654,12 +654,21 @@
         
         if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
 
-        // V16.22 FIX: Limpiar filtros al cargar (para evitar caché del navegador)
+        // V16.23: Limpieza automática al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('searchInput').value = '';
             document.getElementById('stateFilter').value = '';
             document.getElementById('cityFilter').value = '';
         });
+
+        // V16.23: Limpieza extra al regresar con botón "Atrás" del navegador
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('stateFilter').value = '';
+                document.getElementById('cityFilter').value = '';
+            }
+        };
 
         onAuthStateChanged(auth, (user) => {
             const urlJobId = urlParams.get('id'); 
@@ -752,8 +761,33 @@
             } catch (error) { alert("Error: " + error.message); }
         }
         
-        window.enterAsGuest = function() { sessionStorage.setItem('isGuest', 'true'); isAdmin = false; setAdminMode(false); }
-        window.logout = function() { signOut(auth).then(() => { sessionStorage.removeItem('isGuest'); isAdmin = false; showLogin(); }); }
+        // V16.23: Limpieza al entrar como invitado
+        window.enterAsGuest = function() { 
+            sessionStorage.setItem('isGuest', 'true'); 
+            isAdmin = false; 
+            
+            // LIMPIEZA FORZADA
+            document.getElementById('searchInput').value = '';
+            document.getElementById('stateFilter').value = '';
+            document.getElementById('cityFilter').value = '';
+
+            setAdminMode(false); 
+        }
+
+        // V16.23: Limpieza al cerrar sesión
+        window.logout = function() { 
+            signOut(auth).then(() => { 
+                sessionStorage.removeItem('isGuest'); 
+                isAdmin = false; 
+                
+                // LIMPIEZA FORZADA
+                document.getElementById('searchInput').value = '';
+                document.getElementById('stateFilter').value = '';
+                document.getElementById('cityFilter').value = '';
+
+                showLogin(); 
+            }); 
+        }
 
         function showLogin() { document.getElementById('loginScreen').style.display = 'block'; document.getElementById('mainApp').style.display = 'none'; document.getElementById('adminForm').style.display = 'none'; }
         function setAdminMode(enableAdmin) {
