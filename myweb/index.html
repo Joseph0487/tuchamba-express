@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>TuChamba Express | Vacantes Urgentes en Nuevo León, CDMX y EdoMex 2026</title>
+    <title>TuChamba Express | Vacantes Urgentes en CDMX, Monterrey y EdoMex 2026</title>
     
     <link rel="icon" href="favicon.png" type="image/png">
 
@@ -12,13 +12,14 @@
     
     <meta name="keywords" content="bolsa de trabajo 2026, trabajo ixtapaluca, vacantes chalco, empleo valle de chalco, trabajo sin experiencia, cdmx, monterrey, nuevo leon, lunes a viernes, contratación inmediata, ayudante general, ventas, atención a clientes">
 
-    <meta property="og:title" content="¿Buscas chamba urgente? Vacantes en Nuevo León, CDMX y EdoMex 🚀">
+    <meta property="og:title" content="¿Buscas chamba urgente? Vacantes en CDMX, NL y EdoMex 🚀">
     <meta property="og:description" content="Sin correos ni registros. Clic y directo al WhatsApp del reclutador. ¡Entra ya!">
     <meta property="og:image" content="https://tuchamba-express.vercel.app/banner_1.png">
     <meta property="og:url" content="https://tuchamba-express.vercel.app/">
     <meta property="og:type" content="website">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -325,9 +326,48 @@
             
             .admin-controls-wrapper button { flex: 1; min-width: 45%; }
         }
+
+        /* V16.19: ESTILOS DEL FLYER OCULTO */
+        #flyerTemplate {
+            width: 1080px;
+            height: 1080px;
+            background: linear-gradient(135deg, #0a254e 0%, #061936 100%);
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            z-index: -1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: sans-serif;
+            text-align: center;
+            padding: 60px;
+            box-sizing: border-box;
+        }
+        .flyer-logo { font-size: 50px; font-weight: 900; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 3px; color: #ffc107; }
+        .flyer-badge { background: #e65100; color: white; padding: 15px 40px; border-radius: 50px; font-size: 35px; font-weight: bold; margin-bottom: 40px; text-transform: uppercase; }
+        .flyer-title { font-size: 90px; font-weight: 900; line-height: 1.1; margin-bottom: 30px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .flyer-salary { font-size: 100px; color: #ffeb3b; font-weight: 800; margin-bottom: 30px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .flyer-location { font-size: 45px; margin-bottom: 60px; color: #bbdefb; font-weight: 500; display:flex; align-items:center; gap:15px; }
+        .flyer-cta-box { background: white; color: #0a254e; padding: 40px 80px; border-radius: 30px; font-size: 40px; font-weight: 900; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .flyer-footer { margin-top: 50px; font-size: 30px; color: #90caf9; }
     </style>
 </head>
 <body>
+
+    <div id="flyerTemplate">
+        <div class="flyer-logo">🚀 TuChamba Express</div>
+        <div class="flyer-badge">¡Contratación Inmediata!</div>
+        <div id="flyerTitle" class="flyer-title">CHOFER 3.5 TON</div>
+        <div id="flyerSalary" class="flyer-salary">$12,000 / Sem</div>
+        <div class="flyer-location">📍 <span id="flyerLocation">Valle de Chalco, EdoMex</span></div>
+        <div class="flyer-cta-box">
+            📲 WhatsApp: <span id="flyerPhone">55 1234 5678</span>
+        </div>
+        <div class="flyer-footer">Postúlate hoy mismo - Respuesta rápida</div>
+    </div>
 
     <div id="loginScreen" class="welcome-container">
         <div style="font-size: 50px; margin-bottom: 10px;">🚀</div>
@@ -905,19 +945,16 @@
             }).join('');
         }
 
-        // V16.17 FIX: MÉTRICAS BLINDADAS ANTI-ERROR
         function populateMetricsList() {
             const list = document.getElementById('metricsMonthList');
             if(!jobStats) { list.innerHTML = 'No hay datos'; return; }
             
             const months = new Set();
-            // Wrap in try-catch/checks to prevent freeze if data is bad
             Object.values(clickLogs).forEach(log => {
                 if(log && log.timestamp && typeof log.timestamp === 'string') {
                     try { months.add(log.timestamp.substring(0, 7)); } catch(e){}
                 }
             });
-            
             Object.values(jobStats).forEach(stat => {
                 if(stat && stat.monthlyViews) {
                     Object.keys(stat.monthlyViews).forEach(m => months.add(m));
@@ -935,116 +972,69 @@
             ).join('');
         }
 
-        // V16.18: REPORTE INTELIGENTE MULTI-HOJA
         window.downloadSelectedMetrics = function() {
             const checkboxes = document.querySelectorAll('#metricsMonthList input:checked');
             const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
             
             if(selectedMonths.length === 0) return alert("Selecciona al menos un mes");
 
-            // --- 1. DATA SHEET 1: VACANTES ---
-            const vacancyRows = [];
-            let grandTotalViews = 0;
-            let grandTotalClicks = 0;
-            let bestJob = { title: 'N/A', clicks: -1 };
-
+            const dataRows = [];
+            
             Object.keys(jobs).forEach(jobId => {
                 const j = jobs[jobId];
                 const s = jobStats[jobId] || {};
                 
-                let views = 0;
-                // Sumar vistas solo de meses seleccionados
-                selectedMonths.forEach(m => {
-                    if(s.monthlyViews && s.monthlyViews[m]) views += s.monthlyViews[m];
-                });
+                let totalViews = 0;
+                let totalClicks = 0;
 
-                // Contar clics reales en logs filtrados por fecha
-                const jobLogs = Object.values(clickLogs).filter(l => 
+                selectedMonths.forEach(m => {
+                    if(s.monthlyViews && s.monthlyViews[m]) {
+                        totalViews += s.monthlyViews[m];
+                    }
+                });
+                
+                const clicksInMonths = Object.values(clickLogs).filter(l => 
                     l && l.jobId === jobId && 
                     l.timestamp && typeof l.timestamp === 'string' &&
                     selectedMonths.includes(l.timestamp.substring(0,7))
-                );
-                const clicks = jobLogs.length;
+                ).length;
 
-                // Cálculo de CTR (Conversión)
-                const ctr = views > 0 ? ((clicks / views) * 100).toFixed(2) + '%' : '0.00%';
-
-                vacancyRows.push({
+                dataRows.push({
                     'ID': jobId,
                     'Título': j.title,
                     'Empresa': j.company,
-                    'Municipio': j.city,
-                    'Vistas': views,
-                    'Clics': clicks,
-                    'CTR %': ctr,
+                    'Vistas (Meses selecc.)': totalViews,
+                    'Clics WhatsApp (Meses selecc.)': clicksInMonths,
                     'Estatus': j.status
                 });
-
-                grandTotalViews += views;
-                grandTotalClicks += clicks;
-
-                if(clicks > bestJob.clicks) {
-                    bestJob = { title: j.title, clicks: clicks };
-                }
             });
 
-            // --- 2. DATA SHEET 2: RECLUTADORES ---
-            const recruiterMap = {};
-            let totalRecruiterClicks = 0;
-
-            Object.values(clickLogs).forEach(l => {
-                if(l && l.timestamp && typeof l.timestamp === 'string' && selectedMonths.includes(l.timestamp.substring(0,7))) {
-                    const recName = l.recruiter || 'Orgánico';
-                    if(!recruiterMap[recName]) recruiterMap[recName] = 0;
-                    recruiterMap[recName]++;
-                    totalRecruiterClicks++;
-                }
-            });
-
-            const recruiterRows = Object.keys(recruiterMap).map(name => {
-                const count = recruiterMap[name];
-                const percentage = totalRecruiterClicks > 0 ? ((count / totalRecruiterClicks) * 100).toFixed(2) + '%' : '0%';
-                return {
-                    'Reclutador': name,
-                    'Clics Generados': count,
-                    '% del Total': percentage
-                };
-            });
-
-            // Ordenar por quién trajo más gente
-            recruiterRows.sort((a, b) => b['Clics Generados'] - a['Clics Generados']);
-            const bestRecruiter = recruiterRows.length > 0 ? recruiterRows[0]['Reclutador'] : 'N/A';
-
-            // --- 3. DATA SHEET 3: RESUMEN GLOBAL ---
-            const summaryRows = [
-                { 'Métrica': 'Periodo Analizado', 'Valor': selectedMonths.join(', ') },
-                { 'Métrica': 'Total Vistas', 'Valor': grandTotalViews },
-                { 'Métrica': 'Total Clics (Leads)', 'Valor': grandTotalClicks },
-                { 'Métrica': 'Tasa de Conversión Global (CTR)', 'Valor': grandTotalViews > 0 ? ((grandTotalClicks / grandTotalViews) * 100).toFixed(2) + '%' : '0%' },
-                { 'Métrica': 'Vacante Estrella', 'Valor': bestJob.title },
-                { 'Métrica': 'Reclutador MVP', 'Valor': bestRecruiter }
-            ];
-
-            // --- GENERAR ARCHIVO MULTI-HOJA ---
+            const ws = XLSX.utils.json_to_sheet(dataRows);
             const wb = XLSX.utils.book_new();
-            
-            const ws1 = XLSX.utils.json_to_sheet(vacancyRows);
-            XLSX.utils.book_append_sheet(wb, ws1, "Desempeño Vacantes");
-
-            const ws2 = XLSX.utils.json_to_sheet(recruiterRows);
-            XLSX.utils.book_append_sheet(wb, ws2, "Rendimiento Equipo");
-
-            const ws3 = XLSX.utils.json_to_sheet(summaryRows);
-            XLSX.utils.book_append_sheet(wb, ws3, "Resumen Global");
-
-            XLSX.writeFile(wb, `Reporte_TuChamba_${selectedMonths.join('_')}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+            XLSX.writeFile(wb, `Metricas_${selectedMonths.join('_')}.xlsx`);
         }
 
+        // V16.19: DETECTOR DE LEADS REALES + FLYER GENERATOR
         window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
+            const clickedKey = `clic_${jobId}_${new Date().toISOString().split('T')[0]}`; // Llave única por día
+            const alreadyClicked = localStorage.getItem(clickedKey);
+
             btn.disabled = true;
             const originalText = btn.innerHTML;
             btn.innerHTML = '🔄 Abriendo...';
-            window.registerClick(jobId, recruiterName);
+
+            if (!alreadyClicked) {
+                // Nuevo Lead (Real)
+                console.log("✅ Nuevo interesado detectado");
+                localStorage.setItem(clickedKey, 'true');
+                window.registerClick(jobId, recruiterName);
+            } else {
+                // Lead Repetido (No contar)
+                console.log("⚠️ Clic repetido (Ignorado)");
+            }
+
+            // Siempre abrir WhatsApp
             setTimeout(() => { window.open(link, '_blank'); }, 300); 
             setTimeout(() => { btn.disabled = false; btn.innerHTML = originalText; }, 3000);
         }
@@ -1052,6 +1042,37 @@
         window.registerClick = function(jobId, recruiterName) {
             runTransaction(ref(db, `jobStats/${jobId}/whatsappClicks`), (c) => (c || 0) + 1);
             push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
+        }
+
+        // V16.19: FUNCIÓN DE GENERAR FLYER
+        window.generateFlyer = function(jobId) {
+            const j = jobs[jobId];
+            if (!j) return;
+
+            window.showToast("🎨 Creando Flyer...");
+
+            // Llenar el molde oculto
+            document.getElementById('flyerTitle').innerText = j.title;
+            document.getElementById('flyerSalary').innerText = j.salary || 'Sueldo Competitivo';
+            document.getElementById('flyerLocation').innerText = j.city + (j.state ? `, ${j.state}` : '');
+            
+            // Limpiar teléfono para mostrar
+            let phoneShow = j.contact || centralPhone;
+            phoneShow = phoneShow.replace(/^\+52/, '').replace(/(\d{2})(\d{4})(\d{4})/, '$1 $2 $3');
+            document.getElementById('flyerPhone').innerText = phoneShow;
+
+            // Tomar foto al molde
+            const flyerNode = document.getElementById('flyerTemplate');
+            html2canvas(flyerNode, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                window.showToast("✅ ¡Flyer descargado!");
+            }).catch(err => {
+                console.error(err);
+                alert("Error al generar imagen");
+            });
         }
 
         const visitsRef = ref(db, 'siteStats/visits');
@@ -1241,6 +1262,7 @@
                         ${showAdminButtons ? `<button class="more-btn" onclick="event.stopPropagation(); window.toggleMenu('${id}')">⋮</button>
                         <div class="admin-actions" id="menu-${id}">
                             <button class="admin-action" onclick="event.stopPropagation(); window.editJob('${id}')">✏️ Editar</button>
+                            <button class="admin-action" onclick="event.stopPropagation(); window.generateFlyer('${id}')">🖼️ Descargar Flyer</button>
                             <button class="admin-action delete" onclick="event.stopPropagation(); window.deleteJob('${id}')">🗑️ Eliminar</button>
                         </div>` : ''}
                         
@@ -1608,4 +1630,3 @@
     </script>
 </body>
 </html>
-
