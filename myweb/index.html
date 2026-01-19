@@ -329,13 +329,17 @@
             .admin-controls-wrapper button { flex: 1; min-width: 45%; }
         }
 
-        /* V16.24: FLYER MARKETING HIGH-IMPACT (Fondo Azul Sólido + Badge Naranja) */
+        /* V16.25: FLYER MARKETING VISUAL (Imagen + Badge + Caja Blanca) */
         #flyerTemplate {
             width: 1080px;
             min-height: 1080px;
             height: auto;
-            /* Fondo Azul Marino Profundo (Gradient Sutil) */
-            background: linear-gradient(180deg, #021B3D 0%, #042552 100%);
+            /* Fondo Bodega + Overlay Oscuro para legibilidad */
+            background-image: 
+                linear-gradient(rgba(0, 20, 40, 0.85), rgba(0, 20, 40, 0.95)),
+                url('https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
             position: fixed;
             top: -9999px;
             left: -9999px;
@@ -343,17 +347,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* Padding para centrar contenido verticalmente */
             justify-content: center; 
             color: white;
-            font-family: 'Arial Black', 'Arial', sans-serif; /* Fuente gruesa */
+            font-family: 'Arial Black', 'Arial', sans-serif;
             text-align: center;
             padding: 100px 50px;
             box-sizing: border-box;
         }
         
         .flyer-badge-top {
-            background-color: #FF6D00; /* Naranja Seguridad */
+            background-color: #FF6D00; /* Naranja Impacto */
             color: white;
             font-size: 45px;
             padding: 20px 60px;
@@ -363,65 +366,71 @@
             font-weight: 900;
             margin-bottom: 60px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 4px solid white;
         }
 
         .flyer-title { 
-            font-size: 90px; 
+            font-size: 85px; 
             font-weight: 900; 
             line-height: 1.1; 
             margin-bottom: 50px; 
-            text-shadow: 0 5px 15px rgba(0,0,0,0.5); 
+            text-shadow: 0 5px 15px rgba(0,0,0,0.8); 
             max-width: 95%;
             text-transform: uppercase;
         }
         
         .flyer-salary { 
             font-size: 110px; 
-            color: #FFEB3B; /* Amarillo Brillante */
+            color: #FFEB3B; /* Amarillo Gigante */
             font-weight: 900; 
             margin-bottom: 30px; 
-            text-shadow: 0 5px 15px rgba(0,0,0,0.5); 
+            text-shadow: 0 5px 15px rgba(0,0,0,0.8); 
         }
         
         .flyer-salary-sub {
-            font-size: 40px;
+            font-size: 35px;
             color: #E3F2FD;
             margin-top: -20px;
-            margin-bottom: 60px;
+            margin-bottom: 80px;
             font-weight: 500;
             font-family: 'Segoe UI', sans-serif;
+            opacity: 0.9;
         }
 
         .flyer-location { 
-            font-size: 50px; 
-            margin-bottom: 100px; 
-            color: #ffccbc; /* Tono salmón claro para resaltar sobre azul */
+            font-size: 45px; 
+            margin-bottom: 80px; 
+            color: #FFF; 
             font-weight: 700; 
             display:flex; 
             align-items:center; 
             gap:15px; 
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5); 
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8); 
+            background: rgba(0,0,0,0.3);
+            padding: 15px 40px;
+            border-radius: 50px;
         }
         
-        /* Botón Blanco Flotante (Estilo App) */
+        /* CAJA BLANCA PARA WHATSAPP (A Petición) */
         .flyer-cta-box { 
             background: white; 
-            color: #021B3D; 
-            padding: 35px 80px; 
-            border-radius: 100px; 
+            color: #000; 
+            padding: 30px 70px; 
+            border-radius: 20px; 
             font-size: 50px; 
             font-weight: 900; 
             box-shadow: 0 15px 40px rgba(0,0,0,0.6); 
             display: flex;
             align-items: center;
             gap: 20px;
+            border-bottom: 10px solid #ccc; /* Efecto 3D */
         }
     </style>
 </head>
 <body>
 
     <div id="flyerTemplate">
-        <div class="flyer-badge-top">¡CONTRATACIÓN INMEDIATA!</div>
+        <div class="flyer-badge-top">¡ESTAMOS CONTRATANDO!</div>
         
         <div id="flyerTitle" class="flyer-title">CHOFER 3.5 TON</div>
         
@@ -1191,14 +1200,14 @@
             push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
         }
 
-        // V16.24: FUNCIÓN DE GENERAR FLYER MARKETING HIGH-IMPACT
+        // V16.25: FUNCIÓN DE GENERAR FLYER MARKETING VISUAL (Fondo imagen + Badge + Caja blanca)
         window.generateFlyer = function(jobId) {
             const j = jobs[jobId];
             if (!j) return;
 
             window.showToast("🎨 Creando Flyer...");
 
-            // Llenar el molde oculto con datos de la vacante
+            // Llenar el molde oculto
             document.getElementById('flyerTitle').innerText = j.title;
             document.getElementById('flyerSalary').innerText = j.salary || 'Sueldo Competitivo';
             document.getElementById('flyerLocation').innerText = j.city + (j.state ? `, ${j.state}` : '');
@@ -1211,9 +1220,9 @@
             // Tomar foto al molde con mejor calidad
             const flyerNode = document.getElementById('flyerTemplate');
             html2canvas(flyerNode, { 
-                scale: 2, // Mayor resolución para nitidez
-                useCORS: true, // Permitir imagen externa si la hubiera (aunque ahora es gradiente)
-                backgroundColor: null 
+                scale: 2, // Mayor resolución
+                useCORS: true, // Permitir imagen externa
+                backgroundColor: null // Respetar el fondo CSS
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
@@ -1222,7 +1231,7 @@
                 window.showToast("✅ ¡Flyer descargado!");
             }).catch(err => {
                 console.error(err);
-                alert("Error al generar imagen. Intenta de nuevo.");
+                alert("Error al generar imagen. Verifica tu conexión.");
             });
         }
 
