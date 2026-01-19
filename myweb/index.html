@@ -327,11 +327,17 @@
             .admin-controls-wrapper button { flex: 1; min-width: 45%; }
         }
 
-        /* V16.19: ESTILOS DEL FLYER OCULTO */
+        /* V16.20: ESTILOS DEL FLYER INDUSTRIAL PRO (Fondo Imagen + Overlay) */
         #flyerTemplate {
             width: 1080px;
-            height: 1080px;
-            background: linear-gradient(135deg, #0a254e 0%, #061936 100%);
+            min-height: 1080px; /* Crecimiento automático */
+            height: auto;
+            /* Fondo Industrial + Overlay Azul Oscuro al 90% para legibilidad */
+            background-image: 
+                linear-gradient(rgba(10, 37, 78, 0.90), rgba(10, 37, 78, 0.95)),
+                url('https://images.unsplash.com/photo-1587293852726-70cdb56c2866?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
             position: fixed;
             top: -9999px;
             left: -9999px;
@@ -341,18 +347,19 @@
             justify-content: center;
             align-items: center;
             color: white;
-            font-family: sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             text-align: center;
-            padding: 60px;
+            padding: 80px 60px;
             box-sizing: border-box;
+            border-bottom: 40px solid #ffc107; /* Franja amarilla decorativa */
         }
-        .flyer-logo { font-size: 50px; font-weight: 900; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 3px; color: #ffc107; }
-        .flyer-badge { background: #e65100; color: white; padding: 15px 40px; border-radius: 50px; font-size: 35px; font-weight: bold; margin-bottom: 40px; text-transform: uppercase; }
-        .flyer-title { font-size: 90px; font-weight: 900; line-height: 1.1; margin-bottom: 30px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .flyer-salary { font-size: 100px; color: #ffeb3b; font-weight: 800; margin-bottom: 30px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .flyer-location { font-size: 45px; margin-bottom: 60px; color: #bbdefb; font-weight: 500; display:flex; align-items:center; gap:15px; }
-        .flyer-cta-box { background: white; color: #0a254e; padding: 40px 80px; border-radius: 30px; font-size: 40px; font-weight: 900; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .flyer-footer { margin-top: 50px; font-size: 30px; color: #90caf9; }
+        .flyer-logo { font-size: 60px; font-weight: 900; margin-bottom: 50px; text-transform: uppercase; letter-spacing: 4px; color: #ffc107; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+        .flyer-badge { background: #d84315; color: white; padding: 15px 50px; border-radius: 60px; font-size: 40px; font-weight: bold; margin-bottom: 50px; text-transform: uppercase; box-shadow: 0 8px 20px rgba(0,0,0,0.4); letter-spacing: 1px; }
+        .flyer-title { font-size: 85px; font-weight: 900; line-height: 1.1; margin-bottom: 40px; text-shadow: 0 5px 15px rgba(0,0,0,0.6); max-width: 90%; }
+        .flyer-salary { font-size: 95px; color: #ffeb3b; font-weight: 800; margin-bottom: 40px; text-shadow: 0 5px 15px rgba(0,0,0,0.6); }
+        .flyer-location { font-size: 50px; margin-bottom: 70px; color: #e3f2fd; font-weight: 600; display:flex; align-items:center; gap:15px; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .flyer-cta-box { background: white; color: #0a254e; padding: 40px 90px; border-radius: 40px; font-size: 45px; font-weight: 900; box-shadow: 0 15px 40px rgba(0,0,0,0.4); border: 4px solid #ffc107; }
+        .flyer-footer { margin-top: 60px; font-size: 32px; color: #b3e5fc; font-weight: 500; opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -950,6 +957,7 @@
             if(!jobStats) { list.innerHTML = 'No hay datos'; return; }
             
             const months = new Set();
+            // Wrap in try-catch/checks to prevent freeze if data is bad
             Object.values(clickLogs).forEach(log => {
                 if(log && log.timestamp && typeof log.timestamp === 'string') {
                     try { months.add(log.timestamp.substring(0, 7)); } catch(e){}
@@ -1015,7 +1023,7 @@
             XLSX.writeFile(wb, `Metricas_${selectedMonths.join('_')}.xlsx`);
         }
 
-        // V16.19: DETECTOR DE LEADS REALES + FLYER GENERATOR
+        // V16.20: DETECTOR DE LEADS REALES + FLYER GENERATOR
         window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
             const clickedKey = `clic_${jobId}_${new Date().toISOString().split('T')[0]}`; // Llave única por día
             const alreadyClicked = localStorage.getItem(clickedKey);
@@ -1044,7 +1052,7 @@
             push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
         }
 
-        // V16.19: FUNCIÓN DE GENERAR FLYER
+        // V16.20: FUNCIÓN DE GENERAR FLYER PRO
         window.generateFlyer = function(jobId) {
             const j = jobs[jobId];
             if (!j) return;
@@ -1061,9 +1069,13 @@
             phoneShow = phoneShow.replace(/^\+52/, '').replace(/(\d{2})(\d{4})(\d{4})/, '$1 $2 $3');
             document.getElementById('flyerPhone').innerText = phoneShow;
 
-            // Tomar foto al molde
+            // Tomar foto al molde con mejor calidad
             const flyerNode = document.getElementById('flyerTemplate');
-            html2canvas(flyerNode, { scale: 2 }).then(canvas => {
+            html2canvas(flyerNode, { 
+                scale: 2, // Mayor resolución
+                useCORS: true, // Permitir imagen externa
+                backgroundColor: null // Respetar el fondo CSS
+            }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
                 link.href = canvas.toDataURL();
@@ -1071,7 +1083,7 @@
                 window.showToast("✅ ¡Flyer descargado!");
             }).catch(err => {
                 console.error(err);
-                alert("Error al generar imagen");
+                alert("Error al generar imagen. Verifica tu conexión.");
             });
         }
 
