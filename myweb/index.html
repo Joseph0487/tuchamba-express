@@ -269,7 +269,65 @@
         .admin-action { padding: 10px 20px; width: 100%; text-align: left; border: none; background: none; cursor: pointer; }
         .admin-action:hover { background: #f9f9f9; }
 
-        /* V16.20: ESTILOS DEL FLYER INDUSTRIAL PRO (Fondo Imagen + Overlay) */
+        /* V16.21: MODALES MÁS AMPLIOS (UI MEJORADA) */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        /* Se aumentó max-width a 650px y padding a 45px */
+        .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 45px; position: relative; max-height: 90vh; overflow-y: auto; padding-bottom: 0; }
+        .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
+        
+        .job-details { display: grid; gap: 15px; margin-bottom: 20px; }
+        .detail-item { font-size: 15px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+        .location-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        
+        .phone-group { display: flex; gap: 8px; align-items: center; }
+        .phone-select { width: auto; min-width: 100px; max-width: 120px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #f0f2f5; cursor:pointer; }
+        
+        @media (max-width: 500px) { .location-grid { grid-template-columns: 1fr; } }
+        
+        .view-count-badge { background: #e3f2fd; color: #0277bd; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid #bbdefb; margin-right: 5px; }
+        .agency-badge { background: #fff3e0; color: #ef6c00; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid #ffe0b2; }
+
+        .section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px; margin-top: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px; display: inline-block; }
+        .item-list li { background: #f9f9f9; padding: 8px 12px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; }
+        
+        .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .recruiters-table th, .recruiters-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        .recruiters-table th { background: #f9fafb; color: #666; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .recruiters-table tr:hover { background-color: #f9f9f9; }
+
+        .job-counter { color: white; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 10px; display: block; }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header { 
+                flex-direction: row; 
+                justify-content: space-between; 
+                align-items: center;
+                gap: 5px;
+            }
+            .header h1 {
+                font-size: 17px; 
+                max-width: 50%; 
+                line-height: 1.1;
+            }
+            .filter-container { 
+                display: grid; 
+                grid-template-columns: auto 1fr 1fr; 
+                gap: 8px;
+                overflow-x: visible; 
+            }
+            .filter-icon-box { height: 40px; width: 40px; }
+            .filter-select { height: 40px; font-size: 13px; padding: 5px; }
+            
+            .admin-controls-wrapper button { flex: 1; min-width: 45%; }
+        }
+
+        /* V16.21: ESTILOS DEL FLYER INDUSTRIAL PRO (Fondo Imagen + Overlay) */
         #flyerTemplate {
             width: 1080px;
             min-height: 1080px; /* Crecimiento automático */
