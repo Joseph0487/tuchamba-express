@@ -737,6 +737,21 @@
             }
         };
 
+        // V16.26: Cierre con Tecla ESC (UX Master)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") {
+                if(document.getElementById('viewModal').classList.contains('active')) closeViewModal();
+                else if(document.getElementById('formModal').classList.contains('active')) closeFormModal();
+                else if(document.getElementById('metricsModal').classList.contains('active')) closeMetricsModal();
+                else if(document.getElementById('teamModal').classList.contains('active')) closeTeamModal();
+                else if(document.getElementById('settingsModal').classList.contains('active')) closeSettingsModal();
+                else if(document.getElementById('privacyModal').classList.contains('active')) closePrivacyModal();
+                
+                // Cerrar menús de administrador
+                document.querySelectorAll('.admin-actions').forEach(m => m.classList.remove('active'));
+            }
+        });
+
         onAuthStateChanged(auth, (user) => {
             const urlJobId = urlParams.get('id'); 
             if (user) { 
