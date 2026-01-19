@@ -269,14 +269,15 @@
         .admin-action { padding: 10px 20px; width: 100%; text-align: left; border: none; background: none; cursor: pointer; }
         .admin-action:hover { background: #f9f9f9; }
 
-        /* V16.21: MODALES MÁS AMPLIOS (UI MEJORADA) */
+        /* V16.22: AJUSTE DE MODALES (Márgenes optimizados para que no se vea amontonado) */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
         .modal.active { display: flex; align-items: center; justify-content: center; }
-        /* Se aumentó max-width a 650px y padding a 45px */
-        .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 45px; position: relative; max-height: 90vh; overflow-y: auto; padding-bottom: 0; }
+        /* Reduced padding from 45px to 25px */
+        .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; padding-bottom: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
         
-        .job-details { display: grid; gap: 15px; margin-bottom: 20px; }
+        /* Adjusted margins inside modal */
+        .job-details { display: grid; gap: 15px; margin-bottom: 15px; }
         .detail-item { font-size: 15px; }
 
         .form-group { margin-bottom: 20px; }
@@ -292,7 +293,8 @@
         .view-count-badge { background: #e3f2fd; color: #0277bd; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid #bbdefb; margin-right: 5px; }
         .agency-badge { background: #fff3e0; color: #ef6c00; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid #ffe0b2; }
 
-        .section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px; margin-top: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px; display: inline-block; }
+        /* Adjusted section margins */
+        .section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px; margin-top: 20px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px; display: inline-block; }
         .item-list li { background: #f9f9f9; padding: 8px 12px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; }
         
         .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -327,7 +329,7 @@
             .admin-controls-wrapper button { flex: 1; min-width: 45%; }
         }
 
-        /* V16.21: ESTILOS DEL FLYER INDUSTRIAL PRO (Fondo Imagen + Overlay) */
+        /* V16.20: ESTILOS DEL FLYER INDUSTRIAL PRO (Fondo Imagen + Overlay) */
         #flyerTemplate {
             width: 1080px;
             min-height: 1080px; /* Crecimiento automático */
@@ -427,7 +429,7 @@
             </button>
 
             <div class="search-container">
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar vacante, empresa, palabras clave..." onkeyup="filterJobs()">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar vacante, empresa, palabras clave..." onkeyup="filterJobs()" autocomplete="off">
                 <button id="clearSearchBtn" class="search-clear-btn" onclick="clearSearch()">✕</button>
             </div>
 
@@ -435,10 +437,10 @@
                 <div class="filter-icon-box">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                 </div>
-                <select id="stateFilter" class="filter-select" onchange="filterJobs()">
+                <select id="stateFilter" class="filter-select" onchange="filterJobs()" autocomplete="off">
                     <option value="">📍 Estado</option>
                 </select>
-                <select id="cityFilter" class="filter-select" onchange="filterJobs()">
+                <select id="cityFilter" class="filter-select" onchange="filterJobs()" autocomplete="off">
                     <option value="">🏙️ Municipio</option>
                 </select>
             </div>
@@ -651,6 +653,13 @@
         const refCode = urlParams.get('ref');
         
         if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
+
+        // V16.22 FIX: Limpiar filtros al cargar (para evitar caché del navegador)
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('stateFilter').value = '';
+            document.getElementById('cityFilter').value = '';
+        });
 
         onAuthStateChanged(auth, (user) => {
             const urlJobId = urlParams.get('id'); 
