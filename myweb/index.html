@@ -47,6 +47,16 @@
         .footer { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #ccc; font-size: 12px; line-height: 1.6; }
         .footer-link { color: #fff; text-decoration: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
         .legal-note { color: #999; margin-top: 8px; font-style: italic; }
+        
+        /* V16.29: Estilo para BitX */
+        .powered-by { 
+            margin-top: 15px; 
+            color: rgba(255,255,255,0.5); 
+            font-size: 11px; 
+            font-family: monospace; 
+            letter-spacing: 1px; 
+        }
+        .powered-by strong { color: rgba(255,255,255,0.8); }
 
         @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
         .skeleton { background: #f6f7f8; background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%); background-repeat: no-repeat; background-size: 1000px 100%; display: inline-block; position: relative; animation: shimmer 2s infinite linear forwards; border-radius: 4px; }
@@ -241,6 +251,7 @@
 
         .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         
+        /* V16.27: Card Adjustment to support Badge */
         .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden; }
         .job-card:hover { transform: translateY(-4px); }
         .job-card.hidden { display: none; }
@@ -563,8 +574,9 @@
             </div>
 
             <div class="footer">
-                <p>TuChamba Express &copy; 2024. Todos los derechos reservados.<br>
+                <p>TuChamba Express &copy; 2026. Todos los derechos reservados.<br>
                 Aviso: Algunas empresas pueden solicitar examen médico y/o antidoping.</p>
+                <p class="powered-by">Powered by <strong>BitX</strong></p>
                 <div style="margin-top:10px;">
                     <a class="footer-link" onclick="openPrivacyModal()">🔒 Aviso de Privacidad</a>
                 </div>
@@ -1691,10 +1703,6 @@
             
             tempReqs = []; tempBens = []; updateList('reqList', tempReqs, 'req'); updateList('benList', tempBens, 'ben');
             document.getElementById('jobShowCompany').value = 'true';
-            
-            // Reset manual de featured
-            document.getElementById('jobIsFeatured').value = 'false';
-
             document.getElementById('formModal').classList.add('active');
         }
 
@@ -1714,9 +1722,6 @@
             document.getElementById('jobDescription').value = j.description; document.getElementById('jobStatus').value = j.status||'Vigente';
             document.getElementById('jobAgency').value = j.agency||'';
             
-            // V16.27: Cargar valor de featured
-            document.getElementById('jobIsFeatured').value = j.isFeatured ? 'true' : 'false';
-
             let contactVal = j.contact || '';
             let codeVal = '+52';
             if(contactVal.startsWith('+52')) { codeVal = '+52'; contactVal = contactVal.replace('+52',''); }
@@ -1752,7 +1757,7 @@
                     'Requisitos': (j.requirements||[]).join(' | '), 
                     'Beneficios': (j.benefits||[]).join(' | '),
                     'Contacto': j.contact, 'Estatus': j.status, 'Tipo de Servicio o Agencia': j.agency,
-                    'IMPULSAR': j.isFeatured ? 'SI' : 'NO' // V16.27
+                    'IMPULSAR': j.isFeatured ? 'SI' : 'NO' 
                 };
             });
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
@@ -1778,7 +1783,7 @@
                 'CONTACTO': '5512345678', 
                 'ESTATUS': 'Vigente', 
                 'TIPO DE SERVICIO O AGENCIA': 'Agencia Interna',
-                'IMPULSAR': 'SI' // V16.27
+                'IMPULSAR': 'SI'
             }];
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); XLSX.writeFile(wb, 'plantilla.xlsx');
@@ -1810,7 +1815,8 @@
                     if(!json.length) { alert('Archivo vacío'); return; }
                     let count = 0;
                     
-                    const normalizeKey = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                    // V16.29 FIX: Trim spaces for robust matching
+                    const normalizeKey = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
                     const findKey = (row, keyName) => {
                         return Object.keys(row).find(k => normalizeKey(k) === normalizeKey(keyName));
@@ -1832,11 +1838,18 @@
                          const legacyLoc = row['Ubicación'] || ''; 
 
                          const showCompKey = findKey(row, 'mostrar empresa publicamente');
-                         const showCompanyRaw = showCompKey ? row[showCompKey] : 'SI';
+                         // V16.29: Robust boolean parsing from Excel
+                         let showCompanyRaw = 'SI';
+                         if (showCompKey && row[showCompKey]) {
+                             showCompanyRaw = String(row[showCompKey]).trim().toUpperCase();
+                         }
 
                          // V16.27: Detectar columna IMPULSAR o DESTACAR
                          const featuredKey = findKey(row, 'impulsar') || findKey(row, 'destacar') || findKey(row, 'top');
-                         const isFeaturedRaw = featuredKey ? row[featuredKey] : 'NO';
+                         let isFeaturedRaw = 'NO';
+                         if(featuredKey && row[featuredKey]) {
+                             isFeaturedRaw = String(row[featuredKey]).trim().toUpperCase();
+                         }
 
                          let contactRaw = row[findKey(row, 'contacto')] || '';
                          contactRaw = String(contactRaw).replace(/\D/g, ''); 
@@ -1850,7 +1863,7 @@
                          const jobData = {
                              title: title, 
                              company: company, 
-                             showCompany: String(showCompanyRaw).toUpperCase() === 'SI',
+                             showCompany: showCompanyRaw === 'SI', // Simple comparison
                              state: state, city: city, zone: zone,
                              location: (city && state) ? `${city}, ${state}` : legacyLoc, 
                              
@@ -1865,8 +1878,8 @@
                              contact: contactRaw, 
                              status: row[findKey(row, 'estatus')] || 'Vigente',
                              agency: row[findKey(row, 'tipo de servicio o agencia')] || '',
-                             // V16.27: Guardar flag
-                             isFeatured: String(isFeaturedRaw).toUpperCase() === 'SI' 
+                             
+                             isFeatured: isFeaturedRaw === 'SI' 
                          };
                          set(ref(db, 'jobs/' + id), jobData);
                          count++;
