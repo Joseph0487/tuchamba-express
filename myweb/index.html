@@ -48,15 +48,16 @@
         .footer-link { color: #fff; text-decoration: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
         .legal-note { color: #999; margin-top: 8px; font-style: italic; }
         
-        /* V16.29: Estilo para BitX */
+        /* Estilo para BitX (Pie de página) */
         .powered-by { 
-            margin-top: 15px; 
-            color: rgba(255,255,255,0.5); 
-            font-size: 11px; 
+            margin-top: 20px; 
+            color: rgba(255,255,255,0.4); 
+            font-size: 10px; 
             font-family: monospace; 
-            letter-spacing: 1px; 
+            letter-spacing: 1.5px; 
+            text-transform: uppercase;
         }
-        .powered-by strong { color: rgba(255,255,255,0.8); }
+        .powered-by strong { color: rgba(255,255,255,0.7); font-weight: 900; }
 
         @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
         .skeleton { background: #f6f7f8; background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%); background-repeat: no-repeat; background-size: 1000px 100%; display: inline-block; position: relative; animation: shimmer 2s infinite linear forwards; border-radius: 4px; }
@@ -576,10 +577,10 @@
             <div class="footer">
                 <p>TuChamba Express &copy; 2026. Todos los derechos reservados.<br>
                 Aviso: Algunas empresas pueden solicitar examen médico y/o antidoping.</p>
-                <p class="powered-by">Powered by <strong>BitX</strong></p>
                 <div style="margin-top:10px;">
                     <a class="footer-link" onclick="openPrivacyModal()">🔒 Aviso de Privacidad</a>
                 </div>
+                <p class="powered-by">Powered by <strong>BitX</strong></p>
             </div>
 
             <div id="emptyState" class="welcome-container" style="display: none; padding: 30px; margin-top: 20px;">
@@ -722,12 +723,13 @@
         <div class="modal-content">
             <button class="close-btn" onclick="closePrivacyModal()">×</button>
             <h2>🔒 Aviso de Privacidad</h2>
-            <p style="line-height:1.6; color:#444;">
-                <strong>TuChamba Express</strong> funciona como un enlace directo entre candidatos y reclutadores. 
-                No almacenamos currículums ni datos personales sensibles en nuestros servidores.<br><br>
-                Al hacer clic en "Contactar", serás redirigido a WhatsApp, donde la política de privacidad aplicable será la de Meta y la del reclutador contactado.<br><br>
-                Las vacantes son responsabilidad exclusiva de las empresas publicantes.
-            </p>
+            <div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px;">
+                <p style="margin-bottom:10px;"><strong>1. Propósito:</strong> TuChamba Express funciona exclusivamente como un enlace directo entre candidatos y reclutadores para facilitar la búsqueda de empleo.</p>
+                <p style="margin-bottom:10px;"><strong>2. Datos:</strong> No almacenamos currículums ni datos personales sensibles en nuestros servidores.</p>
+                <p style="margin-bottom:10px;"><strong>3. Plataformas Externas:</strong> Al hacer clic en "Contactar", serás redirigido a WhatsApp, donde la política de privacidad aplicable será la de Meta.</p>
+                <p style="margin-bottom:10px;"><strong>4. Responsabilidad:</strong> Las vacantes publicadas son responsabilidad exclusiva de las empresas contratantes.</p>
+                <p style="margin-bottom:0;"><strong>5. Requisitos Salud:</strong> Algunas empresas pueden solicitar examen médico y/o antidoping como parte indispensable de su proceso de selección y contratación.</p>
+            </div>
         </div>
     </div>
 
