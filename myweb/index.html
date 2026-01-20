@@ -241,9 +241,29 @@
 
         .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         
-        .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        /* V16.27: Card Adjustment to support Badge */
+        .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden; }
         .job-card:hover { transform: translateY(-4px); }
         .job-card.hidden { display: none; }
+
+        /* V16.27: ESTILO TOP VACANTE (Opción A - Gold) */
+        .badge-featured {
+            position: absolute;
+            top: 15px;
+            right: 40px; /* Un poco a la izquierda del botón de menú */
+            background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            z-index: 4;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid #ffecb3;
+        }
 
         .card-header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; margin-right: 35px; }
         .card-header-date { font-size: 0.75rem; color: #888; background: #f5f5f5; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 12px; }
@@ -552,6 +572,14 @@
             <form id="jobForm" onsubmit="saveJob(event)">
                 <div class="form-group"><label>Estatus</label><select id="jobStatus"><option value="Vigente">Vigente (Verde)</option><option value="No Vigente">No Vigente (Rojo)</option></select></div>
                 
+                <div class="form-group" style="background: #fff8e1; padding: 10px; border-radius: 8px; border: 1px dashed #ffd54f;">
+                    <label style="color: #ff8f00;">⭐ ¿Impulsar Vacante? (Top 10)</label>
+                    <select id="jobIsFeatured">
+                        <option value="false">NO (Normal)</option>
+                        <option value="true">SÍ (Destacar)</option>
+                    </select>
+                </div>
+
                 <div class="form-group"><label>¿Mostrar nombre de empresa al público?</label><select id="jobShowCompany"><option value="true">SÍ (Visible para todos)</option><option value="false">NO (Confidencial / Solo Admin)</option></select></div>
                 
                 <div class="form-group" style="background: #fff3e0; padding: 10px; border-radius: 8px; border: 1px dashed #ef6c00;">
@@ -1278,6 +1306,9 @@
             }
             const finalPhone = cleanPhone ? (phoneCode + cleanPhone) : '';
 
+            // V16.27: Leer campo destacado manual
+            const isFeaturedVal = document.getElementById('jobIsFeatured').value === 'true';
+
             const jobData = {
                 title: document.getElementById('jobTitle').value,
                 company: document.getElementById('jobCompany').value,
@@ -1297,7 +1328,8 @@
                 status: document.getElementById('jobStatus').value,
                 agency: document.getElementById('jobAgency').value,
                 requirements: tempReqs,
-                benefits: tempBens
+                benefits: tempBens,
+                isFeatured: isFeaturedVal // Guardar el flag
             };
             const id = currentEditId || 'job-' + Date.now();
             set(ref(db, 'jobs/' + id), jobData).then(() => {
@@ -1351,6 +1383,11 @@
                 const statusB = jobB.status === 'No Vigente' ? 1 : 0;
                 if (statusA !== statusB) return statusA - statusB;
                 
+                // V16.27: Ordenar primero las destacadas
+                const featA = jobA.isFeatured ? 1 : 0;
+                const featB = jobB.isFeatured ? 1 : 0;
+                if (featA !== featB) return featB - featA; // Destacadas primero
+
                 const dateA = parseJobDate(jobA.fecha);
                 const dateB = parseJobDate(jobB.fecha);
                 
@@ -1432,8 +1469,12 @@
                 const dateHtml = niceDate ? `<span class="card-header-date">📅 Publicación: ${niceDate}</span>` : '';
                 const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
 
+                // V16.27: BADGE DE TOP VACANTE (Opción A)
+                const featuredBadge = j.isFeatured ? '<div class="badge-featured">⭐ TOP VACANTE</div>' : '';
+
                 return `
                     <div class="job-card" onclick="window.openViewModal('${id}')">
+                        ${featuredBadge}
                         ${showAdminButtons ? `<button class="more-btn" onclick="event.stopPropagation(); window.toggleMenu('${id}')">⋮</button>
                         <div class="admin-actions" id="menu-${id}">
                             <button class="admin-action" onclick="event.stopPropagation(); window.editJob('${id}')">✏️ Editar</button>
@@ -1631,6 +1672,10 @@
             
             tempReqs = []; tempBens = []; updateList('reqList', tempReqs, 'req'); updateList('benList', tempBens, 'ben');
             document.getElementById('jobShowCompany').value = 'true';
+            
+            // Reset manual de featured
+            document.getElementById('jobIsFeatured').value = 'false';
+
             document.getElementById('formModal').classList.add('active');
         }
 
@@ -1650,6 +1695,9 @@
             document.getElementById('jobDescription').value = j.description; document.getElementById('jobStatus').value = j.status||'Vigente';
             document.getElementById('jobAgency').value = j.agency||'';
             
+            // V16.27: Cargar valor de featured
+            document.getElementById('jobIsFeatured').value = j.isFeatured ? 'true' : 'false';
+
             let contactVal = j.contact || '';
             let codeVal = '+52';
             if(contactVal.startsWith('+52')) { codeVal = '+52'; contactVal = contactVal.replace('+52',''); }
@@ -1684,7 +1732,8 @@
                     'Etiquetas': j.tags,
                     'Requisitos': (j.requirements||[]).join(' | '), 
                     'Beneficios': (j.benefits||[]).join(' | '),
-                    'Contacto': j.contact, 'Estatus': j.status, 'Tipo de Servicio o Agencia': j.agency
+                    'Contacto': j.contact, 'Estatus': j.status, 'Tipo de Servicio o Agencia': j.agency,
+                    'IMPULSAR': j.isFeatured ? 'SI' : 'NO' // V16.27
                 };
             });
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
@@ -1709,7 +1758,8 @@
                 'BENEFICIOS': 'Ben 1 | Ben 2', 
                 'CONTACTO': '5512345678', 
                 'ESTATUS': 'Vigente', 
-                'TIPO DE SERVICIO O AGENCIA': 'Agencia Interna'
+                'TIPO DE SERVICIO O AGENCIA': 'Agencia Interna',
+                'IMPULSAR': 'SI' // V16.27
             }];
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); XLSX.writeFile(wb, 'plantilla.xlsx');
@@ -1765,6 +1815,10 @@
                          const showCompKey = findKey(row, 'mostrar empresa publicamente');
                          const showCompanyRaw = showCompKey ? row[showCompKey] : 'SI';
 
+                         // V16.27: Detectar columna IMPULSAR o DESTACAR
+                         const featuredKey = findKey(row, 'impulsar') || findKey(row, 'destacar') || findKey(row, 'top');
+                         const isFeaturedRaw = featuredKey ? row[featuredKey] : 'NO';
+
                          let contactRaw = row[findKey(row, 'contacto')] || '';
                          contactRaw = String(contactRaw).replace(/\D/g, ''); 
                          
@@ -1791,7 +1845,9 @@
                              benefits: (row[findKey(row, 'beneficios')]) ? String(row[findKey(row, 'beneficios')]).split(/\s*\|\s*/) : [],
                              contact: contactRaw, 
                              status: row[findKey(row, 'estatus')] || 'Vigente',
-                             agency: row[findKey(row, 'tipo de servicio o agencia')] || '' 
+                             agency: row[findKey(row, 'tipo de servicio o agencia')] || '',
+                             // V16.27: Guardar flag
+                             isFeatured: String(isFeaturedRaw).toUpperCase() === 'SI' 
                          };
                          set(ref(db, 'jobs/' + id), jobData);
                          count++;
@@ -1805,6 +1861,3 @@
     </script>
 </body>
 </html>
-
-
-
