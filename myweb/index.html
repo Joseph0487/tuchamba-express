@@ -46,10 +46,9 @@
 
         .footer { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #ccc; font-size: 12px; line-height: 1.6; }
         
-        /* V17.1: Link Subrayado */
         .footer-link { 
             color: #fff; 
-            text-decoration: underline; /* Subrayado agregado */
+            text-decoration: underline; 
             font-weight: bold; 
             cursor: pointer; 
             display: inline-flex; 
@@ -59,7 +58,6 @@
         
         .legal-note { color: #999; margin-top: 8px; font-style: italic; }
         
-        /* Estilo para BitX (Pie de página) */
         .powered-by { 
             margin-top: 20px; 
             color: rgba(255,255,255,0.4); 
@@ -251,9 +249,25 @@
 
         .sticky-footer { position: sticky; bottom: 0; background: white; padding: 15px 20px 20px; margin: 20px -30px -30px; border-top: 1px solid #eee; text-align: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100; }
         
-        .whatsapp-btn-large { display: flex; align-items: center; justify-content: center; width: 100%; background-color: #25D366; color: white; text-decoration: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); transition: transform 0.1s, background-color 0.3s, opacity 0.3s; border: none; cursor: pointer; }
-        .whatsapp-btn-large:active { transform: scale(0.98); }
-        .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; opacity: 0.7; }
+        /* V17.2: Animación HEARTBEAT (Latido) */
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.05); }
+            30% { transform: scale(1); }
+            100% { transform: scale(1); }
+        }
+
+        .whatsapp-btn-large { 
+            display: flex; align-items: center; justify-content: center; width: 100%; 
+            background-color: #25D366; color: white; text-decoration: none; 
+            padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; 
+            box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); 
+            border: none; cursor: pointer; 
+            /* Animación aplicada */
+            animation: heartbeat 2s infinite ease-in-out;
+        }
+        .whatsapp-btn-large:active { transform: scale(0.98); animation: none; }
+        .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; opacity: 0.7; animation: none; }
 
         .share-btn { background: #25D366; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
         .admin-controls-wrapper { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -263,23 +277,21 @@
 
         .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         
-        /* V16.27: Card Adjustment to support Badge */
         .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden; }
         .job-card:hover { transform: translateY(-4px); }
         .job-card.hidden { display: none; }
 
-        /* V16.28: BADGE DESTACADA MEJORADO (Morado/Azul Premium) */
         .badge-featured {
             position: absolute;
             top: 15px;
             right: 40px;
-            background: linear-gradient(135deg, #6200ea 0%, #3700b3 100%); /* Gradiente Premium */
-            color: white; /* Texto blanco para contraste máximo */
+            background: linear-gradient(135deg, #6200ea 0%, #3700b3 100%);
+            color: white; 
             padding: 5px 12px;
             border-radius: 12px;
             font-size: 0.7rem;
             font-weight: 800;
-            box-shadow: 0 4px 8px rgba(98, 0, 234, 0.3); /* Sombra con color */
+            box-shadow: 0 4px 8px rgba(98, 0, 234, 0.3);
             z-index: 4;
             display: flex;
             align-items: center;
@@ -288,12 +300,11 @@
             letter-spacing: 0.5px;
         }
 
-        /* V16.28: ICONO VERIFICADO */
         .verified-badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background-color: #1da1f2; /* Azul Twitter/LinkdIn */
+            background-color: #1da1f2;
             color: white;
             border-radius: 50%;
             width: 16px;
@@ -327,14 +338,11 @@
         .admin-action { padding: 10px 20px; width: 100%; text-align: left; border: none; background: none; cursor: pointer; }
         .admin-action:hover { background: #f9f9f9; }
 
-        /* V16.22: AJUSTE DE MODALES (Márgenes optimizados) */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
         .modal.active { display: flex; align-items: center; justify-content: center; }
-        /* Reduced padding to 25px */
         .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; padding-bottom: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
         
-        /* Adjusted margins inside modal */
         .job-details { display: grid; gap: 15px; margin-bottom: 15px; }
         .detail-item { font-size: 15px; }
 
@@ -348,54 +356,15 @@
         
         @media (max-width: 500px) { .location-grid { grid-template-columns: 1fr; } }
         
-        .view-count-badge { background: #e3f2fd; color: #0277bd; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid #bbdefb; margin-right: 5px; }
-        .agency-badge { background: #fff3e0; color: #ef6c00; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid #ffe0b2; }
-
-        /* Adjusted section margins */
-        .section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px; margin-top: 20px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px; display: inline-block; }
-        .item-list li { background: #f9f9f9; padding: 8px 12px; margin-bottom: 5px; border-radius: 6px; display: flex; justify-content: space-between; }
-        
-        .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .recruiters-table th, .recruiters-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
-        .recruiters-table th { background: #f9fafb; color: #666; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .recruiters-table tr:hover { background-color: #f9f9f9; }
-
-        .job-counter { color: white; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 10px; display: block; }
-
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .header { 
-                flex-direction: row; 
-                justify-content: space-between; 
-                align-items: center;
-                gap: 5px;
-            }
-            .header h1 {
-                font-size: 17px; 
-                max-width: 50%; 
-                line-height: 1.1;
-            }
-            .filter-container { 
-                display: grid; 
-                grid-template-columns: auto 1fr 1fr; 
-                gap: 8px;
-                overflow-x: visible; 
-            }
-            .filter-icon-box { height: 40px; width: 40px; }
-            .filter-select { height: 40px; font-size: 13px; padding: 5px; }
-            
-            .admin-controls-wrapper button { flex: 1; min-width: 45%; }
-        }
-
-        /* V16.25: FLYER MARKETING VISUAL (Imagen + Badge + Caja Blanca) */
+        /* V17.2: FLYER "CEBO" PROFESIONAL (Sin teléfono, enfocado en el link) */
         #flyerTemplate {
             width: 1080px;
             min-height: 1080px;
             height: auto;
-            /* Fondo Bodega + Overlay Oscuro para legibilidad */
+            /* Fondo de Gente Trabajando + Overlay Oscuro para contraste */
             background-image: 
-                linear-gradient(rgba(0, 20, 40, 0.85), rgba(0, 20, 40, 0.95)),
-                url('https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+                linear-gradient(rgba(10, 25, 45, 0.85), rgba(10, 25, 45, 0.92)),
+                url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
             background-size: cover;
             background-position: center;
             position: fixed;
@@ -409,97 +378,128 @@
             color: white;
             font-family: 'Arial Black', 'Arial', sans-serif;
             text-align: center;
-            padding: 100px 50px;
+            padding: 80px 60px;
             box-sizing: border-box;
         }
         
         .flyer-badge-top {
-            background-color: #FF6D00; /* Naranja Impacto */
+            background-color: #FF9800; /* Naranja Brillante "Warning" */
             color: white;
-            font-size: 45px;
-            padding: 20px 60px;
-            border-radius: 100px;
+            font-size: 55px;
+            padding: 15px 80px;
+            border-radius: 10px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 4px;
             font-weight: 900;
-            margin-bottom: 60px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            border: 4px solid white;
+            margin-bottom: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            border: 4px solid #FFF;
+            transform: skew(-10deg); /* Efecto dinámico inclinado */
         }
 
         .flyer-title { 
-            font-size: 85px; 
+            font-size: 90px; 
             font-weight: 900; 
             line-height: 1.1; 
-            margin-bottom: 50px; 
-            text-shadow: 0 5px 15px rgba(0,0,0,0.8); 
+            margin-bottom: 20px; 
+            text-shadow: 0 5px 20px rgba(0,0,0,0.9); 
             max-width: 95%;
             text-transform: uppercase;
+            color: #FFFFFF;
+        }
+        
+        .flyer-company {
+            font-size: 35px;
+            color: #BBDEFB;
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 600;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         
         .flyer-salary { 
-            font-size: 110px; 
-            color: #FFEB3B; /* Amarillo Gigante */
+            font-size: 120px; 
+            color: #C6FF00; /* Verde Lima Neón */
             font-weight: 900; 
-            margin-bottom: 30px; 
-            text-shadow: 0 5px 15px rgba(0,0,0,0.8); 
+            margin-bottom: 50px; 
+            text-shadow: 0 5px 20px rgba(0,0,0,0.9); 
         }
         
-        .flyer-salary-sub {
-            font-size: 35px;
-            color: #E3F2FD;
-            margin-top: -20px;
-            margin-bottom: 80px;
-            font-weight: 500;
+        /* Caja de Beneficios Automática */
+        .flyer-benefits-container {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 30px;
+            padding: 40px;
+            width: 90%;
+            margin-bottom: 60px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .flyer-benefits-title {
+            font-size: 40px;
+            color: #FFD740; /* Amarillo */
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding-bottom: 15px;
+            display: inline-block;
+        }
+        
+        .flyer-benefits-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 40px;
             font-family: 'Segoe UI', sans-serif;
-            opacity: 0.9;
+            font-weight: 600;
+            color: white;
+            text-align: left;
+            display: inline-block;
         }
+        .flyer-benefits-list li { margin-bottom: 15px; }
 
-        .flyer-location { 
-            font-size: 45px; 
-            margin-bottom: 80px; 
-            color: #FFF; 
-            font-weight: 700; 
-            display:flex; 
-            align-items:center; 
-            gap:15px; 
-            text-shadow: 0 2px 5px rgba(0,0,0,0.8); 
-            background: rgba(0,0,0,0.3);
-            padding: 15px 40px;
-            border-radius: 50px;
-        }
-        
-        /* CAJA BLANCA PARA WHATSAPP (A Petición) */
+        /* Footer CTA - Sin Teléfono */
         .flyer-cta-box { 
             background: white; 
-            color: #000; 
-            padding: 30px 70px; 
+            color: #D50000; /* Rojo Urgente */
+            padding: 40px 60px; 
             border-radius: 20px; 
-            font-size: 50px; 
+            font-size: 42px; 
             font-weight: 900; 
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6); 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.8); 
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 20px;
-            border-bottom: 10px solid #ccc; /* Efecto 3D */
+            border-bottom: 15px solid #b71c1c; 
+            width: 100%;
+            text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
     <div id="flyerTemplate">
-        <div class="flyer-badge-top">¡ESTAMOS CONTRATANDO!</div>
+        <div class="flyer-badge-top">¡SE SOLICITA!</div>
         
         <div id="flyerTitle" class="flyer-title">CHOFER 3.5 TON</div>
+        <div id="flyerCompany" class="flyer-company">EMPRESA CONFIDENCIAL</div>
         
         <div id="flyerSalary" class="flyer-salary">$12,000</div>
-        <div class="flyer-salary-sub">Pago Semanal / Prestaciones</div>
-
-        <div class="flyer-location">📍 <span id="flyerLocation">Valle de Chalco, EdoMex</span></div>
         
+        <div class="flyer-benefits-container">
+            <div class="flyer-benefits-title">OFRECEMOS:</div>
+            <ul id="flyerBenefitsList" class="flyer-benefits-list">
+                <li>✅ Pago Semanal</li>
+                <li>✅ Prestaciones de Ley</li>
+                <li>✅ Contratación Inmediata</li>
+            </ul>
+        </div>
+
         <div class="flyer-cta-box">
-            <span>📲 WhatsApp:</span> 
-            <span id="flyerPhone">55 1234 5678</span>
+            🔗 DALE CLIC AL LINK DE LA PUBLICACIÓN PARA AGENDAR
         </div>
     </div>
 
@@ -1074,8 +1074,8 @@
 
         // V17.1: Manejador de cambio de estado
         window.handleStateChange = function() {
-            updateCityOptions(); // Actualizar dropdown de ciudades
-            filterJobs();        // Filtrar grid
+            updateCityOptions(); 
+            filterJobs();        
         }
 
         function checkActiveRecruiter() {
@@ -1331,7 +1331,7 @@
             push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
         }
 
-        // V16.25: FUNCIÓN DE GENERAR FLYER MARKETING VISUAL (Fondo imagen + Badge + Caja blanca)
+        // V17.2: FUNCIÓN DE GENERAR FLYER MARKETING VISUAL "CEBO" (Sin Teléfono)
         window.generateFlyer = function(jobId) {
             const j = jobs[jobId];
             if (!j) return;
@@ -1343,17 +1343,30 @@
             document.getElementById('flyerSalary').innerText = j.salary || 'Sueldo Competitivo';
             document.getElementById('flyerLocation').innerText = j.city + (j.state ? `, ${j.state}` : '');
             
-            // Limpiar teléfono para mostrar
-            let phoneShow = j.contact || centralPhone;
-            phoneShow = phoneShow.replace(/^\+52/, '').replace(/(\d{2})(\d{4})(\d{4})/, '$1 $2 $3');
-            document.getElementById('flyerPhone').innerText = phoneShow;
+            // Lógica de Empresa Confidencial en Flyer
+            const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
+            document.getElementById('flyerCompany').innerText = showNamePublicly ? j.company : "Empresa Confidencial";
+
+            // Lógica de Beneficios (Tomar primeros 4)
+            const benefitsList = document.getElementById('flyerBenefitsList');
+            benefitsList.innerHTML = '';
+            if(j.benefits && j.benefits.length > 0) {
+                j.benefits.slice(0, 4).forEach(ben => {
+                    const li = document.createElement('li');
+                    li.innerText = '✅ ' + ben;
+                    benefitsList.appendChild(li);
+                });
+            } else {
+                 // Fallback si no hay beneficios
+                 benefitsList.innerHTML = '<li>✅ Prestaciones de Ley</li><li>✅ Contratación Inmediata</li><li>✅ Excelente Ambiente</li>';
+            }
 
             // Tomar foto al molde con mejor calidad
             const flyerNode = document.getElementById('flyerTemplate');
             html2canvas(flyerNode, { 
                 scale: 2, // Mayor resolución
                 useCORS: true, // Permitir imagen externa
-                backgroundColor: null // Respetar el fondo CSS
+                backgroundColor: null 
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
@@ -1689,10 +1702,11 @@
                 const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                 const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                 
+                // V17.2: Botón con Animación Heartbeat + Texto corregido
                 contactHtml = `<div class="sticky-footer">
                                     <p style="font-size:12px; color:#666; margin-bottom:5px;">👇 Respuesta Inmediata 👇</p>
                                     <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
-                                        📅 Agenda Entrevista Ahora 📲
+                                        📅 ¡Haz Clic para Agendar Entrevista! 📲
                                     </button>
                                </div>`;
             }
@@ -1764,6 +1778,10 @@
             
             tempReqs = []; tempBens = []; updateList('reqList', tempReqs, 'req'); updateList('benList', tempBens, 'ben');
             document.getElementById('jobShowCompany').value = 'true';
+            
+            // Reset manual de featured
+            document.getElementById('jobIsFeatured').value = 'false';
+
             document.getElementById('formModal').classList.add('active');
         }
 
