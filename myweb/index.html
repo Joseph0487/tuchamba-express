@@ -347,6 +347,32 @@
         .job-details { display: grid; gap: 15px; margin-bottom: 25px; margin-top: 15px; }
         .detail-item { font-size: 16px; display:flex; align-items:center; gap:8px;}
 
+        /* V17.5: Estilos de Badges de Admin (Recuperados) */
+        .view-count-badge { 
+            background: #e3f2fd; 
+            color: #0277bd; 
+            font-size: 12px; 
+            padding: 6px 14px; 
+            border-radius: 50px; /* Píldora */
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            font-weight: 700; 
+            border: 1px solid #bbdefb; 
+        }
+        .agency-badge { 
+            background: #fff3e0; 
+            color: #ef6c00; 
+            font-size: 12px; 
+            padding: 6px 14px; 
+            border-radius: 50px; /* Píldora */
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            font-weight: 700; 
+            border: 1px solid #ffe0b2; 
+        }
+
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px; }
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
@@ -358,7 +384,6 @@
         @media (max-width: 500px) { .location-grid { grid-template-columns: 1fr; } }
         
         .section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px; margin-top: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px; display: block; }
-        /* V17.4: Fondo gris para listas */
         .item-list li { background: #f9f9f9; padding: 10px 14px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; font-size: 15px; }
         
         .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -1747,7 +1772,7 @@
 
             let adminInfoHtml = '';
             if (isAdmin && !isRefMode) {
-                adminInfoHtml = `<div style="display:flex; flex-wrap:wrap; gap:10px;">
+                adminInfoHtml = `<div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom: 15px;">
                         <div class="view-count-badge">👁️ ${totalViews} Vistas</div>
                         <div class="agency-badge">${j.agency || 'Sin asignar'}</div>
                     </div>`;
@@ -1789,7 +1814,7 @@
                 </div>
 
                 <div class="section-title">Descripción del Puesto</div>
-                <p style="color: #444; line-height: 1.8; font-size:15px; margin-bottom:20px;">${j.description}</p>
+                <p style="color: #444; line-height: 1.45; font-size:15px; margin-bottom:20px;">${j.description}</p>
                 
                 ${(j.requirements||[]).length ? `<div class="section-title">Requisitos</div><ul class="item-list">${j.requirements.map(r=>`<li>${r}</li>`).join('')}</ul>` : ''}
                 
@@ -1894,7 +1919,7 @@
                 'CONTACTO': '5512345678', 
                 'ESTATUS': 'Vigente', 
                 'TIPO DE SERVICIO O AGENCIA': 'Agencia Interna',
-                'IMPULSAR': 'SI'
+                'IMPULSAR': 'SI' 
             }];
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); XLSX.writeFile(wb, 'plantilla.xlsx');
@@ -1926,6 +1951,7 @@
                     if(!json.length) { alert('Archivo vacío'); return; }
                     let count = 0;
                     
+                    // V16.29 FIX: Trim spaces for robust matching
                     const normalizeKey = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
                     const findKey = (row, keyName) => {
@@ -1948,11 +1974,13 @@
                          const legacyLoc = row['Ubicación'] || ''; 
 
                          const showCompKey = findKey(row, 'mostrar empresa publicamente');
+                         // V16.29: Robust boolean parsing from Excel
                          let showCompanyRaw = 'SI';
                          if (showCompKey && row[showCompKey]) {
                              showCompanyRaw = String(row[showCompKey]).trim().toUpperCase();
                          }
 
+                         // V16.27: Detectar columna IMPULSAR o DESTACAR
                          const featuredKey = findKey(row, 'impulsar') || findKey(row, 'destacar') || findKey(row, 'top');
                          let isFeaturedRaw = 'NO';
                          if(featuredKey && row[featuredKey]) {
@@ -1971,7 +1999,7 @@
                          const jobData = {
                              title: title, 
                              company: company, 
-                             showCompany: showCompanyRaw === 'SI', 
+                             showCompany: showCompanyRaw === 'SI', // Simple comparison
                              state: state, city: city, zone: zone,
                              location: (city && state) ? `${city}, ${state}` : legacyLoc, 
                              
