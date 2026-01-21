@@ -45,7 +45,18 @@
         #toast.show { visibility: visible !important; opacity: 1 !important; bottom: 50px !important; }
 
         .footer { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #ccc; font-size: 12px; line-height: 1.6; }
-        .footer-link { color: #fff; text-decoration: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+        
+        /* V17.1: Link Subrayado */
+        .footer-link { 
+            color: #fff; 
+            text-decoration: underline; /* Subrayado agregado */
+            font-weight: bold; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 5px; 
+        }
+        
         .legal-note { color: #999; margin-top: 8px; font-style: italic; }
         
         /* Estilo para BitX (Pie de página) */
@@ -551,7 +562,7 @@
                 <div class="filter-icon-box">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                 </div>
-                <select id="stateFilter" class="filter-select" onchange="filterJobs()" autocomplete="off">
+                <select id="stateFilter" class="filter-select" onchange="handleStateChange()" autocomplete="off">
                     <option value="">📍 Estado</option>
                 </select>
                 <select id="cityFilter" class="filter-select" onchange="filterJobs()" autocomplete="off">
@@ -1012,29 +1023,59 @@
             });
         }
 
+        // V17.1: FILTROS CASCADA (FIX)
         function populateFilters(jobsData) {
             const allJobsArr = Object.values(jobsData);
             const stateSelect = document.getElementById('stateFilter');
-            const citySelect = document.getElementById('cityFilter');
 
+            // 1. Llenar Estados (Únicos)
             const uniqueStates = [...new Set(allJobsArr.map(j => j.state).filter(Boolean))].sort();
-            const uniqueCities = [...new Set(allJobsArr.map(j => j.city).filter(Boolean))].sort();
             
+            // Guardar selección actual si existe
             const currState = stateSelect.value;
-            const currCity = citySelect.value;
 
-            stateSelect.innerHTML = '<option value="">📍 Estado</option>';
+            let stateHtml = '<option value="">📍 Estado</option>';
             uniqueStates.forEach(s => {
-                stateSelect.innerHTML += `<option value="${s}">${s}</option>`;
+                stateHtml += `<option value="${s}">${s}</option>`;
             });
+            stateSelect.innerHTML = stateHtml;
+            stateSelect.value = currState;
+
+            // 2. Llenar Municipios iniciales (Basado en el estado actual o todos)
+            updateCityOptions();
+        }
+
+        // V17.1: Nueva función para actualizar ciudades dinámicamente
+        window.updateCityOptions = function() {
+            const stateSelect = document.getElementById('stateFilter');
+            const citySelect = document.getElementById('cityFilter');
+            const selectedState = stateSelect.value;
+
+            const allJobsArr = Object.values(jobs);
+
+            // Filtrar ciudades: Si hay estado seleccionado, solo mostrar ciudades de ese estado
+            let availableCities = new Set();
+            allJobsArr.forEach(j => {
+                if (!selectedState || j.state === selectedState) {
+                    if (j.city) availableCities.add(j.city);
+                }
+            });
+
+            const sortedCities = [...availableCities].sort();
 
             citySelect.innerHTML = '<option value="">🏙️ Municipio</option>';
-            uniqueCities.forEach(c => {
-                 citySelect.innerHTML += `<option value="${c}">${c}</option>`;
+            sortedCities.forEach(c => {
+                citySelect.innerHTML += `<option value="${c}">${c}</option>`;
             });
             
-            if(uniqueStates.includes(currState)) stateSelect.value = currState;
-            if(uniqueCities.includes(currCity)) citySelect.value = currCity;
+            // Resetear selección de ciudad para evitar incongruencias
+            citySelect.value = "";
+        }
+
+        // V17.1: Manejador de cambio de estado
+        window.handleStateChange = function() {
+            updateCityOptions(); // Actualizar dropdown de ciudades
+            filterJobs();        // Filtrar grid
         }
 
         function checkActiveRecruiter() {
@@ -1742,6 +1783,9 @@
             document.getElementById('jobDescription').value = j.description; document.getElementById('jobStatus').value = j.status||'Vigente';
             document.getElementById('jobAgency').value = j.agency||'';
             
+            // V16.27: Cargar valor de featured
+            document.getElementById('jobIsFeatured').value = j.isFeatured ? 'true' : 'false';
+
             let contactVal = j.contact || '';
             let codeVal = '+52';
             if(contactVal.startsWith('+52')) { codeVal = '+52'; contactVal = contactVal.replace('+52',''); }
@@ -1803,7 +1847,7 @@
                 'CONTACTO': '5512345678', 
                 'ESTATUS': 'Vigente', 
                 'TIPO DE SERVICIO O AGENCIA': 'Agencia Interna',
-                'IMPULSAR': 'SI' 
+                'IMPULSAR': 'SI'
             }];
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); XLSX.writeFile(wb, 'plantilla.xlsx');
