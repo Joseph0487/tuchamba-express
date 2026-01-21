@@ -249,7 +249,6 @@
 
         .sticky-footer { position: sticky; bottom: 0; background: white; padding: 15px 20px 20px; margin: 20px -30px -30px; border-top: 1px solid #eee; text-align: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100; }
         
-        /* V17.2: Animación HEARTBEAT (Latido) */
         @keyframes heartbeat {
             0% { transform: scale(1); }
             15% { transform: scale(1.05); }
@@ -263,7 +262,6 @@
             padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; 
             box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); 
             border: none; cursor: pointer; 
-            /* Animación aplicada */
             animation: heartbeat 2s infinite ease-in-out;
         }
         .whatsapp-btn-large:active { transform: scale(0.98); animation: none; }
@@ -325,7 +323,9 @@
         .job-title { font-size: 1.2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; line-height: 1.3; }
         .company-name { font-size: 0.9rem; color: #0a66c2; font-weight: 600; display: flex; align-items: center; }
         .location { font-size: 0.9rem; color: #555; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
-        .salary-text { color: #d32f2f; font-weight: 800; font-size: 1.1rem; margin-top: 5px; }
+        
+        /* V17.4: Salario más grande */
+        .salary-text { color: #d32f2f; font-weight: 800; font-size: 1.3rem; margin-top: 5px; }
 
         .company-logo { width: 48px; height: 48px; background: linear-gradient(135deg, #0a66c2 0%, #004182 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; flex-shrink: 0; }
 
@@ -340,11 +340,12 @@
 
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
         .modal.active { display: flex; align-items: center; justify-content: center; }
+        
         .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; padding-bottom: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
         
-        .job-details { display: grid; gap: 15px; margin-bottom: 15px; }
-        .detail-item { font-size: 15px; }
+        .job-details { display: grid; gap: 15px; margin-bottom: 25px; margin-top: 15px; }
+        .detail-item { font-size: 16px; display:flex; align-items:center; gap:8px;}
 
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px; }
@@ -356,12 +357,47 @@
         
         @media (max-width: 500px) { .location-grid { grid-template-columns: 1fr; } }
         
-        /* V17.2: FLYER "CEBO" PROFESIONAL (Sin teléfono, enfocado en el link) */
+        .section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px; margin-top: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px; display: block; }
+        /* V17.4: Fondo gris para listas */
+        .item-list li { background: #f9f9f9; padding: 10px 14px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; font-size: 15px; }
+        
+        .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .recruiters-table th, .recruiters-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        .recruiters-table th { background: #f9fafb; color: #666; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .recruiters-table tr:hover { background-color: #f9f9f9; }
+
+        /* V17.4: Contador Blanco */
+        .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header { 
+                flex-direction: row; 
+                justify-content: space-between; 
+                align-items: center;
+                gap: 5px;
+            }
+            .header h1 {
+                font-size: 17px; 
+                max-width: 50%; 
+                line-height: 1.1;
+            }
+            .filter-container { 
+                display: grid; 
+                grid-template-columns: auto 1fr 1fr; 
+                gap: 8px;
+                overflow-x: visible; 
+            }
+            .filter-icon-box { height: 40px; width: 40px; }
+            .filter-select { height: 40px; font-size: 13px; padding: 5px; }
+            
+            .admin-controls-wrapper button { flex: 1; min-width: 45%; }
+        }
+
         #flyerTemplate {
             width: 1080px;
             min-height: 1080px;
             height: auto;
-            /* Fondo de Gente Trabajando + Overlay Oscuro para contraste */
             background-image: 
                 linear-gradient(rgba(10, 25, 45, 0.85), rgba(10, 25, 45, 0.92)),
                 url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
@@ -394,7 +430,7 @@
             margin-bottom: 50px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
             border: 4px solid #FFF;
-            transform: skew(-10deg); /* Efecto dinámico inclinado */
+            transform: skew(-10deg);
         }
 
         .flyer-title { 
@@ -426,7 +462,6 @@
             text-shadow: 0 5px 20px rgba(0,0,0,0.9); 
         }
         
-        /* Caja de Beneficios Automática */
         .flyer-benefits-container {
             background: rgba(255,255,255,0.1);
             border: 2px solid rgba(255,255,255,0.3);
@@ -460,7 +495,6 @@
         }
         .flyer-benefits-list li { margin-bottom: 15px; }
 
-        /* Footer CTA - Sin Teléfono */
         .flyer-cta-box { 
             background: white; 
             color: #D50000; /* Rojo Urgente */
@@ -1662,6 +1696,7 @@
             document.getElementById(`menu-${id}`).classList.toggle('active'); 
         }
 
+        // V17.3: MODAL LIMPIO Y ORDENADO
         window.openViewModal = function(id) {
             const j = jobs[id];
             const isRefMode = !!refCode;
@@ -1702,7 +1737,6 @@
                 const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                 const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                 
-                // V17.2: Botón con Animación Heartbeat + Texto corregido
                 contactHtml = `<div class="sticky-footer">
                                     <p style="font-size:12px; color:#666; margin-bottom:5px;">👇 Respuesta Inmediata 👇</p>
                                     <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
@@ -1730,34 +1764,36 @@
 
             const shareUrl = `${window.location.origin}/?id=${id}${refCode ? '&ref='+refCode : ''}`;
             
+            // HTML LIMPIO Y RESPIRABLE
             document.getElementById('viewModalBody').innerHTML = `
                 ${adminInfoHtml}
                 
-                <div class="card-header-top">
-                    <div>
-                        ${badgeHtml}
-                        ${newBadge}
-                    </div>
+                <div style="margin-bottom:10px;">
+                    ${badgeHtml} ${newBadge}
                 </div>
                 ${dateHtml}
 
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-top: 15px;">
-                    <h2 style="font-size: 24px; margin-bottom: 5px; color:#333; flex:1;">${j.title}</h2>
-                    <button class="tool-btn" onclick="navigator.clipboard.writeText('${shareUrl}').then(() => window.showToast('🔗 Link copiado'))" style="padding: 5px 10px; font-size: 12px;">🔗 Copiar Link</button>
-                </div>
+                <h2 style="font-size: 26px; margin-top: 15px; margin-bottom: 10px; color:#222; line-height:1.2;">
+                    ${j.title}
+                </h2>
                 
-                <div style="font-size: 18px; color: #0a66c2; margin-bottom: 20px;">${companyDisplay}</div>
-
-                <div class="job-details">
-                    <div class="detail-item">📍 ${locationDetail}</div>
-                    <div class="detail-item salary-text">💰 ${j.salary || 'A convenir'}</div>
-                    <div class="detail-item">🕒 ${j.schedule || 'Horario a definir'}</div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+                    <div style="font-size: 18px; color: #0a66c2; font-weight:600;">${companyDisplay}</div>
+                    <button class="tool-btn" onclick="navigator.clipboard.writeText('${shareUrl}').then(() => window.showToast('🔗 Link copiado'))" style="padding: 6px 12px; font-size: 12px; border-radius:20px;">🔗 Compartir</button>
                 </div>
 
-                <div class="section-title">Descripción</div>
-                <p style="color: #444; line-height: 1.6;">${j.description}</p>
+                <div class="job-details" style="background:#f8f9fa; padding:15px; border-radius:12px;">
+                    <div class="detail-item">📍 <strong>Zona:</strong>&nbsp; ${locationDetail}</div>
+                    <div class="detail-item salary-text" style="color:#d32f2f;">💰 <strong>Sueldo:</strong>&nbsp; ${j.salary || 'A convenir'}</div>
+                    <div class="detail-item">🕒 <strong>Jornada:</strong>&nbsp; ${j.schedule || 'Horario a definir'}</div>
+                </div>
+
+                <div class="section-title">Descripción del Puesto</div>
+                <p style="color: #444; line-height: 1.8; font-size:15px; margin-bottom:20px;">${j.description}</p>
+                
                 ${(j.requirements||[]).length ? `<div class="section-title">Requisitos</div><ul class="item-list">${j.requirements.map(r=>`<li>${r}</li>`).join('')}</ul>` : ''}
-                ${(j.benefits||[]).length ? `<div class="section-title">Beneficios</div><ul class="item-list">${j.benefits.map(b=>`<li>${b}</li>`).join('')}</ul>` : ''}
+                
+                ${(j.benefits||[]).length ? `<div class="section-title">Ofrecemos</div><ul class="item-list">${j.benefits.map(b=>`<li>${b}</li>`).join('')}</ul>` : ''}
                 
                 ${contactHtml}
             `;
@@ -1778,10 +1814,6 @@
             
             tempReqs = []; tempBens = []; updateList('reqList', tempReqs, 'req'); updateList('benList', tempBens, 'ben');
             document.getElementById('jobShowCompany').value = 'true';
-            
-            // Reset manual de featured
-            document.getElementById('jobIsFeatured').value = 'false';
-
             document.getElementById('formModal').classList.add('active');
         }
 
@@ -1801,9 +1833,6 @@
             document.getElementById('jobDescription').value = j.description; document.getElementById('jobStatus').value = j.status||'Vigente';
             document.getElementById('jobAgency').value = j.agency||'';
             
-            // V16.27: Cargar valor de featured
-            document.getElementById('jobIsFeatured').value = j.isFeatured ? 'true' : 'false';
-
             let contactVal = j.contact || '';
             let codeVal = '+52';
             if(contactVal.startsWith('+52')) { codeVal = '+52'; contactVal = contactVal.replace('+52',''); }
@@ -1897,7 +1926,6 @@
                     if(!json.length) { alert('Archivo vacío'); return; }
                     let count = 0;
                     
-                    // V16.29 FIX: Trim spaces for robust matching
                     const normalizeKey = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
                     const findKey = (row, keyName) => {
@@ -1920,13 +1948,11 @@
                          const legacyLoc = row['Ubicación'] || ''; 
 
                          const showCompKey = findKey(row, 'mostrar empresa publicamente');
-                         // V16.29: Robust boolean parsing from Excel
                          let showCompanyRaw = 'SI';
                          if (showCompKey && row[showCompKey]) {
                              showCompanyRaw = String(row[showCompKey]).trim().toUpperCase();
                          }
 
-                         // V16.27: Detectar columna IMPULSAR o DESTACAR
                          const featuredKey = findKey(row, 'impulsar') || findKey(row, 'destacar') || findKey(row, 'top');
                          let isFeaturedRaw = 'NO';
                          if(featuredKey && row[featuredKey]) {
@@ -1945,7 +1971,7 @@
                          const jobData = {
                              title: title, 
                              company: company, 
-                             showCompany: showCompanyRaw === 'SI', // Simple comparison
+                             showCompany: showCompanyRaw === 'SI', 
                              state: state, city: city, zone: zone,
                              location: (city && state) ? `${city}, ${state}` : legacyLoc, 
                              
