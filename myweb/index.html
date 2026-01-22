@@ -10,8 +10,6 @@
 
     <meta name="description" content="Encuentra trabajo sin experiencia y de contratación inmediata en Nuevo León, CDMX y Estado de Mexico. ¡Sin registros! Contacta directo por WhatsApp. Vacantes vigentes 2026.">
     
-    <meta name="keywords" content="bolsa de trabajo 2026, trabajo estado de mexico, ciudad de mexico, trabajo sin experiencia, cdmx, monterrey, nuevo leon, lunes a viernes, contratación inmediata, ayudante general, ventas, atención a clientes">
-
     <meta property="og:title" content="¿Buscas chamba urgente? Vacantes en Nuevo León, CDMX y EdoMex 🚀">
     <meta property="og:description" content="Sin correos ni registros. Clic y directo al WhatsApp del reclutador. ¡Entra ya!">
     <meta property="og:image" content="https://tuchamba-express.vercel.app/banner_1.png">
@@ -256,7 +254,7 @@
             100% { transform: scale(1); }
         }
 
-        /* V17.9: Botón Compacto CON ICONOS */
+        /* V17.9.2: Botón Compacto CON ICONOS */
         .whatsapp-btn-large { 
             display: flex; align-items: center; justify-content: center; width: 100%; 
             background-color: #25D366; color: white; text-decoration: none; 
@@ -362,7 +360,7 @@
         
         .job-details { display: grid; gap: 15px; margin-bottom: 25px; margin-top: 15px; }
         
-        /* V17.9: Ajuste palabra larga */
+        /* V17.9: Ajuste palabra larga y apilado vertical */
         .detail-item { 
             font-size: 15px; 
             display: flex; 
@@ -1424,7 +1422,7 @@
             push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
         }
 
-        // V17.7: GENERADOR DE FLYER REPARADO Y OPTIMIZADO
+        // V17.9.2: GENERADOR DE FLYER REPARADO Y OPTIMIZADO (allowTaint: false)
         window.generateFlyer = function(jobId) {
             const j = jobs[jobId];
             if (!j) return;
@@ -1433,7 +1431,6 @@
 
             document.getElementById('flyerTitle').innerText = j.title;
             document.getElementById('flyerSalary').innerText = j.salary || 'Sueldo Competitivo';
-            document.getElementById('flyerLocation').innerText = j.city + (j.state ? `, ${j.state}` : '');
             
             const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
             document.getElementById('flyerCompany').innerText = showNamePublicly ? j.company : "Empresa Confidencial";
@@ -1452,11 +1449,11 @@
 
             const flyerNode = document.getElementById('flyerTemplate');
             
-            // V17.7: HTML2CANVAS FIX (CORS + Taint)
+            // V17.9.2: FIX DE SEGURIDAD PARA DESCARGA
             html2canvas(flyerNode, { 
                 scale: 2, 
                 useCORS: true, 
-                allowTaint: true, // Permitir imágenes externas
+                allowTaint: false, // <--- EL FIX MAESTRO
                 backgroundColor: null 
             }).then(canvas => {
                 const link = document.createElement('a');
@@ -1466,7 +1463,7 @@
                 window.showToast("✅ ¡Flyer descargado!");
             }).catch(err => {
                 console.error(err);
-                alert("Error al generar imagen. Verifica tu conexión.");
+                alert("Error al generar imagen: " + err.message);
             });
         }
 
@@ -2015,11 +2012,13 @@
                          const legacyLoc = row['Ubicación'] || ''; 
 
                          const showCompKey = findKey(row, 'mostrar empresa publicamente');
+                         // V16.29: Robust boolean parsing from Excel
                          let showCompanyRaw = 'SI';
                          if (showCompKey && row[showCompKey]) {
                              showCompanyRaw = String(row[showCompKey]).trim().toUpperCase();
                          }
 
+                         // V16.27: Detectar columna IMPULSAR o DESTACAR
                          const featuredKey = findKey(row, 'impulsar') || findKey(row, 'destacar') || findKey(row, 'top');
                          let isFeaturedRaw = 'NO';
                          if(featuredKey && row[featuredKey]) {
@@ -2038,7 +2037,7 @@
                          const jobData = {
                              title: title, 
                              company: company, 
-                             showCompany: showCompanyRaw === 'SI', 
+                             showCompany: showCompanyRaw === 'SI', // Simple comparison
                              state: state, city: city, zone: zone,
                              location: (city && state) ? `${city}, ${state}` : legacyLoc, 
                              
