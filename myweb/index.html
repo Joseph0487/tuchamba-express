@@ -256,10 +256,13 @@
             100% { transform: scale(1); }
         }
 
+        /* V17.8: Botón Compacto */
         .whatsapp-btn-large { 
             display: flex; align-items: center; justify-content: center; width: 100%; 
             background-color: #25D366; color: white; text-decoration: none; 
-            padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; 
+            padding: 12px 15px; /* Reducido de 16px */
+            border-radius: 12px; font-weight: bold; 
+            font-size: 15px; /* Ajustado para que quepa */
             box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); 
             border: none; cursor: pointer; 
             animation: heartbeat 2s infinite ease-in-out;
@@ -331,7 +334,6 @@
         .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
         .tag { background: #f3f2ef; color: #444; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
 
-        /* V17.7 FIX: Puntitos Gris Oscuro y Bold */
         .more-btn { position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 24px; color: #333; cursor: pointer; width: 30px; height: 30px; z-index: 5; font-weight: 900; }
         
         .admin-actions { display: none; position: absolute; top: 45px; right: 15px; background: white; border: 1px solid #eee; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 20; }
@@ -345,10 +347,18 @@
         .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; padding-bottom: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
         
+        /* V17.8: Detalles en Columna (Stack) */
         .job-details { display: grid; gap: 15px; margin-bottom: 25px; margin-top: 15px; }
-        .detail-item { font-size: 16px; display:flex; align-items:center; gap:8px;}
+        .detail-item { 
+            font-size: 15px; 
+            display: flex; 
+            flex-direction: column; /* Stack Vertical */
+            align-items: flex-start; 
+            gap: 4px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
 
-        /* V17.7 FIX: Botón de Compartir Homologado */
         .modal-share-btn { 
             background: #455a64; 
             color: white; 
@@ -361,8 +371,8 @@
             display: inline-flex; 
             align-items: center; 
             gap: 6px; 
-            flex-shrink: 0; /* Evita que se aplaste */
-            white-space: nowrap; /* Evita que el texto baje */
+            flex-shrink: 0; 
+            white-space: nowrap; 
         }
 
         .view-count-badge { background: #e3f2fd; color: #0277bd; font-size: 12px; padding: 6px 14px; border-radius: 50px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; border: 1px solid #bbdefb; }
@@ -413,7 +423,6 @@
             .admin-controls-wrapper button { flex: 1; min-width: 45%; }
         }
 
-        /* V17.7 FIX: FLYER CON ETIQUETA IMG Y CORS HABILITADO */
         #flyerTemplate {
             width: 1080px;
             min-height: 1080px;
@@ -431,7 +440,7 @@
             text-align: center;
             padding: 80px 60px;
             box-sizing: border-box;
-            background: #0a192d; /* Fallback */
+            background: #0a192d; 
         }
         
         .flyer-badge-top {
@@ -1400,7 +1409,7 @@
             push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
         }
 
-        // V17.7: GENERADOR DE FLYER REPARADO Y OPTIMIZADO
+        // V17.7: FIX GENERADOR DE FLYER (CORS)
         window.generateFlyer = function(jobId) {
             const j = jobs[jobId];
             if (!j) return;
@@ -1409,6 +1418,7 @@
 
             document.getElementById('flyerTitle').innerText = j.title;
             document.getElementById('flyerSalary').innerText = j.salary || 'Sueldo Competitivo';
+            document.getElementById('flyerLocation').innerText = j.city + (j.state ? `, ${j.state}` : '');
             
             const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
             document.getElementById('flyerCompany').innerText = showNamePublicly ? j.company : "Empresa Confidencial";
@@ -1427,11 +1437,10 @@
 
             const flyerNode = document.getElementById('flyerTemplate');
             
-            // V17.7: HTML2CANVAS FIX (CORS + Taint)
             html2canvas(flyerNode, { 
                 scale: 2, 
                 useCORS: true, 
-                allowTaint: true, // Permitir imágenes externas
+                allowTaint: true, 
                 backgroundColor: null 
             }).then(canvas => {
                 const link = document.createElement('a');
@@ -1441,7 +1450,7 @@
                 window.showToast("✅ ¡Flyer descargado!");
             }).catch(err => {
                 console.error(err);
-                alert("Error al generar imagen: " + err.message);
+                alert("Error al generar imagen. Verifica tu conexión.");
             });
         }
 
@@ -1460,275 +1469,7 @@
         onValue(visitsRef, (s) => { if(document.getElementById('totalVisits')) document.getElementById('totalVisits').innerText = s.val() || 0; });
         onValue(monthlyRef, (s) => { if(document.getElementById('monthlyVisits')) document.getElementById('monthlyVisits').innerText = s.val() || 0; });
 
-        window.saveJob = function(e) {
-            e.preventDefault();
-            
-            const phoneCode = document.getElementById('jobPhoneCode').value;
-            const rawPhone = document.getElementById('jobContact').value.trim();
-            
-            let cleanPhone = rawPhone.replace(/\D/g, '');
-            const codeDigits = phoneCode.replace('+', '');
-            if (cleanPhone.startsWith(codeDigits)) {
-                cleanPhone = cleanPhone.substring(codeDigits.length);
-            }
-            const finalPhone = cleanPhone ? (phoneCode + cleanPhone) : '';
-
-            // V16.27: Leer campo destacado manual
-            const isFeaturedVal = document.getElementById('jobIsFeatured').value === 'true';
-
-            const jobData = {
-                title: document.getElementById('jobTitle').value,
-                company: document.getElementById('jobCompany').value,
-                showCompany: document.getElementById('jobShowCompany').value === 'true', 
-                state: document.getElementById('jobState').value,
-                city: document.getElementById('jobCity').value,
-                zone: document.getElementById('jobZone').value,
-                location: `${document.getElementById('jobCity').value}, ${document.getElementById('jobState').value}`,
-                
-                fecha: document.getElementById('jobDate').value, 
-                
-                salary: document.getElementById('jobSalary').value,
-                description: document.getElementById('jobDescription').value,
-                schedule: document.getElementById('jobSchedule').value, 
-                tags: document.getElementById('jobTags').value,
-                contact: finalPhone, 
-                status: document.getElementById('jobStatus').value,
-                agency: document.getElementById('jobAgency').value,
-                requirements: tempReqs,
-                benefits: tempBens,
-                isFeatured: isFeaturedVal // Guardar el flag
-            };
-            const id = currentEditId || 'job-' + Date.now();
-            set(ref(db, 'jobs/' + id), jobData).then(() => {
-                window.showToast("✅ Vacante guardada");
-                window.closeFormModal();
-            });
-        }
-
-        window.deleteJob = function(id) { if(confirm('¿Borrar vacante?')) remove(ref(db, 'jobs/' + id)); }
-
-        function normalizeText(text) { return text ? text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : ""; }
-
-        function formatDateFriendly(dateString) {
-            return dateString || '';
-        }
-
-        function isNewJob(dateString) {
-            if (!dateString) return false;
-            let jobDate;
-            
-            if (dateString.includes('/')) {
-                const parts = dateString.split('/');
-                if (parts.length === 3) {
-                    jobDate = new Date(parts[2], parts[1] - 1, parts[0]);
-                }
-            } 
-            else if (dateString.includes('-')) {
-                const parts = dateString.split('-');
-                if (parts.length === 3) {
-                    jobDate = new Date(parts[0], parts[1] - 1, parts[2]);
-                }
-            }
-
-            if (!jobDate || isNaN(jobDate.getTime())) return false;
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); 
-
-            const diffTime = Math.abs(today - jobDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            return diffDays <= 3;
-        }
-
-        function renderJobs() {
-            let keys = Object.keys(jobs);
-            
-            keys.sort((a, b) => {
-                const jobA = jobs[a]; const jobB = jobs[b];
-                const statusA = jobA.status === 'No Vigente' ? 1 : 0;
-                const statusB = jobB.status === 'No Vigente' ? 1 : 0;
-                if (statusA !== statusB) return statusA - statusB;
-                
-                // V16.27: Ordenar primero las destacadas
-                const featA = jobA.isFeatured ? 1 : 0;
-                const featB = jobB.isFeatured ? 1 : 0;
-                if (featA !== featB) return featB - featA; // Destacadas primero
-
-                const dateA = parseJobDate(jobA.fecha);
-                const dateB = parseJobDate(jobB.fecha);
-                
-                if (dateA !== dateB) {
-                    return dateB - dateA; 
-                }
-                return b.localeCompare(a); 
-            });
-
-            currentFilteredJobs = keys; 
-            currentPage = 1; 
-            applyFilterAndRender();
-        }
-
-        window.clearSearch = function() {
-            document.getElementById('searchInput').value = '';
-            filterJobs();
-            document.getElementById('searchInput').focus();
-        }
-
-        function applyFilterAndRender() {
-            const stateVal = document.getElementById('stateFilter').value;
-            const cityVal = document.getElementById('cityFilter').value;
-            const searchInput = document.getElementById('searchInput');
-            const searchText = normalizeText(searchInput.value);
-            
-            const clearBtn = document.getElementById('clearSearchBtn');
-            clearBtn.style.display = searchText.length > 0 ? 'flex' : 'none';
-
-            const matchedKeys = currentFilteredJobs.filter(id => {
-                const j = jobs[id];
-                if (!isAdmin && j.status === 'No Vigente') return false;
-
-                const matchState = stateVal === '' || j.state === stateVal;
-                const matchCity = cityVal === '' || j.city === cityVal;
-                
-                let matchSearch = true;
-                if(searchText) {
-                    const fullText = normalizeText(`${j.title} ${j.company} ${j.tags} ${j.description}`);
-                    matchSearch = fullText.includes(searchText);
-                }
-
-                return matchState && matchCity && matchSearch;
-            });
-
-            document.getElementById('jobCounter').textContent = `${matchedKeys.length} vacantes encontradas`;
-            
-            if (matchedKeys.length === 0) {
-                document.getElementById('jobGrid').innerHTML = '';
-                document.getElementById('paginationContainer').style.display = 'none';
-                document.getElementById('emptyState').style.display = 'block';
-                return;
-            }
-            document.getElementById('emptyState').style.display = 'none';
-
-            const totalPages = Math.ceil(matchedKeys.length / itemsPerPage);
-            if(currentPage > totalPages) currentPage = 1;
-
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const visibleKeys = matchedKeys.slice(startIndex, endIndex);
-
-            const grid = document.getElementById('jobGrid');
-            grid.innerHTML = visibleKeys.map(id => {
-                const j = jobs[id];
-                const tags = j.tags ? j.tags.split(',').map(t => t.trim()).filter(t => t) : [];
-                const isVigente = j.status !== 'No Vigente';
-                
-                let statusBadge = '<span class="badge-closed">Cerrada</span>';
-                if(isVigente) statusBadge = '<span class="badge-vigente">🟢 Vigente</span>';
-
-                const showAdminButtons = isAdmin && !refCode;
-                const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
-                const finalCompanyName = (isAdmin && !refCode) || showNamePublicly ? j.company : "Empresa Confidencial";
-                
-                // V16.28: Icono de Empresa Verificada (Solo si es pública)
-                const verifiedHtml = showNamePublicly ? '<span class="verified-badge" title="Empresa Verificada">✓</span>' : '';
-
-                let displayLocation = j.location;
-                if (j.city && j.state) displayLocation = `${j.city}, ${j.state}`;
-
-                const niceDate = formatDateFriendly(j.fecha);
-                const dateHtml = niceDate ? `<span class="card-header-date">📅 Publicación: ${niceDate}</span>` : '';
-                const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
-
-                // V16.28: BADGE DESTACADA MEJORADO (Texto + Color)
-                const featuredBadge = j.isFeatured ? '<div class="badge-featured">⭐ DESTACADA</div>' : '';
-
-                return `
-                    <div class="job-card" onclick="window.openViewModal('${id}')">
-                        ${featuredBadge}
-                        ${showAdminButtons ? `<button class="more-btn" onclick="event.stopPropagation(); window.toggleMenu('${id}')">⋮</button>
-                        <div class="admin-actions" id="menu-${id}">
-                            <button class="admin-action" onclick="event.stopPropagation(); window.editJob('${id}')">✏️ Editar</button>
-                            <button class="admin-action" onclick="event.stopPropagation(); window.generateFlyer('${id}')">🖼️ Descargar Flyer</button>
-                            <button class="admin-action delete" onclick="event.stopPropagation(); window.deleteJob('${id}')">🗑️ Eliminar</button>
-                        </div>` : ''}
-                        
-                        <div class="card-header-top">
-                            <div>
-                                ${statusBadge}
-                                ${newBadge}
-                            </div>
-                        </div>
-                        ${dateHtml}
-                        
-                        <div style="display: flex; gap: 15px; margin-bottom: 15px; margin-top: 10px;">
-                            <div class="company-logo">${j.company.charAt(0)}</div>
-                            <div>
-                                <div class="job-title">${j.title}</div>
-                                <div class="company-name">${finalCompanyName} ${verifiedHtml}</div>
-                            </div>
-                        </div>
-                        
-                        <div class="location">📍 ${displayLocation}</div>
-                        <div class="salary-text">💰 ${j.salary || 'A convenir'}</div>
-                        
-                        ${tags.length > 0 ? `<div class="tags">${tags.slice(0,3).map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-
-            renderPaginationControls(totalPages);
-        }
-
-        function renderPaginationControls(totalPages) {
-            const container = document.getElementById('paginationContainer');
-            if (totalPages <= 1) {
-                container.style.display = 'none';
-                return;
-            }
-            container.style.display = 'flex';
-            
-            let html = '';
-            
-            html += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>&laquo; Anterior</button>`;
-            
-            for (let i = 1; i <= totalPages; i++) {
-                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
-                    html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
-                } else if (i === currentPage - 2 || i === currentPage + 2) {
-                    html += `<span style="color:#999;">...</span>`;
-                }
-            }
-
-            html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Siguiente &raquo;</button>`;
-            
-            html += `<div class="page-info">Página ${currentPage} de ${totalPages}</div>`;
-            
-            container.innerHTML = html;
-        }
-
-        window.changePage = function(newPage) {
-            currentPage = newPage;
-            applyFilterAndRender();
-            document.querySelector('.search-container').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        window.filterJobs = function() {
-            currentPage = 1; 
-            applyFilterAndRender();
-        }
-
-        window.loadMoreJobs = function() {
-            displayLimit += 20;
-            applyFilterAndRender();
-        }
-
-        window.toggleMenu = function(id) { 
-            document.querySelectorAll('.admin-actions').forEach(m => m.classList.remove('active')); 
-            document.getElementById(`menu-${id}`).classList.toggle('active'); 
-        }
-
-        // V17.3: MODAL LIMPIO Y ORDENADO + V17.7 FIX SHARE BUTTON
+        // V17.8 FIX: Stacked Details HTML Construction
         window.openViewModal = function(id) {
             const j = jobs[id];
             const isRefMode = !!refCode;
@@ -1772,7 +1513,7 @@
                 contactHtml = `<div class="sticky-footer">
                                     <p style="font-size:12px; color:#666; margin-bottom:5px;">👇 Respuesta Inmediata 👇</p>
                                     <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
-                                        📅 ¡Haz Clic para Agendar Entrevista! 📲
+                                        ¡Haz Clic para Agendar Entrevista!
                                     </button>
                                </div>`;
             }
@@ -1796,7 +1537,6 @@
 
             const shareUrl = `${window.location.origin}/?id=${id}${refCode ? '&ref='+refCode : ''}`;
             
-            // HTML LIMPIO Y RESPIRABLE
             document.getElementById('viewModalBody').innerHTML = `
                 ${adminInfoHtml}
                 
@@ -1815,9 +1555,18 @@
                 </div>
 
                 <div class="job-details" style="background:#f8f9fa; padding:15px; border-radius:12px;">
-                    <div class="detail-item">📍 <strong>Zona:</strong>&nbsp; ${locationDetail}</div>
-                    <div class="detail-item salary-text" style="color:#d32f2f;">💰 <strong>Sueldo:</strong>&nbsp; ${j.salary || 'A convenir'}</div>
-                    <div class="detail-item">🕒 <strong>Jornada:</strong>&nbsp; ${j.schedule || 'Horario a definir'}</div>
+                    <div class="detail-item">
+                        <div>📍 <strong>Zona:</strong></div>
+                        <div>${locationDetail}</div>
+                    </div>
+                    <div class="detail-item salary-text" style="color:#d32f2f;">
+                        <div>💰 <strong>Sueldo:</strong></div>
+                        <div>${j.salary || 'A convenir'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div>🕒 <strong>Jornada:</strong></div>
+                        <div>${j.schedule || 'Horario a definir'}</div>
+                    </div>
                 </div>
 
                 <div class="section-title">Descripción del Puesto</div>
