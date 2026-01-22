@@ -256,13 +256,12 @@
             100% { transform: scale(1); }
         }
 
-        /* V17.8 FIX: Botón Compacto para Móviles */
         .whatsapp-btn-large { 
             display: flex; align-items: center; justify-content: center; width: 100%; 
             background-color: #25D366; color: white; text-decoration: none; 
-            padding: 12px 15px; /* Reducido para ahorrar espacio */
+            padding: 12px 15px; 
             border-radius: 12px; font-weight: bold; 
-            font-size: 15px; /* Letra ajustada */
+            font-size: 15px; 
             box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); 
             border: none; cursor: pointer; 
             animation: heartbeat 2s infinite ease-in-out;
@@ -344,20 +343,34 @@
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
         .modal.active { display: flex; align-items: center; justify-content: center; }
         
-        .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; padding-bottom: 0; }
+        /* V17.9 FIX: overflow-x: hidden para eliminar scroll horizontal fantasma */
+        .modal-content { 
+            background: white; 
+            border-radius: 16px; 
+            max-width: 650px; 
+            width: 100%; 
+            padding: 25px; 
+            position: relative; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            overflow-x: hidden; /* EL FIX */
+            padding-bottom: 0; 
+        }
+        
         .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
         
         .job-details { display: grid; gap: 15px; margin-bottom: 25px; margin-top: 15px; }
         
-        /* V17.8 FIX: Stack vertical para evitar amontonamiento en móviles */
         .detail-item { 
             font-size: 15px; 
             display: flex; 
-            flex-direction: column; /* Apila etiqueta y valor verticalmente */
+            flex-direction: column; 
             align-items: flex-start; 
             gap: 4px;
             margin-bottom: 10px;
             line-height: 1.4;
+            /* V17.9 FIX: Evitar desborde de texto */
+            word-break: break-word; 
         }
 
         .modal-share-btn { 
@@ -430,7 +443,7 @@
             height: auto;
             position: fixed;
             top: 0;
-            left: -9999px; /* Oculto pero renderizado */
+            left: -9999px;
             z-index: -1;
             display: flex;
             flex-direction: column;
@@ -1419,6 +1432,7 @@
 
             document.getElementById('flyerTitle').innerText = j.title;
             document.getElementById('flyerSalary').innerText = j.salary || 'Sueldo Competitivo';
+            document.getElementById('flyerLocation').innerText = j.city + (j.state ? `, ${j.state}` : '');
             
             const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
             document.getElementById('flyerCompany').innerText = showNamePublicly ? j.company : "Empresa Confidencial";
@@ -1451,7 +1465,7 @@
                 window.showToast("✅ ¡Flyer descargado!");
             }).catch(err => {
                 console.error(err);
-                alert("Error al generar imagen: " + err.message);
+                alert("Error al generar imagen. Verifica tu conexión.");
             });
         }
 
@@ -1779,10 +1793,11 @@
                 const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                 const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                 
+                // V17.8 FIX: Botón con texto corto
                 contactHtml = `<div class="sticky-footer">
                                     <p style="font-size:12px; color:#666; margin-bottom:5px;">👇 Respuesta Inmediata 👇</p>
                                     <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
-                                        📅 ¡Haz Clic para Agendar Entrevista! 📲
+                                        ¡Haz Clic para Agendar Entrevista!
                                     </button>
                                </div>`;
             }
@@ -1999,11 +2014,13 @@
                          const legacyLoc = row['Ubicación'] || ''; 
 
                          const showCompKey = findKey(row, 'mostrar empresa publicamente');
+                         // V16.29: Robust boolean parsing from Excel
                          let showCompanyRaw = 'SI';
                          if (showCompKey && row[showCompKey]) {
                              showCompanyRaw = String(row[showCompKey]).trim().toUpperCase();
                          }
 
+                         // V16.27: Detectar columna IMPULSAR o DESTACAR
                          const featuredKey = findKey(row, 'impulsar') || findKey(row, 'destacar') || findKey(row, 'top');
                          let isFeaturedRaw = 'NO';
                          if(featuredKey && row[featuredKey]) {
@@ -2022,7 +2039,7 @@
                          const jobData = {
                              title: title, 
                              company: company, 
-                             showCompany: showCompanyRaw === 'SI', 
+                             showCompany: showCompanyRaw === 'SI', // Simple comparison
                              state: state, city: city, zone: zone,
                              location: (city && state) ? `${city}, ${state}` : legacyLoc, 
                              
