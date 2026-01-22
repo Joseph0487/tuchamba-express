@@ -256,15 +256,17 @@
             100% { transform: scale(1); }
         }
 
+        /* V17.9: Botón Compacto CON ICONOS */
         .whatsapp-btn-large { 
             display: flex; align-items: center; justify-content: center; width: 100%; 
             background-color: #25D366; color: white; text-decoration: none; 
             padding: 12px 15px; 
             border-radius: 12px; font-weight: bold; 
-            font-size: 15px; 
+            font-size: 14px; /* Letra un poco más pequeña para que quepan los iconos */
             box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); 
             border: none; cursor: pointer; 
             animation: heartbeat 2s infinite ease-in-out;
+            white-space: nowrap; /* Fuerza una sola línea */
         }
         .whatsapp-btn-large:active { transform: scale(0.98); animation: none; }
         .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; opacity: 0.7; animation: none; }
@@ -343,7 +345,7 @@
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
         .modal.active { display: flex; align-items: center; justify-content: center; }
         
-        /* V17.9 FIX: overflow-x: hidden para eliminar scroll horizontal fantasma */
+        /* V17.9 FIX: overflow-x hidden para evitar scroll horizontal en PC */
         .modal-content { 
             background: white; 
             border-radius: 16px; 
@@ -353,14 +355,14 @@
             position: relative; 
             max-height: 90vh; 
             overflow-y: auto; 
-            overflow-x: hidden; /* EL FIX */
+            overflow-x: hidden; 
             padding-bottom: 0; 
         }
-        
         .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
         
         .job-details { display: grid; gap: 15px; margin-bottom: 25px; margin-top: 15px; }
         
+        /* V17.9: Ajuste palabra larga */
         .detail-item { 
             font-size: 15px; 
             display: flex; 
@@ -369,8 +371,7 @@
             gap: 4px;
             margin-bottom: 10px;
             line-height: 1.4;
-            /* V17.9 FIX: Evitar desborde de texto */
-            word-break: break-word; 
+            word-break: break-word; /* Evita que direcciones largas rompan el diseño */
         }
 
         .modal-share-btn { 
@@ -1752,7 +1753,7 @@
             document.getElementById(`menu-${id}`).classList.toggle('active'); 
         }
 
-        // V17.8 FIX: Stacked Details HTML Construction
+        // V17.8 FIX: Stacked Details HTML Construction + V17.9 FIX ICONS & OVERFLOW
         window.openViewModal = function(id) {
             const j = jobs[id];
             const isRefMode = !!refCode;
@@ -1793,11 +1794,11 @@
                 const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                 const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                 
-                // V17.8 FIX: Botón con texto corto
+                // V17.9: Regresan los Iconos
                 contactHtml = `<div class="sticky-footer">
                                     <p style="font-size:12px; color:#666; margin-bottom:5px;">👇 Respuesta Inmediata 👇</p>
                                     <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
-                                        ¡Haz Clic para Agendar Entrevista!
+                                        📅 ¡Haz Clic para Agendar Entrevista! 📲
                                     </button>
                                </div>`;
             }
@@ -2014,13 +2015,11 @@
                          const legacyLoc = row['Ubicación'] || ''; 
 
                          const showCompKey = findKey(row, 'mostrar empresa publicamente');
-                         // V16.29: Robust boolean parsing from Excel
                          let showCompanyRaw = 'SI';
                          if (showCompKey && row[showCompKey]) {
                              showCompanyRaw = String(row[showCompKey]).trim().toUpperCase();
                          }
 
-                         // V16.27: Detectar columna IMPULSAR o DESTACAR
                          const featuredKey = findKey(row, 'impulsar') || findKey(row, 'destacar') || findKey(row, 'top');
                          let isFeaturedRaw = 'NO';
                          if(featuredKey && row[featuredKey]) {
@@ -2039,7 +2038,7 @@
                          const jobData = {
                              title: title, 
                              company: company, 
-                             showCompany: showCompanyRaw === 'SI', // Simple comparison
+                             showCompany: showCompanyRaw === 'SI', 
                              state: state, city: city, zone: zone,
                              location: (city && state) ? `${city}, ${state}` : legacyLoc, 
                              
