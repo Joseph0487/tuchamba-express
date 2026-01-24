@@ -1316,15 +1316,18 @@
             ).join('');
         }
 
-        // V16.21 FIX: FORZAR CREACIÓN DE HOJAS AUNQUE ESTÉN VACÍAS
+        // V17.10: GENERADOR DE REPORTE CON MATRIZ DE RENDIMIENTO
         window.downloadSelectedMetrics = function() {
             const checkboxes = document.querySelectorAll('#metricsMonthList input:checked');
             const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
             
             if(selectedMonths.length === 0) return alert("Selecciona al menos un mes");
 
+            window.showToast("📊 Generando reporte detallado...");
+
             const dataRows = [];
             
+            // --- HOJA 1: DESEMPEÑO DE VACANTES ---
             Object.keys(jobs).forEach(jobId => {
                 const j = jobs[jobId];
                 const s = jobStats[jobId] || {};
@@ -1354,14 +1357,7 @@
                 });
             });
 
-            // LOGICA MEJORADA DE HOJAS
-            const wb = XLSX.utils.book_new();
-            
-            // Hoja 1: Vacantes (Siempre tiene datos aunque sean ceros)
-            const ws1 = XLSX.utils.json_to_sheet(dataRows);
-            XLSX.utils.book_append_sheet(wb, ws1, "Desempeño Vacantes");
-
-            // Hoja 2: Reclutadores (Puede estar vacía)
+            // --- HOJA 2: RENDIMIENTO DE EQUIPO (GENERAL) ---
             const recruiterMap = {};
             let totalRecruiterClicks = 0;
             Object.values(clickLogs).forEach(l => {
@@ -1377,11 +1373,63 @@
                 'Clics Generados': recruiterMap[name],
                 '% del Total': totalRecruiterClicks > 0 ? ((recruiterMap[name] / totalRecruiterClicks) * 100).toFixed(2) + '%' : '0%'
             }));
+            if (recruiterRows.length === 0) recruiterRows = [{'Reclutador': 'Sin datos', 'Clics': 0}];
+
+            // --- HOJA 4: DETALLE MATRICIAL (RECLUTADOR vs VACANTE) ---
+            const detailMap = {}; 
+
+            // 1. Procesar VISTAS (desde jobStats/viewsByRecruiter)
+            Object.keys(jobs).forEach(jobId => {
+                const j = jobs[jobId];
+                const s = jobStats[jobId] || {};
+                
+                if (s.viewsByRecruiter) {
+                    Object.keys(s.viewsByRecruiter).forEach(recCode => {
+                        let recName = 'Orgánico';
+                        if (recCode !== 'ORGANICO') {
+                            const foundRec = Object.values(recruiters).find(r => r.code === recCode);
+                            recName = foundRec ? foundRec.name : recCode;
+                        }
+
+                        const key = `${jobId}_${recName}`;
+                        if (!detailMap[key]) detailMap[key] = { jobId: jobId, title: j.title, recruiter: recName, views: 0, clicks: 0 };
+                        
+                        detailMap[key].views = s.viewsByRecruiter[recCode];
+                    });
+                }
+            });
+
+            // 2. Procesar CLICS (desde clickLogs)
+            Object.values(clickLogs).forEach(l => {
+                if(l && l.jobId && l.timestamp && typeof l.timestamp === 'string' && selectedMonths.includes(l.timestamp.substring(0,7))) {
+                    const j = jobs[l.jobId];
+                    const jobTitle = j ? j.title : 'Vacante Borrada';
+                    const recName = l.recruiter || 'Orgánico';
+                    
+                    const key = `${l.jobId}_${recName}`;
+                    if (!detailMap[key]) detailMap[key] = { jobId: l.jobId, title: jobTitle, recruiter: recName, views: 0, clicks: 0 };
+                    
+                    detailMap[key].clicks++;
+                }
+            });
+
+            let detailRows = Object.values(detailMap).map(d => ({
+                'ID Vacante': d.jobId,
+                'Vacante': d.title,
+                'Reclutador': d.recruiter,
+                'Vistas Totales (Histórico)': d.views, 
+                'Clics (Meses selecc.)': d.clicks,
+                'Conversion %': d.views > 0 ? ((d.clicks / d.views) * 100).toFixed(1) + '%' : '0%'
+            }));
+
+            if (detailRows.length === 0) detailRows = [{'Mensaje': 'Aún no hay interacción detallada registrada'}];
+
+            // --- GENERACIÓN DEL ARCHIVO ---
+            const wb = XLSX.utils.book_new();
             
-            // SI ESTÁ VACÍA, AGREGAR FILA DUMMY PARA QUE EXCEL NO OCULTE LA HOJA
-            if (recruiterRows.length === 0) {
-                recruiterRows = [{'Reclutador': 'Sin datos en este periodo', 'Clics Generados': 0, '% del Total': '0%'}];
-            }
+            const ws1 = XLSX.utils.json_to_sheet(dataRows);
+            XLSX.utils.book_append_sheet(wb, ws1, "Desempeño Vacantes");
+
             const ws2 = XLSX.utils.json_to_sheet(recruiterRows);
             XLSX.utils.book_append_sheet(wb, ws2, "Rendimiento Equipo");
 
@@ -1393,6 +1441,10 @@
             ];
             const ws3 = XLSX.utils.json_to_sheet(summaryRows);
             XLSX.utils.book_append_sheet(wb, ws3, "Resumen Global");
+
+            // Hoja 4: Detalle Matrix
+            const ws4 = XLSX.utils.json_to_sheet(detailRows);
+            XLSX.utils.book_append_sheet(wb, ws4, "Detalle Rec-Vacante");
 
             XLSX.writeFile(wb, `Reporte_TuChamba_${selectedMonths.join('_')}.xlsx`);
         }
@@ -1758,6 +1810,10 @@
             if (!isAdmin || isRefMode) {
                 runTransaction(ref(db, `jobStats/${id}/totalViews`), (c) => (c || 0) + 1);
                 runTransaction(ref(db, `jobStats/${id}/monthlyViews/${currentMonthKey}`), (c) => (c || 0) + 1);
+                
+                // V17.10: Contar vista por reclutador
+                const recCodeSafe = activeRecruiter ? activeRecruiter.code : 'ORGANICO';
+                runTransaction(ref(db, `jobStats/${id}/viewsByRecruiter/${recCodeSafe}`), (c) => (c || 0) + 1);
             }
             
             document.title = `Trabajo en ${j.city || 'México'} - ${j.title} | TuChamba`;
