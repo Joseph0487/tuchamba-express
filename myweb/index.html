@@ -25,12 +25,13 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            /* V18.2: Fondo movido a div separado para corregir error en móviles */
+            /* V18.3: Ajuste de padding para móviles */
             padding: 15px;
+            padding-top: 10px;
             min-height: 100vh;
         }
 
-        /* V18.2: Nuevo Fondo Global Fijo (Funciona en todos los móviles) */
+        /* V18.2: Nuevo Fondo Global Fijo */
         #globalBackground {
             position: fixed;
             top: 0;
@@ -119,8 +120,7 @@
             flex-wrap: wrap; 
             gap: 10px; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            /* V18.2: Sticky activado SOLO por clase .admin-mode */
-            z-index: 1002;
+            z-index: 1100; /* Mayor z-index para estar siempre arriba */
         }
         
         /* V18.2: Lógica Sticky Condicional */
@@ -161,6 +161,43 @@
             text-align: center;
         }
         #recruiterBanner:hover { background: #bbdefb !important; }
+
+        /* V18.3: NUEVO Contenedor Sticky para Búsqueda y Filtros */
+        #userStickyTools {
+            /* Por defecto Sticky para USUARIO */
+            position: sticky;
+            top: 0px; 
+            z-index: 990; /* Debajo del header admin, encima del contenido */
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-left: -15px; /* Compensar padding del body para full width visual */
+            margin-right: -15px;
+            padding-left: 15px;
+            padding-right: 15px;
+            background: transparent; /* Se ajusta con backdrop o color si se desea */
+            transition: top 0.3s ease;
+        }
+        
+        /* Ajuste visual para que parezca integrado */
+        #userStickyTools::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(240, 242, 245, 0.95); /* Simula el fondo de la app */
+            backdrop-filter: blur(5px);
+            z-index: -1;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            /* Solo visible cuando scrolleas? No, siempre visible como bloque */
+            display: block;
+        }
+
+        /* Si es ADMIN, el Sticky baja para no tapar los controles */
+        body.admin-mode #userStickyTools {
+            top: 125px; /* Ajuste calculado: Header + AdminControls */
+        }
 
         .search-container {
             width: 100%;
@@ -203,17 +240,22 @@
             background: white; 
             padding: 10px; 
             border-radius: 12px; 
-            margin-bottom: 15px; 
+            margin-bottom: 15px; /* Margen original */
             display: flex; 
             gap: 10px; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
             align-items: center; 
         }
         
+        /* En modo sticky, reducimos el margen inferior del contenedor de filtros */
+        #userStickyTools .filter-container {
+            margin-bottom: 5px; 
+        }
+        
         .filter-icon-box { display: flex; align-items: center; justify-content: center; background: #f0f2f5; padding: 10px; border-radius: 8px; border: 1px solid #ddd; height: 42px; width: 42px; flex-shrink: 0; }
         .filter-select { flex: 1; min-width: 0; padding: 0 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; outline: none; height: 42px; }
 
-        #mobileFilterToggle { display: none; } 
+        #mobileFilterToggle { display: none; margin-bottom: 10px; width: 100%; padding: 10px; border-radius: 8px; border: none; background: white; font-weight: bold; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; } 
 
         .btn-primary, .admin-btn { background: #0a66c2; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; font-size: 14px; }
         .add-job-btn { background: #10a37f; padding: 12px 24px; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
@@ -298,7 +340,7 @@
             padding-top: 10px;
             padding-bottom: 10px;
             margin-top: 0 !important;
-            margin-bottom: 10px;
+            margin-bottom: 0px; /* Reducido para pegar con userStickyTools en modo Admin */
             border-radius: 0 0 12px 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
@@ -312,7 +354,7 @@
         .metric-val { color: #0a66c2; font-weight: 800; margin-left: 4px; margin-right: 12px; }
         .admin-mode-indicator { background: #ffe0b2; color: #e65100; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ffcc80; }
 
-        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px; margin-top: 10px; } /* Gap reducido para mayor compactación */
         
         .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden; }
         .job-card:hover { transform: translateY(-4px); }
@@ -460,23 +502,25 @@
             font-size: 14px;
         }
         
-        /* Sticky Header Table Condicional (Parte 3) */
+        /* Sticky Header Table V18.3 MEJORADO */
         .management-table th {
             background: #0a66c2;
             color: white;
             padding: 15px;
             text-align: left;
             font-weight: 600;
-            z-index: 1000;
+            z-index: 950; /* Por debajo de userStickyTools y Header */
         }
         body.admin-mode .management-table th {
             position: sticky;
-            top: 130px; /* Ajuste Desktop */
+            /* Se alinea debajo de: Header(65) + AdminControls(60) + SearchBar(aprox 50 si visible) */
+            /* En modo tabla, si SearchBar sigue visible: */
+            top: 200px; /* Ajuste manual aproximado seguro */
         }
         
         /* V18.2: Compactación de celdas */
         .management-table td {
-            padding: 8px 10px; /* Reducido de 12px 15px */
+            padding: 8px 10px; 
             border-bottom: 1px solid #eee;
             color: #333;
         }
@@ -514,9 +558,14 @@
                 line-height: 1.1;
             }
             
-            /* V18.2: Ajustes Sticky Móvil Condicional */
+            /* V18.3: Ajustes Sticky Móvil Condicional */
             body.admin-mode #adminControls { top: 60px; }
-            body.admin-mode .management-table th { top: 120px; } /* Recalibrado para que no se esconda */
+            
+            /* Ajuste para que la barra de búsqueda no se coma espacio en móvil admin */
+            body.admin-mode #userStickyTools { top: 115px; }
+
+            /* Ajuste de Tabla en Móvil */
+            body.admin-mode .management-table th { top: 190px; } 
 
             .filter-container { 
                 display: grid; 
@@ -746,27 +795,28 @@
                 </div>
             </div>
 
-            <button id="mobileFilterToggle" onclick="toggleMobileFilters()">
-                🔍 Filtros de Búsqueda <span>▼</span>
-            </button>
+            <div id="userStickyTools">
+                <button id="mobileFilterToggle" onclick="toggleMobileFilters()">
+                    🔍 Filtros de Búsqueda <span>▼</span>
+                </button>
 
-            <div class="search-container">
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar vacante, empresa, palabras clave..." onkeyup="filterJobs()" autocomplete="off">
-                <button id="clearSearchBtn" class="search-clear-btn" onclick="clearSearch()">✕</button>
-            </div>
-
-            <div class="filter-container" id="filterContainer">
-                <div class="filter-icon-box">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar vacante, empresa, palabras clave..." onkeyup="filterJobs()" autocomplete="off">
+                    <button id="clearSearchBtn" class="search-clear-btn" onclick="clearSearch()">✕</button>
                 </div>
-                <select id="stateFilter" class="filter-select" onchange="handleStateChange()" autocomplete="off">
-                    <option value="">📍 Estado</option>
-                </select>
-                <select id="cityFilter" class="filter-select" onchange="filterJobs()" autocomplete="off">
-                    <option value="">🏙️ Municipio</option>
-                </select>
-            </div>
 
+                <div class="filter-container" id="filterContainer">
+                    <div class="filter-icon-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    </div>
+                    <select id="stateFilter" class="filter-select" onchange="handleStateChange()" autocomplete="off">
+                        <option value="">📍 Estado</option>
+                    </select>
+                    <select id="cityFilter" class="filter-select" onchange="filterJobs()" autocomplete="off">
+                        <option value="">🏙️ Municipio</option>
+                    </select>
+                </div>
+            </div>
             <div class="grid-header"><div class="job-counter" id="jobCounter"></div></div>
             
             <div id="skeletonLoader" class="job-grid">
