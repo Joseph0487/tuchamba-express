@@ -18,32 +18,20 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        body {
+      body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            /* V18.3: Ajuste de padding para móviles */
-            padding: 15px;
-            padding-top: 10px;
-            min-height: 100vh;
-        }
-
-        /* V18.2: Nuevo Fondo Global Fijo */
-        #globalBackground {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -10;
             background-image: 
                 linear-gradient(to bottom, rgba(10, 30, 60, 0.75), rgba(10, 30, 60, 0.85)),
                 url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
-            background-size: cover;
-            background-position: center;
+            background-size: cover;       
+            background-position: center;  
+            background-attachment: fixed; 
+            padding: 15px;
+            min-height: 100vh;
         }
 
         #toast {
@@ -119,16 +107,8 @@
             align-items: center; 
             flex-wrap: wrap; 
             gap: 10px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            z-index: 1100; /* Mayor z-index para estar siempre arriba */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
         }
-        
-        /* V18.2: Lógica Sticky Condicional */
-        body.admin-mode .header {
-            position: sticky;
-            top: 0;
-        }
-
         .header h1 { 
             font-size: 20px; 
             color: #333; 
@@ -161,43 +141,6 @@
             text-align: center;
         }
         #recruiterBanner:hover { background: #bbdefb !important; }
-
-        /* V18.3: NUEVO Contenedor Sticky para Búsqueda y Filtros */
-        #userStickyTools {
-            /* Por defecto Sticky para USUARIO */
-            position: sticky;
-            top: 0px; 
-            z-index: 990; /* Debajo del header admin, encima del contenido */
-            padding-top: 5px;
-            padding-bottom: 5px;
-            margin-left: -15px; /* Compensar padding del body para full width visual */
-            margin-right: -15px;
-            padding-left: 15px;
-            padding-right: 15px;
-            background: transparent; /* Se ajusta con backdrop o color si se desea */
-            transition: top 0.3s ease;
-        }
-        
-        /* Ajuste visual para que parezca integrado */
-        #userStickyTools::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(240, 242, 245, 0.95); /* Simula el fondo de la app */
-            backdrop-filter: blur(5px);
-            z-index: -1;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            /* Solo visible cuando scrolleas? No, siempre visible como bloque */
-            display: block;
-        }
-
-        /* Si es ADMIN, el Sticky baja para no tapar los controles */
-        body.admin-mode #userStickyTools {
-            top: 125px; /* Ajuste calculado: Header + AdminControls */
-        }
 
         .search-container {
             width: 100%;
@@ -240,22 +183,17 @@
             background: white; 
             padding: 10px; 
             border-radius: 12px; 
-            margin-bottom: 15px; /* Margen original */
+            margin-bottom: 15px; 
             display: flex; 
             gap: 10px; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
             align-items: center; 
         }
         
-        /* En modo sticky, reducimos el margen inferior del contenedor de filtros */
-        #userStickyTools .filter-container {
-            margin-bottom: 5px; 
-        }
-        
         .filter-icon-box { display: flex; align-items: center; justify-content: center; background: #f0f2f5; padding: 10px; border-radius: 8px; border: 1px solid #ddd; height: 42px; width: 42px; flex-shrink: 0; }
         .filter-select { flex: 1; min-width: 0; padding: 0 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; outline: none; height: 42px; }
 
-        #mobileFilterToggle { display: none; margin-bottom: 10px; width: 100%; padding: 10px; border-radius: 8px; border: none; background: white; font-weight: bold; color: #333; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; } 
+        #mobileFilterToggle { display: none; } 
 
         .btn-primary, .admin-btn { background: #0a66c2; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; font-size: 14px; }
         .add-job-btn { background: #10a37f; padding: 12px 24px; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
@@ -316,45 +254,28 @@
             100% { transform: scale(1); }
         }
 
+        /* V17.9.2: Botón Compacto CON ICONOS */
         .whatsapp-btn-large { 
             display: flex; align-items: center; justify-content: center; width: 100%; 
             background-color: #25D366; color: white; text-decoration: none; 
             padding: 12px 15px; 
             border-radius: 12px; font-weight: bold; 
-            font-size: 14px; 
+            font-size: 14px; /* Letra un poco más pequeña para que quepan los iconos */
             box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); 
             border: none; cursor: pointer; 
             animation: heartbeat 2s infinite ease-in-out;
-            white-space: nowrap; 
+            white-space: nowrap; /* Fuerza una sola línea */
         }
         .whatsapp-btn-large:active { transform: scale(0.98); animation: none; }
         .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; opacity: 0.7; animation: none; }
 
         .share-btn { background: #25D366; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
-        
-        /* Sticky Admin Controls Condicional */
-        #adminControls {
-            z-index: 1001;
-            background: rgba(240, 242, 245, 0.95);
-            backdrop-filter: blur(5px);
-            padding-top: 10px;
-            padding-bottom: 10px;
-            margin-top: 0 !important;
-            margin-bottom: 0px; /* Reducido para pegar con userStickyTools en modo Admin */
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        body.admin-mode #adminControls {
-            position: sticky;
-            top: 65px; /* Ajuste Desktop */
-        }
-
-        .admin-controls-wrapper { display: flex; gap: 10px; margin-bottom: 0px; flex-wrap: wrap; }
+        .admin-controls-wrapper { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .metrics-card { background: white; color: #333; padding: 10px 20px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; font-size: 14px; }
         .metric-val { color: #0a66c2; font-weight: 800; margin-left: 4px; margin-right: 12px; }
         .admin-mode-indicator { background: #ffe0b2; color: #e65100; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ffcc80; }
 
-        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px; margin-top: 10px; } /* Gap reducido para mayor compactación */
+        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         
         .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden; }
         .job-card:hover { transform: translateY(-4px); }
@@ -422,6 +343,7 @@
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
         .modal.active { display: flex; align-items: center; justify-content: center; }
         
+        /* V17.9 FIX: overflow-x hidden para evitar scroll horizontal en PC */
         .modal-content { 
             background: white; 
             border-radius: 16px; 
@@ -438,6 +360,7 @@
         
         .job-details { display: grid; gap: 15px; margin-bottom: 25px; margin-top: 15px; }
         
+        /* V17.9: Ajuste palabra larga y apilado vertical */
         .detail-item { 
             font-size: 15px; 
             display: flex; 
@@ -446,7 +369,7 @@
             gap: 4px;
             margin-bottom: 10px;
             line-height: 1.4;
-            word-break: break-word; 
+            word-break: break-word; /* Evita que direcciones largas rompan el diseño */
         }
 
         .modal-share-btn { 
@@ -488,62 +411,6 @@
 
         .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
 
-        /* ESTILOS PARA LA TABLA DE GESTIÓN (RECLUTADOR) */
-        .job-table-container { 
-            overflow-x: auto; 
-            background: white; 
-            border-radius: 12px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-        }
-        .management-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        
-        /* Sticky Header Table V18.3 MEJORADO */
-        .management-table th {
-            background: #0a66c2;
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            z-index: 950; /* Por debajo de userStickyTools y Header */
-        }
-        body.admin-mode .management-table th {
-            position: sticky;
-            /* Se alinea debajo de: Header(65) + AdminControls(60) + SearchBar(aprox 50 si visible) */
-            /* En modo tabla, si SearchBar sigue visible: */
-            top: 200px; /* Ajuste manual aproximado seguro */
-        }
-        
-        /* V18.2: Compactación de celdas */
-        .management-table td {
-            padding: 8px 10px; 
-            border-bottom: 1px solid #eee;
-            color: #333;
-        }
-        .management-table tr:hover { background: #f5f5f5; }
-        
-        .action-icon-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            margin-right: 5px;
-            padding: 5px;
-            border-radius: 4px;
-        }
-        .action-icon-btn:hover { background: #e3f2fd; }
-
-        .management-table td:last-child {
-            white-space: nowrap;
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-
         @media (max-width: 768px) {
             body { padding: 10px; }
             .header { 
@@ -557,16 +424,6 @@
                 max-width: 50%; 
                 line-height: 1.1;
             }
-            
-            /* V18.3: Ajustes Sticky Móvil Condicional */
-            body.admin-mode #adminControls { top: 60px; }
-            
-            /* Ajuste para que la barra de búsqueda no se coma espacio en móvil admin */
-            body.admin-mode #userStickyTools { top: 115px; }
-
-            /* Ajuste de Tabla en Móvil */
-            body.admin-mode .management-table th { top: 190px; } 
-
             .filter-container { 
                 display: grid; 
                 grid-template-columns: auto 1fr 1fr; 
@@ -634,7 +491,7 @@
             color: #BBDEFB;
             font-family: 'Segoe UI', sans-serif;
             font-weight: 600;
-            margin-bottom: 10px; 
+            margin-bottom: 40px;
             text-transform: uppercase;
             letter-spacing: 2px;
             z-index: 2;
@@ -642,7 +499,7 @@
         }
         
         .flyer-salary { 
-            font-size: 100px; 
+            font-size: 120px; 
             color: #C6FF00; 
             font-weight: 900; 
             margin-bottom: 50px; 
@@ -677,7 +534,7 @@
             list-style: none;
             padding: 0;
             margin: 0;
-            font-size: 55px; 
+            font-size: 40px;
             font-family: 'Segoe UI', sans-serif;
             font-weight: 600;
             color: white;
@@ -704,32 +561,22 @@
             z-index: 2;
             position: relative;
         }
-
-        #flyerQr {
-            margin-left: 20px;
-            border: 2px solid #ddd;
-            padding: 5px;
-            border-radius: 10px;
-            background: white;
-        }
-        #flyerQr img {
-            display: block;
-        }
     </style>
 </head>
 <body>
 
-    <div id="globalBackground"></div>
-
     <div id="flyerTemplate">
-        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center center / cover no-repeat; opacity: 0.1; z-index: 0;"></div>
+        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" 
+             style="position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; z-index: 0;" 
+             crossorigin="anonymous" 
+             alt="Background">
         
         <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: rgba(10, 25, 45, 0.85); z-index: 1;"></div>
 
         <div class="flyer-badge-top">¡SE SOLICITA!</div>
         
-        <div class="flyer-company">RECONOCIDA EMPRESA BUSCA:</div>
         <div id="flyerTitle" class="flyer-title">CHOFER 3.5 TON</div>
+        <div id="flyerCompany" class="flyer-company">EMPRESA CONFIDENCIAL</div>
         
         <div id="flyerSalary" class="flyer-salary">$12,000</div>
         
@@ -744,7 +591,6 @@
 
         <div class="flyer-cta-box">
             🔗 DALE CLIC AL LINK DE LA PUBLICACIÓN PARA AGENDAR
-            <div id="flyerQr"></div>
         </div>
     </div>
 
@@ -758,7 +604,7 @@
         <button class="btn-big-guest" onclick="enterAsGuest()">🔍 Ver Vacantes Disponibles</button>
         <div class="admin-toggle-link" onclick="toggleAdminLogin()">¿Eres Reclutador? Ingresa aquí</div>
         <div id="adminForm" class="admin-login-form">
-            <div class="form-group"><label style="color:white;">Usuario / Correo</label><input type="text" id="adminEmail" placeholder="Usuario o Correo" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
+            <div class="form-group"><label style="color:white;">Correo de Acceso</label><input type="email" id="adminEmail" placeholder="admin@empresa.com" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
             <div class="form-group"><label style="color:white;">Contraseña</label><input type="password" id="adminPassword" placeholder="******" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
             <button class="btn-primary" style="width: 100%;" onclick="login()">Entrar al Panel</button>
         </div>
@@ -772,7 +618,6 @@
                 <div class="header-buttons">
                     <button class="share-btn" onclick="shareApp()">📤 Compartir</button>
                     <span id="modeIndicator"></span>
-                    <button id="viewToggleBtn" class="tool-btn" style="display:none; background:#00796b;" onclick="toggleViewMode()">👁️ Cambiar Vista</button>
                     <button class="admin-btn" style="background: #333;" onclick="logout()">Salir</button>
                 </div>
             </div>
@@ -795,28 +640,27 @@
                 </div>
             </div>
 
-            <div id="userStickyTools">
-                <button id="mobileFilterToggle" onclick="toggleMobileFilters()">
-                    🔍 Filtros de Búsqueda <span>▼</span>
-                </button>
+            <button id="mobileFilterToggle" onclick="toggleMobileFilters()">
+                🔍 Filtros de Búsqueda <span>▼</span>
+            </button>
 
-                <div class="search-container">
-                    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar vacante, empresa, palabras clave..." onkeyup="filterJobs()" autocomplete="off">
-                    <button id="clearSearchBtn" class="search-clear-btn" onclick="clearSearch()">✕</button>
-                </div>
-
-                <div class="filter-container" id="filterContainer">
-                    <div class="filter-icon-box">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                    </div>
-                    <select id="stateFilter" class="filter-select" onchange="handleStateChange()" autocomplete="off">
-                        <option value="">📍 Estado</option>
-                    </select>
-                    <select id="cityFilter" class="filter-select" onchange="filterJobs()" autocomplete="off">
-                        <option value="">🏙️ Municipio</option>
-                    </select>
-                </div>
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar vacante, empresa, palabras clave..." onkeyup="filterJobs()" autocomplete="off">
+                <button id="clearSearchBtn" class="search-clear-btn" onclick="clearSearch()">✕</button>
             </div>
+
+            <div class="filter-container" id="filterContainer">
+                <div class="filter-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                </div>
+                <select id="stateFilter" class="filter-select" onchange="handleStateChange()" autocomplete="off">
+                    <option value="">📍 Estado</option>
+                </select>
+                <select id="cityFilter" class="filter-select" onchange="filterJobs()" autocomplete="off">
+                    <option value="">🏙️ Municipio</option>
+                </select>
+            </div>
+
             <div class="grid-header"><div class="job-counter" id="jobCounter"></div></div>
             
             <div id="skeletonLoader" class="job-grid">
@@ -825,22 +669,6 @@
             </div>
 
             <div class="job-grid" id="jobGrid" style="display: none;"></div>
-
-            <div class="job-table-container" id="jobTableContainer" style="display: none;">
-                <table class="management-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Empresa</th>
-                            <th>Título</th>
-                            <th>Ubicación</th>
-                            <th>Salario</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="jobTableBody"></tbody>
-                </table>
-            </div>
             
             <div id="paginationContainer" class="pagination-container" style="display:none;"></div>
 
@@ -1045,9 +873,6 @@
         const db = getDatabase(app);
 
         let isAdmin = false;
-        let isRecruiterMode = false; 
-        let currentViewMode = 'grid'; 
-
         let currentUserEmail = ""; 
         let currentEditId = null;
         let jobs = {};
@@ -1073,12 +898,14 @@
         
         if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
 
+        // V16.23: Limpieza automática al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('searchInput').value = '';
             document.getElementById('stateFilter').value = '';
             document.getElementById('cityFilter').value = '';
         });
 
+        // V16.23: Limpieza extra al regresar con botón "Atrás" del navegador
         window.onpageshow = function(event) {
             if (event.persisted) {
                 document.getElementById('searchInput').value = '';
@@ -1087,6 +914,7 @@
             }
         };
 
+        // V16.26: Cierre con Tecla ESC (UX Master)
         document.addEventListener('keydown', (e) => {
             if (e.key === "Escape") {
                 if(document.getElementById('viewModal').classList.contains('active')) closeViewModal();
@@ -1096,6 +924,7 @@
                 else if(document.getElementById('settingsModal').classList.contains('active')) closeSettingsModal();
                 else if(document.getElementById('privacyModal').classList.contains('active')) closePrivacyModal();
                 
+                // Cerrar menús de administrador
                 document.querySelectorAll('.admin-actions').forEach(m => m.classList.remove('active'));
             }
         });
@@ -1138,6 +967,7 @@
         window.openPrivacyModal = function() { document.getElementById('privacyModal').classList.add('active'); }
         window.closePrivacyModal = function() { document.getElementById('privacyModal').classList.remove('active'); }
 
+        // V16.21: MEJORA EN RESET METRICS (Manejo de Errores)
         window.performSafeAction = function(action) {
             if (!isAdmin || !currentUserEmail) {
                 alert("Acceso denegado. Debes ser administrador.");
@@ -1182,51 +1012,20 @@
         window.toggleAdminLogin = function() { const f = document.getElementById('adminForm'); f.style.display = (f.style.display==='none'||f.style.display==='') ? 'block' : 'none'; }
         
         window.login = async function() {
-            const inputVal = document.getElementById('adminEmail').value.trim();
-            const passVal = document.getElementById('adminPassword').value.trim();
-
-            if (!inputVal || !passVal) return alert("Por favor llena todos los campos");
-
-            if (inputVal.includes('@')) {
-                // Login Admin (Firebase)
-                try { 
-                    await setPersistence(auth, browserSessionPersistence); 
-                    await signInWithEmailAndPassword(auth, inputVal, passVal); 
-                    sessionStorage.removeItem('isGuest'); 
-                    localStorage.setItem('iamsuperadmin', 'true'); 
-                    isRecruiterMode = false;
-                } catch (error) { alert("Error de Admin: " + error.message); }
-            } else {
-                // Login Reclutador (Código Local)
-                if (passVal !== 'Express*2026') {
-                    return alert("Contraseña incorrecta para Reclutador.");
-                }
-
-                // Buscar código en la lista descargada de Firebase
-                const foundRec = Object.values(recruiters).find(r => r.code === inputVal.toUpperCase());
-                
-                if (foundRec) {
-                    sessionStorage.removeItem('isGuest');
-                    isAdmin = true; // Activa permisos de UI
-                    isRecruiterMode = true; // Flag específico
-                    activeRecruiter = foundRec;
-                    sessionStorage.setItem('recruiterCode', foundRec.code.toLowerCase()); // Auto-set
-                    
-                    setAdminMode(true);
-                    // Forzar Vista Tabla
-                    toggleViewMode('table');
-                    window.showToast(`Bienvenido Reclutador: ${foundRec.name}`);
-                } else {
-                    alert("Usuario (Código) no encontrado.");
-                }
-            }
+            try { 
+                await setPersistence(auth, browserSessionPersistence); 
+                await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value); 
+                sessionStorage.removeItem('isGuest'); 
+                localStorage.setItem('iamsuperadmin', 'true'); 
+            } catch (error) { alert("Error: " + error.message); }
         }
         
+        // V16.23: Limpieza al entrar como invitado
         window.enterAsGuest = function() { 
             sessionStorage.setItem('isGuest', 'true'); 
             isAdmin = false; 
-            isRecruiterMode = false;
             
+            // LIMPIEZA FORZADA
             document.getElementById('searchInput').value = '';
             document.getElementById('stateFilter').value = '';
             document.getElementById('cityFilter').value = '';
@@ -1234,84 +1033,34 @@
             setAdminMode(false); 
         }
 
+        // V16.23: Limpieza al cerrar sesión
         window.logout = function() { 
-            // Limpieza de modo Sticky
-            document.body.classList.remove('admin-mode');
+            signOut(auth).then(() => { 
+                sessionStorage.removeItem('isGuest'); 
+                isAdmin = false; 
+                
+                // LIMPIEZA FORZADA
+                document.getElementById('searchInput').value = '';
+                document.getElementById('stateFilter').value = '';
+                document.getElementById('cityFilter').value = '';
 
-            if (isRecruiterMode) {
-                isAdmin = false;
-                isRecruiterMode = false;
-                sessionStorage.removeItem('recruiterCode');
-                location.reload(); 
-            } else {
-                signOut(auth).then(() => { 
-                    sessionStorage.removeItem('isGuest'); 
-                    isAdmin = false; 
-                    
-                    document.getElementById('searchInput').value = '';
-                    document.getElementById('stateFilter').value = '';
-                    document.getElementById('cityFilter').value = '';
-
-                    showLogin(); 
-                }); 
-            }
+                showLogin(); 
+            }); 
         }
 
         function showLogin() { document.getElementById('loginScreen').style.display = 'block'; document.getElementById('mainApp').style.display = 'none'; document.getElementById('adminForm').style.display = 'none'; }
-        
         function setAdminMode(enableAdmin) {
             document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block';
             
             const isRefMode = !!refCode;
-            
-            if (enableAdmin && (!isRefMode || isRecruiterMode)) {
-                
-                // V18.2: Activar clase Sticky solo si es Admin/Reclutador
-                document.body.classList.add('admin-mode');
-
-                if (isRecruiterMode) {
-                    document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator" style="background:#e3f2fd; color:#0d47a1; border-color:#90caf9;">Modo Reclutador</span>';
-                    document.getElementById('viewToggleBtn').style.display = 'none'; // Reclutador fijo en Tabla
-                } else {
-                    document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator">Super Admin</span>';
-                    document.getElementById('viewToggleBtn').style.display = 'inline-flex'; // Admin puede cambiar
-                }
+            if (enableAdmin && !isRefMode) {
+                document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator">Super Admin</span>';
                 document.getElementById('adminControls').style.display = 'block';
             } else {
-                // V18.2: Desactivar clase Sticky para usuarios normales
-                document.body.classList.remove('admin-mode');
-                
                 document.getElementById('modeIndicator').innerHTML = '';
                 document.getElementById('adminControls').style.display = 'none';
-                document.getElementById('viewToggleBtn').style.display = 'none';
             }
             loadData();
-        }
-
-        window.toggleViewMode = function(forceMode) {
-            if (forceMode) {
-                currentViewMode = forceMode;
-            } else {
-                currentViewMode = currentViewMode === 'grid' ? 'table' : 'grid';
-            }
-
-            const grid = document.getElementById('jobGrid');
-            const table = document.getElementById('jobTableContainer');
-            const btn = document.getElementById('viewToggleBtn');
-
-            if (currentViewMode === 'table') {
-                grid.style.display = 'none';
-                table.style.display = 'block';
-                document.getElementById('paginationContainer').style.display = 'none'; 
-                btn.innerHTML = '🖼️ Vista Usuario';
-                renderJobsTable();
-            } else {
-                grid.style.display = 'grid';
-                table.style.display = 'none';
-                document.getElementById('paginationContainer').style.display = 'flex';
-                btn.innerHTML = '👁️ Vista Gestión';
-                filterJobs(); 
-            }
         }
 
         function parseJobDate(dateString) {
@@ -1331,17 +1080,9 @@
             onValue(ref(db, 'jobs'), (s) => { 
                 jobs = s.val() || {}; 
                 document.getElementById('skeletonLoader').style.display = 'none'; 
-                
-                if (isRecruiterMode) {
-                    toggleViewMode('table');
-                } else {
-                    document.getElementById('jobGrid').style.display = 'grid';
-                    document.getElementById('jobTableContainer').style.display = 'none';
-                }
-
+                document.getElementById('jobGrid').style.display = 'grid';
                 populateFilters(jobs); 
-                if (currentViewMode === 'grid') renderJobs(); 
-                else renderJobsTable();
+                renderJobs(); 
                 
                 const urlJobId = urlParams.get('id');
                 if (urlJobId && jobs[urlJobId]) {
@@ -1373,12 +1114,15 @@
             });
         }
 
+        // V17.1: FILTROS CASCADA (FIX)
         function populateFilters(jobsData) {
             const allJobsArr = Object.values(jobsData);
             const stateSelect = document.getElementById('stateFilter');
 
+            // 1. Llenar Estados (Únicos)
             const uniqueStates = [...new Set(allJobsArr.map(j => j.state).filter(Boolean))].sort();
             
+            // Guardar selección actual si existe
             const currState = stateSelect.value;
 
             let stateHtml = '<option value="">📍 Estado</option>';
@@ -1388,9 +1132,11 @@
             stateSelect.innerHTML = stateHtml;
             stateSelect.value = currState;
 
+            // 2. Llenar Municipios iniciales (Basado en el estado actual o todos)
             updateCityOptions();
         }
 
+        // V17.1: Nueva función para actualizar ciudades dinámicamente
         window.updateCityOptions = function() {
             const stateSelect = document.getElementById('stateFilter');
             const citySelect = document.getElementById('cityFilter');
@@ -1398,6 +1144,7 @@
 
             const allJobsArr = Object.values(jobs);
 
+            // Filtrar ciudades: Si hay estado seleccionado, solo mostrar ciudades de ese estado
             let availableCities = new Set();
             allJobsArr.forEach(j => {
                 if (!selectedState || j.state === selectedState) {
@@ -1412,9 +1159,11 @@
                 citySelect.innerHTML += `<option value="${c}">${c}</option>`;
             });
             
+            // Resetear selección de ciudad para evitar incongruencias
             citySelect.value = "";
         }
 
+        // V17.1: Manejador de cambio de estado
         window.handleStateChange = function() {
             updateCityOptions(); 
             filterJobs();        
@@ -1529,12 +1278,6 @@
             const link = `${window.location.origin}/?ref=${code}`; 
             navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); 
         }
-
-        window.copyJobLink = function(jobId) {
-             const refCode = sessionStorage.getItem('recruiterCode');
-             const url = `${window.location.origin}/?id=${jobId}${refCode ? '&ref='+refCode : ''}`;
-             navigator.clipboard.writeText(url).then(() => window.showToast('🔗 Link de vacante copiado'));
-        }
         
         function renderRecruitersTable() {
             const list = document.getElementById('recruitersList');
@@ -1550,6 +1293,7 @@
             if(!jobStats) { list.innerHTML = 'No hay datos'; return; }
             
             const months = new Set();
+            // Wrap in try-catch/checks to prevent freeze if data is bad
             Object.values(clickLogs).forEach(log => {
                 if(log && log.timestamp && typeof log.timestamp === 'string') {
                     try { months.add(log.timestamp.substring(0, 7)); } catch(e){}
@@ -1572,6 +1316,7 @@
             ).join('');
         }
 
+        // V17.10: GENERADOR DE REPORTE CON MATRIZ DE RENDIMIENTO
         window.downloadSelectedMetrics = function() {
             const checkboxes = document.querySelectorAll('#metricsMonthList input:checked');
             const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
@@ -1582,6 +1327,7 @@
 
             const dataRows = [];
             
+            // --- HOJA 1: DESEMPEÑO DE VACANTES ---
             Object.keys(jobs).forEach(jobId => {
                 const j = jobs[jobId];
                 const s = jobStats[jobId] || {};
@@ -1611,6 +1357,7 @@
                 });
             });
 
+            // --- HOJA 2: RENDIMIENTO DE EQUIPO (GENERAL) ---
             const recruiterMap = {};
             let totalRecruiterClicks = 0;
             Object.values(clickLogs).forEach(l => {
@@ -1628,8 +1375,10 @@
             }));
             if (recruiterRows.length === 0) recruiterRows = [{'Reclutador': 'Sin datos', 'Clics': 0}];
 
+            // --- HOJA 4: DETALLE MATRICIAL (RECLUTADOR vs VACANTE) ---
             const detailMap = {}; 
 
+            // 1. Procesar VISTAS (desde jobStats/viewsByRecruiter)
             Object.keys(jobs).forEach(jobId => {
                 const j = jobs[jobId];
                 const s = jobStats[jobId] || {};
@@ -1650,6 +1399,7 @@
                 }
             });
 
+            // 2. Procesar CLICS (desde clickLogs)
             Object.values(clickLogs).forEach(l => {
                 if(l && l.jobId && l.timestamp && typeof l.timestamp === 'string' && selectedMonths.includes(l.timestamp.substring(0,7))) {
                     const j = jobs[l.jobId];
@@ -1674,6 +1424,7 @@
 
             if (detailRows.length === 0) detailRows = [{'Mensaje': 'Aún no hay interacción detallada registrada'}];
 
+            // --- GENERACIÓN DEL ARCHIVO ---
             const wb = XLSX.utils.book_new();
             
             const ws1 = XLSX.utils.json_to_sheet(dataRows);
@@ -1682,6 +1433,7 @@
             const ws2 = XLSX.utils.json_to_sheet(recruiterRows);
             XLSX.utils.book_append_sheet(wb, ws2, "Rendimiento Equipo");
 
+            // Hoja 3: Resumen
             const summaryRows = [
                 { 'Métrica': 'Periodo Analizado', 'Valor': selectedMonths.join(', ') },
                 { 'Métrica': 'Total Vistas', 'Valor': dataRows.reduce((a,b)=>a+b['Vistas (Meses selecc.)'],0) },
@@ -1690,6 +1442,7 @@
             const ws3 = XLSX.utils.json_to_sheet(summaryRows);
             XLSX.utils.book_append_sheet(wb, ws3, "Resumen Global");
 
+            // Hoja 4: Detalle Matrix
             const ws4 = XLSX.utils.json_to_sheet(detailRows);
             XLSX.utils.book_append_sheet(wb, ws4, "Detalle Rec-Vacante");
 
@@ -1721,6 +1474,7 @@
             push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
         }
 
+        // V17.9.2: GENERADOR DE FLYER REPARADO Y OPTIMIZADO (allowTaint: false)
         window.generateFlyer = function(jobId) {
             const j = jobs[jobId];
             if (!j) return;
@@ -1730,6 +1484,9 @@
             document.getElementById('flyerTitle').innerText = j.title;
             document.getElementById('flyerSalary').innerText = j.salary || 'Sueldo Competitivo';
             
+            const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
+            document.getElementById('flyerCompany').innerText = showNamePublicly ? j.company : "Empresa Confidencial";
+
             const benefitsList = document.getElementById('flyerBenefitsList');
             benefitsList.innerHTML = '';
             if(j.benefits && j.benefits.length > 0) {
@@ -1742,40 +1499,24 @@
                  benefitsList.innerHTML = '<li>✅ Prestaciones de Ley</li><li>✅ Contratación Inmediata</li><li>✅ Excelente Ambiente</li>';
             }
 
-            const qrContainer = document.getElementById('flyerQr');
-            qrContainer.innerHTML = ''; 
+            const flyerNode = document.getElementById('flyerTemplate');
             
-            const refCode = sessionStorage.getItem('recruiterCode');
-            const jobLink = `${window.location.origin}/?id=${jobId}${refCode ? '&ref='+refCode : ''}`;
-
-            new QRCode(qrContainer, {
-                text: jobLink,
-                width: 256,
-                height: 256,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
+            // V17.9.2: FIX DE SEGURIDAD PARA DESCARGA
+            html2canvas(flyerNode, { 
+                scale: 2, 
+                useCORS: true, 
+                allowTaint: false, // <--- EL FIX MAESTRO
+                backgroundColor: null 
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                window.showToast("✅ ¡Flyer descargado!");
+            }).catch(err => {
+                console.error(err);
+                alert("Error al generar imagen: " + err.message);
             });
-
-            setTimeout(() => {
-                const flyerNode = document.getElementById('flyerTemplate');
-                
-                html2canvas(flyerNode, { 
-                    scale: 2, 
-                    useCORS: true, 
-                    allowTaint: false, 
-                    backgroundColor: null 
-                }).then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
-                    link.href = canvas.toDataURL();
-                    link.click();
-                    window.showToast("✅ ¡Flyer descargado!");
-                }).catch(err => {
-                    console.error(err);
-                    alert("Error al generar imagen: " + err.message);
-                });
-            }, 500); 
         }
 
         const visitsRef = ref(db, 'siteStats/visits');
@@ -1806,6 +1547,7 @@
             }
             const finalPhone = cleanPhone ? (phoneCode + cleanPhone) : '';
 
+            // V16.27: Leer campo destacado manual
             const isFeaturedVal = document.getElementById('jobIsFeatured').value === 'true';
 
             const jobData = {
@@ -1828,7 +1570,7 @@
                 agency: document.getElementById('jobAgency').value,
                 requirements: tempReqs,
                 benefits: tempBens,
-                isFeatured: isFeaturedVal 
+                isFeatured: isFeaturedVal // Guardar el flag
             };
             const id = currentEditId || 'job-' + Date.now();
             set(ref(db, 'jobs/' + id), jobData).then(() => {
@@ -1873,38 +1615,6 @@
             return diffDays <= 3;
         }
 
-        function renderJobsTable() {
-            const keys = Object.keys(jobs).sort((a,b) => b.localeCompare(a)); 
-            const tableBody = document.getElementById('jobTableBody');
-            
-            let html = '';
-            let count = 1;
-
-            keys.forEach(id => {
-                const j = jobs[id];
-                
-                const loc = `${j.city}, ${j.state}`;
-                const salary = j.salary || 'N/A';
-                
-                html += `
-                    <tr>
-                        <td>${count}</td>
-                        <td style="font-weight:bold; color:#0a66c2;">${j.company}</td>
-                        <td>${j.title}</td>
-                        <td>${loc}</td>
-                        <td style="color:#d32f2f; font-weight:bold;">${salary}</td>
-                        <td>
-                             <button class="action-icon-btn" title="Descargar Flyer" onclick="window.generateFlyer('${id}')">🖼️</button>
-                             <button class="action-icon-btn" title="Copiar Link" onclick="window.copyJobLink('${id}')">🔗</button>
-                             ${isAdmin && !isRecruiterMode ? `<button class="action-icon-btn" title="Editar" onclick="window.editJob('${id}')">✏️</button>` : ''}
-                        </td>
-                    </tr>
-                `;
-                count++;
-            });
-            tableBody.innerHTML = html;
-        }
-
         function renderJobs() {
             let keys = Object.keys(jobs);
             
@@ -1914,9 +1624,10 @@
                 const statusB = jobB.status === 'No Vigente' ? 1 : 0;
                 if (statusA !== statusB) return statusA - statusB;
                 
+                // V16.27: Ordenar primero las destacadas
                 const featA = jobA.isFeatured ? 1 : 0;
                 const featB = jobB.isFeatured ? 1 : 0;
-                if (featA !== featB) return featB - featA; 
+                if (featA !== featB) return featB - featA; // Destacadas primero
 
                 const dateA = parseJobDate(jobA.fecha);
                 const dateB = parseJobDate(jobB.fecha);
@@ -1939,8 +1650,6 @@
         }
 
         function applyFilterAndRender() {
-            if (currentViewMode === 'table') return; 
-
             const stateVal = document.getElementById('stateFilter').value;
             const cityVal = document.getElementById('cityFilter').value;
             const searchInput = document.getElementById('searchInput');
@@ -1995,6 +1704,7 @@
                 const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
                 const finalCompanyName = (isAdmin && !refCode) || showNamePublicly ? j.company : "Empresa Confidencial";
                 
+                // V16.28: Icono de Empresa Verificada (Solo si es pública)
                 const verifiedHtml = showNamePublicly ? '<span class="verified-badge" title="Empresa Verificada">✓</span>' : '';
 
                 let displayLocation = j.location;
@@ -2004,6 +1714,7 @@
                 const dateHtml = niceDate ? `<span class="card-header-date">📅 Publicación: ${niceDate}</span>` : '';
                 const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
 
+                // V16.28: BADGE DESTACADA MEJORADO (Texto + Color)
                 const featuredBadge = j.isFeatured ? '<div class="badge-featured">⭐ DESTACADA</div>' : '';
 
                 return `
@@ -2091,6 +1802,7 @@
             document.getElementById(`menu-${id}`).classList.toggle('active'); 
         }
 
+        // V17.8 FIX: Stacked Details HTML Construction + V17.9 FIX ICONS & OVERFLOW
         window.openViewModal = function(id) {
             const j = jobs[id];
             const isRefMode = !!refCode;
@@ -2099,6 +1811,7 @@
                 runTransaction(ref(db, `jobStats/${id}/totalViews`), (c) => (c || 0) + 1);
                 runTransaction(ref(db, `jobStats/${id}/monthlyViews/${currentMonthKey}`), (c) => (c || 0) + 1);
                 
+                // V17.10: Contar vista por reclutador
                 const recCodeSafe = activeRecruiter ? activeRecruiter.code : 'ORGANICO';
                 runTransaction(ref(db, `jobStats/${id}/viewsByRecruiter/${recCodeSafe}`), (c) => (c || 0) + 1);
             }
@@ -2134,6 +1847,7 @@
                 const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                 const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                 
+                // V17.9: Regresan los Iconos
                 contactHtml = `<div class="sticky-footer">
                                     <p style="font-size:12px; color:#666; margin-bottom:5px;">👇 Respuesta Inmediata 👇</p>
                                     <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
@@ -2161,6 +1875,7 @@
 
             const shareUrl = `${window.location.origin}/?id=${id}${refCode ? '&ref='+refCode : ''}`;
             
+            // HTML CON LOS DATOS EN COLUMNA (STACK)
             document.getElementById('viewModalBody').innerHTML = `
                 ${adminInfoHtml}
                 
@@ -2353,11 +2068,13 @@
                          const legacyLoc = row['Ubicación'] || ''; 
 
                          const showCompKey = findKey(row, 'mostrar empresa publicamente');
+                         // V16.29: Robust boolean parsing from Excel
                          let showCompanyRaw = 'SI';
                          if (showCompKey && row[showCompKey]) {
                              showCompanyRaw = String(row[showCompKey]).trim().toUpperCase();
                          }
 
+                         // V16.27: Detectar columna IMPULSAR o DESTACAR
                          const featuredKey = findKey(row, 'impulsar') || findKey(row, 'destacar') || findKey(row, 'top');
                          let isFeaturedRaw = 'NO';
                          if(featuredKey && row[featuredKey]) {
@@ -2376,7 +2093,7 @@
                          const jobData = {
                              title: title, 
                              company: company, 
-                             showCompany: showCompanyRaw === 'SI', 
+                             showCompany: showCompanyRaw === 'SI', // Simple comparison
                              state: state, city: city, zone: zone,
                              location: (city && state) ? `${city}, ${state}` : legacyLoc, 
                              
@@ -2406,3 +2123,4 @@
     </script>
 </body>
 </html>
+
