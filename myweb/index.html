@@ -18,6 +18,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -411,6 +412,43 @@
 
         .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
 
+        /* V18.0: ESTILOS PARA LA TABLA DE GESTIÓN (RECLUTADOR) */
+        .job-table-container { 
+            overflow-x: auto; 
+            background: white; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        .management-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .management-table th {
+            background: #0a66c2;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .management-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+        }
+        .management-table tr:hover { background: #f5f5f5; }
+        .action-icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .action-icon-btn:hover { background: #e3f2fd; }
+
         @media (max-width: 768px) {
             body { padding: 10px; }
             .header { 
@@ -561,13 +599,25 @@
             z-index: 2;
             position: relative;
         }
+
+        /* V18.0: QR dentro del flyer */
+        #flyerQr {
+            margin-left: 20px;
+            border: 2px solid #ddd;
+            padding: 5px;
+            border-radius: 10px;
+            background: white;
+        }
+        #flyerQr img {
+            display: block;
+        }
     </style>
 </head>
 <body>
 
     <div id="flyerTemplate">
         <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" 
-             style="position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; z-index: 0;" 
+             style="position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; opacity: 0.2; z-index: 0;" 
              crossorigin="anonymous" 
              alt="Background">
         
@@ -576,7 +626,7 @@
         <div class="flyer-badge-top">¡SE SOLICITA!</div>
         
         <div id="flyerTitle" class="flyer-title">CHOFER 3.5 TON</div>
-        <div id="flyerCompany" class="flyer-company">EMPRESA CONFIDENCIAL</div>
+        <div class="flyer-company">RECONOCIDA EMPRESA BUSCA:</div>
         
         <div id="flyerSalary" class="flyer-salary">$12,000</div>
         
@@ -591,6 +641,7 @@
 
         <div class="flyer-cta-box">
             🔗 DALE CLIC AL LINK DE LA PUBLICACIÓN PARA AGENDAR
+            <div id="flyerQr"></div>
         </div>
     </div>
 
@@ -604,7 +655,7 @@
         <button class="btn-big-guest" onclick="enterAsGuest()">🔍 Ver Vacantes Disponibles</button>
         <div class="admin-toggle-link" onclick="toggleAdminLogin()">¿Eres Reclutador? Ingresa aquí</div>
         <div id="adminForm" class="admin-login-form">
-            <div class="form-group"><label style="color:white;">Correo de Acceso</label><input type="email" id="adminEmail" placeholder="admin@empresa.com" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
+            <div class="form-group"><label style="color:white;">Usuario / Correo</label><input type="text" id="adminEmail" placeholder="Usuario o Correo" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
             <div class="form-group"><label style="color:white;">Contraseña</label><input type="password" id="adminPassword" placeholder="******" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
             <button class="btn-primary" style="width: 100%;" onclick="login()">Entrar al Panel</button>
         </div>
@@ -618,6 +669,7 @@
                 <div class="header-buttons">
                     <button class="share-btn" onclick="shareApp()">📤 Compartir</button>
                     <span id="modeIndicator"></span>
+                    <button id="viewToggleBtn" class="tool-btn" style="display:none; background:#00796b;" onclick="toggleViewMode()">👁️ Cambiar Vista</button>
                     <button class="admin-btn" style="background: #333;" onclick="logout()">Salir</button>
                 </div>
             </div>
@@ -669,6 +721,22 @@
             </div>
 
             <div class="job-grid" id="jobGrid" style="display: none;"></div>
+
+            <div class="job-table-container" id="jobTableContainer" style="display: none;">
+                <table class="management-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Empresa</th>
+                            <th>Título</th>
+                            <th>Ubicación</th>
+                            <th>Salario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobTableBody"></tbody>
+                </table>
+            </div>
             
             <div id="paginationContainer" class="pagination-container" style="display:none;"></div>
 
@@ -873,6 +941,9 @@
         const db = getDatabase(app);
 
         let isAdmin = false;
+        let isRecruiterMode = false; // V18.0 Flag para reclutadores
+        let currentViewMode = 'grid'; // 'grid' o 'table'
+
         let currentUserEmail = ""; 
         let currentEditId = null;
         let jobs = {};
@@ -1011,19 +1082,53 @@
 
         window.toggleAdminLogin = function() { const f = document.getElementById('adminForm'); f.style.display = (f.style.display==='none'||f.style.display==='') ? 'block' : 'none'; }
         
+        // V18.0: Login Híbrido (Email o Código)
         window.login = async function() {
-            try { 
-                await setPersistence(auth, browserSessionPersistence); 
-                await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value); 
-                sessionStorage.removeItem('isGuest'); 
-                localStorage.setItem('iamsuperadmin', 'true'); 
-            } catch (error) { alert("Error: " + error.message); }
+            const inputVal = document.getElementById('adminEmail').value.trim();
+            const passVal = document.getElementById('adminPassword').value.trim();
+
+            if (!inputVal || !passVal) return alert("Por favor llena todos los campos");
+
+            if (inputVal.includes('@')) {
+                // Login Admin (Firebase)
+                try { 
+                    await setPersistence(auth, browserSessionPersistence); 
+                    await signInWithEmailAndPassword(auth, inputVal, passVal); 
+                    sessionStorage.removeItem('isGuest'); 
+                    localStorage.setItem('iamsuperadmin', 'true'); 
+                    isRecruiterMode = false;
+                } catch (error) { alert("Error de Admin: " + error.message); }
+            } else {
+                // Login Reclutador (Código Local)
+                if (passVal !== 'Express*2026') {
+                    return alert("Contraseña incorrecta para Reclutador.");
+                }
+
+                // Buscar código en la lista descargada de Firebase
+                const foundRec = Object.values(recruiters).find(r => r.code === inputVal.toUpperCase());
+                
+                if (foundRec) {
+                    sessionStorage.removeItem('isGuest');
+                    isAdmin = true; // Activa permisos de UI
+                    isRecruiterMode = true; // Flag específico
+                    activeRecruiter = foundRec;
+                    sessionStorage.setItem('recruiterCode', foundRec.code.toLowerCase()); // Auto-set
+                    
+                    setAdminMode(true);
+                    // Forzar Vista Tabla
+                    toggleViewMode('table');
+                    window.showToast(`Bienvenido Reclutador: ${foundRec.name}`);
+                } else {
+                    alert("Usuario (Código) no encontrado.");
+                }
+            }
         }
         
         // V16.23: Limpieza al entrar como invitado
         window.enterAsGuest = function() { 
             sessionStorage.setItem('isGuest', 'true'); 
             isAdmin = false; 
+            isRecruiterMode = false;
             
             // LIMPIEZA FORZADA
             document.getElementById('searchInput').value = '';
@@ -1035,32 +1140,81 @@
 
         // V16.23: Limpieza al cerrar sesión
         window.logout = function() { 
-            signOut(auth).then(() => { 
-                sessionStorage.removeItem('isGuest'); 
-                isAdmin = false; 
-                
-                // LIMPIEZA FORZADA
-                document.getElementById('searchInput').value = '';
-                document.getElementById('stateFilter').value = '';
-                document.getElementById('cityFilter').value = '';
+            if (isRecruiterMode) {
+                // Logout local para reclutador
+                isAdmin = false;
+                isRecruiterMode = false;
+                sessionStorage.removeItem('recruiterCode');
+                location.reload(); // Recarga simple para limpiar estado
+            } else {
+                // Logout Firebase
+                signOut(auth).then(() => { 
+                    sessionStorage.removeItem('isGuest'); 
+                    isAdmin = false; 
+                    
+                    // LIMPIEZA FORZADA
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('stateFilter').value = '';
+                    document.getElementById('cityFilter').value = '';
 
-                showLogin(); 
-            }); 
+                    showLogin(); 
+                }); 
+            }
         }
 
         function showLogin() { document.getElementById('loginScreen').style.display = 'block'; document.getElementById('mainApp').style.display = 'none'; document.getElementById('adminForm').style.display = 'none'; }
+        
         function setAdminMode(enableAdmin) {
             document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block';
             
             const isRefMode = !!refCode;
-            if (enableAdmin && !isRefMode) {
-                document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator">Super Admin</span>';
+            
+            // Lógica de visibilidad de controles
+            if (enableAdmin && (!isRefMode || isRecruiterMode)) {
+                // Si es Recruiter, mostramos controles pero adaptados
+                if (isRecruiterMode) {
+                    document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator" style="background:#e3f2fd; color:#0d47a1; border-color:#90caf9;">Modo Reclutador</span>';
+                    // Ocultamos botones peligrosos o de configuración global si se requiere, pero el prompt dice "gestionar mejor"
+                    // Dejaremos los controles visibles.
+                    document.getElementById('viewToggleBtn').style.display = 'none'; // Reclutador fijo en Tabla
+                } else {
+                    document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator">Super Admin</span>';
+                    document.getElementById('viewToggleBtn').style.display = 'inline-flex'; // Admin puede cambiar
+                }
                 document.getElementById('adminControls').style.display = 'block';
             } else {
                 document.getElementById('modeIndicator').innerHTML = '';
                 document.getElementById('adminControls').style.display = 'none';
+                document.getElementById('viewToggleBtn').style.display = 'none';
             }
             loadData();
+        }
+
+        // V18.0: Función para alternar vistas (Grid vs Table)
+        window.toggleViewMode = function(forceMode) {
+            if (forceMode) {
+                currentViewMode = forceMode;
+            } else {
+                currentViewMode = currentViewMode === 'grid' ? 'table' : 'grid';
+            }
+
+            const grid = document.getElementById('jobGrid');
+            const table = document.getElementById('jobTableContainer');
+            const btn = document.getElementById('viewToggleBtn');
+
+            if (currentViewMode === 'table') {
+                grid.style.display = 'none';
+                table.style.display = 'block';
+                document.getElementById('paginationContainer').style.display = 'none'; // Tabla scroll interna
+                btn.innerHTML = '🖼️ Vista Usuario';
+                renderJobsTable();
+            } else {
+                grid.style.display = 'grid';
+                table.style.display = 'none';
+                document.getElementById('paginationContainer').style.display = 'flex';
+                btn.innerHTML = '👁️ Vista Gestión';
+                filterJobs(); // Re-render grid
+            }
         }
 
         function parseJobDate(dateString) {
@@ -1080,9 +1234,18 @@
             onValue(ref(db, 'jobs'), (s) => { 
                 jobs = s.val() || {}; 
                 document.getElementById('skeletonLoader').style.display = 'none'; 
-                document.getElementById('jobGrid').style.display = 'grid';
+                
+                // Decidir vista inicial
+                if (isRecruiterMode) {
+                    toggleViewMode('table');
+                } else {
+                    document.getElementById('jobGrid').style.display = 'grid';
+                    document.getElementById('jobTableContainer').style.display = 'none';
+                }
+
                 populateFilters(jobs); 
-                renderJobs(); 
+                if (currentViewMode === 'grid') renderJobs(); 
+                else renderJobsTable();
                 
                 const urlJobId = urlParams.get('id');
                 if (urlJobId && jobs[urlJobId]) {
@@ -1277,6 +1440,12 @@
         window.copyLink = function(code) { 
             const link = `${window.location.origin}/?ref=${code}`; 
             navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); 
+        }
+
+        window.copyJobLink = function(jobId) {
+             const refCode = sessionStorage.getItem('recruiterCode');
+             const url = `${window.location.origin}/?id=${jobId}${refCode ? '&ref='+refCode : ''}`;
+             navigator.clipboard.writeText(url).then(() => window.showToast('🔗 Link de vacante copiado'));
         }
         
         function renderRecruitersTable() {
@@ -1484,9 +1653,8 @@
             document.getElementById('flyerTitle').innerText = j.title;
             document.getElementById('flyerSalary').innerText = j.salary || 'Sueldo Competitivo';
             
-            const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
-            document.getElementById('flyerCompany').innerText = showNamePublicly ? j.company : "Empresa Confidencial";
-
+            // V18.0: La empresa en el flyer es fija, NO se sobrescribe dinámicamente.
+            
             const benefitsList = document.getElementById('flyerBenefitsList');
             benefitsList.innerHTML = '';
             if(j.benefits && j.benefits.length > 0) {
@@ -1499,24 +1667,44 @@
                  benefitsList.innerHTML = '<li>✅ Prestaciones de Ley</li><li>✅ Contratación Inmediata</li><li>✅ Excelente Ambiente</li>';
             }
 
-            const flyerNode = document.getElementById('flyerTemplate');
+            // V18.0: Generar QR en el Flyer
+            const qrContainer = document.getElementById('flyerQr');
+            qrContainer.innerHTML = ''; // Limpiar previo
             
-            // V17.9.2: FIX DE SEGURIDAD PARA DESCARGA
-            html2canvas(flyerNode, { 
-                scale: 2, 
-                useCORS: true, 
-                allowTaint: false, // <--- EL FIX MAESTRO
-                backgroundColor: null 
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-                window.showToast("✅ ¡Flyer descargado!");
-            }).catch(err => {
-                console.error(err);
-                alert("Error al generar imagen: " + err.message);
+            // Link de la vacante
+            const refCode = sessionStorage.getItem('recruiterCode');
+            const jobLink = `${window.location.origin}/?id=${jobId}${refCode ? '&ref='+refCode : ''}`;
+
+            // Crear QR
+            new QRCode(qrContainer, {
+                text: jobLink,
+                width: 128,
+                height: 128,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
             });
+
+            // Esperar un poco a que el QR se renderice en el DOM
+            setTimeout(() => {
+                const flyerNode = document.getElementById('flyerTemplate');
+                
+                html2canvas(flyerNode, { 
+                    scale: 2, 
+                    useCORS: true, 
+                    allowTaint: false, 
+                    backgroundColor: null 
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    window.showToast("✅ ¡Flyer descargado!");
+                }).catch(err => {
+                    console.error(err);
+                    alert("Error al generar imagen: " + err.message);
+                });
+            }, 500); // 500ms delay para el QR
         }
 
         const visitsRef = ref(db, 'siteStats/visits');
@@ -1615,6 +1803,40 @@
             return diffDays <= 3;
         }
 
+        // V18.0: Renderizado en Tabla para Reclutadores
+        function renderJobsTable() {
+            const keys = Object.keys(jobs).sort((a,b) => b.localeCompare(a)); // Orden simple por ID/fecha desc
+            const tableBody = document.getElementById('jobTableBody');
+            
+            let html = '';
+            let count = 1;
+
+            keys.forEach(id => {
+                const j = jobs[id];
+                // Los reclutadores ven TODO (Vigente y no vigente) para poder gestionar
+                
+                const loc = `${j.city}, ${j.state}`;
+                const salary = j.salary || 'N/A';
+                
+                html += `
+                    <tr>
+                        <td>${count}</td>
+                        <td style="font-weight:bold; color:#0a66c2;">${j.company}</td>
+                        <td>${j.title}</td>
+                        <td>${loc}</td>
+                        <td style="color:#d32f2f; font-weight:bold;">${salary}</td>
+                        <td>
+                             <button class="action-icon-btn" title="Descargar Flyer" onclick="window.generateFlyer('${id}')">🖼️</button>
+                             <button class="action-icon-btn" title="Copiar Link" onclick="window.copyJobLink('${id}')">🔗</button>
+                             ${isAdmin && !isRecruiterMode ? `<button class="action-icon-btn" title="Editar" onclick="window.editJob('${id}')">✏️</button>` : ''}
+                        </td>
+                    </tr>
+                `;
+                count++;
+            });
+            tableBody.innerHTML = html;
+        }
+
         function renderJobs() {
             let keys = Object.keys(jobs);
             
@@ -1650,6 +1872,8 @@
         }
 
         function applyFilterAndRender() {
+            if (currentViewMode === 'table') return; // En modo tabla no filtramos por ahora (vista completa)
+
             const stateVal = document.getElementById('stateFilter').value;
             const cityVal = document.getElementById('cityFilter').value;
             const searchInput = document.getElementById('searchInput');
