@@ -294,19 +294,82 @@
         .action-icon-btn:hover { background: #e3f2fd; }
         .management-table td:last-child { white-space: nowrap; display: flex; gap: 5px; align-items: center; }
 
+        /* --- MASTER MÓVIL FIX (V19.2 - FUSIÓN COMPLETA) --- */
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            .header { flex-direction: row; justify-content: space-between; align-items: center; gap: 5px; }
-            .header h1 { font-size: 17px; max-width: 50%; line-height: 1.1; }
             
-            body.admin-mode #adminControls { top: 60px; }
-            /* Ajuste de Tabla en Móvil */
-            body.admin-mode .management-table th { top: 110px; } 
+            /* 1. AJUSTES GENERALES */
+            body { padding: 10px !important; }
 
-            .filter-container { display: flex; overflow-x: auto; }
+            /* 2. HEADER LIBRE (No sticky): Que ocupe el espacio que necesite */
+            body.admin-mode .header {
+                position: relative !important; /* Se mueve con el scroll */
+                height: auto !important; 
+                min-height: 50px;
+                flex-wrap: wrap !important;
+                gap: 10px !important;
+                padding: 10px !important;
+            }
+            .header { flex-direction: row; justify-content: space-between; align-items: center; }
+            .header h1 { font-size: 16px !important; margin: 0 !important; max-width: 60%; line-height: 1.2; }
+            .header-buttons { margin-top: 5px; width: 100%; justify-content: flex-end; }
+
+            /* 3. PANEL DE BOTONES ADMIN: Este SÍ se pega al techo */
+            body.admin-mode #adminControls {
+                position: sticky !important;
+                top: 0 !important; /* Se pega hasta arriba */
+                padding: 5px !important;
+                z-index: 1000 !important;
+                border-radius: 0 0 12px 12px !important;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+                max-height: none !important; /* Dejamos que crezca si es necesario */
+            }
+
+            /* ORGANIZACIÓN EN GRID (4 Columnas) */
+            .admin-controls-wrapper {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important; 
+                gap: 5px !important;
+                margin: 0 !important;
+            }
+
+            /* Tarjeta de Visitas */
+            .metrics-card {
+                grid-column: span 4 !important; 
+                height: 28px !important;
+                font-size: 11px !important;
+                padding: 0 !important;
+                justify-content: center !important;
+                margin-bottom: 4px !important;
+                background: rgba(255,255,255,0.95) !important;
+            }
+
+            /* Botones compactos */
+            .admin-controls-wrapper button, 
+            .admin-controls-wrapper .tool-btn,
+            .add-job-btn {
+                width: 100% !important; height: 38px !important; 
+                font-size: 10px !important; padding: 2px !important;
+                display: flex !important; align-items: center; justify-content: center;
+                flex-direction: column; gap: 2px; /* Icono arriba, texto abajo si cabe */
+            }
+
+            /* 4. BARRA AZUL (TABLA) */
+            /* Se pega debajo del panel de controles (aprox 140px) */
+            body.admin-mode .management-table th {
+                position: sticky !important;
+                top: 135px !important; 
+                z-index: 800 !important;
+                font-size: 11px !important;
+                padding: 8px 4px !important;
+                height: 35px !important;
+            }
+            
+            .job-table-container { margin-top: 5px !important; border: none !important; }
+
+            /* 5. FILTROS (VISTA USUARIO) */
+            .filter-container { display: flex; overflow-x: auto; padding-bottom: 5px; }
             .filter-icon-box { height: 40px; width: 40px; }
             .filter-select { height: 40px; font-size: 13px; padding: 5px; }
-            .admin-controls-wrapper button { flex: 1; min-width: 45%; }
         }
 
         #flyerTemplate { width: 1080px; min-height: 1080px; height: auto; position: fixed; top: 0; left: -9999px; z-index: -1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: 'Arial Black', 'Arial', sans-serif; text-align: center; padding: 80px 60px; box-sizing: border-box; background: #0a192d; }
@@ -584,82 +647,82 @@
             margin: 0 !important;
         }
         /* --- CORRECCIÓN FINAL DE ESPACIOS MÓVIL (V19.0) --- */
+        /* --- MASTER MÓVIL FIX (V19.2 - FUSIÓN COMPLETA) --- */
         @media (max-width: 768px) {
             
-            /* 1. HEADER (Fila Superior): Altura Fija y Delgada */
-            .header {
-                height: 50px !important;
-                padding: 0 10px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: space-between !important;
-                overflow: hidden !important;
-            }
-            .header h1 { font-size: 14px !important; margin: 0 !important; }
-            .header-buttons { transform: scale(0.9); transform-origin: right center; }
+            /* 1. AJUSTES GENERALES */
+            body { padding: 10px !important; }
 
-            /* 2. PANEL DE BOTONES (Zona Gris): Pegado y Compacto */
+            /* 2. HEADER LIBRE (No sticky): Que ocupe el espacio que necesite */
+            body.admin-mode .header {
+                position: relative !important; /* Se mueve con el scroll */
+                height: auto !important; 
+                min-height: 50px;
+                flex-wrap: wrap !important;
+                gap: 10px !important;
+                padding: 10px !important;
+            }
+            .header { flex-direction: row; justify-content: space-between; align-items: center; }
+            .header h1 { font-size: 16px !important; margin: 0 !important; max-width: 60%; line-height: 1.2; }
+            .header-buttons { margin-top: 5px; width: 100%; justify-content: flex-end; }
+
+            /* 3. PANEL DE BOTONES ADMIN: Este SÍ se pega al techo */
             body.admin-mode #adminControls {
                 position: sticky !important;
-                top: 50px !important; /* Justo debajo del header blanco */
+                top: 0 !important; /* Se pega hasta arriba */
                 padding: 5px !important;
-                max-height: 115px !important; /* Altura controlada */
-                overflow: hidden;
-                box-sizing: border-box !important;
+                z-index: 1000 !important;
+                border-radius: 0 0 12px 12px !important;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+                max-height: none !important; /* Dejamos que crezca si es necesario */
             }
 
-            /* ORGANIZACIÓN EN GRID (4 Columnas x 2 Filas) */
-            /* Esto evita que se amontonen, los obliga a formarse */
+            /* ORGANIZACIÓN EN GRID (4 Columnas) */
             .admin-controls-wrapper {
                 display: grid !important;
                 grid-template-columns: repeat(4, 1fr) !important; 
-                gap: 4px !important;
+                gap: 5px !important;
                 margin: 0 !important;
             }
 
-            /* TARJETA DE VISITAS (Ocupa toda la primera línea del grid) */
+            /* Tarjeta de Visitas */
             .metrics-card {
-                grid-column: span 4 !important; /* Ocupa las 4 columnas */
-                height: 24px !important;
+                grid-column: span 4 !important; 
+                height: 28px !important;
                 font-size: 11px !important;
                 padding: 0 !important;
                 justify-content: center !important;
-                margin-bottom: 2px !important;
-                background: rgba(255,255,255,0.8) !important;
+                margin-bottom: 4px !important;
+                background: rgba(255,255,255,0.95) !important;
             }
 
-            /* BOTONES (Chiquitos y uniformes) */
+            /* Botones compactos */
             .admin-controls-wrapper button, 
             .admin-controls-wrapper .tool-btn,
             .add-job-btn {
-                width: 100% !important;
-                height: 34px !important; /* Altura cómoda para el dedo pero compacta */
-                font-size: 10px !important; /* Letra pequeña para que quepa "Respaldo" */
-                padding: 2px !important;
-                margin: 0 !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                gap: 2px !important;
+                width: 100% !important; height: 38px !important; 
+                font-size: 10px !important; padding: 2px !important;
+                display: flex !important; align-items: center; justify-content: center;
+                flex-direction: column; gap: 2px; /* Icono arriba, texto abajo si cabe */
             }
 
-            /* 3. BARRA AZUL DE LA TABLA (El ajuste matemático) */
-            /* Header (50px) + Controles (~110px) = Barra empieza en 160px */
+            /* 4. BARRA AZUL (TABLA) */
+            /* Se pega debajo del panel de controles (aprox 140px) */
             body.admin-mode .management-table th {
                 position: sticky !important;
-                top: 155px !important; /* <--- AQUÍ ESTÁ LA MAGIA */
+                top: 135px !important; 
                 z-index: 800 !important;
-                font-size: 10px !important;
-                padding: 8px 2px !important;
+                font-size: 11px !important;
+                padding: 8px 4px !important;
                 height: 35px !important;
-                vertical-align: middle !important;
             }
             
-            /* Ajuste extra para que el contenido no se esconda */
-            .job-table-container {
-                margin-top: 5px !important;
-                border: none !important;
-            }
+            .job-table-container { margin-top: 5px !important; border: none !important; }
+
+            /* 5. FILTROS (VISTA USUARIO) */
+            .filter-container { display: flex; overflow-x: auto; padding-bottom: 5px; }
+            .filter-icon-box { height: 40px; width: 40px; }
+            .filter-select { height: 40px; font-size: 13px; padding: 5px; }
         }
         }
 
@@ -1217,8 +1280,18 @@
             }
         }
 
-        function showLogin() { document.getElementById('loginScreen').style.display = 'block'; document.getElementById('mainApp').style.display = 'none'; document.getElementById('adminForm').style.display = 'none'; }
-        
+        function showLogin() function showLogin() { 
+            document.getElementById('loginScreen').style.display = 'block'; 
+            document.getElementById('mainApp').style.display = 'none'; 
+            document.getElementById('adminForm').style.display = 'none'; 
+            
+            // --- CORRECCIÓN: Reseteamos el botón por si se quedó trabado ---
+            const btn = document.getElementById('btnLogin');
+            if(btn) { 
+                btn.innerHTML = 'Entrar al Panel'; 
+                btn.disabled = false; 
+            }
+        }
         function setAdminMode(enableAdmin) {
             document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block';
             
