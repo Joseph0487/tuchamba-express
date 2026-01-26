@@ -1230,14 +1230,21 @@
 
             if (!inputVal || !passVal) return alert("Por favor llena todos los campos");
 
+            // Evitamos el error de "texto Verificando infinito"
+            if (btn.innerText.includes('Verificando')) return; 
+
             const originalText = btn.innerHTML;
             btn.innerHTML = "🔄 Verificando...";
             btn.disabled = true;
 
-            // Esperar si los datos de reclutadores no han bajado
+            // --- VALIDACIÓN DE DATOS CARGADOS ---
+            // Si es reclutador y los datos no han bajado, mostramos error en lugar de trabar la app
             if (!inputVal.includes('@') && !recruitersLoaded) {
-                setTimeout(() => window.login(), 1000);
-                return; 
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                // Forzamos la carga de datos por si acaso falló la conexión
+                initRecruitersData(); 
+                return alert("⚠️ Los datos aún están cargando. Espera 3 segundos e intenta de nuevo.");
             }
 
             if (inputVal.includes('@')) {
@@ -1265,10 +1272,11 @@
                 
                 if (foundRec) {
                     sessionStorage.removeItem('isGuest');
-                    // GUARDAR SESIÓN Y RECARGAR (SOLUCIÓN PANTALLA BLANCA)
+                    // Guardamos sesión
                     sessionStorage.setItem('recruiterCode', foundRec.code.toLowerCase());
                     sessionStorage.setItem('isRecruiterSession', 'true'); 
                     
+                    // RECARGA LIMPIA (Solución pantalla blanca)
                     window.location.reload(); 
                 } else {
                     btn.innerHTML = originalText; btn.disabled = false;
@@ -1389,6 +1397,38 @@
             return jobDate && !isNaN(jobDate.getTime()) ? jobDate.getTime() : 0;
         }
 
+        // 1. FUNCIÓN GLOBAL: Carga reclutadores SIEMPRE (Login o No Login)
+        function initRecruitersData() {
+            onValue(ref(db, 'recruiters'), (s) => { 
+                recruiters = s.val() || {}; 
+                recruitersLoaded = true; // ¡Liberamos el semáforo!
+                
+                // Auto-Login (Recuperar sesión tras reload)
+                if(sessionStorage.getItem('isRecruiterSession') === 'true' && !isAdmin) {
+                    const savedCode = sessionStorage.getItem('recruiterCode');
+                    if (savedCode) {
+                        const foundRec = Object.values(recruiters).find(r => r.code.toLowerCase() === savedCode);
+                        if(foundRec) {
+                            isAdmin = true; 
+                            isRecruiterMode = true; 
+                            activeRecruiter = foundRec;
+                            setAdminMode(true);
+                            if(typeof toggleViewMode === 'function') toggleViewMode('table'); 
+                            window.showToast(`👋 Hola de nuevo: ${foundRec.name}`);
+                        }
+                    }
+                }
+                
+                checkActiveRecruiter(); 
+                if(isAdmin) renderRecruitersTable(); 
+            });
+        }
+
+        // Ejecutamos esto INMEDIATAMENTE al arrancar
+        initRecruitersData();
+
+
+        // 2. FUNCIÓN DE DATOS GENERALES (Solo corre al entrar)
         function loadData() {
             onValue(ref(db, 'jobs'), (s) => { 
                 jobs = s.val() || {}; 
@@ -1413,44 +1453,15 @@
                         document.getElementById('mainApp').style.display = 'block';
                         if(!isAdmin) sessionStorage.setItem('isGuest', 'true');
                         window.openViewModal(urlJobId);
-                    } else {
-                        window.showToast("⚠️ Esta vacante ya no está disponible.");
                     }
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             });
+
             onValue(ref(db, 'jobStats'), (s) => { jobStats = s.val() || {}; });
             onValue(ref(db, 'clickLogs'), (s) => { clickLogs = s.val() || {}; });
             
-            // --- BLOQUE CORREGIDO: DESCARGA DE RECLUTADORES ---
-            onValue(ref(db, 'recruiters'), (s) => { 
-                recruiters = s.val() || {}; 
-                
-                // ¡AQUÍ ESTÁ LA MAGIA! 👇
-                recruitersLoaded = true; // Avisamos al sistema que ya terminamos de cargar
-                
-                // --- Lógica de Auto-Login (Para que no te saque al recargar) ---
-                if(sessionStorage.getItem('isRecruiterSession') === 'true' && !isAdmin) {
-                    const savedCode = sessionStorage.getItem('recruiterCode');
-                    if (savedCode) {
-                        const foundRec = Object.values(recruiters).find(r => r.code.toLowerCase() === savedCode);
-                        if(foundRec) {
-                            isAdmin = true; 
-                            isRecruiterMode = true; 
-                            activeRecruiter = foundRec;
-                            setAdminMode(true);
-                            
-                            // Si existe la función de vista, forzamos tabla
-                            if(typeof toggleViewMode === 'function') toggleViewMode('table'); 
-                            
-                            window.showToast(`👋 Hola de nuevo: ${foundRec.name}`);
-                        }
-                    }
-                }
-                
-                checkActiveRecruiter(); 
-                if(isAdmin) renderRecruitersTable(); 
-            });
+            // YA NO cargamos recruiters aquí adentro, porque ya lo hicimos arriba en initRecruitersData()
             
             onValue(ref(db, 'settings/centralPhone'), (s) => { 
                 centralPhone = s.val() || '';
