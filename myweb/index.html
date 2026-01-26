@@ -568,118 +568,100 @@
             border-bottom-left-radius: 0 !important;
             margin: 0 !important;
         }
-        /* --- ESTILOS MÓVILES DEFINITIVOS (V20 - Clean & Compact) --- */
+        /* --- ESTILOS MÓVILES V21 (Optimización de Espacio y Fix Barra Azul) --- */
         @media (max-width: 768px) {
             
-            /* 1. HEADER PRINCIPAL (Donde dice "Portal de Vacantes") */
-            /* Lo hacemos relativo para que SCROLLEE y desaparezca al bajar */
+            /* 1. Header Global Compacto */
+            /* Lo dejamos "static" para que se esconda al bajar y no robe pantalla */
             body.admin-mode .header {
-                position: relative !important; 
+                position: static !important; 
                 display: flex !important;
-                flex-direction: row !important;
-                justify-content: space-between !important;
+                flex-wrap: wrap !important;
                 align-items: center !important;
+                justify-content: space-between !important;
                 padding: 8px 10px !important;
                 height: auto !important;
-                min-height: 45px;
-                background: #fff;
-                margin-bottom: 0 !important;
+                border-bottom: 1px solid #eee;
+                background: white;
             }
-
-            /* Título pequeño y manejable */
-            .header h1 { 
-                font-size: 15px !important; /* Reducido drásticamente */
-                line-height: 1.2 !important;
-                margin: 0 !important;
-                max-width: 60%; 
+            .header h1 { font-size: 16px !important; margin: 0 !important; max-width: 60%; }
+            
+            /* Botones del header en una sola línea compacta */
+            .header-buttons { 
+                margin-top: 5px; width: 100%; justify-content: flex-end; gap: 5px; 
+                padding-bottom: 5px;
             }
+            .header-buttons button { padding: 4px 10px !important; font-size: 11px !important; height: 30px !important; }
 
-            /* Botones del header (Salir, Cambiar Vista) compactos */
-            .header-buttons { gap: 5px !important; }
-            .header-buttons button, .header-buttons span {
-                padding: 4px 8px !important;
-                font-size: 11px !important;
-                height: 28px !important;
-            }
-            .admin-mode-indicator { padding: 2px 6px !important; font-size: 10px !important; }
-
-            /* 2. PANEL DE CONTROL (Botones de Colores) */
-            /* Este es el ÚNICO que se queda pegado al techo (Top 0) */
+            /* 2. Panel de Controles (Botones Admin) */
+            /* También dejamos que se esconda al scrollear */
             body.admin-mode #adminControls {
-                position: sticky !important;
-                top: 0 !important; 
-                z-index: 1000 !important;
-                padding: 5px !important;
-                background: #f0f2f5 !important;
-                border-bottom: 1px solid #ccc;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                border-radius: 0 0 10px 10px;
-                height: 115px !important; /* Altura fija forzada para el cálculo */
-                overflow: hidden;
+                position: static !important; 
+                padding: 5px 10px !important;
+                height: auto !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                margin-bottom: 0 !important;
+                background: #f0f2f5;
             }
 
-            /* GRID 4 COLUMNAS (Súper compacto) */
+            /* Grid 4 columnas ordenadas */
             .admin-controls-wrapper {
                 display: grid !important;
-                grid-template-columns: repeat(4, 1fr) !important; 
-                gap: 4px !important;
-                margin: 0 !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 5px !important;
             }
 
-            /* Tarjeta de métricas (Fila 1 completa) */
+            /* Tarjeta de métricas compacta */
             .metrics-card {
-                grid-column: span 4 !important; 
-                height: 24px !important;
+                grid-column: span 4 !important;
+                padding: 4px !important;
                 font-size: 11px !important;
-                padding: 0 !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-                margin-bottom: 4px !important;
+                height: auto !important;
+                min-height: 28px !important;
+                margin-bottom: 5px !important;
                 background: #fff !important;
                 border: 1px solid #ddd;
-            }
-
-            /* Botones individuales (Cuadrados tipo App) */
-            .admin-controls-wrapper button, 
-            .add-job-btn {
-                width: 100% !important; 
-                height: 36px !important; 
-                font-size: 9px !important; /* Letra pequeña para que quepa todo */
-                padding: 0 !important;
-                display: flex !important; 
-                align-items: center !important; 
                 justify-content: center !important;
-                flex-direction: column; 
-                line-height: 1;
-                border-radius: 6px !important;
             }
 
-            /* 3. TABLA DE RECLUTADOR (La Magia Matemática) */
-            /* Como el panel mide 115px y está en Top 0, la tabla se pega en Top 115px */
+            /* Botones cuadrados pequeños y uniformes */
+            .admin-controls-wrapper button, .add-job-btn {
+                width: 100% !important;
+                height: 38px !important; /* Altura cómoda pero compacta */
+                font-size: 10px !important;
+                padding: 0 !important;
+                display: flex !important;
+                flex-direction: column; /* Icono arriba, texto abajo */
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 8px !important;
+                line-height: 1.1 !important;
+            }
             
-            .job-table-container { margin-top: 5px !important; border: none !important; }
+            /* Corrección visual para botones con icono lateral */
+            .tool-btn { gap: 0 !important; }
 
+            /* 3. BARRA AZUL (TABLA) - EL ARREGLO MAESTRO */
+            /* Al quitar el 'sticky' de los paneles de arriba, ahora podemos decirle */
+            /* a la barra azul que se pegue al 'Top 0'. Así nunca fallará ni tapará vacantes. */
             body.admin-mode .management-table th {
                 position: sticky !important;
-                top: 115px !important; /* <--- AQUÍ ESTÁ EL ARREGLO */
-                z-index: 900 !important;
-                font-size: 10px !important;
-                padding: 8px 2px !important;
+                top: 0 !important; /* Se pega al borde superior de la pantalla */
+                z-index: 1000 !important;
+                font-size: 11px !important;
+                padding: 10px 5px !important;
                 background: #0a66c2 !important;
                 color: white !important;
-                height: 35px !important;
-                box-shadow: 0 2px 2px rgba(0,0,0,0.1);
-            }
-            
-            .management-table td {
-                font-size: 11px !important;
-                padding: 8px 4px !important;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                height: 40px !important; /* Altura fija para que se vea bien */
+                vertical-align: middle !important;
             }
 
-            /* Ajustes Varios */
+            /* Ajustes finales de limpieza */
+            .job-table-container { margin-top: 0 !important; border-top: none !important; }
+            body { padding-top: 0 !important; }
             .filter-container { display: flex; overflow-x: auto; padding-bottom: 5px; }
-            .filter-icon-box, .filter-select { height: 38px !important; }
         }
 
     </style>
