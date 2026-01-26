@@ -1148,17 +1148,26 @@
             const grid = document.getElementById('jobGrid');
             const table = document.getElementById('jobTableContainer');
             const btn = document.getElementById('viewToggleBtn');
+            const searchBar = document.getElementById('userStickyTools'); // <--- EL ELEMENTO A OCULTAR
 
             if (currentViewMode === 'table') {
+                // MODO GESTIÓN (Tabla)
                 grid.style.display = 'none';
                 table.style.display = 'block';
-                // AQUI CAMBIÓ: Ya no ocultamos la paginación
+                
+                // Ocultamos la barra porque no la necesitamos aquí
+                if(searchBar) searchBar.style.display = 'none'; 
+                
                 btn.innerHTML = '🖼️ Vista Usuario';
                 renderJobsTable();
             } else {
+                // MODO USUARIO (Fichas)
                 grid.style.display = 'grid';
                 table.style.display = 'none';
-                // La paginación se maneja dentro de filterJobs
+                
+                // La mostramos de nuevo porque aquí es vital
+                if(searchBar) searchBar.style.display = 'block';
+
                 btn.innerHTML = '👁️ Vista Gestión';
                 filterJobs(); 
             }
