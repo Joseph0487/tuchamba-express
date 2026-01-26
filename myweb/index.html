@@ -568,129 +568,103 @@
             border-bottom-left-radius: 0 !important;
             margin: 0 !important;
         }
-       /* --- SOLUCIÓN MAESTRA MÓVIL V24 (Final) --- */
-       /* --- CORRECCIÓN FINAL: INSTRUCCIONES EXACTAS (V25) --- */
-       /* --- CORRECCIÓN FINAL V26 (Colores, Orden y Barra Azul) --- */
-       /* --- ARREGLO FINAL V27 (Simple y Directo) --- */
+       /* --- CORRECCIÓN FINAL V29 (Fuerza Bruta para Botón Nueva) --- */
         @media (max-width: 768px) {
 
-            /* 1. ENCABEZADO GENERAL (Invitado y Admin) - UNA SOLA LÍNEA */
+            /* 1. ENCABEZADO (Limpio en una línea) */
             .header {
-                display: flex !important;
-                flex-wrap: nowrap !important; /* Fuerza una línea */
-                align-items: center !important;
-                padding: 8px 10px !important;
-                gap: 5px !important;
-                height: 50px !important;
-                overflow: hidden !important;
+                display: flex !important; flex-wrap: nowrap !important; align-items: center !important;
+                padding: 8px 10px !important; gap: 5px !important; height: 50px !important;
             }
-            .header h1 {
-                font-size: 15px !important;
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis;
-                margin: 0 !important;
-                flex: 1; /* Ocupa el espacio disponible */
-            }
-            .header-buttons {
-                flex-shrink: 0; /* No se encoge */
-                gap: 5px !important;
-            }
-            /* Botones del header pequeños */
-            .header-buttons button, .header-buttons span {
-                padding: 4px 8px !important;
-                font-size: 11px !important;
-                height: 30px !important;
-            }
-            /* Ocultar botón "Cambiar Vista" en celular para ahorrar espacio */
+            .header h1 { font-size: 15px !important; margin: 0 !important; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+            .header-buttons { flex-shrink: 0; gap: 5px !important; }
+            .header-buttons button, .header-buttons span { padding: 4px 8px !important; font-size: 11px !important; height: 30px !important; }
             #viewToggleBtn { display: none !important; }
 
-
-            /* 2. PANEL DE CONTROL (RECLUTADOR) - GRID 2x2 */
+            /* 2. CONTENEDOR GRID (Reclutador) */
             body.recruiter-view #adminControls {
-                position: static !important; /* No fijo, para que no estorbe */
+                position: static !important;
                 padding: 5px !important;
                 background: #f4f6f8 !important;
             }
-
             body.recruiter-view .admin-controls-wrapper {
                 display: grid !important;
-                grid-template-columns: 1fr 1fr !important; /* 2 Columnas iguales */
+                grid-template-columns: 1fr 1fr !important; /* 2 columnas exactas */
                 gap: 5px !important;
                 margin: 0 !important;
             }
 
-            /* ELEMENTO 1: TARJETA DE VISTAS (Métricas) */
+            /* --- ELEMENTOS DE LA CUADRÍCULA --- */
+            
+            /* POSICIÓN 1: Tarjeta de Vistas (Texto) */
             body.recruiter-view .metrics-card {
-                order: 1;
-                width: 100% !important;
-                height: 40px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                font-size: 11px !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                background: white !important;
-                border: 1px solid #ccc !important;
-                border-left: 4px solid #7b1fa2 !important; /* Morado original */
+                order: 1 !important;
+                width: 100% !important; height: 40px !important;
+                display: flex !important; align-items: center !important; justify-content: center !important;
+                font-size: 11px !important; padding: 0 !important; margin: 0 !important;
+                background: white !important; border: 1px solid #ccc !important;
+                border-left: 4px solid #0a66c2 !important;
+            }
+            /* Aseguramos que el texto de visitas SÍ se vea */
+            body.recruiter-view .metrics-card span { display: inline !important; }
+
+            /* POSICIÓN 2: Botón MÉTRICAS (Morado) - EL CAMBIO QUE PEDISTE */
+            body.recruiter-view button.metrics-btn {
+                display: flex !important; /* Forzamos visibilidad */
+                order: 2 !important;
+                width: 100% !important; height: 40px !important;
+                background: #7b1fa2 !important; /* Morado */
+                color: white !important;
+                font-size: 12px !important; border-radius: 6px !important;
+                align-items: center !important; justify-content: center !important;
+                padding: 0 !important; margin: 0 !important;
             }
 
-            /* ELEMENTO 2: BOTÓN NUEVA VACANTE (Verde) */
-            body.recruiter-view .add-job-btn {
-                order: 2;
-                width: 100% !important;
-                height: 40px !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                font-size: 13px !important;
-                background: #10a37f !important; /* Verde original */
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-            }
-
-            /* ELEMENTO 3: BOTÓN RESPALDO */
+            /* POSICIÓN 3: Botón Respaldo */
             body.recruiter-view button[onclick="exportToExcel()"] {
-                order: 3;
-                height: 40px !important;
-                font-size: 12px !important;
-                padding: 0 !important;
-                width: 100% !important;
+                order: 3 !important;
+                height: 40px !important; width: 100% !important; font-size: 12px !important; padding: 0 !important;
             }
 
-            /* ELEMENTO 4: BOTÓN PLANTILLA */
+            /* POSICIÓN 4: Botón Plantilla */
             body.recruiter-view button[onclick="downloadTemplate()"] {
-                order: 4;
-                height: 40px !important;
-                font-size: 12px !important;
-                padding: 0 !important;
-                width: 100% !important;
+                order: 4 !important;
+                height: 40px !important; width: 100% !important; font-size: 12px !important; padding: 0 !important;
             }
 
-            /* OCULTAR TODO LO DEMÁS EN MODO RECLUTADOR */
-            body.recruiter-view .metrics-btn, /* Botón morado redundante */
+            /* 3. BOTÓN FLOTANTE NUEVA VACANTE (El Rebelde) */
+            /* Usamos "button.add-job-btn" para ganarle a la regla que lo ocultaba */
+            body.recruiter-view button.add-job-btn {
+                display: flex !important; /* <--- ESTO ES LA CLAVE */
+                position: fixed !important;
+                bottom: 25px !important; right: 20px !important;
+                width: 55px !important; height: 55px !important;
+                border-radius: 50% !important;
+                background: #10a37f !important; /* Verde */
+                color: transparent !important; /* Ocultar texto */
+                box-shadow: 0 4px 15px rgba(16, 163, 127, 0.5) !important;
+                z-index: 2000 !important;
+                justify-content: center !important; align-items: center !important;
+                padding: 0 !important; margin: 0 !important;
+            }
+            /* El signo de Más (+) */
+            body.recruiter-view button.add-job-btn::after {
+                content: "+"; color: white; font-size: 32px; margin-top: -4px; font-weight: bold;
+            }
+
+            /* 4. OCULTAR LO QUE SOBRA */
             body.recruiter-view .team-btn,
             body.recruiter-view .settings-btn,
-            body.recruiter-view button[onclick*="excelFile"] { 
-                display: none !important; 
-            }
+            body.recruiter-view button[onclick*="excelFile"] { display: none !important; }
 
-
-            /* 3. BARRA AZUL (TABLA) - PEGADA AL TECHO */
-            /* Al bajar, la barra azul se pega al borde superior (0px) */
+            /* 5. BARRA AZUL (Tabla) */
             body.recruiter-view .management-table th {
                 position: sticky !important;
                 top: 0 !important; 
                 z-index: 1000 !important;
                 padding: 10px 5px !important;
-                font-size: 11px !important;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
             }
-            
-            /* Ajuste final de contenedores */
             .job-table-container { margin-top: 5px !important; border: none !important; }
-            .container { padding: 0 5px !important; }
         }
 
     </style>
@@ -2498,4 +2472,3 @@
     </script>
 </body>
 </html>
-
