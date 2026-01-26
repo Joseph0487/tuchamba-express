@@ -570,146 +570,108 @@
         }
        /* --- SOLUCIÓN MAESTRA MÓVIL V24 (Final) --- */
        /* --- CORRECCIÓN FINAL: INSTRUCCIONES EXACTAS (V25) --- */
+       /* --- CORRECCIÓN FINAL V26 (Colores, Orden y Barra Azul) --- */
         @media (max-width: 768px) {
 
-            /* ==============================================
-               1. ARREGLO VISTA INVITADO (Volver a una línea)
-            ============================================== */
-            /* Aseguramos que el header normal no se rompa */
+            /* 1. ARREGLAR VISTA INVITADO (Que se vea en una línea) */
             .header {
                 flex-wrap: nowrap !important;
-                white-space: nowrap !important;
-                overflow: hidden !important;
+                align-items: center !important;
+                gap: 5px !important;
+                padding: 8px 10px !important;
             }
             .header h1 {
                 font-size: 16px !important;
-                overflow: hidden;
+                white-space: nowrap !important;
+                overflow: hidden !important;
                 text-overflow: ellipsis;
+                max-width: 60%;
             }
 
-
-            /* ==============================================
-               2. MODO RECLUTADOR: ENCABEZADO FIJO (2 PISOS)
-            ============================================== */
+            /* 2. ENCABEZADO RECLUTADOR (Fijo arriba, 2 pisos compactos) */
             body.recruiter-view .header {
                 position: sticky !important;
                 top: 0 !important;
                 z-index: 1200 !important;
                 background: white !important;
                 border-bottom: 1px solid #ccc !important;
-                /* Altura fija calculada para 2 pisos: 35px + 35px + espacios = 82px */
-                height: 82px !important; 
+                height: 82px !important; /* Altura exacta para el cálculo */
                 padding: 5px 10px !important;
-                margin: 0 !important;
                 
-                /* Usamos GRID para definir las posiciones exactas */
                 display: grid !important;
-                grid-template-areas: 
-                    "titulo salir"
-                    "compartir modo";
+                grid-template-areas: "titulo salir" "compartir modo";
                 grid-template-columns: 1fr auto !important;
-                grid-template-rows: 1fr 1fr !important;
-                gap: 2px 10px !important;
+                gap: 5px !important;
                 align-content: center !important;
             }
 
-            /* Desarmamos contenedores para mover las piezas */
-            body.recruiter-view .header-buttons { display: contents !important; }
-
-            /* ASIGNACIÓN DE LUGARES (Según tu diagrama) */
-            /* Piso 1 */
-            body.recruiter-view .header h1 { 
-                grid-area: titulo;
-                font-size: 15px !important; margin: 0 !important; align-self: center;
-            }
-            body.recruiter-view .admin-btn { /* Botón Salir */
-                grid-area: salir;
-                padding: 4px 10px !important; height: 26px !important; font-size: 11px !important; 
-                margin: 0 !important; align-self: center;
-            }
-
-            /* Piso 2 */
-            body.recruiter-view .share-btn { /* Botón Compartir */
-                grid-area: compartir;
-                width: 100% !important; height: 28px !important; font-size: 12px !important;
-                margin: 0 !important; display: flex; align-items: center; justify-content: center;
-                background: #0a66c2 !important; align-self: center;
-            }
-            body.recruiter-view #modeIndicator { /* Etiqueta Modo */
-                grid-area: modo; align-self: center;
-            }
-            body.recruiter-view .admin-mode-indicator {
-                font-size: 10px !important; padding: 4px 8px !important;
-            }
+            /* Elementos del header en su lugar */
+            body.recruiter-view .header h1 { grid-area: titulo; font-size: 16px !important; margin: 0 !important; }
+            body.recruiter-view .admin-btn { grid-area: salir; padding: 4px 12px !important; height: 28px !important; font-size: 11px !important; }
+            body.recruiter-view .share-btn { grid-area: compartir; width: 100% !important; height: 28px !important; font-size: 12px !important; padding: 0 !important; display: flex; align-items: center; justify-content: center; }
+            body.recruiter-view #modeIndicator { grid-area: modo; }
             
-            /* Ocultar lo que no se pidió */
+            /* Ocultar botón "Cambiar Vista" en reclutador para ahorrar espacio */
             body.recruiter-view #viewToggleBtn { display: none !important; }
 
 
-            /* ==============================================
-               3. MODO RECLUTADOR: BOTONES DELGADOS (GRID 2 COL)
-            ============================================== */
+            /* 3. PANEL DE BOTONES (Colores Originales + Grid 2 Col) */
             body.recruiter-view #adminControls {
-                position: static !important; /* Este panel SÍ se desplaza */
+                position: static !important; /* Que haga scroll para no estorbar */
                 padding: 10px !important;
                 background: #f4f6f8 !important;
-                border-bottom: 1px solid #e0e0e0;
             }
 
             body.recruiter-view .admin-controls-wrapper {
                 display: grid !important;
-                grid-template-columns: 1fr 1fr !important; /* 2 columnas */
+                grid-template-columns: 1fr 1fr !important; /* 2 Columnas */
                 gap: 8px !important;
             }
 
-            /* Estilo UNIFICADO para botones DELGADOS (Slim) */
+            /* Estilo base para los botones (Respetando sus colores originales) */
             body.recruiter-view .admin-controls-wrapper > * {
-                height: 40px !important; /* Altura delgada */
-                min-height: 0 !important;
-                font-size: 11px !important;
-                font-weight: 600 !important;
-                color: #444 !important;
-                background: white !important;
-                border: 1px solid #ccc !important;
-                border-radius: 6px !important;
-                padding: 0 8px !important;
-                margin: 0 !important;
                 width: 100% !important;
-                display: flex !important; align-items: center !important; justify-content: flex-start !important;
-                gap: 6px !important;
+                height: 42px !important; /* Altura cómoda */
+                font-size: 12px !important;
+                margin: 0 !important;
+                border-radius: 8px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
             }
 
-            /* ORDEN DE LA CUADRILLA (Incluyendo Nueva Vacante para poder trabajar) */
-            body.recruiter-view .add-job-btn { order: 1; background: #10a37f !important; color: white !important; justify-content: center !important; }
+            /* ORDEN Y COLORES ESPECÍFICOS */
+            /* Botón Nueva Vacante (Verde) */
+            body.recruiter-view .add-job-btn { order: 1; grid-column: span 2 !important; /* Que ocupe todo el ancho arriba */ background: #10a37f !important; }
             
-            /* Tu lista solicitada */
-            body.recruiter-view .metrics-card { order: 2; border-left: 3px solid #0a66c2 !important; }
-            body.recruiter-view .metrics-card span { display: none !important; }
-            body.recruiter-view .metrics-card::after { content: "Vistas"; font-weight: normal; }
+            /* Métricas (Morado) */
+            body.recruiter-view .metrics-btn { order: 2; background: #7b1fa2 !important; }
+            /* Ajuste especial para la tarjeta de visitas (La convertimos en botón visual) */
+            body.recruiter-view .metrics-card { order: 3; background: white !important; color: #333 !important; border: 1px solid #ddd !important; justify-content: flex-start !important; padding-left: 10px !important; }
             
-            body.recruiter-view button[onclick="exportToExcel()"] { order: 3; border-left: 3px solid #455a64 !important; }
+            /* Respaldo (Gris Azul) */
+            body.recruiter-view button[onclick="exportToExcel()"] { order: 4; background: #2c3e50 !important; }
+            /* Plantilla (Gris Azul) */
+            body.recruiter-view button[onclick="downloadTemplate()"] { order: 5; background: #2c3e50 !important; }
             
-            body.recruiter-view button[onclick="openMetricsModal()"] { order: 4; border-left: 3px solid #7b1fa2 !important; }
-            
-            body.recruiter-view button[onclick="downloadTemplate()"] { order: 5; border-left: 3px solid #00796b !important; }
+            /* Ocultar botones de Admin que el reclutador no necesita */
+            body.recruiter-view .team-btn, 
+            body.recruiter-view .settings-btn, 
+            body.recruiter-view button[onclick*="excelFile"] { display: none !important; }
 
-            /* Ocultar sobrantes de Admin */
-            body.recruiter-view .team-btn, body.recruiter-view .settings-btn, body.recruiter-view button[onclick*="excelFile"] { display: none !important; }
 
-
-            /* ==============================================
-               4. BARRA AZUL (Pegada exactamente debajo del header)
-            ============================================== */
-            /* Header mide 82px -> La tabla se pega en 82px */
+            /* 4. BARRA AZUL (TABLA) - FIX MATEMÁTICO */
+            /* Como el header mide 82px y es sticky, la tabla se pega en 82px */
             body.recruiter-view .management-table th {
                 position: sticky !important;
-                top: 82px !important; 
+                top: 82px !important; /* <--- AQUÍ ESTÁ EL ARREGLO */
                 z-index: 1100 !important;
-                padding: 8px 4px !important;
-                height: 35px !important;
-                font-size: 10px !important;
+                padding: 10px 5px !important;
+                font-size: 11px !important;
                 box-shadow: 0 4px 5px rgba(0,0,0,0.15) !important;
             }
+            
             .job-table-container { margin-top: 0 !important; border: none !important; }
         }
 
