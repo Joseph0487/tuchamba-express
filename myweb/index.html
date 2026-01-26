@@ -568,237 +568,138 @@
             border-bottom-left-radius: 0 !important;
             margin: 0 !important;
         }
-        /* --- ESTILOS MÓVILES V21 (Optimización de Espacio y Fix Barra Azul) --- */
+       /* --- SOLUCIÓN MAESTRA MÓVIL V24 (Final) --- */
         @media (max-width: 768px) {
             
-            /* 1. Header Global Compacto */
-            /* Lo dejamos "static" para que se esconda al bajar y no robe pantalla */
-            body.admin-mode .header {
-                position: static !important; 
-                display: flex !important;
-                flex-wrap: wrap !important;
-                align-items: center !important;
-                justify-content: space-between !important;
-                padding: 8px 10px !important;
-                height: auto !important;
-                border-bottom: 1px solid #eee;
-                background: white;
-            }
-            .header h1 { font-size: 16px !important; margin: 0 !important; max-width: 60%; }
-            
-            /* Botones del header en una sola línea compacta */
-            .header-buttons { 
-                margin-top: 5px; width: 100%; justify-content: flex-end; gap: 5px; 
-                padding-bottom: 5px;
-            }
-            .header-buttons button { padding: 4px 10px !important; font-size: 11px !important; height: 30px !important; }
+            /* 1. RESET Y AJUSTES BASE */
+            body { padding: 5px !important; padding-top: 0 !important; }
+            .container { padding: 0 !important; max-width: 100% !important; }
 
-            /* 2. Panel de Controles (Botones Admin) */
-            /* También dejamos que se esconda al scrollear */
-            body.admin-mode #adminControls {
-                position: static !important; 
-                padding: 5px 10px !important;
-                height: auto !important;
-                border-radius: 0 !important;
-                box-shadow: none !important;
-                margin-bottom: 0 !important;
-                background: #f0f2f5;
-            }
-
-            /* Grid 4 columnas ordenadas */
-            .admin-controls-wrapper {
-                display: grid !important;
-                grid-template-columns: repeat(4, 1fr) !important;
-                gap: 5px !important;
-            }
-
-            /* Tarjeta de métricas compacta */
-            .metrics-card {
-                grid-column: span 4 !important;
-                padding: 4px !important;
-                font-size: 11px !important;
-                height: auto !important;
-                min-height: 28px !important;
-                margin-bottom: 5px !important;
-                background: #fff !important;
-                border: 1px solid #ddd;
-                justify-content: center !important;
-            }
-
-            /* Botones cuadrados pequeños y uniformes */
-            .admin-controls-wrapper button, .add-job-btn {
-                width: 100% !important;
-                height: 38px !important; /* Altura cómoda pero compacta */
-                font-size: 10px !important;
-                padding: 0 !important;
-                display: flex !important;
-                flex-direction: column; /* Icono arriba, texto abajo */
-                align-items: center !important;
-                justify-content: center !important;
-                border-radius: 8px !important;
-                line-height: 1.1 !important;
-            }
-            
-            /* Corrección visual para botones con icono lateral */
-            .tool-btn { gap: 0 !important; }
-
-            /* 3. BARRA AZUL (TABLA) - EL ARREGLO MAESTRO */
-            /* Al quitar el 'sticky' de los paneles de arriba, ahora podemos decirle */
-            /* a la barra azul que se pegue al 'Top 0'. Así nunca fallará ni tapará vacantes. */
-            body.admin-mode .management-table th {
-                position: sticky !important;
-                top: 0 !important; /* Se pega al borde superior de la pantalla */
-                z-index: 1000 !important;
-                font-size: 11px !important;
-                padding: 10px 5px !important;
-                background: #0a66c2 !important;
-                color: white !important;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-                height: 40px !important; /* Altura fija para que se vea bien */
-                vertical-align: middle !important;
-            }
-
-            /* Ajustes finales de limpieza */
-            .job-table-container { margin-top: 0 !important; border-top: none !important; }
-            body { padding-top: 0 !important; }
-            .filter-container { display: flex; overflow-x: auto; padding-bottom: 5px; }
-        }
-        /* --- ESTILOS EXCLUSIVOS RECLUTADOR V23 (Header Fijo + Botones Slim) --- */
-        @media (max-width: 768px) {
-            
-            /* 1. HEADER (Panel 1): AHORA ES FIJO (STICKY) */
+            /* 2. HEADER FIJO Y ORDENADO (Grid Tetris) */
             body.recruiter-view .header {
                 position: sticky !important;
                 top: 0 !important;
-                z-index: 1100 !important; /* Capa superior máxima */
+                z-index: 1200 !important;
+                background: white !important;
+                border-bottom: 1px solid #ccc !important;
+                height: 85px !important; /* Altura Fija Innegociable */
+                padding: 5px 10px !important;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+                margin: 0 !important;
+                
                 display: grid !important;
                 grid-template-columns: 1fr auto !important;
                 grid-template-rows: auto auto !important;
-                padding: 8px 12px !important;
-                gap: 5px 0 !important;
-                background: white !important;
-                border-bottom: 1px solid #ccc !important;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
-                height: auto !important;
-                min-height: 75px !important; /* Altura reservada calculada */
+                gap: 2px 10px !important;
+                align-content: center !important;
             }
 
-            /* Elementos del Header */
+            /* Desarmamos la caja de botones para moverlos libremente */
+            body.recruiter-view .header-buttons { display: contents !important; }
+
+            /* UBICACIONES EXACTAS */
             body.recruiter-view .header h1 { 
-                grid-column: 1 / 2; grid-row: 1; 
-                font-size: 16px !important; margin: 0 !important; color: #333;
-            }
-            body.recruiter-view .admin-btn { /* Botón Salir */
-                grid-column: 2 / 3; grid-row: 1; 
-                padding: 4px 12px !important; height: 28px !important; font-size: 11px !important; 
+                grid-row: 1; grid-column: 1; 
+                font-size: 15px !important; margin: 0 !important; line-height: 1.2;
             }
             
-            /* Fila 2 del Header: Compartir y Modo */
-            body.recruiter-view .header-buttons {
-                grid-column: 1 / 3; grid-row: 2;
-                padding-top: 4px !important; display: flex !important; gap: 8px !important; width: 100% !important;
+            body.recruiter-view .admin-btn { /* Botón Salir */
+                grid-row: 1; grid-column: 2;
+                padding: 2px 10px !important; height: 26px !important; font-size: 11px !important; 
+                margin: 0 !important; align-self: center;
             }
-            body.recruiter-view .share-btn {
-                flex: 1 !important; height: 30px !important; font-size: 12px !important; 
-                padding: 0 !important; display: flex !important; align-items: center; justify-content: center;
+
+            body.recruiter-view .share-btn { /* Compartir */
+                grid-row: 2; grid-column: 1;
+                width: 100% !important; height: 28px !important; font-size: 12px !important;
+                margin: 0 !important; display: flex; align-items: center; justify-content: center;
                 background: #0a66c2 !important;
             }
-            body.recruiter-view .admin-mode-indicator {
-                flex: 1 !important; height: 30px !important; font-size: 11px !important;
-                display: flex !important; align-items: center; justify-content: center;
-                white-space: nowrap; overflow: hidden;
+
+            body.recruiter-view #modeIndicator { /* Etiqueta Modo */
+                grid-row: 2; grid-column: 2; align-self: center;
             }
             
-            /* Ocultar botón vista que no se usa */
             body.recruiter-view #viewToggleBtn { display: none !important; }
 
 
-            /* 2. PANEL DE BOTONES (Panel 2): "SLIM FIT" */
+            /* 3. PANEL DE BOTONES (Slim & Clean) */
             body.recruiter-view #adminControls {
-                position: static !important; /* Este sí scrollea y se esconde */
-                padding: 8px 10px !important;
-                background: #f4f6f8 !important; /* Fondo gris muy suave */
+                position: static !important; /* Scrollea natural */
+                padding: 8px 5px !important;
+                background: #f4f6f8 !important;
                 border-bottom: 1px solid #e0e0e0;
                 margin-top: 0 !important;
             }
 
             body.recruiter-view .admin-controls-wrapper {
                 display: grid !important;
-                grid-template-columns: 1fr 1fr !important; /* 2 Columnas */
-                gap: 8px !important; /* Espacio limpio */
+                grid-template-columns: 1fr 1fr !important; /* 2 columnas */
+                gap: 6px !important;
             }
 
-            /* ESTILO UNIFICADO DE BOTONES DELGADOS (42px) */
-            /* Quitamos colores fuertes, usamos diseño limpio tipo App */
-            body.recruiter-view .metrics-card,
-            body.recruiter-view button[onclick="exportToExcel()"],
-            body.recruiter-view button[onclick="openMetricsModal()"],
-            body.recruiter-view button[onclick="downloadTemplate()"] {
-                height: 42px !important; /* <--- AQUÍ ESTÁ EL AHORRO */
+            /* TODOS LOS BOTONES DEL PANEL */
+            body.recruiter-view .admin-controls-wrapper > * {
+                height: 40px !important; /* Altura delgada */
                 min-height: 0 !important;
-                font-size: 12px !important;
-                font-weight: 600 !important;
+                font-size: 11px !important;
                 color: #444 !important;
                 background: white !important;
                 border: 1px solid #ccc !important;
-                border-radius: 8px !important;
+                border-radius: 6px !important;
                 box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
-                padding: 0 10px !important;
+                padding: 0 8px !important;
                 margin: 0 !important;
+                width: 100% !important;
                 
-                /* Alineación Horizontal (Icono - Texto) */
                 display: flex !important;
-                flex-direction: row !important;
                 align-items: center !important;
-                justify-content: flex-start !important; /* Todo a la izquierda */
-                gap: 8px !important;
+                justify-content: flex-start !important;
+                gap: 6px !important;
             }
 
-            /* Asignación de Iconos y Orden */
-            body.recruiter-view .metrics-card { order: 1; border-left: 4px solid #0a66c2 !important; }
-            body.recruiter-view .metrics-card::after { content: " Vistas"; font-weight: normal; margin-left: 4px; }
+            /* Personalización de botones */
+            body.recruiter-view .metrics-card { order: 1; border-left: 3px solid #0a66c2 !important; }
+            body.recruiter-view .metrics-card span { display: none !important; }
+            body.recruiter-view .metrics-card::after { content: "Vistas"; font-weight: normal; }
             
-            body.recruiter-view button[onclick="exportToExcel()"] { order: 2; border-left: 4px solid #455a64 !important; }
+            body.recruiter-view button[onclick="exportToExcel()"] { order: 2; border-left: 3px solid #455a64 !important; }
             body.recruiter-view button[onclick="exportToExcel()"]::before { content: "📦"; }
             
-            body.recruiter-view button[onclick="openMetricsModal()"] { order: 3; border-left: 4px solid #7b1fa2 !important; }
+            body.recruiter-view button[onclick="openMetricsModal()"] { order: 3; border-left: 3px solid #7b1fa2 !important; }
             body.recruiter-view button[onclick="openMetricsModal()"]::before { content: "📊"; }
             
-            body.recruiter-view button[onclick="downloadTemplate()"] { order: 4; border-left: 4px solid #00796b !important; }
+            body.recruiter-view button[onclick="downloadTemplate()"] { order: 4; border-left: 3px solid #00796b !important; }
             body.recruiter-view button[onclick="downloadTemplate()"]::before { content: "📋"; }
 
-            /* Ocultar botones Admin sobrantes */
-            body.recruiter-view .team-btn, 
-            body.recruiter-view .settings-btn,
-            body.recruiter-view button[onclick*="excelFile"] { display: none !important; }
+            /* Ocultar sobrantes */
+            body.recruiter-view .team-btn, body.recruiter-view .settings-btn, body.recruiter-view button[onclick*="excelFile"] { display: none !important; }
 
 
-            /* 3. BARRA AZUL (TABLA): SE PEGA DEBAJO DEL HEADER */
-            /* Header fijo mide aprox 75px. La tabla se pega ahí. */
+            /* 4. BARRA AZUL (La Clave Matemática) */
+            /* Header (85px) -> Tabla empieza en pixel 85 */
             body.recruiter-view .management-table th {
                 position: sticky !important;
-                top: 75px !important; 
-                z-index: 1000 !important;
+                top: 85px !important; 
+                z-index: 1100 !important;
                 padding: 8px 4px !important;
                 height: 35px !important;
                 font-size: 10px !important;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
             }
             
-            /* Ajuste de contenedor para que no se oculte nada */
             .job-table-container { margin-top: 0 !important; border: none !important; }
 
-            /* 4. BOTÓN FLOTANTE (FAB) VERDE */
+            /* 5. FAB (Botón Nueva Vacante) */
             body.recruiter-view .add-job-btn {
-                position: fixed !important; bottom: 25px; right: 20px;
-                width: 55px; height: 55px; border-radius: 50%; padding: 0 !important;
+                position: fixed !important; bottom: 20px; right: 15px;
+                width: 50px; height: 50px; border-radius: 50%; padding: 0 !important;
                 background: #10a37f !important; color: transparent !important;
-                box-shadow: 0 4px 15px rgba(16, 163, 127, 0.4) !important;
+                box-shadow: 0 4px 15px rgba(16, 163, 127, 0.5) !important;
                 z-index: 2000 !important;
                 display: flex !important; align-items: center; justify-content: center;
-                order: 99 !important;
             }
-            body.recruiter-view .add-job-btn::after { content: "+"; color: white; font-size: 32px; margin-top: -4px; }
+            body.recruiter-view .add-job-btn::after { content: "+"; color: white; font-size: 30px; margin-top: -3px; }
         }
 
     </style>
