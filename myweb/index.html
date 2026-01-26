@@ -1180,19 +1180,20 @@
         window.toggleAdminLogin = function() { const f = document.getElementById('adminForm'); f.style.display = (f.style.display==='none'||f.style.display==='') ? 'block' : 'none'; }
         
         window.login = async function() {
-            const inputVal = document.getElementById('adminEmail').value.trim();
+            // 1. LIMPIEZA AGRESIVA: Quitamos espacios al inicio, final y EN MEDIO
+            // Esto arregla el problema de "RL 00002" vs "RL00002"
+            let inputVal = document.getElementById('adminEmail').value.trim();
             const passVal = document.getElementById('adminPassword').value.trim();
             const btn = document.getElementById('btnLogin');
 
             if (!inputVal || !passVal) return alert("Por favor llena todos los campos");
 
-            // Feedback visual: Cambiamos el texto del botón para que sepan que algo está pasando
             const originalText = btn.innerHTML;
             btn.innerHTML = "🔄 Verificando...";
             btn.disabled = true;
 
             if (inputVal.includes('@')) {
-                // --- Login Admin (Firebase) ---
+                // --- Login Admin (Email) ---
                 try { 
                     await setPersistence(auth, browserSessionPersistence); 
                     await signInWithEmailAndPassword(auth, inputVal, passVal); 
@@ -1201,47 +1202,91 @@
                     isRecruiterMode = false;
                 } catch (error) { 
                     alert("Error de Admin: " + error.message);
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
+                    btn.innerHTML = originalText; btn.disabled = false;
                 }
             } else {
                 // --- Login Reclutador ---
                 
-                // 1. SEGURIDAD: Verificar si ya descargamos la lista de reclutadores
-                if (!recruiters || Object.keys(recruiters).length === 0) {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                    return alert("⏳ Los datos del sistema aún se están cargando. Espera 5 segundos e intenta de nuevo.");
+                // TRUCO: Quitamos todos los espacios y hacemos mayúsculas
+                inputVal = inputVal.replace(/\s/g, '').toUpperCase();
+
+                // Validación de carga de datos
+                if (!recruitersLoaded) {
+                    btn.innerHTML = originalText; btn.disabled = false;
+                    return alert("⏳ Conectando con el servidor... Intenta de nuevo en 2 segundos.");
                 }
 
                 if (passVal !== 'Express*2026') {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                    return alert("❌ Contraseña incorrecta.");
+                    btn.innerHTML = originalText; btn.disabled = false;
+                    return alert("❌ Contraseña incorrecta. Verifica mayúsculas y asterisco (*).");
                 }
 
-                // Buscar código
-                const foundRec = Object.values(recruiters).find(r => r.code === inputVal.toUpperCase());
+                // Buscar código exacto
+                const foundRec = Object.values(recruiters).find(r => r.code === inputVal);
                 
                 if (foundRec) {
                     sessionStorage.removeItem('isGuest');
-                    isAdmin = true; 
-                    isRecruiterMode = true; 
-                    activeRecruiter = foundRec;
+                    isAdmin = true; isRecruiterMode = true; activeRecruiter = foundRec;
                     sessionStorage.setItem('recruiterCode', foundRec.code.toLowerCase());
                     
                     setAdminMode(true);
                     toggleViewMode('table');
                     window.showToast(`✅ Bienvenido: ${foundRec.name}`);
                     
-                    // Restauramos botón por si salen después
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
+                    // Reset final por si salen después
+                    btn.innerHTML = 'Entrar al Panel'; btn.disabled = false;
                 } else {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                    alert("❌ Usuario (Código) no encontrado. Revisa que esté bien escrito.");
+                    btn.innerHTML = originalText; btn.disabled = false;
+                    alert(`❌ El código '${inputVal}' no existe en el sistema.\n\nVerifica con el Administrador que tu código esté dado de alta en la sección 'Equipo'.`);
                 }
+            }
+        }
+        
+        window.enterAsGuest = function() { 
+            sessionStorage.setItem('isGuest', 'true'); 
+            isAdmin = false; 
+            isRecruiterMode = false;
+            
+            document.getElementById('searchInput').value = '';
+            document.getElementById('stateFilter').value = '';
+            document.getElementById('cityFilter').value = '';
+
+            setAdminMode(false); 
+        }
+
+        window.logout = function() { 
+            // Limpieza de modo Sticky
+            document.body.classList.remove('admin-mode');
+
+            if (isRecruiterMode) {
+                isAdmin = false;
+                isRecruiterMode = false;
+                sessionStorage.removeItem('recruiterCode');
+                location.reload(); 
+            } else {
+                signOut(auth).then(() => { 
+                    sessionStorage.removeItem('isGuest'); 
+                    isAdmin = false; 
+                    
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('stateFilter').value = '';
+                    document.getElementById('cityFilter').value = '';
+
+                    showLogin(); 
+                }); 
+            }
+        }
+
+        function showLogin() { 
+            document.getElementById('loginScreen').style.display = 'block'; 
+            document.getElementById('mainApp').style.display = 'none'; 
+            document.getElementById('adminForm').style.display = 'none'; 
+            
+            // --- CORRECCIÓN: Reseteamos el botón por si se quedó trabado ---
+            const btn = document.getElementById('btnLogin');
+            if(btn) { 
+                btn.innerHTML = 'Entrar al Panel'; 
+                btn.disabled = false; 
             }
         }
         
