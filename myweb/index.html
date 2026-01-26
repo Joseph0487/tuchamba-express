@@ -89,6 +89,99 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         .admin-login-form input:focus { transform: scale(1.02); transition: 0.2s; }
+
+            /* =========================================================
+           BLOQUE 1 DEFINITIVO: CAMPO DE CONTRASEÑA Y OJITO (IMAGEN)
+           ========================================================= */
+
+        /* =========================================================
+           BLOQUE 1 FINAL-FINAL: BARRA FLACA Y OJO CENTRADO
+           ========================================================= */
+
+        /* 1. El Contenedor */
+        .password-wrapper {
+            position: relative; 
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        /* 2. El Input: BAJAMOS LA ALTURA A 44px (Igual que el de arriba) */
+        .password-wrapper input {
+            width: 100% !important;
+            height: 44px !important; /* <--- AQUÍ ESTABA EL DETALLE (Antes 50px) */
+            
+            padding: 0 50px 0 15px !important; 
+            margin: 0 !important;
+            box-sizing: border-box !important;
+            line-height: normal !important;
+        }
+
+        /* 3. El Área del Icono: SE MANTIENE EL CENTRADO QUE SÍ SIRVIÓ */
+        .password-toggle-icon {
+            position: absolute;
+            right: 5px;
+            
+            /* Truco de centrado automático */
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            
+            width: 44px; /* Ajustamos el área al mismo alto que el input */
+            height: 44px; 
+            
+            display: flex;
+            align-items: center; 
+            justify-content: center;
+            
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        /* 4. La Imagen */
+        .password-toggle-icon img {
+            width: 22px !important; 
+            height: 22px !important;
+            display: block;
+            object-fit: contain;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        
+        .password-toggle-icon:hover img { opacity: 1; }
+
+        /* 2. El Contenedor del Icono (El que centra) */
+        .password-toggle-icon {
+            position: absolute;
+            right: 10px; /* Pegado a la derecha */
+            
+            /* --- LA FORMULA DEL CENTRADO PERFECTO --- */
+            top: 50%;    
+            transform: translateY(-50%); 
+            /* --------------------------------------- */
+            
+            width: 40px; /* Área grande para dar clic fácil */
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        /* 3. La Imagen (PNG) */
+        .password-toggle-icon img {
+            width: 22px !important; /* Tamaño del ojito */
+            height: 22px !important;
+            object-fit: contain;
+            display: block;
+            opacity: 0.7; /* Un poco transparente para que se vea elegante */
+        }
+        
+        /* Cuando pasas el mouse, se oscurece */
+        .password-toggle-icon:hover img {
+            opacity: 1;
+        }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .container { max-width: 1250px; margin: 0 auto; }
@@ -694,9 +787,16 @@
                 <label style="color:white;">Usuario / Correo</label>
                 <input type="text" id="adminEmail" placeholder="Usuario o Correo" autocomplete="username" enterkeyhint="next" style="background:rgba(255,255,255,0.9);">
             </div>
-            <div class="form-group">
+                <div class="form-group">
                 <label style="color:white;">Contraseña</label>
-                <input type="password" id="adminPassword" placeholder="******" autocomplete="current-password" enterkeyhint="go" style="background:rgba(255,255,255,0.9);">
+                <div class="password-wrapper">
+                    <input type="password" id="adminPassword" placeholder="******" autocomplete="current-password" enterkeyhint="go" style="background:rgba(255,255,255,0.9);">
+                    
+                    <span class="password-toggle-icon" onclick="togglePasswordVisibility()">
+                        <img id="ojoIcono" src="ver.png" alt="Ver Password">
+                    </span>
+
+                </div>
             </div>
             <button type="submit" id="btnLogin" class="btn-primary" style="width: 100%;">Entrar al Panel</button>
         </form>
@@ -1104,10 +1204,26 @@
             container.classList.toggle('active');
         }
 
-        window.toggleAdminLogin = function() { const f = document.getElementById('adminForm'); f.style.display = (f.style.display==='none'||f.style.display==='') ? 'block' : 'none'; }
+        window.toggleAdminLogin = function() { 
+            const f = document.getElementById('adminForm'); 
+            f.style.display = (f.style.display==='none'||f.style.display==='') ? 'block' : 'none'; 
+        }
         
+        // --- FUNCIÓN DEL OJITO (VERSIÓN IMÁGENES PNG) ---
+        window.togglePasswordVisibility = function() {
+            const input = document.getElementById('adminPassword');
+            const imagen = document.getElementById('ojoIcono'); // Buscamos la imagen
+
+            if (input.type === "password") {
+                input.type = "text"; // Muestra la contraseña
+                imagen.src = "ocultar.png"; // Cambia a la foto del ojo tachado
+            } else {
+                input.type = "password"; // Oculta la contraseña
+                imagen.src = "ver.png"; // Cambia a la foto del ojo normal
+            }
+        }
+
         window.login = async function() {
-            // 1. LIMPIEZA AGRESIVA: Quitamos espacios al inicio, final y EN MEDIO
             let inputVal = document.getElementById('adminEmail').value.trim();
             const passVal = document.getElementById('adminPassword').value.trim();
             const btn = document.getElementById('btnLogin');
@@ -1118,8 +1234,14 @@
             btn.innerHTML = "🔄 Verificando...";
             btn.disabled = true;
 
+            // Esperar si los datos de reclutadores no han bajado
+            if (!inputVal.includes('@') && !recruitersLoaded) {
+                setTimeout(() => window.login(), 1000);
+                return; 
+            }
+
             if (inputVal.includes('@')) {
-                // --- Login Admin (Email) ---
+                // --- Login Admin ---
                 try { 
                     await setPersistence(auth, browserSessionPersistence); 
                     await signInWithEmailAndPassword(auth, inputVal, passVal); 
@@ -1127,42 +1249,30 @@
                     localStorage.setItem('iamsuperadmin', 'true'); 
                     isRecruiterMode = false;
                 } catch (error) { 
-                    alert("Error de Admin: " + error.message);
+                    alert("Error: " + error.message);
                     btn.innerHTML = originalText; btn.disabled = false;
                 }
             } else {
                 // --- Login Reclutador ---
-                
-                // Quitamos espacios internos (ej. convierte "RL 00002" en "RL00002")
                 inputVal = inputVal.replace(/\s/g, '').toUpperCase();
-
-                if (!recruitersLoaded) {
-                    btn.innerHTML = originalText; btn.disabled = false;
-                    return alert("⏳ Conectando con el servidor... Intenta de nuevo en 2 segundos.");
-                }
-
+                
                 if (passVal !== 'Express*2026') {
                     btn.innerHTML = originalText; btn.disabled = false;
                     return alert("❌ Contraseña incorrecta.");
                 }
 
-                // Buscar código
                 const foundRec = Object.values(recruiters).find(r => r.code === inputVal);
                 
                 if (foundRec) {
                     sessionStorage.removeItem('isGuest');
-                    isAdmin = true; isRecruiterMode = true; activeRecruiter = foundRec;
+                    // GUARDAR SESIÓN Y RECARGAR (SOLUCIÓN PANTALLA BLANCA)
                     sessionStorage.setItem('recruiterCode', foundRec.code.toLowerCase());
+                    sessionStorage.setItem('isRecruiterSession', 'true'); 
                     
-                    setAdminMode(true);
-                    toggleViewMode('table');
-                    window.showToast(`✅ Bienvenido: ${foundRec.name}`);
-                    
-                    // Reset final por si salen después
-                    btn.innerHTML = 'Entrar al Panel'; btn.disabled = false;
+                    window.location.reload(); 
                 } else {
                     btn.innerHTML = originalText; btn.disabled = false;
-                    alert(`❌ El código '${inputVal}' no existe en el sistema.\n\nVerifica con el Administrador que tu código esté dado de alta en la sección 'Equipo'.`);
+                    alert(`❌ Código no encontrado.`);
                 }
             }
         }
@@ -1180,26 +1290,13 @@
         }
 
         window.logout = function() { 
-            // Limpieza de modo Sticky
             document.body.classList.remove('admin-mode');
-
-            if (isRecruiterMode) {
-                isAdmin = false;
-                isRecruiterMode = false;
-                sessionStorage.removeItem('recruiterCode');
-                location.reload(); 
-            } else {
-                signOut(auth).then(() => { 
-                    sessionStorage.removeItem('isGuest'); 
-                    isAdmin = false; 
-                    
-                    document.getElementById('searchInput').value = '';
-                    document.getElementById('stateFilter').value = '';
-                    document.getElementById('cityFilter').value = '';
-
-                    showLogin(); 
-                }); 
-            }
+            sessionStorage.clear(); // Limpia memoria
+            localStorage.removeItem('iamsuperadmin');
+            
+            signOut(auth).then(() => { 
+                window.location.reload(); // Recarga simple y limpia
+            }); 
         }
 
         function showLogin() { 
@@ -1327,7 +1424,27 @@
             
             onValue(ref(db, 'recruiters'), (s) => { 
                 recruiters = s.val() || {}; 
-                recruitersLoaded = true; // <--- ¡AQUÍ AVISAMOS QUE YA CARGÓ!
+                recruitersLoaded = true; // Avisar que ya cargaron
+                
+                // --- AUTO-LOGIN RECLUTADOR (Para evitar pantalla blanca) ---
+                if(sessionStorage.getItem('isRecruiterSession') === 'true' && !isAdmin) {
+                    const savedCode = sessionStorage.getItem('recruiterCode');
+                    if (savedCode) {
+                        const foundRec = Object.values(recruiters).find(r => r.code.toLowerCase() === savedCode);
+                        if(foundRec) {
+                            isAdmin = true; 
+                            isRecruiterMode = true; 
+                            activeRecruiter = foundRec;
+                            setAdminMode(true);
+                            
+                            // Forzar vista de tabla si es necesario
+                            if(typeof toggleViewMode === 'function') toggleViewMode('table'); 
+                            
+                            window.showToast(`👋 Hola de nuevo: ${foundRec.name}`);
+                        }
+                    }
+                }
+                
                 checkActiveRecruiter(); 
                 if(isAdmin) renderRecruitersTable(); 
             });
@@ -2458,3 +2575,4 @@
     </script>
 </body>
 </html>
+
