@@ -583,6 +583,84 @@
             border-bottom-left-radius: 0 !important;
             margin: 0 !important;
         }
+        /* --- OPTIMIZACIÓN MÓVIL EXTREMA (V18.12) --- */
+        @media (max-width: 768px) {
+            
+            /* 1. Encabezado más delgado */
+            .header {
+                padding: 8px 10px !important;
+                flex-wrap: nowrap !important; /* Que no se rompa en dos líneas */
+                gap: 5px !important;
+            }
+            .header h1 {
+                font-size: 14px !important; /* Título chiquito */
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 120px; 
+            }
+            
+            /* Botones del header más compactos */
+            .header-buttons button, .header-buttons span {
+                padding: 4px 8px !important;
+                font-size: 11px !important;
+                height: 30px !important;
+                display: flex; align-items: center;
+            }
+
+            /* 2. Panel de Control (Admin): GRID DE 3 COLUMNAS */
+            .admin-controls-wrapper {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important; /* 3 botones por fila */
+                gap: 5px !important;
+                padding: 0 5px !important;
+            }
+            
+            /* Botones de herramientas (Métricas, Equipo, etc.) súper compactos */
+            .admin-controls-wrapper .tool-btn, 
+            .admin-controls-wrapper .add-job-btn,
+            .admin-controls-wrapper .metrics-card {
+                width: 100% !important;
+                min-width: 0 !important; /* Para que no se desborden */
+                margin: 0 !important;
+                padding: 6px 2px !important; /* Poco relleno */
+                font-size: 10px !important; /* Letra pequeña */
+                justify-content: center !important;
+                text-align: center !important;
+                height: 36px !important; /* Altura fija uniforme */
+            }
+            
+            /* Ajuste especial para la tarjeta de métricas (que ocupe toda la fila 1) */
+            .admin-controls-wrapper .metrics-card {
+                grid-column: span 3 !important; /* Ocupa las 3 columnas */
+                margin-bottom: 2px !important;
+                font-size: 12px !important;
+            }
+
+            /* 3. CORRECCIÓN DE LA BARRA AZUL (TABLA) */
+            /* Calculamos la nueva altura: Header (50px) + Controls (aprox 90px) */
+            body.admin-mode .management-table th {
+                top: 135px !important; /* Ajustado para que quede justo debajo de los botones */
+                padding: 8px 4px !important; /* Menos relleno para que quepan los textos */
+                font-size: 11px !important;
+            }
+            
+            /* Ajuste del contenedor de la tabla para que no lo tape el header fijo */
+            .job-table-container {
+                margin-top: 5px !important;
+                border-top: none !important;
+            }
+            
+            /* Ajuste para que el input de búsqueda no estorbe en admin */
+            body.admin-mode #userStickyTools {
+                margin-top: 5px !important;
+                padding: 5px !important;
+            }
+            body.admin-mode .search-input {
+                padding: 6px 10px !important;
+                font-size: 12px !important;
+            }
+        }
 
     </style>
 </head>
@@ -620,11 +698,17 @@
         </p>
         <button class="btn-big-guest" onclick="enterAsGuest()">🔍 Ver Vacantes Disponibles</button>
         <div class="admin-toggle-link" onclick="toggleAdminLogin()">¿Eres Reclutador? Ingresa aquí</div>
-        <div id="adminForm" class="admin-login-form">
-            <div class="form-group"><label style="color:white;">Usuario / Correo</label><input type="text" id="adminEmail" placeholder="Usuario o Correo" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
-            <div class="form-group"><label style="color:white;">Contraseña</label><input type="password" id="adminPassword" placeholder="******" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
-            <button class="btn-primary" style="width: 100%;" onclick="login()">Entrar al Panel</button>
-        </div>
+        <form id="adminForm" class="admin-login-form" onsubmit="event.preventDefault(); login();">
+            <div class="form-group">
+                <label style="color:white;">Usuario / Correo</label>
+                <input type="text" id="adminEmail" placeholder="Usuario o Correo" autocomplete="username" enterkeyhint="next" style="background:rgba(255,255,255,0.9);">
+            </div>
+            <div class="form-group">
+                <label style="color:white;">Contraseña</label>
+                <input type="password" id="adminPassword" placeholder="******" autocomplete="current-password" enterkeyhint="go" style="background:rgba(255,255,255,0.9);">
+            </div>
+            <button type="submit" id="btnLogin" class="btn-primary" style="width: 100%;">Entrar al Panel</button>
+        </form>
     </div>
 
     <div id="mainApp" style="display: none;">
@@ -1033,40 +1117,65 @@
         window.login = async function() {
             const inputVal = document.getElementById('adminEmail').value.trim();
             const passVal = document.getElementById('adminPassword').value.trim();
+            const btn = document.getElementById('btnLogin');
 
             if (!inputVal || !passVal) return alert("Por favor llena todos los campos");
 
+            // Feedback visual: Cambiamos el texto del botón para que sepan que algo está pasando
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "🔄 Verificando...";
+            btn.disabled = true;
+
             if (inputVal.includes('@')) {
-                // Login Admin (Firebase)
+                // --- Login Admin (Firebase) ---
                 try { 
                     await setPersistence(auth, browserSessionPersistence); 
                     await signInWithEmailAndPassword(auth, inputVal, passVal); 
                     sessionStorage.removeItem('isGuest'); 
                     localStorage.setItem('iamsuperadmin', 'true'); 
                     isRecruiterMode = false;
-                } catch (error) { alert("Error de Admin: " + error.message); }
+                } catch (error) { 
+                    alert("Error de Admin: " + error.message);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
             } else {
-                // Login Reclutador (Código Local)
-                if (passVal !== 'Express*2026') {
-                    return alert("Contraseña incorrecta para Reclutador.");
+                // --- Login Reclutador ---
+                
+                // 1. SEGURIDAD: Verificar si ya descargamos la lista de reclutadores
+                if (!recruiters || Object.keys(recruiters).length === 0) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return alert("⏳ Los datos del sistema aún se están cargando. Espera 5 segundos e intenta de nuevo.");
                 }
 
-                // Buscar código en la lista descargada de Firebase
+                if (passVal !== 'Express*2026') {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return alert("❌ Contraseña incorrecta.");
+                }
+
+                // Buscar código
                 const foundRec = Object.values(recruiters).find(r => r.code === inputVal.toUpperCase());
                 
                 if (foundRec) {
                     sessionStorage.removeItem('isGuest');
-                    isAdmin = true; // Activa permisos de UI
-                    isRecruiterMode = true; // Flag específico
+                    isAdmin = true; 
+                    isRecruiterMode = true; 
                     activeRecruiter = foundRec;
-                    sessionStorage.setItem('recruiterCode', foundRec.code.toLowerCase()); // Auto-set
+                    sessionStorage.setItem('recruiterCode', foundRec.code.toLowerCase());
                     
                     setAdminMode(true);
-                    // Forzar Vista Tabla
                     toggleViewMode('table');
-                    window.showToast(`Bienvenido Reclutador: ${foundRec.name}`);
+                    window.showToast(`✅ Bienvenido: ${foundRec.name}`);
+                    
+                    // Restauramos botón por si salen después
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
                 } else {
-                    alert("Usuario (Código) no encontrado.");
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    alert("❌ Usuario (Código) no encontrado. Revisa que esté bien escrito.");
                 }
             }
         }
