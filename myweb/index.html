@@ -1181,7 +1181,6 @@
         
         window.login = async function() {
             // 1. LIMPIEZA AGRESIVA: Quitamos espacios al inicio, final y EN MEDIO
-            // Esto arregla el problema de "RL 00002" vs "RL00002"
             let inputVal = document.getElementById('adminEmail').value.trim();
             const passVal = document.getElementById('adminPassword').value.trim();
             const btn = document.getElementById('btnLogin');
@@ -1207,10 +1206,9 @@
             } else {
                 // --- Login Reclutador ---
                 
-                // TRUCO: Quitamos todos los espacios y hacemos mayúsculas
+                // Quitamos espacios internos (ej. convierte "RL 00002" en "RL00002")
                 inputVal = inputVal.replace(/\s/g, '').toUpperCase();
 
-                // Validación de carga de datos
                 if (!recruitersLoaded) {
                     btn.innerHTML = originalText; btn.disabled = false;
                     return alert("⏳ Conectando con el servidor... Intenta de nuevo en 2 segundos.");
@@ -1218,10 +1216,10 @@
 
                 if (passVal !== 'Express*2026') {
                     btn.innerHTML = originalText; btn.disabled = false;
-                    return alert("❌ Contraseña incorrecta. Verifica mayúsculas y asterisco (*).");
+                    return alert("❌ Contraseña incorrecta.");
                 }
 
-                // Buscar código exacto
+                // Buscar código
                 const foundRec = Object.values(recruiters).find(r => r.code === inputVal);
                 
                 if (foundRec) {
@@ -1278,54 +1276,6 @@
         }
 
         function showLogin() { 
-            document.getElementById('loginScreen').style.display = 'block'; 
-            document.getElementById('mainApp').style.display = 'none'; 
-            document.getElementById('adminForm').style.display = 'none'; 
-            
-            // --- CORRECCIÓN: Reseteamos el botón por si se quedó trabado ---
-            const btn = document.getElementById('btnLogin');
-            if(btn) { 
-                btn.innerHTML = 'Entrar al Panel'; 
-                btn.disabled = false; 
-            }
-        }
-        
-        window.enterAsGuest = function() { 
-            sessionStorage.setItem('isGuest', 'true'); 
-            isAdmin = false; 
-            isRecruiterMode = false;
-            
-            document.getElementById('searchInput').value = '';
-            document.getElementById('stateFilter').value = '';
-            document.getElementById('cityFilter').value = '';
-
-            setAdminMode(false); 
-        }
-
-        window.logout = function() { 
-            // Limpieza de modo Sticky
-            document.body.classList.remove('admin-mode');
-
-            if (isRecruiterMode) {
-                isAdmin = false;
-                isRecruiterMode = false;
-                sessionStorage.removeItem('recruiterCode');
-                location.reload(); 
-            } else {
-                signOut(auth).then(() => { 
-                    sessionStorage.removeItem('isGuest'); 
-                    isAdmin = false; 
-                    
-                    document.getElementById('searchInput').value = '';
-                    document.getElementById('stateFilter').value = '';
-                    document.getElementById('cityFilter').value = '';
-
-                    showLogin(); 
-                }); 
-            }
-        }
-
-        function showLogin() function showLogin() { 
             document.getElementById('loginScreen').style.display = 'block'; 
             document.getElementById('mainApp').style.display = 'none'; 
             document.getElementById('adminForm').style.display = 'none'; 
