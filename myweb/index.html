@@ -979,6 +979,7 @@
         const db = getDatabase(app);
 
         let isAdmin = false;
+        let recruitersLoaded = false; // <--- NUEVA BANDERA DE CONTROL
         let isRecruiterMode = false; 
         let currentViewMode = 'grid'; 
 
@@ -1331,6 +1332,7 @@
             
             onValue(ref(db, 'recruiters'), (s) => { 
                 recruiters = s.val() || {}; 
+                recruitersLoaded = true; // <--- ¡AQUÍ AVISAMOS QUE YA CARGÓ!
                 checkActiveRecruiter(); 
                 if(isAdmin) renderRecruitersTable(); 
             });
