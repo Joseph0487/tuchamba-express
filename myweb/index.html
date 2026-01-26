@@ -583,83 +583,84 @@
             border-bottom-left-radius: 0 !important;
             margin: 0 !important;
         }
-        /* --- OPTIMIZACIÓN MÓVIL EXTREMA (V18.12) --- */
+        /* --- CORRECCIÓN FINAL DE ESPACIOS MÓVIL (V19.0) --- */
         @media (max-width: 768px) {
             
-            /* 1. Encabezado más delgado */
+            /* 1. HEADER (Fila Superior): Altura Fija y Delgada */
             .header {
-                padding: 8px 10px !important;
-                flex-wrap: nowrap !important; /* Que no se rompa en dos líneas */
-                gap: 5px !important;
+                height: 50px !important;
+                padding: 0 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                overflow: hidden !important;
             }
-            .header h1 {
-                font-size: 14px !important; /* Título chiquito */
-                white-space: nowrap;
+            .header h1 { font-size: 14px !important; margin: 0 !important; }
+            .header-buttons { transform: scale(0.9); transform-origin: right center; }
+
+            /* 2. PANEL DE BOTONES (Zona Gris): Pegado y Compacto */
+            body.admin-mode #adminControls {
+                position: sticky !important;
+                top: 50px !important; /* Justo debajo del header blanco */
+                padding: 5px !important;
+                max-height: 115px !important; /* Altura controlada */
                 overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 120px; 
-            }
-            
-            /* Botones del header más compactos */
-            .header-buttons button, .header-buttons span {
-                padding: 4px 8px !important;
-                font-size: 11px !important;
-                height: 30px !important;
-                display: flex; align-items: center;
+                box-sizing: border-box !important;
             }
 
-            /* 2. Panel de Control (Admin): GRID DE 3 COLUMNAS */
+            /* ORGANIZACIÓN EN GRID (4 Columnas x 2 Filas) */
+            /* Esto evita que se amontonen, los obliga a formarse */
             .admin-controls-wrapper {
                 display: grid !important;
-                grid-template-columns: repeat(3, 1fr) !important; /* 3 botones por fila */
-                gap: 5px !important;
-                padding: 0 5px !important;
-            }
-            
-            /* Botones de herramientas (Métricas, Equipo, etc.) súper compactos */
-            .admin-controls-wrapper .tool-btn, 
-            .admin-controls-wrapper .add-job-btn,
-            .admin-controls-wrapper .metrics-card {
-                width: 100% !important;
-                min-width: 0 !important; /* Para que no se desborden */
+                grid-template-columns: repeat(4, 1fr) !important; 
+                gap: 4px !important;
                 margin: 0 !important;
-                padding: 6px 2px !important; /* Poco relleno */
-                font-size: 10px !important; /* Letra pequeña */
-                justify-content: center !important;
-                text-align: center !important;
-                height: 36px !important; /* Altura fija uniforme */
-            }
-            
-            /* Ajuste especial para la tarjeta de métricas (que ocupe toda la fila 1) */
-            .admin-controls-wrapper .metrics-card {
-                grid-column: span 3 !important; /* Ocupa las 3 columnas */
-                margin-bottom: 2px !important;
-                font-size: 12px !important;
             }
 
-            /* 3. CORRECCIÓN DE LA BARRA AZUL (TABLA) */
-            /* Calculamos la nueva altura: Header (50px) + Controls (aprox 90px) */
-            body.admin-mode .management-table th {
-                top: 135px !important; /* Ajustado para que quede justo debajo de los botones */
-                padding: 8px 4px !important; /* Menos relleno para que quepan los textos */
+            /* TARJETA DE VISITAS (Ocupa toda la primera línea del grid) */
+            .metrics-card {
+                grid-column: span 4 !important; /* Ocupa las 4 columnas */
+                height: 24px !important;
                 font-size: 11px !important;
+                padding: 0 !important;
+                justify-content: center !important;
+                margin-bottom: 2px !important;
+                background: rgba(255,255,255,0.8) !important;
+            }
+
+            /* BOTONES (Chiquitos y uniformes) */
+            .admin-controls-wrapper button, 
+            .admin-controls-wrapper .tool-btn,
+            .add-job-btn {
+                width: 100% !important;
+                height: 34px !important; /* Altura cómoda para el dedo pero compacta */
+                font-size: 10px !important; /* Letra pequeña para que quepa "Respaldo" */
+                padding: 2px !important;
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 2px !important;
+            }
+
+            /* 3. BARRA AZUL DE LA TABLA (El ajuste matemático) */
+            /* Header (50px) + Controles (~110px) = Barra empieza en 160px */
+            body.admin-mode .management-table th {
+                position: sticky !important;
+                top: 155px !important; /* <--- AQUÍ ESTÁ LA MAGIA */
+                z-index: 800 !important;
+                font-size: 10px !important;
+                padding: 8px 2px !important;
+                height: 35px !important;
+                vertical-align: middle !important;
             }
             
-            /* Ajuste del contenedor de la tabla para que no lo tape el header fijo */
+            /* Ajuste extra para que el contenido no se esconda */
             .job-table-container {
                 margin-top: 5px !important;
-                border-top: none !important;
+                border: none !important;
             }
-            
-            /* Ajuste para que el input de búsqueda no estorbe en admin */
-            body.admin-mode #userStickyTools {
-                margin-top: 5px !important;
-                padding: 5px !important;
-            }
-            body.admin-mode .search-input {
-                padding: 6px 10px !important;
-                font-size: 12px !important;
-            }
+        }
         }
 
     </style>
