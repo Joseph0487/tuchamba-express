@@ -18,20 +18,33 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-      body {
+       body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 15px;
+            padding-top: 10px;
+            min-height: 100vh;
+            background-color: #f0f2f5; 
+            overflow-anchor: none;  /* <--- ESTA ES LA LÍNEA MÁGICA */
+        }
+
+        /* Fondo Global Fijo */
+        #globalBackground {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
             background-image: 
                 linear-gradient(to bottom, rgba(10, 30, 60, 0.75), rgba(10, 30, 60, 0.85)),
                 url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
-            background-size: cover;       
-            background-position: center;  
-            background-attachment: fixed; 
-            padding: 15px;
-            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
         }
 
         #toast {
@@ -44,26 +57,9 @@
 
         .footer { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #ccc; font-size: 12px; line-height: 1.6; }
         
-        .footer-link { 
-            color: #fff; 
-            text-decoration: underline; 
-            font-weight: bold; 
-            cursor: pointer; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 5px; 
-        }
+        .footer-link { color: #fff; text-decoration: underline; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
         
-        .legal-note { color: #999; margin-top: 8px; font-style: italic; }
-        
-        .powered-by { 
-            margin-top: 20px; 
-            color: rgba(255,255,255,0.4); 
-            font-size: 10px; 
-            font-family: monospace; 
-            letter-spacing: 1.5px; 
-            text-transform: uppercase;
-        }
+        .powered-by { margin-top: 20px; color: rgba(255,255,255,0.4); font-size: 10px; font-family: monospace; letter-spacing: 1.5px; text-transform: uppercase; }
         .powered-by strong { color: rgba(255,255,255,0.7); font-weight: 900; }
 
         @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
@@ -71,28 +67,28 @@
         .skeleton-card { background: white; border-radius: 16px; padding: 25px; height: 200px; display: flex; flex-direction: column; gap: 15px; }
         .sk-title { width: 70%; height: 24px; } .sk-text { width: 90%; height: 16px; } .sk-tag { width: 30%; height: 20px; border-radius: 20px; }
 
-        .welcome-container { 
-            max-width: 480px; 
-            margin: 60px auto; 
-            background: rgba(255, 255, 255, 0.15); 
-            backdrop-filter: blur(8px);            
-            -webkit-backdrop-filter: blur(8px);    
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            border-top: 5px solid #ffc107; 
-            padding: 40px 25px; 
-            border-radius: 20px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
-            text-align: center; 
-        }
-        
+        .welcome-container { max-width: 480px; margin: 60px auto; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2); border-top: 5px solid #ffc107; padding: 40px 25px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); text-align: center; }
         .welcome-title { font-size: 28px; color: #ffffff; margin-bottom: 10px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
         .welcome-subtitle { color: #f0f0f0; margin-bottom: 30px; font-size: 16px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.5); line-height: 1.5; }
-        
         .btn-big-guest { background: #0a66c2; color: white; border: none; padding: 16px; width: 100%; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.2s, background 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-big-guest:hover { background: #004182; transform: translateY(-2px); }
-        
         .admin-toggle-link { display: block; margin-top: 30px; color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: underline; cursor: pointer; }
-        .admin-login-form { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); text-align: left; animation: fadeIn 0.5s; color: white; }
+        /* --- CORRECCIÓN LOGIN MODERNO (V18.1) --- */
+        .admin-login-form { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); text-align: left; animation: fadeIn 0.5s; }
+        .admin-login-form label { display: block; color: white; margin-bottom: 8px; font-weight: bold; font-size: 14px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .admin-login-form input { 
+            width: 100%; 
+            padding: 12px 15px; 
+            margin-bottom: 15px; 
+            border-radius: 10px; 
+            border: none; 
+            font-size: 16px; 
+            background: rgba(255,255,255,0.95) !important; 
+            color: #333; 
+            outline: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .admin-login-form input:focus { transform: scale(1.02); transition: 0.2s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .container { max-width: 1250px; margin: 0 auto; }
@@ -102,96 +98,76 @@
             padding: 12px 15px; 
             border-radius: 12px; 
             margin-bottom: 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-wrap: wrap; 
-            gap: 10px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+            display: flex; justify-content: space-between; align-items: center; 
+            flex-wrap: wrap; gap: 10px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            z-index: 1100; 
         }
-        .header h1 { 
-            font-size: 20px; 
-            color: #333; 
-            font-weight: 800; 
-            margin: 0;
-            line-height: 1.2;
-        }
-        .header-buttons {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
+        
+        /* Sticky solo para Admin en el Header */
+        body.admin-mode .header { position: sticky; top: 0; }
 
-        #recruiterBanner { 
-            background: #e3f2fd !important; 
-            color: #0d47a1 !important; 
-            padding: 10px 15px; 
-            border-radius: 8px; 
-            margin-top: 30px; 
-            margin-bottom: 10px; 
-            font-size: 13px; 
-            display: flex !important; 
-            align-items: center; 
-            justify-content: center;
-            gap: 10px; 
-            border: 1px solid #bbdefb; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            text-align: center;
-        }
+        .header h1 { font-size: 20px; color: #333; font-weight: 800; margin: 0; line-height: 1.2; }
+        .header-buttons { display: flex; gap: 8px; align-items: center; }
+
+        #recruiterBanner { background: #e3f2fd !important; color: #0d47a1 !important; padding: 10px 15px; border-radius: 8px; margin-top: 30px; margin-bottom: 10px; font-size: 13px; display: flex !important; align-items: center; justify-content: center; gap: 10px; border: 1px solid #bbdefb; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
         #recruiterBanner:hover { background: #bbdefb !important; }
 
-        .search-container {
-            width: 100%;
-            margin-bottom: 10px;
-            position: relative;
+        /* --- V18.2 MEJORA DE DISEÑO DE BÚSQUEDA (Estilo App Moderna) --- */
+        #userStickyTools {
+            position: sticky;
+            top: 10px; 
+            z-index: 990; 
+            margin-bottom: 15px;
+            
+            /* Nuevo Look Flotante */
+            background: white;
+            border-radius: 16px;
+            padding: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1); /* Sombra suave */
+            border: 1px solid rgba(255,255,255,0.2);
         }
+        
+        /* --- FIX V18.2: Descongelar búsqueda en modo Admin/Reclutador --- */
+        body.admin-mode #userStickyTools {
+            position: static !important; /* Deja de ser sticky */
+            margin-top: 10px;
+            box-shadow: none; /* Se integra más plano en modo trabajo */
+            background: rgba(255,255,255,0.9);
+        }
+
+        .search-container { width: 100%; position: relative; margin-bottom: 8px; }
+        
+        /* Input más moderno */
         .search-input {
             width: 100%;
             padding: 12px 40px 12px 15px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
+            border-radius: 10px;
+            border: 1px solid #eee;
             font-size: 15px;
             outline: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            transition: border 0.2s;
+            background: #f9f9f9; /* Gris muy tenue */
+            transition: all 0.2s;
         }
-        .search-input:focus { border-color: #0a66c2; }
+        .search-input:focus { border-color: #0a66c2; background: #fff; box-shadow: 0 0 0 2px rgba(10,102,194,0.1); }
         
-        .search-clear-btn {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #ddd;
-            color: #666;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .search-clear-btn:hover { background: #ccc; }
+        .search-clear-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: #ddd; color: #666; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
 
         .filter-container { 
-            background: white; 
-            padding: 10px; 
-            border-radius: 12px; 
-            margin-bottom: 15px; 
-            display: flex; 
-            gap: 10px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
-            align-items: center; 
+            display: flex; gap: 8px; align-items: center; 
+            padding: 0; /* Quitamos padding extra */
+            background: transparent; 
+            box-shadow: none; /* Quitamos sombra vieja */
         }
         
-        .filter-icon-box { display: flex; align-items: center; justify-content: center; background: #f0f2f5; padding: 10px; border-radius: 8px; border: 1px solid #ddd; height: 42px; width: 42px; flex-shrink: 0; }
-        .filter-select { flex: 1; min-width: 0; padding: 0 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; outline: none; height: 42px; }
+        .filter-icon-box { display: flex; align-items: center; justify-content: center; background: #f0f2f5; padding: 0; border-radius: 10px; border: 1px solid #eee; height: 42px; width: 42px; flex-shrink: 0; }
+        .filter-select { 
+            flex: 1; min-width: 0; padding: 0 12px; 
+            border: 1px solid #eee; border-radius: 10px; 
+            font-size: 14px; background: #f9f9f9; outline: none; height: 42px; 
+            cursor: pointer;
+        }
+        .filter-select:focus { background: white; border-color: #0a66c2; }
 
         #mobileFilterToggle { display: none; } 
 
@@ -203,383 +179,424 @@
         .danger-section { background: #ffebee; padding: 15px; border-radius: 8px; border: 1px solid #ef9a9a; margin-top: 25px; }
         .danger-btn { background: #d32f2f; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
 
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-            margin-top: 30px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
-        .page-btn {
-            background: white;
-            border: 1px solid #ddd;
-            color: #0a66c2;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .page-btn:hover {
-            background: #f0f2f5;
-            border-color: #0a66c2;
-        }
-        .page-btn.active {
-            background: #0a66c2;
-            color: white;
-            border-color: #0a66c2;
-        }
-        .page-btn:disabled {
-            background: #f9f9f9;
-            color: #ccc;
-            cursor: not-allowed;
-            border-color: #eee;
-        }
-        .page-info {
-            width: 100%;
-            text-align: center;
-            font-size: 13px;
-            color: #666;
-            margin-top: 10px;
-        }
+        .pagination-container { display: flex; justify-content: center; align-items: center; gap: 5px; margin-top: 30px; margin-bottom: 40px; flex-wrap: wrap; }
+        .page-btn { background: white; border: 1px solid #ddd; color: #0a66c2; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .page-btn:hover { background: #f0f2f5; border-color: #0a66c2; }
+        .page-btn.active { background: #0a66c2; color: white; border-color: #0a66c2; }
+        .page-btn:disabled { background: #f9f9f9; color: #ccc; cursor: not-allowed; border-color: #eee; }
+        .page-info { width: 100%; text-align: center; font-size: 13px; color: #666; margin-top: 10px; }
 
         .sticky-footer { position: sticky; bottom: 0; background: white; padding: 15px 20px 20px; margin: 20px -30px -30px; border-top: 1px solid #eee; text-align: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100; }
-        
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            15% { transform: scale(1.05); }
-            30% { transform: scale(1); }
-            100% { transform: scale(1); }
-        }
-
-        /* V17.9.2: Botón Compacto CON ICONOS */
-        .whatsapp-btn-large { 
-            display: flex; align-items: center; justify-content: center; width: 100%; 
-            background-color: #25D366; color: white; text-decoration: none; 
-            padding: 12px 15px; 
-            border-radius: 12px; font-weight: bold; 
-            font-size: 14px; /* Letra un poco más pequeña para que quepan los iconos */
-            box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); 
-            border: none; cursor: pointer; 
-            animation: heartbeat 2s infinite ease-in-out;
-            white-space: nowrap; /* Fuerza una sola línea */
-        }
+        @keyframes heartbeat { 0% { transform: scale(1); } 15% { transform: scale(1.05); } 30% { transform: scale(1); } 100% { transform: scale(1); } }
+        .whatsapp-btn-large { display: flex; align-items: center; justify-content: center; width: 100%; background-color: #25D366; color: white; text-decoration: none; padding: 12px 15px; border-radius: 12px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); border: none; cursor: pointer; animation: heartbeat 2s infinite ease-in-out; white-space: nowrap; }
         .whatsapp-btn-large:active { transform: scale(0.98); animation: none; }
         .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; opacity: 0.7; animation: none; }
 
         .share-btn { background: #25D366; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
-        .admin-controls-wrapper { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        
+        #adminControls {
+            z-index: 1001;
+            background: rgba(240, 242, 245, 0.95);
+            backdrop-filter: blur(5px);
+            padding-top: 10px; padding-bottom: 10px; margin-top: 0 !important; margin-bottom: 0px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        /* CORRECCIÓN: Botones Admin Sticky (Te siguen al bajar) */
+        body.admin-mode #adminControls { 
+            position: sticky; 
+            top: 60px; /* Ajuste para quedar debajo de la barra blanca */
+            z-index: 900; /* Menor que el header (1100) pero visible */
+        }
+
+        .admin-controls-wrapper { display: flex; gap: 10px; margin-bottom: 0px; flex-wrap: wrap; }
         .metrics-card { background: white; color: #333; padding: 10px 20px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; font-size: 14px; }
         .metric-val { color: #0a66c2; font-weight: 800; margin-left: 4px; margin-right: 12px; }
         .admin-mode-indicator { background: #ffe0b2; color: #e65100; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ffcc80; }
 
-        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-        
+        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px; margin-top: 10px; }
         .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden; }
         .job-card:hover { transform: translateY(-4px); }
-        .job-card.hidden { display: none; }
-
-        .badge-featured {
-            position: absolute;
-            top: 15px;
-            right: 40px;
-            background: linear-gradient(135deg, #6200ea 0%, #3700b3 100%);
-            color: white; 
-            padding: 5px 12px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            box-shadow: 0 4px 8px rgba(98, 0, 234, 0.3);
-            z-index: 4;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            border: none;
-            letter-spacing: 0.5px;
-        }
-
-        .verified-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #1da1f2;
-            color: white;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            font-size: 10px;
-            margin-left: 6px;
-            vertical-align: middle;
-        }
-
+        .badge-featured { position: absolute; top: 15px; right: 40px; background: linear-gradient(135deg, #6200ea 0%, #3700b3 100%); color: white; padding: 5px 12px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; box-shadow: 0 4px 8px rgba(98, 0, 234, 0.3); z-index: 4; display: flex; align-items: center; gap: 5px; border: none; letter-spacing: 0.5px; }
+        .verified-badge { display: inline-flex; align-items: center; justify-content: center; background-color: #1da1f2; color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; margin-left: 6px; vertical-align: middle; }
         .card-header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; margin-right: 35px; }
         .card-header-date { font-size: 0.75rem; color: #888; background: #f5f5f5; padding: 3px 8px; border-radius: 4px; display: inline-block; margin-bottom: 12px; }
-        
         .badge-vigente { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
         .badge-closed { background: #ffebee; color: #c62828; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
-        
         .badge-new { background: #fff3e0; color: #e65100; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; margin-left: 5px; border: 1px solid #ffcc80; }
-
         .job-title { font-size: 1.2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; line-height: 1.3; }
         .company-name { font-size: 0.9rem; color: #0a66c2; font-weight: 600; display: flex; align-items: center; }
         .location { font-size: 0.9rem; color: #555; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
-        
         .salary-text { color: #d32f2f; font-weight: 800; font-size: 1.3rem; margin-top: 5px; }
-
         .company-logo { width: 48px; height: 48px; background: linear-gradient(135deg, #0a66c2 0%, #004182 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; flex-shrink: 0; }
-
         .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
         .tag { background: #f3f2ef; color: #444; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-
         .more-btn { position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 24px; color: #333; cursor: pointer; width: 30px; height: 30px; z-index: 5; font-weight: 900; }
-        
         .admin-actions { display: none; position: absolute; top: 45px; right: 15px; background: white; border: 1px solid #eee; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 20; }
         .admin-actions.active { display: block; }
         .admin-action { padding: 10px 20px; width: 100%; text-align: left; border: none; background: none; cursor: pointer; }
         .admin-action:hover { background: #f9f9f9; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; padding: 20px; backdrop-filter: blur(4px); }
+        /* CORRECCIÓN: Modal siempre hasta el frente (Nivel 3000) */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(0,0,0,0.6); 
+            z-index: 3000 !important; /* ¡FUERZA BRUTA! Para que nada lo tape */
+            padding: 20px; 
+            backdrop-filter: blur(4px); 
+        }
         .modal.active { display: flex; align-items: center; justify-content: center; }
-        
-        /* V17.9 FIX: overflow-x hidden para evitar scroll horizontal en PC */
-        .modal-content { 
-            background: white; 
-            border-radius: 16px; 
-            max-width: 650px; 
-            width: 100%; 
-            padding: 25px; 
-            position: relative; 
-            max-height: 90vh; 
-            overflow-y: auto; 
-            overflow-x: hidden; 
-            padding-bottom: 0; 
-        }
+        .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; overflow-x: hidden; padding-bottom: 0; }
         .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
-        
         .job-details { display: grid; gap: 15px; margin-bottom: 25px; margin-top: 15px; }
-        
-        /* V17.9: Ajuste palabra larga y apilado vertical */
-        .detail-item { 
-            font-size: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: flex-start; 
-            gap: 4px;
-            margin-bottom: 10px;
-            line-height: 1.4;
-            word-break: break-word; /* Evita que direcciones largas rompan el diseño */
-        }
-
-        .modal-share-btn { 
-            background: #455a64; 
-            color: white; 
-            border: none; 
-            padding: 8px 15px; 
-            border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 6px; 
-            flex-shrink: 0; 
-            white-space: nowrap; 
-        }
-
+        .detail-item { font-size: 15px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 10px; line-height: 1.4; word-break: break-word; }
+        .modal-share-btn { background: #455a64; color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; white-space: nowrap; }
         .view-count-badge { background: #e3f2fd; color: #0277bd; font-size: 12px; padding: 6px 14px; border-radius: 50px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; border: 1px solid #bbdefb; }
         .agency-badge { background: #fff3e0; color: #ef6c00; font-size: 12px; padding: 6px 14px; border-radius: 50px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; border: 1px solid #ffe0b2; }
-
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
-        .location-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        
-        .phone-group { display: flex; gap: 8px; align-items: center; }
-        .phone-select { width: auto; min-width: 100px; max-width: 120px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #f0f2f5; cursor:pointer; }
-        
-        @media (max-width: 500px) { .location-grid { grid-template-columns: 1fr; } }
-        
         .section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px; margin-top: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px; display: block; }
         .item-list li { background: #f9f9f9; padding: 10px 14px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; font-size: 15px; }
-        
         .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .recruiters-table th, .recruiters-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
         .recruiters-table th { background: #f9fafb; color: #666; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
         .recruiters-table tr:hover { background-color: #f9f9f9; }
-
         .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
+
+        /* ESTILOS PARA LA TABLA DE GESTIÓN (RECLUTADOR) */
+        .job-table-container { overflow-x: auto; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .management-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        
+        /* --- FIX V18.2: Sticky Títulos Tabla Corregido --- */
+        .management-table th {
+            background: #0a66c2; color: white; padding: 15px; text-align: left; font-weight: 600; 
+            z-index: 950;
+        }
+        
+        /* CORRECCIÓN BARRA AZUL + CURSOR DE ORDENAR (V18.1) */
+        body.admin-mode .management-table th {
+            position: relative; 
+            top: 0;
+            z-index: 1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            cursor: pointer; /* Manita para indicar clic */
+            user-select: none; /* Evita que se seleccione el texto al dar clic rápido */
+            transition: background 0.2s;
+        }
+        body.admin-mode .management-table th:hover {
+            background-color: #004182; /* Color un poco más oscuro al pasar el mouse */
+        }
+        /* Ocultar botones delicados en modo Reclutador */
+        body.recruiter-view .admin-only { display: none !important; }
+
+        .management-table td { padding: 8px 10px; border-bottom: 1px solid #eee; color: #333; }
+        .management-table tr:hover { background: #f5f5f5; }
+        
+        .action-icon-btn { background: none; border: none; cursor: pointer; font-size: 16px; margin-right: 5px; padding: 5px; border-radius: 4px; }
+        .action-icon-btn:hover { background: #e3f2fd; }
+        .management-table td:last-child { white-space: nowrap; display: flex; gap: 5px; align-items: center; }
 
         @media (max-width: 768px) {
             body { padding: 10px; }
-            .header { 
-                flex-direction: row; 
-                justify-content: space-between; 
-                align-items: center;
-                gap: 5px;
-            }
-            .header h1 {
-                font-size: 17px; 
-                max-width: 50%; 
-                line-height: 1.1;
-            }
-            .filter-container { 
-                display: grid; 
-                grid-template-columns: auto 1fr 1fr; 
-                gap: 8px;
-                overflow-x: visible; 
-            }
+            .header { flex-direction: row; justify-content: space-between; align-items: center; gap: 5px; }
+            .header h1 { font-size: 17px; max-width: 50%; line-height: 1.1; }
+            
+            body.admin-mode #adminControls { top: 60px; }
+            /* Ajuste de Tabla en Móvil */
+            body.admin-mode .management-table th { top: 110px; } 
+
+            .filter-container { display: flex; overflow-x: auto; }
             .filter-icon-box { height: 40px; width: 40px; }
             .filter-select { height: 40px; font-size: 13px; padding: 5px; }
-            
             .admin-controls-wrapper button { flex: 1; min-width: 45%; }
         }
 
-        #flyerTemplate {
-            width: 1080px;
-            min-height: 1080px;
-            height: auto;
-            position: fixed;
-            top: 0;
-            left: -9999px;
-            z-index: -1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center; 
-            color: white;
-            font-family: 'Arial Black', 'Arial', sans-serif;
-            text-align: center;
-            padding: 80px 60px;
-            box-sizing: border-box;
-            background: #0a192d; 
-        }
-        
-        .flyer-badge-top {
-            background-color: #FF9800;
-            color: white;
-            font-size: 55px;
-            padding: 15px 80px;
-            border-radius: 10px;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            font-weight: 900;
-            margin-bottom: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            border: 4px solid #FFF;
-            transform: skew(-10deg);
-            z-index: 2;
-            position: relative;
-        }
-
-        .flyer-title { 
-            font-size: 90px; 
-            font-weight: 900; 
-            line-height: 1.1; 
-            margin-bottom: 20px; 
-            text-shadow: 0 5px 20px rgba(0,0,0,0.9); 
-            max-width: 95%;
-            text-transform: uppercase;
-            color: #FFFFFF;
-            z-index: 2;
-            position: relative;
-        }
-        
-        .flyer-company {
-            font-size: 35px;
-            color: #BBDEFB;
-            font-family: 'Segoe UI', sans-serif;
-            font-weight: 600;
-            margin-bottom: 40px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            z-index: 2;
-            position: relative;
-        }
-        
-        .flyer-salary { 
-            font-size: 120px; 
-            color: #C6FF00; 
-            font-weight: 900; 
-            margin-bottom: 50px; 
-            text-shadow: 0 5px 20px rgba(0,0,0,0.9); 
-            z-index: 2;
-            position: relative;
-        }
-        
-        .flyer-benefits-container {
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 30px;
-            padding: 40px;
-            width: 90%;
-            margin-bottom: 60px;
-            backdrop-filter: blur(10px);
-            z-index: 2;
-            position: relative;
-        }
-        
-        .flyer-benefits-title {
-            font-size: 40px;
-            color: #FFD740;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            border-bottom: 2px solid rgba(255,255,255,0.2);
-            padding-bottom: 15px;
-            display: inline-block;
-        }
-        
-        .flyer-benefits-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            font-size: 40px;
-            font-family: 'Segoe UI', sans-serif;
-            font-weight: 600;
-            color: white;
-            text-align: left;
-            display: inline-block;
-        }
+        #flyerTemplate { width: 1080px; min-height: 1080px; height: auto; position: fixed; top: 0; left: -9999px; z-index: -1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: 'Arial Black', 'Arial', sans-serif; text-align: center; padding: 80px 60px; box-sizing: border-box; background: #0a192d; }
+        .flyer-badge-top { background-color: #FF9800; color: white; font-size: 55px; padding: 15px 80px; border-radius: 10px; text-transform: uppercase; letter-spacing: 4px; font-weight: 900; margin-bottom: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 4px solid #FFF; transform: skew(-10deg); z-index: 2; position: relative; }
+        .flyer-title { font-size: 90px; font-weight: 900; line-height: 1.1; margin-bottom: 20px; text-shadow: 0 5px 20px rgba(0,0,0,0.9); max-width: 95%; text-transform: uppercase; color: #FFFFFF; z-index: 2; position: relative; }
+        .flyer-company { font-size: 35px; color: #BBDEFB; font-family: 'Segoe UI', sans-serif; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; z-index: 2; position: relative; }
+        .flyer-salary { font-size: 100px; color: #C6FF00; font-weight: 900; margin-bottom: 50px; text-shadow: 0 5px 20px rgba(0,0,0,0.9); z-index: 2; position: relative; }
+        .flyer-benefits-container { background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 30px; padding: 40px; width: 90%; margin-bottom: 60px; backdrop-filter: blur(10px); z-index: 2; position: relative; }
+        .flyer-benefits-title { font-size: 40px; color: #FFD740; margin-bottom: 30px; text-transform: uppercase; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 15px; display: inline-block; }
+        .flyer-benefits-list { list-style: none; padding: 0; margin: 0; font-size: 55px; font-family: 'Segoe UI', sans-serif; font-weight: 600; color: white; text-align: left; display: inline-block; }
         .flyer-benefits-list li { margin-bottom: 15px; }
-
-        .flyer-cta-box { 
-            background: white; 
-            color: #D50000;
-            padding: 40px 60px; 
-            border-radius: 20px; 
-            font-size: 42px; 
-            font-weight: 900; 
-            box-shadow: 0 15px 50px rgba(0,0,0,0.8); 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            border-bottom: 15px solid #b71c1c; 
-            width: 100%;
-            text-transform: uppercase;
-            z-index: 2;
-            position: relative;
+        .flyer-cta-box { background: white; color: #D50000; padding: 40px 60px; border-radius: 20px; font-size: 42px; font-weight: 900; box-shadow: 0 15px 50px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; gap: 20px; border-bottom: 15px solid #b71c1c; width: 100%; text-transform: uppercase; z-index: 2; position: relative; }
+        #flyerQr { margin-left: 20px; border: 2px solid #ddd; padding: 5px; border-radius: 10px; background: white; }
+        #flyerQr img { display: block; }
+        /* --- ESTILOS MODERNOS PARA MODALES (V18.3) --- */
+        .modal-header-pro {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;
         }
+        .modal-header-pro h2 { margin: 0; font-size: 1.4rem; color: #1a1a1a; display: flex; align-items: center; gap: 10px; }
+        
+        .modern-form-box {
+            background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 20px; margin-bottom: 20px;
+        }
+        
+        /* Grid para ahorrar espacio (2 columnas) */
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        /* Tabla Pro */
+        .table-container-pro {
+            border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; margin-top: 10px;
+        }
+        .recruiters-table { width: 100%; border-collapse: collapse; }
+        .recruiters-table thead { background: #f1f3f5; }
+        .recruiters-table th { color: #495057; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; padding: 12px 15px; letter-spacing: 0.5px; }
+        .recruiters-table td { padding: 12px 15px; border-bottom: 1px solid #f1f3f5; color: #333; font-size: 0.9rem; vertical-align: middle; }
+        .recruiters-table tr:hover { background: #fffde7; }
+
+        /* Botones de acción pequeños */
+        .btn-icon-small { border: none; background: transparent; cursor: pointer; font-size: 16px; padding: 5px; border-radius: 4px; transition: background 0.2s; }
+        .btn-icon-small:hover { background: #eee; }
+        .copy-badge { background: #e3f2fd; color: #1565c0; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; border: none; }
+        .copy-badge:hover { background: #bbdefb; }
+
+        /* Zona de Peligro Bonita */
+        .danger-zone-pro {
+            background: #fff5f5; border: 1px solid #ffc9c9; border-radius: 12px; padding: 20px;
+            position: relative; overflow: hidden; margin-top: 10px;
+        }
+        .danger-zone-pro::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #ff6b6b; }
+        .danger-title { color: #c92a2a; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 1rem; }
+        
+        @media (max-width: 600px) { .form-grid-2 { grid-template-columns: 1fr; } }
+        /* --- ESTILOS V18.6 (Separación Total: App vs Login) --- */
+
+        /* GRUPO 1: DENTRO DE LA APP (Compactos y Modernos) */
+        /* Excluimos explícitamente el #adminForm para que no lo toque */
+        :not(#adminForm) > .form-group input, 
+        :not(#adminForm) > .form-group textarea, 
+        :not(#adminForm) > .form-group select { 
+            width: 100% !important; 
+            padding: 8px 12px !important; /* Compactos */
+            background-color: #f0f2f5 !important; /* Gris App */
+            border: 1px solid transparent !important; 
+            border-radius: 8px !important;
+            font-size: 14px !important; 
+            color: #1c1e21 !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease !important;
+            box-shadow: none !important;
+            min-height: 38px !important;
+        }
+        
+        /* Efecto Focus App */
+        :not(#adminForm) > .form-group input:focus, 
+        :not(#adminForm) > .form-group select:focus {
+            background-color: #ffffff !important;
+            border: 1px solid #0a66c2 !important;
+            box-shadow: 0 2px 6px rgba(10, 102, 194, 0.15) !important;
+        }
+
+        /* Etiquetas App (Gris oscuro) */
+        :not(#adminForm) > .form-group label {
+            display: block !important;
+            margin-bottom: 4px !important;
+            color: #444 !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+        }
+
+        /* GRUPO 2: LOGIN (Rescatando el estilo original) */
+        #adminForm .form-group input {
+            background-color: #ffffff !important; /* BLANCO PURO */
+            color: #000000 !important; /* Texto NEGRO */
+            border: none !important;
+            padding: 12px 15px !important; /* Grandes y cómodos */
+            border-radius: 10px !important;
+            font-size: 16px !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+            margin-bottom: 15px !important;
+        }
+
+        /* Etiquetas del Login (BLANCAS para que se vean en el fondo oscuro) */
+        #adminForm .form-group label {
+            color: #ffffff !important; 
+            font-size: 14px !important;
+            font-weight: bold !important;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8) !important;
+            margin-bottom: 8px !important;
+            text-transform: none !important; /* Normal, no mayúsculas */
+        }
+
+        /* Ajustes técnicos globales */
+        .phone-group input { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+        .phone-select { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; background-color: #e4e6eb !important; border-right: 1px solid #ccc !important; padding: 5px !important; }
+
+        /* Efecto al dar clic (Se ilumina) */
+        .form-group input:focus, 
+        .form-group textarea:focus, 
+        .form-group select:focus { 
+            background-color: #ffffff !important;
+            border: 1px solid #0a66c2 !important; /* Borde azul al escribir */
+            box-shadow: 0 4px 15px rgba(10, 102, 194, 0.15) !important;
+            outline: none !important;
+        }
+
+        /* Etiquetas (Títulos de los campos) */
+        .form-group label {
+            display: block !important;
+            margin-bottom: 8px !important;
+            margin-left: 5px !important;
+            font-weight: 700 !important;
+            color: #444 !important;
+            font-size: 12px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+        }
+        
+        /* Ajuste especial para el grupo de teléfono (que no se rompa) */
+        .phone-group input {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+        }
+        .phone-select {
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            background-color: #e4e6eb !important;
+            border-right: 1px solid #ccc !important;
+        }
+        /* --- ESTILO BARRA DE BÚSQUEDA DE ALTO CONTRASTE (V18.7) --- */
+        
+        /* 1. La barra contenedora (Fondo Gris) */
+        #userStickyTools, body.admin-mode #userStickyTools {
+            background-color: #e4e6eb !important; /* Gris sólido para el fondo */
+            border: 1px solid rgba(0,0,0,0.05) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important; /* Sombra suave para que flote */
+        }
+
+        /* 2. Los campos de búsqueda y filtros (Blancos Brillantes) */
+        .search-input, 
+        .filter-select, 
+        .filter-icon-box {
+            background-color: #ffffff !important; /* BLANCO PURO */
+            border: 1px solid transparent !important; /* Sin bordes grises */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important; /* Pequeña sombra 3D */
+            color: #333 !important;
+        }
+
+        /* 3. Efecto al hacer clic en ellos (Resplandor Azul) */
+        .search-input:focus, 
+        .filter-select:focus {
+            background-color: #ffffff !important;
+            box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.2) !important; /* Anillo azul suave */
+            border-color: #0a66c2 !important;
+        }
+
+        /* Ajuste para el icono del embudo */
+        .filter-icon-box svg {
+            stroke: #555 !important;
+        }
+        /* --- FICHAS COMPACTAS (Optimización de Espacio V18.8) --- */
+        
+        /* 1. Reducir el "aire" general de la tarjeta */
+        .job-card {
+            padding: 14px !important; /* Antes era 20px */
+            border-radius: 12px !important;
+        }
+
+        /* 2. Pegar más los elementos internos */
+        .card-header-top { margin-bottom: 4px !important; } /* Menos espacio arriba */
+        .card-header-date { margin-bottom: 8px !important; font-size: 0.7rem !important; }
+        
+        /* El bloque del Logo y Título */
+        .job-card > div[style*="display: flex"] {
+            margin-top: 5px !important; /* Pegarlo a la fecha */
+            margin-bottom: 8px !important; /* Pegarlo a la ubicación */
+            gap: 10px !important; /* Acercar logo al texto */
+        }
+        
+        /* Ajustar márgenes de textos clave */
+        .job-title { margin-bottom: 0px !important; line-height: 1.2 !important; }
+        .company-name { margin-bottom: 2px !important; }
+        .location { margin-top: 4px !important; }
+        .salary-text { margin-top: 4px !important; }
+
+        /* Las etiquetas de abajo (Tags) */
+        .tags { margin-top: 10px !important; gap: 5px !important; }
+        .tag { padding: 3px 8px !important; font-size: 11px !important; }
+
+        /* Hacer los botones de "Destacado" y "Vigente" más delgados */
+        .badge-featured, .badge-vigente, .badge-closed, .badge-new {
+            padding: 3px 8px !important;
+            top: 12px !important; /* Subirlos un poquito */
+        }
+        .more-btn { top: 10px !important; right: 10px !important; } /* Ajustar botón de menú */
+        /* --- CORRECCIÓN FINAL LADAS (V18.9) --- */
+        .phone-group {
+            display: flex !important; /* Obliga a ponerse en fila */
+            align-items: stretch !important;
+            width: 100% !important;
+            gap: 0 !important; /* Pegaditos */
+        }
+        
+        .phone-select {
+            width: auto !important; /* Que solo ocupe lo necesario */
+            flex: 0 0 auto !important; /* No permitir que se estire */
+            min-width: 100px !important; /* Ancho fijo ideal para "🇲🇽 +52" */
+            padding: 8px 5px !important;
+            text-align: center !important;
+            border-right: 1px solid #ccc !important;
+            background-color: #e4e6eb !important;
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            cursor: pointer !important;
+        }
+
+        .phone-group input {
+            flex: 1 !important; /* El input toma TODO el espacio sobrante */
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+            border-left: none !important;
+        }
+        /* --- CORRECCIÓN FINAL MAESTRA LADAS (V18.11) --- */
+        
+        /* 1. Forzamos al contenedor a ser flexible horizontalmente */
+        .form-group .phone-group {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            width: 100% !important;
+        }
+
+        /* 2. AL SELECTOR DE PAÍS: Lo obligamos a ser pequeño */
+        .form-group .phone-group select.phone-select {
+            width: 110px !important; /* Ancho fijo pequeño */
+            min-width: 110px !important;
+            max-width: 110px !important;
+            flex: 0 0 110px !important; /* No te estires ni te encojas */
+            
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            border-right: 1px solid #ccc !important;
+            margin: 0 !important;
+        }
+
+        /* 3. AL CAMPO DE NÚMERO: Le decimos que ocupe TODO el resto */
+        .form-group .phone-group input {
+            width: auto !important; 
+            flex-grow: 1 !important; /* Crece para llenar el hueco */
+            min-width: 0 !important;
+            
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+            margin: 0 !important;
+        }
+
     </style>
 </head>
 <body>
 
-    <div id="flyerTemplate">
-        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" 
-             style="position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; z-index: 0;" 
-             crossorigin="anonymous" 
-             alt="Background">
-        
-        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: rgba(10, 25, 45, 0.85); z-index: 1;"></div>
+    <div id="globalBackground"></div>
 
+    <div id="flyerTemplate">
+        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center center / cover no-repeat; opacity: 0.1; z-index: 0;"></div>
+        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: rgba(10, 25, 45, 0.85); z-index: 1;"></div>
         <div class="flyer-badge-top">¡SE SOLICITA!</div>
-        
+        <div class="flyer-company">RECONOCIDA EMPRESA BUSCA:</div>
         <div id="flyerTitle" class="flyer-title">CHOFER 3.5 TON</div>
-        <div id="flyerCompany" class="flyer-company">EMPRESA CONFIDENCIAL</div>
-        
         <div id="flyerSalary" class="flyer-salary">$12,000</div>
-        
         <div class="flyer-benefits-container">
             <div class="flyer-benefits-title">OFRECEMOS:</div>
             <ul id="flyerBenefitsList" class="flyer-benefits-list">
@@ -588,9 +605,9 @@
                 <li>✅ Contratación Inmediata</li>
             </ul>
         </div>
-
         <div class="flyer-cta-box">
             🔗 DALE CLIC AL LINK DE LA PUBLICACIÓN PARA AGENDAR
+            <div id="flyerQr"></div>
         </div>
     </div>
 
@@ -604,7 +621,7 @@
         <button class="btn-big-guest" onclick="enterAsGuest()">🔍 Ver Vacantes Disponibles</button>
         <div class="admin-toggle-link" onclick="toggleAdminLogin()">¿Eres Reclutador? Ingresa aquí</div>
         <div id="adminForm" class="admin-login-form">
-            <div class="form-group"><label style="color:white;">Correo de Acceso</label><input type="email" id="adminEmail" placeholder="admin@empresa.com" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
+            <div class="form-group"><label style="color:white;">Usuario / Correo</label><input type="text" id="adminEmail" placeholder="Usuario o Correo" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
             <div class="form-group"><label style="color:white;">Contraseña</label><input type="password" id="adminPassword" placeholder="******" autocomplete="off" style="background:rgba(255,255,255,0.9);"></div>
             <button class="btn-primary" style="width: 100%;" onclick="login()">Entrar al Panel</button>
         </div>
@@ -618,49 +635,53 @@
                 <div class="header-buttons">
                     <button class="share-btn" onclick="shareApp()">📤 Compartir</button>
                     <span id="modeIndicator"></span>
+                    <button id="viewToggleBtn" class="tool-btn" style="display:none; background:#00796b;" onclick="toggleViewMode()">👁️ Cambiar Vista</button>
                     <button class="admin-btn" style="background: #333;" onclick="logout()">Salir</button>
                 </div>
             </div>
 
             <div id="adminControls" style="display: none;">
                 <div class="admin-controls-wrapper">
-                    <div class="metrics-card">
-                        🌎 <span class="metric-val" id="totalVisits">...</span>
-                        📅 Mes: <span class="metric-val" id="monthlyVisits">...</span>
+                <div class="metrics-card">
+                    🌎 <span class="metric-val" id="totalVisits">...</span>
+                    📅 Mes: <span class="metric-val" id="monthlyVisits">...</span>
+                </div>
+                <button class="add-job-btn admin-only" onclick="openJobForm()">➕ Nueva</button>
+                
+                <button class="tool-btn" onclick="exportToExcel()">📦 Respaldo</button> 
+                <button class="tool-btn metrics-btn" onclick="openMetricsModal()">📊 Métricas</button>
+                
+                <button class="tool-btn team-btn admin-only" onclick="openTeamModal()">👥 Equipo</button>
+                <button class="tool-btn settings-btn admin-only" onclick="openSettingsModal()">⚙️ Ajustes</button>
+                <button class="tool-btn admin-only" onclick="document.getElementById('excelFile').click()">📤 Cargar</button>
+                
+                <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
+                <button class="tool-btn" onclick="downloadTemplate()">📋 Plantilla</button>
+            </div>
+            </div>
+
+            <div id="userStickyTools">
+                <button id="mobileFilterToggle" onclick="toggleMobileFilters()">
+                    🔍 Filtros de Búsqueda <span>▼</span>
+                </button>
+
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar vacante, empresa, palabras clave..." onkeyup="filterJobs()" autocomplete="off">
+                    <button id="clearSearchBtn" class="search-clear-btn" onclick="clearSearch()">✕</button>
+                </div>
+
+                <div class="filter-container" id="filterContainer">
+                    <div class="filter-icon-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                     </div>
-                    <button class="add-job-btn" onclick="openJobForm()">➕ Nueva</button>
-                    <button class="tool-btn" onclick="exportToExcel()">📦 Respaldo</button> 
-                    <button class="tool-btn metrics-btn" onclick="openMetricsModal()">📊 Métricas</button>
-                    <button class="tool-btn team-btn" onclick="openTeamModal()">👥 Equipo</button>
-                    <button class="tool-btn settings-btn" onclick="openSettingsModal()">⚙️ Ajustes</button>
-                    
-                    <button class="tool-btn" onclick="document.getElementById('excelFile').click()">📤 Cargar</button>
-                    <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
-                    <button class="tool-btn" onclick="downloadTemplate()">📋 Plantilla</button>
+                    <select id="stateFilter" class="filter-select" onchange="handleStateChange()" autocomplete="off">
+                        <option value="">📍 Estado</option>
+                    </select>
+                    <select id="cityFilter" class="filter-select" onchange="filterJobs()" autocomplete="off">
+                        <option value="">🏙️ Municipio</option>
+                    </select>
                 </div>
             </div>
-
-            <button id="mobileFilterToggle" onclick="toggleMobileFilters()">
-                🔍 Filtros de Búsqueda <span>▼</span>
-            </button>
-
-            <div class="search-container">
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar vacante, empresa, palabras clave..." onkeyup="filterJobs()" autocomplete="off">
-                <button id="clearSearchBtn" class="search-clear-btn" onclick="clearSearch()">✕</button>
-            </div>
-
-            <div class="filter-container" id="filterContainer">
-                <div class="filter-icon-box">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                </div>
-                <select id="stateFilter" class="filter-select" onchange="handleStateChange()" autocomplete="off">
-                    <option value="">📍 Estado</option>
-                </select>
-                <select id="cityFilter" class="filter-select" onchange="filterJobs()" autocomplete="off">
-                    <option value="">🏙️ Municipio</option>
-                </select>
-            </div>
-
             <div class="grid-header"><div class="job-counter" id="jobCounter"></div></div>
             
             <div id="skeletonLoader" class="job-grid">
@@ -669,9 +690,25 @@
             </div>
 
             <div class="job-grid" id="jobGrid" style="display: none;"></div>
-            
-            <div id="paginationContainer" class="pagination-container" style="display:none;"></div>
 
+            <div class="job-table-container" id="jobTableContainer" style="display: none;">
+                <table class="management-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th onclick="window.handleSort('company')" title="Ordenar por Empresa">Empresa ↕️</th>
+                            <th onclick="window.handleSort('title')" title="Ordenar por Título">Título ↕️</th>
+                            <th onclick="window.handleSort('location')" title="Ordenar por Ubicación">Ubicación ↕️</th>
+                            <th onclick="window.handleSort('salary')">Salario</th>
+                            <th onclick="window.handleSort('status')" title="Ordenar por Estatus">Estatus ↕️</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobTableBody"></tbody>
+                </table>
+            </div>
+            <div id="paginationContainer" class="pagination-container" style="display:none;"></div>
+            
             <div id="recruiterBanner" onclick="contactCentralOffice()">
                 👤 Asistido por: <span id="recruiterNameDisplay">Oficina Central</span> (Clic para contacto)
             </div>
@@ -758,100 +795,84 @@
         </div>
     </div>
 
-    <div class="modal" id="metricsModal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeMetricsModal()">×</button>
-            <h2>📊 Exportar Métricas</h2>
-            <p style="margin-bottom:10px; color:#666;">Selecciona los meses que deseas incluir en el reporte:</p>
-            <div id="metricsMonthList" style="margin: 15px 0; max-height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px; background:#f9f9f9;">
-                <p style="text-align:center; color:#999;">Cargando historial...</p>
-            </div>
-            <button class="btn-primary" style="width:100%" onclick="downloadSelectedMetrics()">📥 Descargar Excel Consolidado</button>
-        </div>
-    </div>
-
+    <div class="modal" id="metricsModal"><div class="modal-content"><button class="close-btn" onclick="closeMetricsModal()">×</button><h2>📊 Exportar Métricas</h2><p style="margin-bottom:10px; color:#666;">Selecciona los meses que deseas incluir en el reporte:</p><div id="metricsMonthList" style="margin: 15px 0; max-height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px; background:#f9f9f9;"><p style="text-align:center; color:#999;">Cargando historial...</p></div><button class="btn-primary" style="width:100%" onclick="downloadSelectedMetrics()">📥 Descargar Excel Consolidado</button></div></div>
     <div class="modal" id="teamModal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeTeamModal()">×</button>
-            <h2>👥 Equipo de Reclutadores</h2>
-            <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <div class="form-group"><label>Nombre</label><input type="text" id="recName" placeholder="Ej. Juan Pérez"></div>
+            <div class="modal-header-pro">
+                <h2>👥 Gestión de Equipo</h2>
+                <button class="close-btn" style="position:static;" onclick="closeTeamModal()">×</button>
+            </div>
+            
+            <div class="modern-form-box">
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label>Nombre del Reclutador</label>
+                        <input type="text" id="recName" placeholder="Ej. Juan Pérez">
+                    </div>
+                    <div class="form-group">
+                        <label>Código Único (Link)</label>
+                        <input type="text" id="recCode" placeholder="Ej. JUAN (Sin espacios)">
+                    </div>
+                </div>
+                
                 <div class="form-group">
-                    <label>WhatsApp</label>
+                    <label>WhatsApp de Contacto</label>
                     <div class="phone-group">
-                        <select id="recPhoneCode" class="phone-select"><option value="+52">🇲🇽 +52</option><option value="+1">🇺🇸 +1</option><option value="+57">🇨🇴 +57</option></select>
+                        <select id="recPhoneCode" class="phone-select">
+                            <option value="+52">🇲🇽 +52</option>
+                            <option value="+54">🇦🇷 +54</option>
+                            <option value="+591">🇧🇴 +591</option>
+                            <option value="+55">🇧🇷 +55</option>
+                            <option value="+56">🇨🇱 +56</option>
+                            <option value="+57">🇨🇴 +57</option>
+                            <option value="+506">🇨🇷 +506</option>
+                            <option value="+53">🇨🇺 +53</option>
+                            <option value="+593">🇪🇨 +593</option>
+                            <option value="+503">🇸🇻 +503</option>
+                            <option value="+34">🇪🇸 +34</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+502">🇬🇹 +502</option>
+                            <option value="+504">🇭🇳 +504</option>
+                            <option value="+505">🇳🇮 +505</option>
+                            <option value="+507">🇵🇦 +507</option>
+                            <option value="+595">🇵🇾 +595</option>
+                            <option value="+51">🇵🇪 +51</option>
+                            <option value="+1">🇩🇴 +1</option>
+                            <option value="+598">🇺🇾 +598</option>
+                            <option value="+58">🇻🇪 +58</option>
+                        </select>
                         <input type="text" id="recPhone" placeholder="10 dígitos" style="flex:1;">
                     </div>
                 </div>
-                <div class="form-group"><label>Código Único (Link Personal)</label><input type="text" id="recCode" placeholder="Ej. JUAN"></div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-primary" style="flex:1;" id="btnSaveRecruiter" onclick="saveRecruiter()">Agregar</button>
-                    <button class="tool-btn" style="background:#666; display:none;" id="btnCancelRecruiter" onclick="resetRecruiterForm()">Cancelar Edición</button>
+
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button class="btn-primary" style="flex:1; display:flex; justify-content:center; align-items:center; gap:8px;" id="btnSaveRecruiter" onclick="saveRecruiter()">
+                        💾 Guardar Reclutador
+                    </button>
+                    <button class="tool-btn" style="background:#666; display:none;" id="btnCancelRecruiter" onclick="resetRecruiterForm()">Cancelar</button>
                 </div>
             </div>
-            <h3>Directorio</h3>
-            <div style="overflow-x: auto;">
-                <table class="recruiters-table">
-                    <thead><tr><th>Nombre</th><th>Código</th><th>Link</th><th>Acción</th></tr></thead>
-                    <tbody id="recruitersList"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 
-    <div class="modal" id="settingsModal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeSettingsModal()">×</button>
-            <h2>⚙️ Ajustes del Sistema</h2>
-            <div class="form-group">
-                <label>📞 Teléfono Oficina Central (Respaldo)</label>
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1;">
-                    <button class="btn-primary" id="btnSaveCentral" onclick="saveCentralConfig()">Guardar</button>
+            <h3 style="font-size:16px; margin-bottom:10px; color:#555;">📂 Directorio Activo</h3>
+            <div class="table-container-pro">
+                <div style="overflow-x: auto;">
+                    <table class="recruiters-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Código</th>
+                                <th style="text-align:center;">Link</th>
+                                <th style="text-align:right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recruitersList"></tbody>
+                    </table>
                 </div>
-                <p style="font-size:12px; color:#666; margin-top:5px;">Este número se usa si la vacante no tiene contacto o está mal escrito.</p>
-            </div>
-            
-            <div class="danger-section">
-                <h3 style="color:#d32f2f; margin-bottom:10px;">⚠️ Zona de Peligro (Admin)</h3>
-                <p style="font-size:13px; color:#666; margin-bottom:10px;">Acciones irreversibles protegidas por contraseña.</p>
-                <button class="danger-btn" onclick="performSafeAction('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button>
-                <button class="danger-btn" onclick="performSafeAction('deleteJobs')">🔥 Borrar TODAS las Vacantes</button>
             </div>
         </div>
     </div>
-
-    <div class="modal" id="privacyModal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closePrivacyModal()">×</button>
-            <h2>🔒 Aviso de Privacidad</h2>
-            <div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto;">
-                <p style="font-size: 12px; color: #666; margin-bottom: 15px;"><strong>Última actualización: Enero 2026</strong></p>
-                
-                <p style="margin-bottom: 15px;">En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, <strong>TuChamba Express</strong> informa:</p>
-
-                <p style="margin-bottom:5px;"><strong>1. Responsable de los datos:</strong></p>
-                <p style="margin-bottom:15px;">TuChamba Express actúa como enlace entre candidatos y empresas reclutadoras.</p>
-
-                <p style="margin-bottom:5px;"><strong>2. Datos recopilados:</strong></p>
-                <p style="margin-bottom:15px;">Podemos recopilar datos de contacto (como número telefónico) con el único fin de facilitar la comunicación para procesos de reclutamiento.</p>
-
-                <p style="margin-bottom:5px;"><strong>3. Uso de la información:</strong></p>
-                <p style="margin-bottom:5px;">Los datos proporcionados serán utilizados exclusivamente para:</p>
-                <ul style="margin-left: 20px; margin-bottom: 15px;">
-                    <li>Contactar al candidato respecto a la vacante de interés.</li>
-                    <li>Agendar entrevistas laborales.</li>
-                    <li>Procesos internos de selección.</li>
-                </ul>
-
-                <p style="margin-bottom:5px;"><strong>4. Compartir datos:</strong></p>
-                <p style="margin-bottom:15px;">Su información de contacto será compartida únicamente con la empresa o reclutador responsable de la vacante a la que usted decida postularse voluntariamente.</p>
-
-                <p style="margin-bottom:5px;"><strong>5. Examen Médico:</strong></p>
-                <p style="margin-bottom:0;">Al utilizar esta plataforma, usted reconoce que algunas empresas contratantes pueden requerir, como parte de su proceso de selección y conforme a la ley, la realización de exámenes médicos y/o pruebas de detección de sustancias.</p>
-            </div>
-        </div>
-    </div>
+    <div class="modal" id="settingsModal"><div class="modal-content"><button class="close-btn" onclick="closeSettingsModal()">×</button><h2>⚙️ Ajustes del Sistema</h2><div class="form-group"><label>📞 Teléfono Oficina Central (Respaldo)</label><div style="display:flex; gap:10px;"><input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1;"><button class="btn-primary" id="btnSaveCentral" onclick="saveCentralConfig()">Guardar</button></div><p style="font-size:12px; color:#666; margin-top:5px;">Este número se usa si la vacante no tiene contacto o está mal escrito.</p></div><div class="danger-section"><h3 style="color:#d32f2f; margin-bottom:10px;">⚠️ Zona de Peligro (Admin)</h3><p style="font-size:13px; color:#666; margin-bottom:10px;">Acciones irreversibles protegidas por contraseña.</p><button class="danger-btn" onclick="performSafeAction('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button><button class="danger-btn" onclick="performSafeAction('deleteJobs')">🔥 Borrar TODAS las Vacantes</button></div></div></div>
+    <div class="modal" id="privacyModal"><div class="modal-content"><button class="close-btn" onclick="closePrivacyModal()">×</button><h2>🔒 Aviso de Privacidad</h2><div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto;"><p style="font-size: 12px; color: #666; margin-bottom: 15px;"><strong>Última actualización: Enero 2026</strong></p><p style="margin-bottom: 15px;">En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, <strong>TuChamba Express</strong> informa:</p><p style="margin-bottom:5px;"><strong>1. Responsable de los datos:</strong></p><p style="margin-bottom:15px;">TuChamba Express actúa como enlace entre candidatos y empresas reclutadoras.</p><p style="margin-bottom:5px;"><strong>2. Datos recopilados:</strong></p><p style="margin-bottom:15px;">Podemos recopilar datos de contacto (como número telefónico) con el único fin de facilitar la comunicación para procesos de reclutamiento.</p><p style="margin-bottom:5px;"><strong>3. Uso de la información:</strong></p><p style="margin-bottom:5px;">Los datos proporcionados serán utilizados exclusivamente para:</p><ul style="margin-left: 20px; margin-bottom: 15px;"><li>Contactar al candidato respecto a la vacante de interés.</li><li>Agendar entrevistas laborales.</li><li>Procesos internos de selección.</li></ul><p style="margin-bottom:5px;"><strong>4. Compartir datos:</strong></p><p style="margin-bottom:15px;">Su información de contacto será compartida únicamente con la empresa o reclutador responsable de la vacante a la que usted decida postularse voluntariamente.</p><p style="margin-bottom:5px;"><strong>5. Examen Médico:</strong></p><p style="margin-bottom:0;">Al utilizar esta plataforma, usted reconoce que algunas empresas contratantes pueden requerir, como parte de su proceso de selección y conforme a la ley, la realización de exámenes médicos y/o pruebas de detección de sustancias.</p></div></div></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -873,6 +894,9 @@
         const db = getDatabase(app);
 
         let isAdmin = false;
+        let isRecruiterMode = false; 
+        let currentViewMode = 'grid'; 
+
         let currentUserEmail = ""; 
         let currentEditId = null;
         let jobs = {};
@@ -898,14 +922,12 @@
         
         if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
 
-        // V16.23: Limpieza automática al cargar la página
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('searchInput').value = '';
             document.getElementById('stateFilter').value = '';
             document.getElementById('cityFilter').value = '';
         });
 
-        // V16.23: Limpieza extra al regresar con botón "Atrás" del navegador
         window.onpageshow = function(event) {
             if (event.persisted) {
                 document.getElementById('searchInput').value = '';
@@ -914,7 +936,6 @@
             }
         };
 
-        // V16.26: Cierre con Tecla ESC (UX Master)
         document.addEventListener('keydown', (e) => {
             if (e.key === "Escape") {
                 if(document.getElementById('viewModal').classList.contains('active')) closeViewModal();
@@ -924,7 +945,6 @@
                 else if(document.getElementById('settingsModal').classList.contains('active')) closeSettingsModal();
                 else if(document.getElementById('privacyModal').classList.contains('active')) closePrivacyModal();
                 
-                // Cerrar menús de administrador
                 document.querySelectorAll('.admin-actions').forEach(m => m.classList.remove('active'));
             }
         });
@@ -967,7 +987,6 @@
         window.openPrivacyModal = function() { document.getElementById('privacyModal').classList.add('active'); }
         window.closePrivacyModal = function() { document.getElementById('privacyModal').classList.remove('active'); }
 
-        // V16.21: MEJORA EN RESET METRICS (Manejo de Errores)
         window.performSafeAction = function(action) {
             if (!isAdmin || !currentUserEmail) {
                 alert("Acceso denegado. Debes ser administrador.");
@@ -1012,20 +1031,51 @@
         window.toggleAdminLogin = function() { const f = document.getElementById('adminForm'); f.style.display = (f.style.display==='none'||f.style.display==='') ? 'block' : 'none'; }
         
         window.login = async function() {
-            try { 
-                await setPersistence(auth, browserSessionPersistence); 
-                await signInWithEmailAndPassword(auth, document.getElementById('adminEmail').value, document.getElementById('adminPassword').value); 
-                sessionStorage.removeItem('isGuest'); 
-                localStorage.setItem('iamsuperadmin', 'true'); 
-            } catch (error) { alert("Error: " + error.message); }
+            const inputVal = document.getElementById('adminEmail').value.trim();
+            const passVal = document.getElementById('adminPassword').value.trim();
+
+            if (!inputVal || !passVal) return alert("Por favor llena todos los campos");
+
+            if (inputVal.includes('@')) {
+                // Login Admin (Firebase)
+                try { 
+                    await setPersistence(auth, browserSessionPersistence); 
+                    await signInWithEmailAndPassword(auth, inputVal, passVal); 
+                    sessionStorage.removeItem('isGuest'); 
+                    localStorage.setItem('iamsuperadmin', 'true'); 
+                    isRecruiterMode = false;
+                } catch (error) { alert("Error de Admin: " + error.message); }
+            } else {
+                // Login Reclutador (Código Local)
+                if (passVal !== 'Express*2026') {
+                    return alert("Contraseña incorrecta para Reclutador.");
+                }
+
+                // Buscar código en la lista descargada de Firebase
+                const foundRec = Object.values(recruiters).find(r => r.code === inputVal.toUpperCase());
+                
+                if (foundRec) {
+                    sessionStorage.removeItem('isGuest');
+                    isAdmin = true; // Activa permisos de UI
+                    isRecruiterMode = true; // Flag específico
+                    activeRecruiter = foundRec;
+                    sessionStorage.setItem('recruiterCode', foundRec.code.toLowerCase()); // Auto-set
+                    
+                    setAdminMode(true);
+                    // Forzar Vista Tabla
+                    toggleViewMode('table');
+                    window.showToast(`Bienvenido Reclutador: ${foundRec.name}`);
+                } else {
+                    alert("Usuario (Código) no encontrado.");
+                }
+            }
         }
         
-        // V16.23: Limpieza al entrar como invitado
         window.enterAsGuest = function() { 
             sessionStorage.setItem('isGuest', 'true'); 
             isAdmin = false; 
+            isRecruiterMode = false;
             
-            // LIMPIEZA FORZADA
             document.getElementById('searchInput').value = '';
             document.getElementById('stateFilter').value = '';
             document.getElementById('cityFilter').value = '';
@@ -1033,34 +1083,85 @@
             setAdminMode(false); 
         }
 
-        // V16.23: Limpieza al cerrar sesión
         window.logout = function() { 
-            signOut(auth).then(() => { 
-                sessionStorage.removeItem('isGuest'); 
-                isAdmin = false; 
-                
-                // LIMPIEZA FORZADA
-                document.getElementById('searchInput').value = '';
-                document.getElementById('stateFilter').value = '';
-                document.getElementById('cityFilter').value = '';
+            // Limpieza de modo Sticky
+            document.body.classList.remove('admin-mode');
 
-                showLogin(); 
-            }); 
+            if (isRecruiterMode) {
+                isAdmin = false;
+                isRecruiterMode = false;
+                sessionStorage.removeItem('recruiterCode');
+                location.reload(); 
+            } else {
+                signOut(auth).then(() => { 
+                    sessionStorage.removeItem('isGuest'); 
+                    isAdmin = false; 
+                    
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('stateFilter').value = '';
+                    document.getElementById('cityFilter').value = '';
+
+                    showLogin(); 
+                }); 
+            }
         }
 
         function showLogin() { document.getElementById('loginScreen').style.display = 'block'; document.getElementById('mainApp').style.display = 'none'; document.getElementById('adminForm').style.display = 'none'; }
+        
         function setAdminMode(enableAdmin) {
             document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block';
             
             const isRefMode = !!refCode;
-            if (enableAdmin && !isRefMode) {
-                document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator">Super Admin</span>';
+            
+            // Limpieza de clases (Reset)
+            document.body.classList.remove('admin-mode', 'recruiter-view');
+
+            if (enableAdmin && (!isRefMode || isRecruiterMode)) {
+                
+                document.body.classList.add('admin-mode');
+
+                if (isRecruiterMode) {
+                    // ACTIVAMOS LA VISTA RECLUTADOR (Oculta botones)
+                    document.body.classList.add('recruiter-view');
+                    document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator" style="background:#e3f2fd; color:#0d47a1; border-color:#90caf9;">Modo Reclutador</span>';
+                    document.getElementById('viewToggleBtn').style.display = 'none'; 
+                } else {
+                    document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator">Super Admin</span>';
+                    document.getElementById('viewToggleBtn').style.display = 'inline-flex'; 
+                }
                 document.getElementById('adminControls').style.display = 'block';
             } else {
                 document.getElementById('modeIndicator').innerHTML = '';
                 document.getElementById('adminControls').style.display = 'none';
+                document.getElementById('viewToggleBtn').style.display = 'none';
             }
             loadData();
+        }
+
+        window.toggleViewMode = function(forceMode) {
+            if (forceMode) {
+                currentViewMode = forceMode;
+            } else {
+                currentViewMode = currentViewMode === 'grid' ? 'table' : 'grid';
+            }
+
+            const grid = document.getElementById('jobGrid');
+            const table = document.getElementById('jobTableContainer');
+            const btn = document.getElementById('viewToggleBtn');
+
+            if (currentViewMode === 'table') {
+                grid.style.display = 'none';
+                table.style.display = 'block';
+                // AQUI CAMBIÓ: Ya no ocultamos la paginación
+                btn.innerHTML = '🖼️ Vista Usuario';
+                renderJobsTable();
+            } else {
+                grid.style.display = 'grid';
+                table.style.display = 'none';
+                // La paginación se maneja dentro de filterJobs
+                btn.innerHTML = '👁️ Vista Gestión';
+                filterJobs(); 
+            }
         }
 
         function parseJobDate(dateString) {
@@ -1080,9 +1181,17 @@
             onValue(ref(db, 'jobs'), (s) => { 
                 jobs = s.val() || {}; 
                 document.getElementById('skeletonLoader').style.display = 'none'; 
-                document.getElementById('jobGrid').style.display = 'grid';
+                
+                if (isRecruiterMode) {
+                    toggleViewMode('table');
+                } else {
+                    document.getElementById('jobGrid').style.display = 'grid';
+                    document.getElementById('jobTableContainer').style.display = 'none';
+                }
+
                 populateFilters(jobs); 
-                renderJobs(); 
+                if (currentViewMode === 'grid') renderJobs(); 
+                else renderJobsTable();
                 
                 const urlJobId = urlParams.get('id');
                 if (urlJobId && jobs[urlJobId]) {
@@ -1114,15 +1223,12 @@
             });
         }
 
-        // V17.1: FILTROS CASCADA (FIX)
         function populateFilters(jobsData) {
             const allJobsArr = Object.values(jobsData);
             const stateSelect = document.getElementById('stateFilter');
 
-            // 1. Llenar Estados (Únicos)
             const uniqueStates = [...new Set(allJobsArr.map(j => j.state).filter(Boolean))].sort();
             
-            // Guardar selección actual si existe
             const currState = stateSelect.value;
 
             let stateHtml = '<option value="">📍 Estado</option>';
@@ -1132,11 +1238,9 @@
             stateSelect.innerHTML = stateHtml;
             stateSelect.value = currState;
 
-            // 2. Llenar Municipios iniciales (Basado en el estado actual o todos)
             updateCityOptions();
         }
 
-        // V17.1: Nueva función para actualizar ciudades dinámicamente
         window.updateCityOptions = function() {
             const stateSelect = document.getElementById('stateFilter');
             const citySelect = document.getElementById('cityFilter');
@@ -1144,7 +1248,6 @@
 
             const allJobsArr = Object.values(jobs);
 
-            // Filtrar ciudades: Si hay estado seleccionado, solo mostrar ciudades de ese estado
             let availableCities = new Set();
             allJobsArr.forEach(j => {
                 if (!selectedState || j.state === selectedState) {
@@ -1159,11 +1262,9 @@
                 citySelect.innerHTML += `<option value="${c}">${c}</option>`;
             });
             
-            // Resetear selección de ciudad para evitar incongruencias
             citySelect.value = "";
         }
 
-        // V17.1: Manejador de cambio de estado
         window.handleStateChange = function() {
             updateCityOptions(); 
             filterJobs();        
@@ -1278,6 +1379,12 @@
             const link = `${window.location.origin}/?ref=${code}`; 
             navigator.clipboard.writeText(link).then(() => window.showToast('Link copiado')); 
         }
+
+        window.copyJobLink = function(jobId) {
+             const refCode = sessionStorage.getItem('recruiterCode');
+             const url = `${window.location.origin}/?id=${jobId}${refCode ? '&ref='+refCode : ''}`;
+             navigator.clipboard.writeText(url).then(() => window.showToast('🔗 Link de vacante copiado'));
+        }
         
         function renderRecruitersTable() {
             const list = document.getElementById('recruitersList');
@@ -1293,7 +1400,6 @@
             if(!jobStats) { list.innerHTML = 'No hay datos'; return; }
             
             const months = new Set();
-            // Wrap in try-catch/checks to prevent freeze if data is bad
             Object.values(clickLogs).forEach(log => {
                 if(log && log.timestamp && typeof log.timestamp === 'string') {
                     try { months.add(log.timestamp.substring(0, 7)); } catch(e){}
@@ -1316,7 +1422,6 @@
             ).join('');
         }
 
-        // V17.10: GENERADOR DE REPORTE CON MATRIZ DE RENDIMIENTO
         window.downloadSelectedMetrics = function() {
             const checkboxes = document.querySelectorAll('#metricsMonthList input:checked');
             const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
@@ -1327,7 +1432,6 @@
 
             const dataRows = [];
             
-            // --- HOJA 1: DESEMPEÑO DE VACANTES ---
             Object.keys(jobs).forEach(jobId => {
                 const j = jobs[jobId];
                 const s = jobStats[jobId] || {};
@@ -1357,7 +1461,6 @@
                 });
             });
 
-            // --- HOJA 2: RENDIMIENTO DE EQUIPO (GENERAL) ---
             const recruiterMap = {};
             let totalRecruiterClicks = 0;
             Object.values(clickLogs).forEach(l => {
@@ -1375,10 +1478,8 @@
             }));
             if (recruiterRows.length === 0) recruiterRows = [{'Reclutador': 'Sin datos', 'Clics': 0}];
 
-            // --- HOJA 4: DETALLE MATRICIAL (RECLUTADOR vs VACANTE) ---
             const detailMap = {}; 
 
-            // 1. Procesar VISTAS (desde jobStats/viewsByRecruiter)
             Object.keys(jobs).forEach(jobId => {
                 const j = jobs[jobId];
                 const s = jobStats[jobId] || {};
@@ -1399,7 +1500,6 @@
                 }
             });
 
-            // 2. Procesar CLICS (desde clickLogs)
             Object.values(clickLogs).forEach(l => {
                 if(l && l.jobId && l.timestamp && typeof l.timestamp === 'string' && selectedMonths.includes(l.timestamp.substring(0,7))) {
                     const j = jobs[l.jobId];
@@ -1424,7 +1524,6 @@
 
             if (detailRows.length === 0) detailRows = [{'Mensaje': 'Aún no hay interacción detallada registrada'}];
 
-            // --- GENERACIÓN DEL ARCHIVO ---
             const wb = XLSX.utils.book_new();
             
             const ws1 = XLSX.utils.json_to_sheet(dataRows);
@@ -1433,7 +1532,6 @@
             const ws2 = XLSX.utils.json_to_sheet(recruiterRows);
             XLSX.utils.book_append_sheet(wb, ws2, "Rendimiento Equipo");
 
-            // Hoja 3: Resumen
             const summaryRows = [
                 { 'Métrica': 'Periodo Analizado', 'Valor': selectedMonths.join(', ') },
                 { 'Métrica': 'Total Vistas', 'Valor': dataRows.reduce((a,b)=>a+b['Vistas (Meses selecc.)'],0) },
@@ -1442,7 +1540,6 @@
             const ws3 = XLSX.utils.json_to_sheet(summaryRows);
             XLSX.utils.book_append_sheet(wb, ws3, "Resumen Global");
 
-            // Hoja 4: Detalle Matrix
             const ws4 = XLSX.utils.json_to_sheet(detailRows);
             XLSX.utils.book_append_sheet(wb, ws4, "Detalle Rec-Vacante");
 
@@ -1474,7 +1571,6 @@
             push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
         }
 
-        // V17.9.2: GENERADOR DE FLYER REPARADO Y OPTIMIZADO (allowTaint: false)
         window.generateFlyer = function(jobId) {
             const j = jobs[jobId];
             if (!j) return;
@@ -1484,9 +1580,6 @@
             document.getElementById('flyerTitle').innerText = j.title;
             document.getElementById('flyerSalary').innerText = j.salary || 'Sueldo Competitivo';
             
-            const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
-            document.getElementById('flyerCompany').innerText = showNamePublicly ? j.company : "Empresa Confidencial";
-
             const benefitsList = document.getElementById('flyerBenefitsList');
             benefitsList.innerHTML = '';
             if(j.benefits && j.benefits.length > 0) {
@@ -1499,24 +1592,40 @@
                  benefitsList.innerHTML = '<li>✅ Prestaciones de Ley</li><li>✅ Contratación Inmediata</li><li>✅ Excelente Ambiente</li>';
             }
 
-            const flyerNode = document.getElementById('flyerTemplate');
+            const qrContainer = document.getElementById('flyerQr');
+            qrContainer.innerHTML = ''; 
             
-            // V17.9.2: FIX DE SEGURIDAD PARA DESCARGA
-            html2canvas(flyerNode, { 
-                scale: 2, 
-                useCORS: true, 
-                allowTaint: false, // <--- EL FIX MAESTRO
-                backgroundColor: null 
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-                window.showToast("✅ ¡Flyer descargado!");
-            }).catch(err => {
-                console.error(err);
-                alert("Error al generar imagen: " + err.message);
+            const refCode = sessionStorage.getItem('recruiterCode');
+            const jobLink = `${window.location.origin}/?id=${jobId}${refCode ? '&ref='+refCode : ''}`;
+
+            new QRCode(qrContainer, {
+                text: jobLink,
+                width: 256,
+                height: 256,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
             });
+
+            setTimeout(() => {
+                const flyerNode = document.getElementById('flyerTemplate');
+                
+                html2canvas(flyerNode, { 
+                    scale: 2, 
+                    useCORS: true, 
+                    allowTaint: false, 
+                    backgroundColor: null 
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    window.showToast("✅ ¡Flyer descargado!");
+                }).catch(err => {
+                    console.error(err);
+                    alert("Error al generar imagen: " + err.message);
+                });
+            }, 500); 
         }
 
         const visitsRef = ref(db, 'siteStats/visits');
@@ -1547,7 +1656,6 @@
             }
             const finalPhone = cleanPhone ? (phoneCode + cleanPhone) : '';
 
-            // V16.27: Leer campo destacado manual
             const isFeaturedVal = document.getElementById('jobIsFeatured').value === 'true';
 
             const jobData = {
@@ -1570,7 +1678,7 @@
                 agency: document.getElementById('jobAgency').value,
                 requirements: tempReqs,
                 benefits: tempBens,
-                isFeatured: isFeaturedVal // Guardar el flag
+                isFeatured: isFeaturedVal 
             };
             const id = currentEditId || 'job-' + Date.now();
             set(ref(db, 'jobs/' + id), jobData).then(() => {
@@ -1615,6 +1723,88 @@
             return diffDays <= 3;
         }
 
+        // --- VARIABLES DE ORDENAMIENTO ---
+        let currentSortCol = '';   // Qué columna estamos ordenando
+        let currentSortAsc = true; // true = A-Z, false = Z-A
+
+        // Función para cambiar el orden al dar clic
+        window.handleSort = function(colName) {
+            if (currentSortCol === colName) {
+                currentSortAsc = !currentSortAsc; // Si es la misma, invierte el orden
+            } else {
+                currentSortCol = colName;
+                currentSortAsc = true; // Si es nueva, empieza A-Z
+            }
+            renderJobsTable(); // Redibuja la tabla
+        }
+
+        function renderJobsTable() {
+            let keys = Object.keys(jobs);
+
+            // LÓGICA DE ORDENAMIENTO
+            if (currentSortCol) {
+                keys.sort((a, b) => {
+                    let valA = '', valB = '';
+                    const jA = jobs[a];
+                    const jB = jobs[b];
+
+                    // Definir qué valor comparar según la columna
+                    switch(currentSortCol) {
+                        case 'company': valA = jA.company; valB = jB.company; break;
+                        case 'title': valA = jA.title; valB = jB.title; break;
+                        case 'status': valA = jA.status; valB = jB.status; break;
+                        case 'location': valA = jA.city + jA.state; valB = jB.city + jB.state; break;
+                        case 'salary': valA = jA.salary; valB = jB.salary; break;
+                        default: return 0;
+                    }
+
+                    // Limpiar textos para comparar bien (minúsculas y sin acentos)
+                    valA = valA ? valA.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
+                    valB = valB ? valB.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
+
+                    if (valA < valB) return currentSortAsc ? -1 : 1;
+                    if (valA > valB) return currentSortAsc ? 1 : -1;
+                    return 0;
+                });
+            } else {
+                // Orden por defecto (Fecha/ID descendente)
+                keys.sort((a,b) => b.localeCompare(a));
+            }
+
+            const tableBody = document.getElementById('jobTableBody');
+            let html = '';
+            let count = 1;
+
+            keys.forEach(id => {
+                const j = jobs[id];
+                const loc = `${j.city}, ${j.state}`;
+                const salary = j.salary || 'N/A';
+                
+                // Estatus en una línea
+                const statusBadge = j.status === 'No Vigente' 
+                    ? '<span style="white-space: nowrap; background:#ffebee; color:#c62828; padding:5px 10px; border-radius:15px; font-weight:bold; font-size:12px;">🔴 No Vigente</span>' 
+                    : '<span style="white-space: nowrap; background:#e8f5e9; color:#2e7d32; padding:5px 10px; border-radius:15px; font-weight:bold; font-size:12px;">🟢 Vigente</span>';
+
+                html += `
+                    <tr>
+                        <td>${count}</td>
+                        <td style="font-weight:bold; color:#0a66c2;">${j.company}</td>
+                        <td>${j.title}</td>
+                        <td>${loc}</td>
+                        <td style="color:#d32f2f; font-weight:bold;">${salary}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                             <button class="action-icon-btn" title="Descargar Flyer" onclick="window.generateFlyer('${id}')">🖼️</button>
+                             <button class="action-icon-btn" title="Copiar Link" onclick="window.copyJobLink('${id}')">🔗</button>
+                             ${isAdmin && !isRecruiterMode ? `<button class="action-icon-btn" title="Editar" onclick="window.editJob('${id}')">✏️</button>` : ''}
+                        </td>
+                    </tr>
+                `;
+                count++;
+            });
+            tableBody.innerHTML = html;
+        }
+
         function renderJobs() {
             let keys = Object.keys(jobs);
             
@@ -1624,10 +1814,9 @@
                 const statusB = jobB.status === 'No Vigente' ? 1 : 0;
                 if (statusA !== statusB) return statusA - statusB;
                 
-                // V16.27: Ordenar primero las destacadas
                 const featA = jobA.isFeatured ? 1 : 0;
                 const featB = jobB.isFeatured ? 1 : 0;
-                if (featA !== featB) return featB - featA; // Destacadas primero
+                if (featA !== featB) return featB - featA; 
 
                 const dateA = parseJobDate(jobA.fecha);
                 const dateB = parseJobDate(jobB.fecha);
@@ -1650,6 +1839,8 @@
         }
 
         function applyFilterAndRender() {
+            if (currentViewMode === 'table') return; 
+
             const stateVal = document.getElementById('stateFilter').value;
             const cityVal = document.getElementById('cityFilter').value;
             const searchInput = document.getElementById('searchInput');
@@ -1704,7 +1895,6 @@
                 const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
                 const finalCompanyName = (isAdmin && !refCode) || showNamePublicly ? j.company : "Empresa Confidencial";
                 
-                // V16.28: Icono de Empresa Verificada (Solo si es pública)
                 const verifiedHtml = showNamePublicly ? '<span class="verified-badge" title="Empresa Verificada">✓</span>' : '';
 
                 let displayLocation = j.location;
@@ -1714,7 +1904,6 @@
                 const dateHtml = niceDate ? `<span class="card-header-date">📅 Publicación: ${niceDate}</span>` : '';
                 const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
 
-                // V16.28: BADGE DESTACADA MEJORADO (Texto + Color)
                 const featuredBadge = j.isFeatured ? '<div class="badge-featured">⭐ DESTACADA</div>' : '';
 
                 return `
@@ -1781,10 +1970,46 @@
             container.innerHTML = html;
         }
 
+        // Función para cambiar página: TÉCNICA "DESAPARECER EL ANCLA" ⚓🚫
         window.changePage = function(newPage) {
+            // 1. Quitar foco del clic
+            if (document.activeElement) document.activeElement.blur();
+            
             currentPage = newPage;
-            applyFilterAndRender();
-            document.querySelector('.search-container').scrollIntoView({ behavior: 'smooth' });
+            
+            if (currentViewMode === 'table') {
+                // Renderizamos los datos nuevos
+                renderJobsTable(); 
+                
+                // --- TRUCO MAESTRO ---
+                // Forzamos que los botones de abajo DESAPAREZCAN un instante.
+                // Al no haber "piso" abajo, el navegador no puede anclarse y subirá sí o sí.
+                const pagContainer = document.getElementById('paginationContainer');
+                if(pagContainer) pagContainer.style.display = 'none';
+
+                // Ordenamos subir (ahora sí nos obedecerá)
+                window.scrollTo(0, 0);
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                
+                // Hacemos reaparecer los botones un parpadeo después
+                setTimeout(() => {
+                    if(pagContainer) {
+                        // RenderJobsTable calcula si debe ser flex o none, aquí lo forzamos a flex si hay páginas
+                        pagContainer.style.display = 'flex'; 
+                    }
+                }, 100);
+
+            } else {
+                // MODO USUARIO (Fichas) - Este ya funcionaba, no le movemos
+                applyFilterAndRender(); 
+                const topHeader = document.querySelector('.header');
+                if(topHeader) {
+                     setTimeout(() => {
+                        topHeader.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                     }, 100); 
+                }
+            }
         }
 
         window.filterJobs = function() {
@@ -1802,7 +2027,6 @@
             document.getElementById(`menu-${id}`).classList.toggle('active'); 
         }
 
-        // V17.8 FIX: Stacked Details HTML Construction + V17.9 FIX ICONS & OVERFLOW
         window.openViewModal = function(id) {
             const j = jobs[id];
             const isRefMode = !!refCode;
@@ -1811,7 +2035,6 @@
                 runTransaction(ref(db, `jobStats/${id}/totalViews`), (c) => (c || 0) + 1);
                 runTransaction(ref(db, `jobStats/${id}/monthlyViews/${currentMonthKey}`), (c) => (c || 0) + 1);
                 
-                // V17.10: Contar vista por reclutador
                 const recCodeSafe = activeRecruiter ? activeRecruiter.code : 'ORGANICO';
                 runTransaction(ref(db, `jobStats/${id}/viewsByRecruiter/${recCodeSafe}`), (c) => (c || 0) + 1);
             }
@@ -1847,7 +2070,6 @@
                 const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                 const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                 
-                // V17.9: Regresan los Iconos
                 contactHtml = `<div class="sticky-footer">
                                     <p style="font-size:12px; color:#666; margin-bottom:5px;">👇 Respuesta Inmediata 👇</p>
                                     <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
@@ -1875,7 +2097,6 @@
 
             const shareUrl = `${window.location.origin}/?id=${id}${refCode ? '&ref='+refCode : ''}`;
             
-            // HTML CON LOS DATOS EN COLUMNA (STACK)
             document.getElementById('viewModalBody').innerHTML = `
                 ${adminInfoHtml}
                 
@@ -2068,13 +2289,11 @@
                          const legacyLoc = row['Ubicación'] || ''; 
 
                          const showCompKey = findKey(row, 'mostrar empresa publicamente');
-                         // V16.29: Robust boolean parsing from Excel
                          let showCompanyRaw = 'SI';
                          if (showCompKey && row[showCompKey]) {
                              showCompanyRaw = String(row[showCompKey]).trim().toUpperCase();
                          }
 
-                         // V16.27: Detectar columna IMPULSAR o DESTACAR
                          const featuredKey = findKey(row, 'impulsar') || findKey(row, 'destacar') || findKey(row, 'top');
                          let isFeaturedRaw = 'NO';
                          if(featuredKey && row[featuredKey]) {
@@ -2093,7 +2312,7 @@
                          const jobData = {
                              title: title, 
                              company: company, 
-                             showCompany: showCompanyRaw === 'SI', // Simple comparison
+                             showCompany: showCompanyRaw === 'SI', 
                              state: state, city: city, zone: zone,
                              location: (city && state) ? `${city}, ${state}` : legacyLoc, 
                              
@@ -2123,4 +2342,3 @@
     </script>
 </body>
 </html>
-
