@@ -568,7 +568,7 @@
             border-bottom-left-radius: 0 !important;
             margin: 0 !important;
         }
-       /* --- CORRECCIÓN FINAL V29 (Fuerza Bruta para Botón Nueva) --- */
+       /* --- CORRECCIÓN FINAL V30 (Sin Botón de Nueva Vacante) --- */
         @media (max-width: 768px) {
 
             /* 1. ENCABEZADO (Limpio en una línea) */
@@ -608,7 +608,7 @@
             /* Aseguramos que el texto de visitas SÍ se vea */
             body.recruiter-view .metrics-card span { display: inline !important; }
 
-            /* POSICIÓN 2: Botón MÉTRICAS (Morado) - EL CAMBIO QUE PEDISTE */
+            /* POSICIÓN 2: Botón MÉTRICAS (Morado) */
             body.recruiter-view button.metrics-btn {
                 display: flex !important; /* Forzamos visibilidad */
                 order: 2 !important;
@@ -632,24 +632,10 @@
                 height: 40px !important; width: 100% !important; font-size: 12px !important; padding: 0 !important;
             }
 
-            /* 3. BOTÓN FLOTANTE NUEVA VACANTE (El Rebelde) */
-            /* Usamos "button.add-job-btn" para ganarle a la regla que lo ocultaba */
+            /* 3. ELIMINAR EL BOTÓN VERDE (+ NUEVA) */
+            /* En modo reclutador, lo ocultamos por completo */
             body.recruiter-view button.add-job-btn {
-                display: flex !important; /* <--- ESTO ES LA CLAVE */
-                position: fixed !important;
-                bottom: 25px !important; right: 20px !important;
-                width: 55px !important; height: 55px !important;
-                border-radius: 50% !important;
-                background: #10a37f !important; /* Verde */
-                color: transparent !important; /* Ocultar texto */
-                box-shadow: 0 4px 15px rgba(16, 163, 127, 0.5) !important;
-                z-index: 2000 !important;
-                justify-content: center !important; align-items: center !important;
-                padding: 0 !important; margin: 0 !important;
-            }
-            /* El signo de Más (+) */
-            body.recruiter-view button.add-job-btn::after {
-                content: "+"; color: white; font-size: 32px; margin-top: -4px; font-weight: bold;
+                display: none !important;
             }
 
             /* 4. OCULTAR LO QUE SOBRA */
