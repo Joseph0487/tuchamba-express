@@ -1422,11 +1422,14 @@
             onValue(ref(db, 'jobStats'), (s) => { jobStats = s.val() || {}; });
             onValue(ref(db, 'clickLogs'), (s) => { clickLogs = s.val() || {}; });
             
+            // --- BLOQUE CORREGIDO: DESCARGA DE RECLUTADORES ---
             onValue(ref(db, 'recruiters'), (s) => { 
                 recruiters = s.val() || {}; 
-                recruitersLoaded = true; // Avisar que ya cargaron
                 
-                // --- AUTO-LOGIN RECLUTADOR (Para evitar pantalla blanca) ---
+                // ¡AQUÍ ESTÁ LA MAGIA! 👇
+                recruitersLoaded = true; // Avisamos al sistema que ya terminamos de cargar
+                
+                // --- Lógica de Auto-Login (Para que no te saque al recargar) ---
                 if(sessionStorage.getItem('isRecruiterSession') === 'true' && !isAdmin) {
                     const savedCode = sessionStorage.getItem('recruiterCode');
                     if (savedCode) {
@@ -1437,7 +1440,7 @@
                             activeRecruiter = foundRec;
                             setAdminMode(true);
                             
-                            // Forzar vista de tabla si es necesario
+                            // Si existe la función de vista, forzamos tabla
                             if(typeof toggleViewMode === 'function') toggleViewMode('table'); 
                             
                             window.showToast(`👋 Hola de nuevo: ${foundRec.name}`);
