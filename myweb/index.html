@@ -1224,64 +1224,72 @@
         }
 
         window.login = async function() {
-            let inputVal = document.getElementById('adminEmail').value.trim();
-            const passVal = document.getElementById('adminPassword').value.trim();
+            const emailField = document.getElementById('adminEmail');
+            const passField = document.getElementById('adminPassword');
             const btn = document.getElementById('btnLogin');
+            
+            let inputVal = emailField.value.trim();
+            const passVal = passField.value.trim();
 
             if (!inputVal || !passVal) return alert("Por favor llena todos los campos");
 
-            // Evitamos el error de "texto Verificando infinito"
+            // Evitamos doble clic
             if (btn.innerText.includes('Verificando')) return; 
 
             const originalText = btn.innerHTML;
             btn.innerHTML = "🔄 Verificando...";
             btn.disabled = true;
 
-            // --- VALIDACIÓN DE DATOS CARGADOS ---
-            // Si es reclutador y los datos no han bajado, mostramos error en lugar de trabar la app
-            if (!inputVal.includes('@') && !recruitersLoaded) {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                // Forzamos la carga de datos por si acaso falló la conexión
-                initRecruitersData(); 
-                return alert("⚠️ Los datos aún están cargando. Espera 3 segundos e intenta de nuevo.");
-            }
-
-            if (inputVal.includes('@')) {
-                // --- Login Admin ---
-                try { 
+            try {
+                // --- CAMINO 1: LOGIN ADMIN (Correo) ---
+                if (inputVal.includes('@')) {
                     await setPersistence(auth, browserSessionPersistence); 
                     await signInWithEmailAndPassword(auth, inputVal, passVal); 
                     sessionStorage.removeItem('isGuest'); 
                     localStorage.setItem('iamsuperadmin', 'true'); 
                     isRecruiterMode = false;
-                } catch (error) { 
-                    alert("Error: " + error.message);
-                    btn.innerHTML = originalText; btn.disabled = false;
-                }
-            } else {
-                // --- Login Reclutador ---
-                inputVal = inputVal.replace(/\s/g, '').toUpperCase();
+                    return; // Firebase se encarga del resto
+                } 
+
+                // --- CAMINO 2: LOGIN RECLUTADOR (Código) ---
                 
+                // 1. Semáforo: ¿Ya bajaron los datos?
+                if (!recruitersLoaded) {
+                    throw new Error("⏳ Los datos siguen cargando. Espera 5 segundos e intenta de nuevo.");
+                }
+
+                inputVal = inputVal.replace(/\s/g, '').toUpperCase(); // Limpiar espacios
+
                 if (passVal !== 'Express*2026') {
-                    btn.innerHTML = originalText; btn.disabled = false;
-                    return alert("❌ Contraseña incorrecta.");
+                    throw new Error("❌ Contraseña incorrecta.");
                 }
 
                 const foundRec = Object.values(recruiters).find(r => r.code === inputVal);
                 
                 if (foundRec) {
                     sessionStorage.removeItem('isGuest');
-                    // Guardamos sesión
+                    // Guardamos sesión para sobrevivir al cierre de navegador
                     sessionStorage.setItem('recruiterCode', foundRec.code.toLowerCase());
                     sessionStorage.setItem('isRecruiterSession', 'true'); 
                     
-                    // RECARGA LIMPIA (Solución pantalla blanca)
+                    // ÉXITO: Recarga limpia
                     window.location.reload(); 
                 } else {
-                    btn.innerHTML = originalText; btn.disabled = false;
-                    alert(`❌ Código no encontrado.`);
+                    throw new Error(`❌ El código '${inputVal}' no existe.`);
                 }
+
+            } catch (error) {
+                // SI ALGO FALLA, DESBLOQUEAMOS EL BOTÓN
+                console.error(error);
+                btn.innerHTML = originalText; 
+                btn.disabled = false;
+                
+                // Si el error es de carga, forzamos la carga de nuevo
+                if (error.message.includes('datos siguen cargando')) {
+                    initRecruitersData(); 
+                }
+                
+                alert(error.message);
             }
         }
         
@@ -1397,13 +1405,16 @@
             return jobDate && !isNaN(jobDate.getTime()) ? jobDate.getTime() : 0;
         }
 
-        // 1. FUNCIÓN GLOBAL: Carga reclutadores SIEMPRE (Login o No Login)
+        // 1. FUNCIÓN GLOBAL: Carga reclutadores INDEPENDIENTEMENTE del login
         function initRecruitersData() {
+            console.log("Iniciando carga de reclutadores...");
             onValue(ref(db, 'recruiters'), (s) => { 
                 recruiters = s.val() || {}; 
-                recruitersLoaded = true; // ¡Liberamos el semáforo!
-                
-                // Auto-Login (Recuperar sesión tras reload)
+                recruitersLoaded = true; // ¡SEMÁFORO EN VERDE!
+                console.log("✅ Reclutadores cargados");
+
+                // AUTO-LOGIN: Si recargaste el celular, aquí te recuperamos
+                // IMPORTANTE: Esto corre AUTOMÁTICAMENTE al abrir la página
                 if(sessionStorage.getItem('isRecruiterSession') === 'true' && !isAdmin) {
                     const savedCode = sessionStorage.getItem('recruiterCode');
                     if (savedCode) {
@@ -1414,7 +1425,7 @@
                             activeRecruiter = foundRec;
                             setAdminMode(true);
                             if(typeof toggleViewMode === 'function') toggleViewMode('table'); 
-                            window.showToast(`👋 Hola de nuevo: ${foundRec.name}`);
+                            window.showToast(`👋 Sesión restaurada: ${foundRec.name}`);
                         }
                     }
                 }
@@ -1424,15 +1435,21 @@
             });
         }
 
+        // ¡EJECUTAR YA! (Esta línea es vital)
+        initRecruitersData();
+
         // Ejecutamos esto INMEDIATAMENTE al arrancar
         initRecruitersData();
 
 
-        // 2. FUNCIÓN DE DATOS GENERALES (Solo corre al entrar)
+        // --- FUNCIÓN DE DATOS GENERALES (LIMPIA) ---
         function loadData() {
+            // 1. Cargamos las vacantes
             onValue(ref(db, 'jobs'), (s) => { 
                 jobs = s.val() || {}; 
-                document.getElementById('skeletonLoader').style.display = 'none'; 
+                // Ocultamos el esqueleto de carga
+                const skel = document.getElementById('skeletonLoader');
+                if(skel) skel.style.display = 'none'; 
                 
                 if (isRecruiterMode) {
                     toggleViewMode('table');
@@ -1445,6 +1462,7 @@
                 if (currentViewMode === 'grid') renderJobs(); 
                 else renderJobsTable();
                 
+                // Lógica para abrir vacante por Link (?id=...)
                 const urlJobId = urlParams.get('id');
                 if (urlJobId && jobs[urlJobId]) {
                     const job = jobs[urlJobId];
@@ -1454,20 +1472,21 @@
                         if(!isAdmin) sessionStorage.setItem('isGuest', 'true');
                         window.openViewModal(urlJobId);
                     }
-                    window.history.replaceState({}, document.title, window.location.pathname);
                 }
             });
 
+            // 2. Cargamos estadísticas y logs
             onValue(ref(db, 'jobStats'), (s) => { jobStats = s.val() || {}; });
             onValue(ref(db, 'clickLogs'), (s) => { clickLogs = s.val() || {}; });
             
-            // YA NO cargamos recruiters aquí adentro, porque ya lo hicimos arriba en initRecruitersData()
-            
+            // 3. Cargamos teléfono central
             onValue(ref(db, 'settings/centralPhone'), (s) => { 
                 centralPhone = s.val() || '';
                 if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone;
                 updateBanner();
             });
+            
+            // ¡IMPORTANTE! AQUÍ YA NO HAY NADA DE 'recruiters'
         }
 
         function populateFilters(jobsData) {
