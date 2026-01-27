@@ -876,13 +876,23 @@
                 display: flex !important; align-items: center !important; justify-content: center !important;
             }
 
-            /* 5. TABLA STICKY */
+            /* 5. TABLA STICKY (CORREGIDO JERARQUÍA) */
+            
+            /* A. Todos los encabezados del reclutador (Nivel Alto) */
             body.recruiter-view .management-table th {
-                position: sticky !important; top: 0 !important; z-index: 1000 !important;
+                position: sticky !important; 
+                top: 0 !important; 
+                z-index: 1000 !important; /* Nivel base alto */
                 padding: 10px 5px !important;
             }
+
+            /* B. EXCEPCIÓN: La columna # debe ganarles a todos (El Rey) */
+            body.recruiter-view .management-table th:first-child {
+                z-index: 1005 !important; /* <--- 5 puntos más arriba que el resto */
+                left: 0 !important; /* Aseguramos que esté pegado a la izquierda */
+            }
+
             .job-table-container { margin-top: 5px !important; border: none !important; }
-        }
 
         /* =========================================================
            BLOQUE FINAL: PC RECLUTADOR (ULTRA SLIM V3)
