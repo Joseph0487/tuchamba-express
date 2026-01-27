@@ -355,7 +355,7 @@
         .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
 
         /* =========================================================
-           BLOQUE 2 FINAL V9: EL BÚNKER (SCROLL INTERNO + CAPAS OK)
+           BLOQUE 2 FINAL V10: LA ESQUINA INDESTRUCTIBLE 💎
            ========================================================= */
 
         /* 1. Contador "Slim" Transparente */
@@ -376,12 +376,12 @@
         .tag-active { color: #69f0ae; }
         .tag-inactive { color: #ff8a80; }
 
-        /* 2. CONTENEDOR "VENTANA" (Aquí está el truco del scroll) */
+        /* 2. CONTENEDOR (SCROLL INTERNO OBLIGATORIO) */
         .job-table-container {
             width: 100%; 
-            /* Altura controlada para que el sticky vertical funcione SIEMPRE */
-            max-height: 75vh; 
-            overflow: auto; /* Scroll tanto vertical como horizontal */
+            /* Altura máxima para activar el scroll interno y que sticky funcione */
+            max-height: 70vh; 
+            overflow: auto; 
             
             background: white;
             border-radius: 12px; 
@@ -399,41 +399,42 @@
             min-width: 900px; 
         }
 
-        /* --- BARRA AZUL (ENCABEZADOS) - FIJA ARRIBA --- */
+        /* --- ENCABEZADOS (BARRA AZUL) --- */
         .management-table th {
-            background: #0a66c2; color: white; 
+            background: #0a66c2; 
+            color: white; 
             padding: 10px 8px; 
             text-align: left; font-size: 13px; font-weight: 700; 
             text-transform: uppercase; white-space: nowrap;
             
-            /* Sticky Vertical (Fijo al techo de la caja) */
-            position: sticky;
+            position: sticky; 
             top: 0; 
-            z-index: 30; /* Nivel Alto (Le gana a los números) */
-            vertical-align: middle;
+            z-index: 30; /* Nivel Alto */
             border-bottom: none; 
         }
 
-        /* --- LA ESQUINA MAESTRA (#) - FIJA EN 4 DIRECCIONES --- */
+        /* --- LA ESQUINA MALDITA (#) - AHORA SÍ FIJA --- */
         .management-table th:first-child {
-            /* Sticky Horizontal + Vertical (El Rey) */
-            position: sticky !important;
-            left: 0 !important;
-            top: 0 !important;
-            z-index: 40 !important; /* Nivel Máximo (Encima de todo) */
+            position: sticky;
+            left: 0;
+            top: 0;
+            z-index: 50 !important; /* MÁXIMA PRIORIDAD */
             
-            background-color: #0a66c2 !important; 
+            background-color: #0a66c2; 
             width: 30px !important;
             padding-left: 2px !important;
             padding-right: 2px !important;
             text-align: center !important;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2); /* Sombra para resaltar */
             
-            /* Corrección de bordes para que no se vean raros al scrollear */
-            border-top-left-radius: 0; 
+            /* Sombra para tapar lo que pase por debajo */
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1); 
+            
+            /* TRUCO: Quitamos border-radius aquí para evitar glitches en Safari */
+            border-top-left-radius: 0 !important; 
         }
         
-        .management-table th:last-child { border-top-right-radius: 0; }
+        /* Solo redondeamos la esquina derecha final */
+        .management-table th:last-child { border-top-right-radius: 0 !important; }
 
         /* Select del Filtro */
         .header-select {
@@ -450,14 +451,14 @@
             border-bottom: 1px solid #f0f0f0; 
             color: #333; font-size: 13px; vertical-align: middle;
             white-space: nowrap; 
-            background-color: white;
+            background-color: white; /* Fondo base */
         }
 
-        /* --- COLUMNA # LATERAL (1, 2, 3...) - FIJA A LA IZQUIERDA --- */
+        /* --- COLUMNA # LATERAL (1, 2, 3...) --- */
         .management-table td:first-child {
-            position: sticky !important;
-            left: 0 !important;
-            z-index: 20 !important; /* Nivel Medio (Debajo del header, encima del resto) */
+            position: sticky;
+            left: 0;
+            z-index: 40 !important; /* Debajo de la esquina azul, encima del resto */
             
             font-weight: bold;
             color: #0a66c2;
@@ -499,11 +500,18 @@
 
         /* 3. AJUSTE PC */
         @media (min-width: 1024px) {
-            .job-table-container { overflow-x: visible; max-height: none; overflow-y: visible; } /* En PC soltamos el scroll interno */
+            .job-table-container { 
+                overflow: visible !important; 
+                max-height: none !important; 
+            }
             .management-table { min-width: 100%; width: 100%; table-layout: auto; }
             .management-table td { white-space: normal; word-wrap: break-word; max-width: 250px; }
             .management-table td:nth-child(6), .management-table td:last-child { white-space: nowrap; width: 1%; }
             .header-select { max-width: 100%; }
+            
+            /* En PC devolvemos las esquinas redondas */
+            .management-table th:first-child { border-top-left-radius: 11px !important; }
+            .management-table th:last-child { border-top-right-radius: 11px !important; }
         }
 
         
