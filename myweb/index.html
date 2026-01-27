@@ -355,7 +355,7 @@
         .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
 
         /* =========================================================
-           BLOQUE 2 FINAL V15: CORRECCIÓN DE ANCLAJE (SIN TRANSFORM) ⚓
+           BLOQUE 2 FINAL V16: LA PURGA (SIN TRANSFORM + ULTRA FUERTE) 🛡️
            ========================================================= */
 
         /* 1. Contador "Slim" Transparente */
@@ -376,49 +376,54 @@
         .tag-active { color: #69f0ae; }
         .tag-inactive { color: #ff8a80; }
 
-        /* 2. CONTENEDOR (LIMPIO, SIN ACELERACIÓN GRÁFICA QUE ROMPA EL STICKY) */
+        /* 2. CONTENEDOR (LIMPIO DE ERRORES) */
         .job-table-container {
             width: 100%; 
-            overflow-x: auto; /* Scroll horizontal activo */
+            overflow-x: auto !important; /* Scroll obligatorio */
             background: white;
             border-radius: 12px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 50px; 
             border: 1px solid #e0e0e0;
-            -webkit-overflow-scrolling: touch; /* Suavidad nativa en iOS */
-            /* IMPORTANTE: Quitamos 'position: relative' y 'z-index' aquí para no crear conflictos */
+            -webkit-overflow-scrolling: touch; 
+            
+            /* --- LA CURA: PROHIBIDO USAR TRANSFORM AQUÍ --- */
+            transform: none !important; 
+            position: static !important; /* Dejamos que fluya natural */
         }
 
         .management-table {
             width: 100%; 
-            border-collapse: separate; /* OBLIGATORIO para sticky */
+            border-collapse: separate !important; /* VITAL para sticky */
             border-spacing: 0;
             min-width: 900px; 
         }
 
         /* --- 3. ENCABEZADOS (BARRA AZUL) --- */
-        .management-table th {
+        /* Usamos selectores fuertes (body ...) para ganar prioridad */
+        body .management-table th {
             background: #0a66c2; 
             color: white; 
             padding: 10px 8px; 
             text-align: left; font-size: 13px; font-weight: 700; 
             text-transform: uppercase; white-space: nowrap;
             
-            /* Sticky Vertical (Arriba) - Nivel Medio */
+            /* Sticky Vertical (Arriba) */
             position: sticky; 
             top: 0; 
-            z-index: 10; 
+            z-index: 20; 
             border-bottom: none; 
         }
 
         /* --- 4. LA ESQUINA MAESTRA (#) - DOBLE ANCLAJE --- */
-        .management-table th:first-child {
-            /* Sticky Horizontal + Vertical */
+        /* Specificity Hack: body.recruiter-view gana a todo lo demás */
+        body .management-table th:first-child,
+        body.recruiter-view .management-table th:first-child {
             position: -webkit-sticky !important;
             position: sticky !important;
             left: 0 !important;
             top: 0 !important;
-            z-index: 20 !important; /* El nivel más alto (encima de todo) */
+            z-index: 100 !important; /* SIEMPRE ARRIBA DE TODO */
             
             background-color: #0a66c2 !important; 
             width: 35px !important; 
@@ -426,7 +431,7 @@
             text-align: center !important;
             padding: 10px 0 !important;
             
-            /* La sombra interna que te gustó */
+            /* La sombra interna gris (indestructible) */
             box-shadow: inset -1px 0 0 rgba(255,255,255,0.3) !important;
             border-top-left-radius: 11px;
         }
@@ -443,12 +448,12 @@
         }
 
         /* --- 6. COLUMNA LATERAL (1, 2, 3...) - ANCLAJE IZQUIERDO --- */
-        .management-table td:first-child {
-            /* Sticky Horizontal */
+        body .management-table td:first-child,
+        body.recruiter-view .management-table td:first-child {
             position: -webkit-sticky !important;
             position: sticky !important;
             left: 0 !important;
-            z-index: 15 !important; /* Encima de las celdas normales, debajo de la esquina azul */
+            z-index: 50 !important; /* Encima de las celdas normales */
             
             font-weight: bold;
             color: #0a66c2;
@@ -460,7 +465,7 @@
             /* Sombra interna GRIS para la división */
             box-shadow: inset -2px 0 0 #e0e0e0 !important;
             
-            background-color: white !important; /* Fondo sólido obligatorio */
+            background-color: white !important; /* Fondo sólido */
         }
 
         /* Texto Grande */
@@ -471,7 +476,7 @@
         .management-table td:last-child { text-align: right; width: 1%; }
         .actions-flex { display: flex; justify-content: flex-end; align-items: center; gap: 5px; }
 
-        /* --- COLORES CEBRA (Sincronizados) --- */
+        /* --- COLORES CEBRA (Sincronizados a la fuerza) --- */
         .management-table tr:nth-child(even) td { background-color: #f8f9fa; }
         .management-table tr:nth-child(even) td:first-child { background-color: #f8f9fa !important; }
 
