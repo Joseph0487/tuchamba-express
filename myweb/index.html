@@ -355,7 +355,7 @@
         .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
 
         /* =========================================================
-           BLOQUE 2 FINAL V10: LA ESQUINA INDESTRUCTIBLE 💎
+           BLOQUE 2 FINAL V11: SOLUCIÓN SIMPLE (PEGAMENTO LATERAL)
            ========================================================= */
 
         /* 1. Contador "Slim" Transparente */
@@ -376,65 +376,54 @@
         .tag-active { color: #69f0ae; }
         .tag-inactive { color: #ff8a80; }
 
-        /* 2. CONTENEDOR (SCROLL INTERNO OBLIGATORIO) */
+        /* 2. CONTENEDOR (Solo Scroll Horizontal) */
         .job-table-container {
             width: 100%; 
-            /* Altura máxima para activar el scroll interno y que sticky funcione */
-            max-height: 70vh; 
-            overflow: auto; 
-            
+            overflow-x: auto; /* Permite deslizar a los lados */
             background: white;
             border-radius: 12px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 50px; 
             border: 1px solid #e0e0e0;
             -webkit-overflow-scrolling: touch; 
-            position: relative;
+            /* Importante: NO ponemos max-height para evitar conflictos */
         }
 
         .management-table {
             width: 100%; 
-            border-collapse: separate; 
+            border-collapse: separate; /* Necesario para el sticky */
             border-spacing: 0;
-            min-width: 900px; 
+            min-width: 900px; /* Fuerza el ancho para que haya scroll */
         }
 
-        /* --- ENCABEZADOS (BARRA AZUL) --- */
+        /* --- ENCABEZADOS (Barra Azul) --- */
         .management-table th {
             background: #0a66c2; 
             color: white; 
             padding: 10px 8px; 
             text-align: left; font-size: 13px; font-weight: 700; 
             text-transform: uppercase; white-space: nowrap;
-            
-            position: sticky; 
-            top: 0; 
-            z-index: 30; /* Nivel Alto */
-            border-bottom: none; 
+            border-bottom: none;
+            /* Aquí NO ponemos sticky vertical para no marear al celular */
         }
 
-        /* --- LA ESQUINA MALDITA (#) - AHORA SÍ FIJA --- */
+        /* --- LA ESQUINA (#) - PEGADA A LA IZQUIERDA --- */
         .management-table th:first-child {
             position: sticky;
             left: 0;
-            top: 0;
-            z-index: 50 !important; /* MÁXIMA PRIORIDAD */
+            z-index: 100; /* Siempre arriba */
             
-            background-color: #0a66c2; 
-            width: 30px !important;
-            padding-left: 2px !important;
-            padding-right: 2px !important;
+            background-color: #0a66c2; /* Color sólido para que no se transparente */
+            width: 35px !important; /* Un poco más ancho para asegurar */
             text-align: center !important;
             
-            /* Sombra para tapar lo que pase por debajo */
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.1); 
+            /* Sombra para simular elevación sobre el resto */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2); 
             
-            /* TRUCO: Quitamos border-radius aquí para evitar glitches en Safari */
-            border-top-left-radius: 0 !important; 
+            border-top-left-radius: 11px;
         }
         
-        /* Solo redondeamos la esquina derecha final */
-        .management-table th:last-child { border-top-right-radius: 0 !important; }
+        .management-table th:last-child { border-top-right-radius: 11px; }
 
         /* Select del Filtro */
         .header-select {
@@ -451,25 +440,23 @@
             border-bottom: 1px solid #f0f0f0; 
             color: #333; font-size: 13px; vertical-align: middle;
             white-space: nowrap; 
-            background-color: white; /* Fondo base */
+            background-color: white; 
         }
 
-        /* --- COLUMNA # LATERAL (1, 2, 3...) --- */
+        /* --- COLUMNA # (1, 2, 3...) - PEGADA A LA IZQUIERDA --- */
         .management-table td:first-child {
             position: sticky;
             left: 0;
-            z-index: 40 !important; /* Debajo de la esquina azul, encima del resto */
+            z-index: 90; /* Debajo del encabezado pero encima de las otras celdas */
             
             font-weight: bold;
             color: #0a66c2;
+            background-color: white; /* IMPORTANTE: Fondo sólido */
             border-right: 1px solid #e0e0e0; 
-            background-color: white; 
             
-            width: 30px !important;
-            padding-left: 2px !important;
-            padding-right: 2px !important;
+            width: 35px !important;
             text-align: center !important;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05); /* Sombra lateral */
         }
 
         /* Texto Grande Vacante y Ubicación */
@@ -483,11 +470,12 @@
         .actions-flex { display: flex; justify-content: flex-end; align-items: center; gap: 5px; }
 
         /* --- COLORES CEBRA (Sincronizados) --- */
+        /* Truco: Forzamos el color de fondo en la columna fija para que coincida */
         .management-table tr:nth-child(even) td { background-color: #f8f9fa; }
-        .management-table tr:nth-child(even) td:first-child { background-color: #f8f9fa !important; }
+        .management-table tr:nth-child(even) td:first-child { background-color: #f8f9fa; }
 
         .management-table tr:hover td { background-color: #e3f2fd; }
-        .management-table tr:hover td:first-child { background-color: #e3f2fd !important; }
+        .management-table tr:hover td:first-child { background-color: #e3f2fd; }
 
         /* Botones Acción */
         .action-icon-btn {
@@ -500,18 +488,11 @@
 
         /* 3. AJUSTE PC */
         @media (min-width: 1024px) {
-            .job-table-container { 
-                overflow: visible !important; 
-                max-height: none !important; 
-            }
+            .job-table-container { overflow-x: visible; }
             .management-table { min-width: 100%; width: 100%; table-layout: auto; }
             .management-table td { white-space: normal; word-wrap: break-word; max-width: 250px; }
             .management-table td:nth-child(6), .management-table td:last-child { white-space: nowrap; width: 1%; }
             .header-select { max-width: 100%; }
-            
-            /* En PC devolvemos las esquinas redondas */
-            .management-table th:first-child { border-top-left-radius: 11px !important; }
-            .management-table th:last-child { border-top-right-radius: 11px !important; }
         }
 
         
