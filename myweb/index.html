@@ -1005,6 +1005,20 @@
         }
 
 
+        
+        /* =========================================================
+           CORRECCIÓN URGENTE: CANDADO BOTÓN VISTA (SOLO ADMIN)
+           ========================================================= */
+        
+        /* 1. Por defecto: OCULTO PARA TODOS (Invitados y Reclutadores) */
+        #viewToggleBtn {
+            display: none !important;
+        }
+
+        /* 2. La única excepción: SUPER ADMIN (body tiene .admin-mode pero NO .recruiter-view) */
+        body.admin-mode:not(.recruiter-view) #viewToggleBtn {
+            display: flex !important; /* Solo aquí aparece */
+        }
 
 
        
@@ -1151,7 +1165,7 @@
 
                             <th onclick="window.handleSort('title')" style="cursor:pointer;">💼 Vacante ↕️</th>
                             <th onclick="window.handleSort('location')" style="cursor:pointer;">📍 Ubicación ↕️</th>
-                            <th onclick="window.handleSort('salary')" style="cursor:pointer;">💰 Salario</th>
+                            <th onclick="window.handleSort('salary')" style="cursor:pointer;">💰 Salario ↕️</th>
                             <th onclick="window.handleSort('status')" style="cursor:pointer; text-align:center;">Estado ↕️</th>
                             <th style="text-align:right;">Acciones</th>
                         </tr>
