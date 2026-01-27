@@ -355,7 +355,7 @@
         .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
 
         /* =========================================================
-           BLOQUE 2 FINAL V12: EL CLAVO DE ACERO (FIX TOTAL) 🔒
+           BLOQUE 2 FINAL V13: EL TRUCO DE LA SOMBRA INTERNA 🌑
            ========================================================= */
 
         /* 1. Contador "Slim" Transparente */
@@ -376,94 +376,87 @@
         .tag-active { color: #69f0ae; }
         .tag-inactive { color: #ff8a80; }
 
-        /* 2. CONTENEDOR TIPO VENTANA (NECESARIO PARA QUE NO SE MUEVA) */
+        /* 2. CONTENEDOR (Scroll Horizontal Natural) */
         .job-table-container {
             width: 100%; 
-            /* ¡OJO! Esto es lo que permite que se quede fijo */
-            height: 70vh; /* Ocupa el 70% de la altura de la pantalla */
-            overflow: auto; /* Scroll interno */
-            
+            overflow-x: auto; 
             background: white;
             border-radius: 12px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 50px; 
             border: 1px solid #e0e0e0;
             -webkit-overflow-scrolling: touch; 
-            position: relative;
         }
 
         .management-table {
             width: 100%; 
-            border-collapse: separate; /* OBLIGATORIO para sticky */
+            /* OBLIGATORIO: Separate permite que el sticky no se rompa */
+            border-collapse: separate; 
             border-spacing: 0;
             min-width: 900px; 
         }
 
-        /* --- A. LA ESQUINA MAESTRA (#) - SIEMPRE ENCIMA DE TODO --- */
-        .management-table th:first-child {
-            position: sticky;
-            top: 0;
-            left: 0;
-            z-index: 100 !important; /* Capa más alta: EL REY */
-            
-            background-color: #0a66c2; 
-            color: white;
-            padding: 10px 0; /* Sin relleno lateral para controlar ancho */
-            width: 35px;
-            min-width: 35px;
-            text-align: center;
-            
-            /* Bordes rectos para evitar fallos visuales en esquinas */
-            border-top-left-radius: 0; 
-            border-bottom: none;
-            
-            /* Sombra para que se vea que flota */
-            box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        /* --- B. EL RESTO DEL ENCABEZADO (BARRA AZUL) --- */
+        /* --- ENCABEZADOS (AZUL) --- */
         .management-table th {
-            position: sticky;
-            top: 0;
-            z-index: 90; /* Capa alta, pero debajo de la esquina */
-            
-            background: #0a66c2; 
-            color: white; 
+            background: #0a66c2; color: white; 
             padding: 10px 8px; 
             text-align: left; font-size: 13px; font-weight: 700; 
             text-transform: uppercase; white-space: nowrap;
+            /* Sticky solo arriba para PC, en móvil dejamos que fluya natural verticalmente */
+            position: sticky; top: 0; z-index: 10;
             border-bottom: none; 
         }
-        
-        .management-table th:last-child { border-top-right-radius: 0; }
 
-        /* --- C. LA COLUMNA LATERAL (1, 2, 3...) - FIJA A LA IZQ --- */
-        .management-table td:first-child {
-            position: sticky;
-            left: 0;
-            z-index: 80; /* Capa media: Encima de las celdas normales */
+        /* --- LA ESQUINA (#) - PEGAMENTO TOTAL --- */
+        .management-table th:first-child {
+            /* Sticky Horizontal */
+            position: -webkit-sticky !important; /* Safari/iPhone */
+            position: sticky !important;
+            left: 0 !important;
+            z-index: 100 !important; /* Capa suprema */
             
-            background-color: white; /* Fondo base (se sobreescribe con el cebra) */
-            font-weight: bold;
-            color: #0a66c2;
-            border-right: 1px solid #ddd; /* Línea divisoria */
+            background-color: #0a66c2 !important; 
+            width: 35px !important;
+            text-align: center !important;
+            padding: 10px 0 !important;
             
-            width: 35px;
-            min-width: 35px;
-            text-align: center;
-            padding: 8px 0;
+            /* TRUCO: Borde derecho simulado con sombra para que no desaparezca */
+            box-shadow: inset -1px 0 0 rgba(255,255,255,0.3); 
             
-            box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+            border-top-left-radius: 11px;
         }
+        
+        .management-table th:last-child { border-top-right-radius: 11px; }
 
-        /* --- D. RESTO DE LAS CELDAS --- */
+        /* --- CELDAS DEL CUERPO --- */
         .management-table td {
             padding: 8px 8px; 
             border-bottom: 1px solid #f0f0f0; 
             color: #333; font-size: 13px; vertical-align: middle;
             white-space: nowrap; 
-            background-color: white;
-            z-index: 1; /* Capa más baja */
+            background-color: white; 
+        }
+
+        /* --- COLUMNA LATERAL (1, 2, 3...) - PEGADA A LA IZQ --- */
+        .management-table td:first-child {
+            /* Sticky Horizontal */
+            position: -webkit-sticky !important; /* Safari/iPhone */
+            position: sticky !important;
+            left: 0 !important;
+            z-index: 90 !important; 
+            
+            font-weight: bold;
+            color: #0a66c2;
+            
+            width: 35px !important;
+            text-align: center !important;
+            padding: 8px 0 !important;
+            
+            /* --- AQUÍ ESTÁ LA SOLUCIÓN: SOMBRA INTERNA --- */
+            /* En lugar de border-right, usamos esto. Dibuja una línea gris DENTRO de la celda */
+            box-shadow: inset -1px 0 0 #e0e0e0; 
+            
+            background-color: white; /* Base sólida obligatoria */
         }
 
         /* Select del Filtro */
@@ -475,7 +468,7 @@
         }
         .header-select option { color: #333; background: white; }
 
-        /* TEXTO GRANDE */
+        /* Texto Grande */
         .management-table td:nth-child(3), 
         .management-table td:nth-child(4) { 
             font-size: 15px !important; font-weight: 600; 
@@ -484,9 +477,9 @@
         .management-table td:last-child { text-align: right; width: 1%; }
         .actions-flex { display: flex; justify-content: flex-end; align-items: center; gap: 5px; }
 
-        /* --- COLORES CEBRA (Sincronizando la columna fija) --- */
+        /* --- COLORES CEBRA --- */
         .management-table tr:nth-child(even) td { background-color: #f8f9fa; }
-        .management-table tr:nth-child(even) td:first-child { background-color: #f8f9fa; } /* La fija también se pinta */
+        .management-table tr:nth-child(even) td:first-child { background-color: #f8f9fa; }
 
         .management-table tr:hover td { background-color: #e3f2fd; }
         .management-table tr:hover td:first-child { background-color: #e3f2fd; }
@@ -502,18 +495,11 @@
 
         /* 3. AJUSTE PC */
         @media (min-width: 1024px) {
-            .job-table-container { 
-                overflow: visible !important; 
-                height: auto !important; /* En PC soltamos la altura */
-            }
+            .job-table-container { overflow-x: visible; }
             .management-table { min-width: 100%; width: 100%; table-layout: auto; }
             .management-table td { white-space: normal; word-wrap: break-word; max-width: 250px; }
             .management-table td:nth-child(6), .management-table td:last-child { white-space: nowrap; width: 1%; }
             .header-select { max-width: 100%; }
-            
-            /* En PC devolvemos las esquinas redondas */
-            .management-table th:first-child { border-top-left-radius: 11px !important; }
-            .management-table th:last-child { border-top-right-radius: 11px !important; }
         }
 
         
