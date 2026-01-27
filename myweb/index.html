@@ -355,7 +355,7 @@
         .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
 
         /* =========================================================
-           BLOQUE 2 FINAL V14: EL EXORCISMO (ANCLAJE FORZADO) ⚓
+           BLOQUE 2 FINAL V15: CORRECCIÓN DE ANCLAJE (SIN TRANSFORM) ⚓
            ========================================================= */
 
         /* 1. Contador "Slim" Transparente */
@@ -376,105 +376,92 @@
         .tag-active { color: #69f0ae; }
         .tag-inactive { color: #ff8a80; }
 
-        /* 2. CONTENEDOR (La Caja que permite el scroll) */
+        /* 2. CONTENEDOR (LIMPIO, SIN ACELERACIÓN GRÁFICA QUE ROMPA EL STICKY) */
         .job-table-container {
             width: 100%; 
-            overflow-x: auto; /* Scroll horizontal habilitado */
+            overflow-x: auto; /* Scroll horizontal activo */
             background: white;
             border-radius: 12px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 50px; 
             border: 1px solid #e0e0e0;
-            -webkit-overflow-scrolling: touch; /* Suavidad en iPhone */
-            position: relative; /* Ancla para los elementos sticky */
-            z-index: 1;
+            -webkit-overflow-scrolling: touch; /* Suavidad nativa en iOS */
+            /* IMPORTANTE: Quitamos 'position: relative' y 'z-index' aquí para no crear conflictos */
         }
 
         .management-table {
             width: 100%; 
             border-collapse: separate; /* OBLIGATORIO para sticky */
             border-spacing: 0;
-            min-width: 900px; /* Fuerza que la tabla sea ancha */
+            min-width: 900px; 
         }
 
-        /* --- 3. JERARQUÍA MILITAR DE CAPAS (Z-INDEX) --- */
-        /* Nivel 30: La Esquina Superior Izquierda (El #) - SIEMPRE ARRIBA
-           Nivel 20: El Resto del Encabezado (Barra Azul)
-           Nivel 15: La Columna Izquierda (1, 2, 3...)
-           Nivel 10: El contenido normal
-        */
-
-        /* --- ENCABEZADOS GENERALES --- */
+        /* --- 3. ENCABEZADOS (BARRA AZUL) --- */
         .management-table th {
-            background: #0a66c2; color: white; 
+            background: #0a66c2; 
+            color: white; 
             padding: 10px 8px; 
             text-align: left; font-size: 13px; font-weight: 700; 
             text-transform: uppercase; white-space: nowrap;
-            position: sticky; top: 0; 
-            z-index: 20; /* Nivel Alto */
+            
+            /* Sticky Vertical (Arriba) - Nivel Medio */
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
             border-bottom: none; 
         }
 
-        /* --- CELDAS GENERALES --- */
-        .management-table td {
-            padding: 8px 8px; 
-            border-bottom: 1px solid #f0f0f0; 
-            color: #333; font-size: 13px; vertical-align: middle;
-            white-space: nowrap; 
-            background-color: white;
-            position: relative;
-            z-index: 1; /* Nivel Base */
-        }
-
-        /* --- 4. EL ANCLAJE DE LA PRIMERA COLUMNA (IZQUIERDA) --- */
-        
-        /* A. LA ESQUINA AZUL (#) */
+        /* --- 4. LA ESQUINA MAESTRA (#) - DOBLE ANCLAJE --- */
         .management-table th:first-child {
-            position: sticky !important; 
-            position: -webkit-sticky !important; /* iPhone */
+            /* Sticky Horizontal + Vertical */
+            position: -webkit-sticky !important;
+            position: sticky !important;
             left: 0 !important;
             top: 0 !important;
-            z-index: 30 !important; /* EL REY DE LA COLINA */
+            z-index: 20 !important; /* El nivel más alto (encima de todo) */
             
             background-color: #0a66c2 !important; 
             width: 35px !important; 
             min-width: 35px !important;
             text-align: center !important;
+            padding: 10px 0 !important;
             
-            /* Sombra interna para la división */
-            box-shadow: inset -2px 0 0 rgba(0,0,0,0.2) !important;
+            /* La sombra interna que te gustó */
+            box-shadow: inset -1px 0 0 rgba(255,255,255,0.3) !important;
             border-top-left-radius: 11px;
         }
+        
+        .management-table th:last-child { border-top-right-radius: 11px; }
 
-        /* B. LA COLUMNA DE NÚMEROS (1, 2, 3...) */
+        /* --- 5. CELDAS DEL CUERPO --- */
+        .management-table td {
+            padding: 8px 8px; 
+            border-bottom: 1px solid #f0f0f0; 
+            color: #333; font-size: 13px; vertical-align: middle;
+            white-space: nowrap; 
+            background-color: white; 
+        }
+
+        /* --- 6. COLUMNA LATERAL (1, 2, 3...) - ANCLAJE IZQUIERDO --- */
         .management-table td:first-child {
+            /* Sticky Horizontal */
+            position: -webkit-sticky !important;
             position: sticky !important;
-            position: -webkit-sticky !important; /* iPhone */
             left: 0 !important;
-            z-index: 15 !important; /* Encima de las celdas normales */
+            z-index: 15 !important; /* Encima de las celdas normales, debajo de la esquina azul */
             
             font-weight: bold;
             color: #0a66c2;
             width: 35px !important;
             min-width: 35px !important;
             text-align: center !important;
+            padding: 8px 0 !important;
             
-            /* LA MAGIA: Sombra interna como borde indestructible */
+            /* Sombra interna GRIS para la división */
             box-shadow: inset -2px 0 0 #e0e0e0 !important;
-            background-color: white !important; /* Fondo sólido a fuerza */
+            
+            background-color: white !important; /* Fondo sólido obligatorio */
         }
-
-        /* C. ESQUINA DERECHA REDONDA */
-        .management-table th:last-child { border-top-right-radius: 11px; }
-
-        /* --- 5. COMPLEMENTOS VISUALES --- */
-        .header-select {
-            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
-            color: white; padding: 2px 4px; border-radius: 4px;
-            font-size: 11px; font-weight: bold; width: 100%; max-width: 180px;
-            outline: none; cursor: pointer;
-        }
-        .header-select option { color: #333; background: white; }
 
         /* Texto Grande */
         .management-table td:nth-child(3), 
@@ -484,18 +471,12 @@
         .management-table td:last-child { text-align: right; width: 1%; }
         .actions-flex { display: flex; justify-content: flex-end; align-items: center; gap: 5px; }
 
-        /* --- 6. COLORES CEBRA (CON SOPORTE PARA COLUMNA FIJA) --- */
+        /* --- COLORES CEBRA (Sincronizados) --- */
         .management-table tr:nth-child(even) td { background-color: #f8f9fa; }
-        
-        /* ¡IMPORTANTE! Forzamos el color en la columna fija también para que coincida */
-        .management-table tr:nth-child(even) td:first-child { 
-            background-color: #f8f9fa !important; 
-        }
+        .management-table tr:nth-child(even) td:first-child { background-color: #f8f9fa !important; }
 
         .management-table tr:hover td { background-color: #e3f2fd; }
-        .management-table tr:hover td:first-child { 
-            background-color: #e3f2fd !important; 
-        }
+        .management-table tr:hover td:first-child { background-color: #e3f2fd !important; }
 
         /* Botones Acción */
         .action-icon-btn {
@@ -506,21 +487,14 @@
         }
         .action-icon-btn:hover { transform: translateY(-2px); border-color: #0a66c2; background: #f0f7ff; }
 
-        /* --- 7. AJUSTE DE SEGURIDAD PARA MÓVILES (Lo que faltaba) --- */
-        @media (max-width: 768px) {
-            /* Forzamos que la tabla no herede comportamientos raros */
-            .job-table-container { 
-                overflow-x: auto !important; 
-                transform: translate3d(0,0,0); /* Truco de aceleración de hardware */
-            }
-            /* Reforzamos el sticky en celular */
-            .management-table th:first-child,
-            .management-table td:first-child {
-                position: -webkit-sticky !important;
-                position: sticky !important;
-                left: 0 !important;
-            }
+        /* 7. Select del Filtro */
+        .header-select {
+            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+            color: white; padding: 2px 4px; border-radius: 4px;
+            font-size: 11px; font-weight: bold; width: 100%; max-width: 180px;
+            outline: none; cursor: pointer;
         }
+        .header-select option { color: #333; background: white; }
 
         /* 8. AJUSTE PC */
         @media (min-width: 1024px) {
