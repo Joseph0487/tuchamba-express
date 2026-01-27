@@ -285,8 +285,18 @@
         .whatsapp-btn-large:active { transform: scale(0.98); animation: none; }
         .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; opacity: 0.7; animation: none; }
 
-        .share-btn { background: #25D366; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
-        
+        /* --- AJUSTE V20.2: BOTÓN COMPARTIR (BLANCO CLÁSICO) --- */
+        .share-btn { 
+            background: #25D366; 
+            color: white !important; /* <--- Regresamos al blanco puro */
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 800 !important; /* Mantenemos la negrita para que resalte */
+            font-size: 14px; 
+        }
+
         #adminControls {
             z-index: 1001;
             background: rgba(240, 242, 245, 0.95);
@@ -1187,6 +1197,189 @@
             }
         }
 
+        /* =========================================================
+           FASE 4: PANEL SUPER ADMIN MÓVIL (GRID ORGANIZADO) 🛠️📱
+           ========================================================= */
+        @media (max-width: 768px) {
+            
+            /* 1. Contenedor Principal (Solo para Super Admin) */
+            body.admin-mode:not(.recruiter-view) .admin-controls-wrapper {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important; /* 2 Columnas */
+                gap: 8px !important;
+                padding: 5px !important;
+            }
+
+            /* 2. La Tarjeta de Vistas (Encabezado) */
+            body.admin-mode:not(.recruiter-view) .metrics-card {
+                grid-column: span 2 !important; /* Ocupa las 2 columnas (ancho total) */
+                justify-content: center !important;
+                background: #fff !important;
+                border: 1px solid #ddd !important;
+                border-left: 4px solid #0d47a1 !important; /* Borde azul elegante */
+                margin-bottom: 5px !important;
+                height: 40px !important;
+            }
+
+            /* 3. Todos los Botones del Admin (Uniformes) */
+            body.admin-mode:not(.recruiter-view) button,
+            body.admin-mode:not(.recruiter-view) .tool-btn,
+            body.admin-mode:not(.recruiter-view) .add-job-btn {
+                width: 100% !important;
+                height: 42px !important; /* Altura cómoda para el dedo */
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 12px !important;
+                border-radius: 8px !important;
+                padding: 0 !important;
+            }
+
+            /* 4. Colores Específicos para identificar rápido */
+            /* Nueva Vacante (Verde fuerte) */
+            body.admin-mode:not(.recruiter-view) .add-job-btn { 
+                background-color: #2e7d32 !important; 
+                grid-column: span 2 !important; /* Botón grande para "Nueva" */
+                font-size: 14px !important;
+                font-weight: 800 !important;
+            }
+            
+            /* Equipo (Naranja) */
+            body.admin-mode:not(.recruiter-view) .team-btn { background-color: #ef6c00 !important; }
+            
+            /* Ajustes (Gris Oscuro) */
+            body.admin-mode:not(.recruiter-view) .settings-btn { background-color: #455a64 !important; }
+            
+            /* Métricas (Morado) */
+            body.admin-mode:not(.recruiter-view) .metrics-btn { background-color: #7b1fa2 !important; }
+        }
+
+        /* =========================================================
+           FASE 4 FINAL: ADMIN PANEL (PÍLDORA PC + GRID MÓVIL) 💎
+           ========================================================= */
+
+        /* --- 1. ESTILO MÓVIL (GRID ORGANIZADO) --- */
+        @media (max-width: 768px) {
+            
+            /* El Contenedor del Panel */
+            body.admin-mode:not(.recruiter-view) #adminControls {
+                padding: 10px !important;
+                background: #f0f2f5 !important; /* Fondo gris suave */
+                position: relative !important;
+                top: 0 !important;
+                box-shadow: none !important;
+            }
+
+            /* La Cuadrícula (Grid) */
+            body.admin-mode:not(.recruiter-view) .admin-controls-wrapper {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important; /* 2 Columnas idénticas */
+                gap: 8px !important;
+                margin-bottom: 5px !important;
+            }
+
+            /* A. Tarjeta de Métricas (Fila 1 - Ancho Completo) */
+            body.admin-mode:not(.recruiter-view) .metrics-card {
+                grid-column: span 2 !important; 
+                width: 100% !important;
+                justify-content: center !important;
+                height: 40px !important;
+                margin: 0 !important;
+                border: 1px solid #ddd !important;
+                border-left: 4px solid #0a66c2 !important;
+            }
+
+            /* B. Botón "NUEVA" (Fila 2 - Ancho Completo para resaltar) */
+            body.admin-mode:not(.recruiter-view) .add-job-btn {
+                grid-column: span 2 !important; 
+                width: 100% !important;
+                background-color: #2e7d32 !important;
+                height: 45px !important;
+                font-size: 14px !important;
+                font-weight: 800 !important;
+                margin: 0 !important;
+            }
+
+            /* C. El resto de botones (Cuadrícula 2x2) */
+            body.admin-mode:not(.recruiter-view) button,
+            body.admin-mode:not(.recruiter-view) .tool-btn {
+                width: 100% !important;
+                height: 42px !important;
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 12px !important;
+                border-radius: 8px !important;
+                padding: 0 !important;
+            }
+
+            /* Colores de identificación */
+            body.admin-mode:not(.recruiter-view) .team-btn { background-color: #ef6c00 !important; }
+            body.admin-mode:not(.recruiter-view) .settings-btn { background-color: #455a64 !important; }
+            body.admin-mode:not(.recruiter-view) .metrics-btn { background-color: #7b1fa2 !important; }
+            
+            /* Input file oculto */
+            #excelFile { display: none !important; }
+        }
+
+        /* --- 2. ESTILO PC (PÍLDORA FLOTANTE "REDONDA") --- */
+        @media (min-width: 769px) {
+            
+            /* Convertimos la barra en una Píldora Flotante */
+            body.admin-mode #adminControls {
+                position: sticky !important;
+                top: 10px !important;
+                margin: 10px auto 20px auto !important; /* Centrado con margen */
+                width: 95% !important; /* Casi todo el ancho */
+                max-width: 1200px !important;
+                
+                background: #ffffff !important;
+                border-radius: 50px !important; /* <--- LA CLAVE REDONDA */
+                border: 1px solid #e0e0e0 !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.08) !important;
+                
+                padding: 8px 20px !important;
+                z-index: 900 !important;
+            }
+
+            /* Alineación de los botones adentro */
+            body.admin-mode .admin-controls-wrapper {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                gap: 10px !important;
+                flex-wrap: nowrap !important; /* Todo en una línea */
+            }
+
+            /* Hacemos los botones de Admin un poco más estilizados en PC */
+            body.admin-mode .tool-btn, 
+            body.admin-mode .add-job-btn {
+                border-radius: 20px !important; /* Botones redonditos también */
+                padding: 8px 20px !important;
+                height: 36px !important;
+                display: flex; align-items: center; justify-content: center;
+                transition: transform 0.2s;
+            }
+            
+            body.admin-mode .tool-btn:hover, 
+            body.admin-mode .add-job-btn:hover {
+                transform: translateY(-2px);
+            }
+
+            /* Tarjeta de métricas estilo píldora */
+            body.admin-mode .metrics-card {
+                border-radius: 20px !important;
+                height: 36px !important;
+                background: #f8f9fa !important;
+                border: 1px solid #ddd !important;
+                border-left: 4px solid #0a66c2 !important;
+                padding: 0 15px !important;
+                display: flex; align-items: center;
+            }
+        }
+
 
     </style>    
 </head>
@@ -1194,9 +1387,11 @@
 
     <div id="globalBackground"></div>
 
+    
+    
     <div id="flyerTemplate">
         <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center center / cover no-repeat; opacity: 0.1; z-index: 0;"></div>
-        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: rgba(10, 25, 45, 0.85); z-index: 1;"></div>
+        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: rgba(10, 25, 45, 0.2); z-index: 1;"></div>
         <div class="flyer-badge-top">¡SE SOLICITA!</div>
         <div class="flyer-company">RECONOCIDA EMPRESA BUSCA:</div>
         <div id="flyerTitle" class="flyer-title">CHOFER 3.5 TON</div>
@@ -1563,7 +1758,16 @@
         const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
         
-        if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
+        if (refCode) {
+            sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
+            
+            // --- NUEVO: OCULTAR ACCESO RECLUTADOR SI ES REFERIDO ---
+            // Usamos un listener para asegurar que el botón ya exista antes de ocultarlo
+            document.addEventListener("DOMContentLoaded", () => {
+                const adminLink = document.querySelector('.admin-toggle-link');
+                if(adminLink) adminLink.style.display = 'none';
+            });
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('searchInput').value = '';
