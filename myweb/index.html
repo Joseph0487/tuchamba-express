@@ -1112,6 +1112,47 @@
             }
         }
 
+        /* =========================================================
+           CORRECCIÓN FINAL: ENCABEZADOS TABLA MÓVIL (VISTA PRO)
+           ========================================================= */
+        @media (max-width: 768px) {
+            
+            /* 1. Estilo General de los Títulos (TH) */
+            .management-table th {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+                font-size: 11px !important;      /* Tamaño estándar para todos */
+                font-weight: 800 !important;     /* Negrita fuerte */
+                color: #ffffff !important;       /* BLANCO PURO */
+                text-transform: uppercase !important; 
+                letter-spacing: 0.5px !important;
+                vertical-align: middle !important;
+                padding-top: 12px !important;
+                padding-bottom: 12px !important;
+                background-color: #0a66c2 !important; /* Fondo azul asegurado */
+            }
+
+            /* 2. Ajuste especial para el Select "EMPRESAS" (Para que no se vea feo) */
+            .management-table th select#headerCompanyFilter {
+                font-family: inherit !important;
+                font-weight: 800 !important;
+                font-size: 11px !important;
+                color: #333 !important; /* El texto dentro del select debe ser oscuro para leerse */
+                background: white !important;
+                border-radius: 4px !important;
+                border: none !important;
+                padding: 2px 5px !important;
+                text-transform: uppercase !important;
+                width: 100% !important;
+                max-width: 120px !important; /* Que no se ensanche demasiado */
+            }
+
+            /* 3. Asegurar que la esquina # también respete esto */
+            .management-table th:first-child {
+                font-size: 11px !important;
+                color: #ffffff !important;
+            }
+        }
+
 
     </style>    
 </head>
