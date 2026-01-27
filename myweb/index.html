@@ -1025,6 +1025,39 @@
         }
 
 
+        /* =========================================================
+           BOTÓN COPIAR LINK (MODO RECLUTADOR)
+           ========================================================= */
+        .copy-link-btn {
+            background: #e3f2fd; /* Fondo azulito suave */
+            color: #0d47a1;      /* Texto azul fuerte */
+            border: 1px solid #90caf9;
+            padding: 6px 15px;
+            border-radius: 50px; /* Óvalo perfecto */
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Efecto al pasar el mouse (Hover) */
+        .copy-link-btn:hover {
+            background: #bbdefb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Efecto al dar clic (Active) */
+        .copy-link-btn:active {
+            transform: translateY(0);
+            background: #90caf9;
+        }
+
        
     </style>    
 </head>
@@ -1624,8 +1657,10 @@
                 btn.disabled = false; 
             }
         }
+
         function setAdminMode(enableAdmin) {
-            document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('loginScreen').style.display = 'none'; 
+            document.getElementById('mainApp').style.display = 'block';
             
             const isRefMode = !!refCode;
             
@@ -1637,11 +1672,24 @@
                 document.body.classList.add('admin-mode');
 
                 if (isRecruiterMode) {
-                    // ACTIVAMOS LA VISTA RECLUTADOR (Oculta botones)
+                    // ACTIVAMOS LA VISTA RECLUTADOR
                     document.body.classList.add('recruiter-view');
-                    document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator" style="background:#e3f2fd; color:#0d47a1; border-color:#90caf9;">Modo Reclutador</span>';
+                    
+                    // --- AQUÍ ESTÁ EL CAMBIO: BOTÓN DE COPIAR LINK ---
+                    // Obtenemos el código del reclutador activo
+                    let myRecCode = sessionStorage.getItem('recruiterCode') || '';
+                    if(!myRecCode && activeRecruiter) myRecCode = activeRecruiter.code;
+                    
+                    // Creamos el botón funcional
+                    document.getElementById('modeIndicator').innerHTML = `
+                        <button class="copy-link-btn" onclick="copyMyRecruiterLink('${myRecCode}')">
+                            🔗 Copiar Link
+                        </button>
+                    `;
+                    
                     document.getElementById('viewToggleBtn').style.display = 'none'; 
                 } else {
+                    // MODO SUPER ADMIN (Se queda igual)
                     document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator">Super Admin</span>';
                     document.getElementById('viewToggleBtn').style.display = 'inline-flex'; 
                 }
@@ -1652,6 +1700,19 @@
                 document.getElementById('viewToggleBtn').style.display = 'none';
             }
             loadData();
+        }
+
+        // --- NUEVA FUNCIÓN PARA COPIAR EL LINK DEL RECLUTADOR ---
+        window.copyMyRecruiterLink = function(code) {
+            if(!code) return window.showToast('❌ Error: No se encontró tu código');
+            
+            const link = `${window.location.origin}/?ref=${code}`;
+            navigator.clipboard.writeText(link).then(() => {
+                window.showToast('✅ ¡Link de Reclutador Copiado!');
+            }).catch(err => {
+                console.error(err);
+                prompt("Copia tu link manualmente:", link);
+            });
         }
 
         window.toggleViewMode = function(forceMode) {
