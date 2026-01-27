@@ -1058,6 +1058,40 @@
             background: #90caf9;
         }
 
+        /* =========================================================
+           CORRECCIÓN FINAL: CENTRADO BOTÓN LINK (MÓVIL Y PC)
+           ========================================================= */
+        
+        /* 1. Asegurar que el texto e icono estén siempre al centro */
+        .copy-link-btn {
+            justify-content: center !important; 
+            text-align: center !important;
+        }
+
+        /* 2. Ajuste específico para Celular (Para que se alinee con Compartir/Salir) */
+        @media (max-width: 768px) {
+            
+            /* Reseteamos el contenedor SPAN para que no estorbe */
+            .header-buttons #modeIndicator {
+                padding: 0 !important;
+                background: transparent !important;
+                border: none !important;
+                height: auto !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            /* Forzamos al botón a tener el tamaño exacto de los otros */
+            .copy-link-btn {
+                height: 30px !important;      /* Misma altura que el botón Salir */
+                font-size: 11px !important;   /* Misma letra */
+                padding: 0 10px !important;   /* Relleno lateral equilibrado */
+                width: auto !important;
+                margin: 0 !important;
+                border-radius: 50px !important; /* Mantiene la forma ovalada */
+            }
+        }
+        
        
     </style>    
 </head>
