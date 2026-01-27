@@ -736,33 +736,7 @@
             top: 12px !important; /* Subirlos un poquito */
         }
         .more-btn { top: 10px !important; right: 10px !important; } /* Ajustar botón de menú */
-        /* --- CORRECCIÓN FINAL LADAS (V18.9) --- */
-        .phone-group {
-            display: flex !important; /* Obliga a ponerse en fila */
-            align-items: stretch !important;
-            width: 100% !important;
-            gap: 0 !important; /* Pegaditos */
-        }
         
-        .phone-select {
-            width: auto !important; /* Que solo ocupe lo necesario */
-            flex: 0 0 auto !important; /* No permitir que se estire */
-            min-width: 100px !important; /* Ancho fijo ideal para "🇲🇽 +52" */
-            padding: 8px 5px !important;
-            text-align: center !important;
-            border-right: 1px solid #ccc !important;
-            background-color: #e4e6eb !important;
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-            cursor: pointer !important;
-        }
-
-        .phone-group input {
-            flex: 1 !important; /* El input toma TODO el espacio sobrante */
-            border-top-left-radius: 0 !important;
-            border-bottom-left-radius: 0 !important;
-            border-left: none !important;
-        }
         /* --- CORRECCIÓN FINAL MAESTRA LADAS (V18.11) --- */
         
         /* 1. Forzamos al contenedor a ser flexible horizontalmente */
@@ -1112,67 +1086,6 @@
             }
         }
 
-       /* --- ESTILO TÍTULOS TABLA MÓVIL (BLANCOS) --- */
-        @media (max-width: 768px) {
-            .management-table th {
-                color: #ffffff !important;   /* Blanco Puro */
-                font-weight: 800 !important; /* Negrita */
-                text-transform: uppercase !important;
-                font-size: 11px !important;
-                letter-spacing: 0.5px !important;
-                padding-top: 12px !important;
-                padding-bottom: 12px !important;
-            }
-            
-            /* Para que el select de "EMPRESAS" no se vea raro */
-            .management-table th select {
-                color: #333 !important; 
-                font-weight: 800 !important;
-                font-size: 11px !important;
-            }
-        }
-
-        /* =========================================================
-           CORRECCIÓN FINAL: ENCABEZADOS TABLA MÓVIL (VISTA PRO)
-           ========================================================= */
-        @media (max-width: 768px) {
-            
-            /* 1. Estilo General de los Títulos (TH) */
-            .management-table th {
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-                font-size: 11px !important;      /* Tamaño estándar para todos */
-                font-weight: 800 !important;     /* Negrita fuerte */
-                color: #ffffff !important;       /* BLANCO PURO */
-                text-transform: uppercase !important; 
-                letter-spacing: 0.5px !important;
-                vertical-align: middle !important;
-                padding-top: 12px !important;
-                padding-bottom: 12px !important;
-                background-color: #0a66c2 !important; /* Fondo azul asegurado */
-            }
-
-            /* 2. Ajuste especial para el Select "EMPRESAS" (Para que no se vea feo) */
-            .management-table th select#headerCompanyFilter {
-                font-family: inherit !important;
-                font-weight: 800 !important;
-                font-size: 11px !important;
-                color: #333 !important; /* El texto dentro del select debe ser oscuro para leerse */
-                background: white !important;
-                border-radius: 4px !important;
-                border: none !important;
-                padding: 2px 5px !important;
-                text-transform: uppercase !important;
-                width: 100% !important;
-                max-width: 120px !important; /* Que no se ensanche demasiado */
-            }
-
-            /* 3. Asegurar que la esquina # también respete esto */
-            .management-table th:first-child {
-                font-size: 11px !important;
-                color: #ffffff !important;
-            }
-        }
-
         /* =========================================================
            CORRECCIÓN FINAL V2: ENCABEZADOS TABLA MÓVIL (UNIFORMES)
            ========================================================= */
@@ -1205,64 +1118,6 @@
                 height: 20px !important;         /* Altura controlada */
                 margin: 0 !important;
             }
-        }
-
-        /* =========================================================
-           FASE 4: PANEL SUPER ADMIN MÓVIL (GRID ORGANIZADO) 🛠️📱
-           ========================================================= */
-        @media (max-width: 768px) {
-            
-            /* 1. Contenedor Principal (Solo para Super Admin) */
-            body.admin-mode:not(.recruiter-view) .admin-controls-wrapper {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important; /* 2 Columnas */
-                gap: 8px !important;
-                padding: 5px !important;
-            }
-
-            /* 2. La Tarjeta de Vistas (Encabezado) */
-            body.admin-mode:not(.recruiter-view) .metrics-card {
-                grid-column: span 2 !important; /* Ocupa las 2 columnas (ancho total) */
-                justify-content: center !important;
-                background: #fff !important;
-                border: 1px solid #ddd !important;
-                border-left: 4px solid #0d47a1 !important; /* Borde azul elegante */
-                margin-bottom: 5px !important;
-                height: 40px !important;
-            }
-
-            /* 3. Todos los Botones del Admin (Uniformes) */
-            body.admin-mode:not(.recruiter-view) button,
-            body.admin-mode:not(.recruiter-view) .tool-btn,
-            body.admin-mode:not(.recruiter-view) .add-job-btn {
-                width: 100% !important;
-                height: 42px !important; /* Altura cómoda para el dedo */
-                margin: 0 !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                font-size: 12px !important;
-                border-radius: 8px !important;
-                padding: 0 !important;
-            }
-
-            /* 4. Colores Específicos para identificar rápido */
-            /* Nueva Vacante (Verde fuerte) */
-            body.admin-mode:not(.recruiter-view) .add-job-btn { 
-                background-color: #2e7d32 !important; 
-                grid-column: span 2 !important; /* Botón grande para "Nueva" */
-                font-size: 14px !important;
-                font-weight: 800 !important;
-            }
-            
-            /* Equipo (Naranja) */
-            body.admin-mode:not(.recruiter-view) .team-btn { background-color: #ef6c00 !important; }
-            
-            /* Ajustes (Gris Oscuro) */
-            body.admin-mode:not(.recruiter-view) .settings-btn { background-color: #455a64 !important; }
-            
-            /* Métricas (Morado) */
-            body.admin-mode:not(.recruiter-view) .metrics-btn { background-color: #7b1fa2 !important; }
         }
 
         /* =========================================================
@@ -3037,9 +2892,70 @@
             }
         }
 
+        // --- FILTROS INTELIGENTES V20 (EL CEREBRO DEL BUSCADOR) ---
         window.filterJobs = function() {
             currentPage = 1; 
+            
+            // 1. Detectamos qué escribió el usuario
+            const searchText = normalizeText(document.getElementById('searchInput').value);
+            
+            // 2. Si hay texto, actualizamos los "dropdowns" para que coincidan con la búsqueda
+            updateSmartFilters(searchText);
+
+            // 3. Aplicamos el filtrado visual normal
             applyFilterAndRender();
+        }
+
+        // Esta función recalcula los municipios disponibles según lo que escribes
+        function updateSmartFilters(searchText) {
+            const stateSelect = document.getElementById('stateFilter');
+            const citySelect = document.getElementById('cityFilter');
+            
+            // Guardamos lo que el usuario tenía seleccionado para intentar mantenerlo
+            const selectedState = stateSelect.value;
+            const selectedCity = citySelect.value;
+
+            // Filtramos las vacantes que coinciden con el TEXTO (ignorando estado/ciudad por ahora)
+            const availableJobs = Object.values(jobs).filter(j => {
+                if (!isAdmin && j.status === 'No Vigente') return false;
+                if (!searchText) return true;
+                const fullText = normalizeText(`${j.title} ${j.company} ${j.tags} ${j.description}`);
+                return fullText.includes(searchText);
+            });
+
+            // Extraemos Estados y Ciudades únicos de esas vacantes filtradas
+            const availableStates = new Set();
+            const availableCities = new Set();
+
+            availableJobs.forEach(j => {
+                if (j.state) availableStates.add(j.state);
+                // Solo agregamos ciudades si coinciden con el estado seleccionado (si hay uno)
+                // O si no hay estado seleccionado, agregamos todas
+                if (!selectedState || j.state === selectedState) {
+                    if (j.city) availableCities.add(j.city);
+                }
+            });
+
+            // --- RECONSTRUIR SELECT DE ESTADOS ---
+            let stateHtml = '<option value="">📍 Estado</option>';
+            [...availableStates].sort().forEach(s => {
+                const isSelected = s === selectedState ? 'selected' : '';
+                stateHtml += `<option value="${s}" ${isSelected}>${s}</option>`;
+            });
+            stateSelect.innerHTML = stateHtml;
+
+            // --- RECONSTRUIR SELECT DE MUNICIPIOS ---
+            let cityHtml = '<option value="">🏙️ Municipio</option>';
+            [...availableCities].sort().forEach(c => {
+                const isSelected = c === selectedCity ? 'selected' : '';
+                cityHtml += `<option value="${c}" ${isSelected}>${c}</option>`;
+            });
+            citySelect.innerHTML = cityHtml;
+        }
+
+        // Ajuste para que al cambiar estado, se recalculen los municipios
+        window.handleStateChange = function() {
+            filterJobs();        
         }
 
         window.loadMoreJobs = function() {
