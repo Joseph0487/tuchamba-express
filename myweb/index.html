@@ -355,7 +355,7 @@
         .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
 
         /* =========================================================
-           BLOQUE 2 FINAL V7: AHORA SÍ, COLUMNA # INMOVILIZADA 🔒
+           BLOQUE 2 FINAL V8: COLUMNA # FIJA (SOPORTE TOTAL IPHONE)
            ========================================================= */
 
         /* 1. Contador "Slim" Transparente */
@@ -376,46 +376,56 @@
         .tag-active { color: #69f0ae; }
         .tag-inactive { color: #ff8a80; }
 
-        /* 2. CONFIGURACIÓN BASE (MÓVIL) */
+        /* 2. CONTENEDOR DE LA TABLA (EL QUE HACE SCROLL) */
         .job-table-container {
             width: 100%; 
-            overflow-x: auto; 
+            overflow-x: auto; /* Aquí ocurre la magia del scroll */
             background: white;
             border-radius: 12px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 50px; 
             border: 1px solid #e0e0e0;
-            -webkit-overflow-scrolling: touch; 
+            -webkit-overflow-scrolling: touch; /* Suavidad en iPhone */
+            position: relative; /* Necesario para que sticky funcione adentro */
         }
 
         .management-table {
-            width: 100%; border-collapse: separate; border-spacing: 0;
-            min-width: 900px; 
+            width: 100%; 
+            border-collapse: separate; /* Importante para sticky */
+            border-spacing: 0;
+            min-width: 900px; /* Fuerza el scroll horizontal */
         }
 
-        /* --- ENCABEZADOS GENERALES --- */
+        /* --- ENCABEZADOS (Barra Azul) --- */
         .management-table th {
             background: #0a66c2; color: white; 
             padding: 10px 8px; 
             text-align: left; font-size: 13px; font-weight: 700; 
             text-transform: uppercase; white-space: nowrap;
-            position: sticky; top: 0; z-index: 10; vertical-align: middle;
+            /* Sticky Vertical (Para que bajes y la barra azul te siga) */
+            position: -webkit-sticky; /* Safari */
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
+            vertical-align: middle;
             border-bottom: none; 
         }
 
-        /* --- COLUMNA # FIJA (HEADER) --- */
+        /* --- CANDADO 1: COLUMNA # DEL ENCABEZADO --- */
         .management-table th:first-child {
-            position: sticky !important; /* <--- ¡AQUÍ ESTÁ EL CANDADO! */
+            /* Sticky Horizontal (Para que deslices y el # se quede) */
+            position: -webkit-sticky !important; /* Safari */
+            position: sticky !important;
             left: 0 !important;
-            z-index: 20 !important; /* Por encima de todo */
-            background-color: #0a66c2 !important; 
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1); 
+            z-index: 20 !important; /* Encima de todo */
             
+            background-color: #0a66c2 !important; /* Fondo sólido */
             width: 30px !important;
             padding-left: 2px !important;
             padding-right: 2px !important;
             text-align: center !important;
             border-top-left-radius: 11px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1); /* Sombrita divisoria */
         }
         
         .management-table th:last-child { border-top-right-radius: 11px; }
@@ -435,48 +445,47 @@
             border-bottom: 1px solid #f0f0f0; 
             color: #333; font-size: 13px; vertical-align: middle;
             white-space: nowrap; 
+            background-color: white; /* Base sólida */
         }
 
-        /* --- COLUMNA # FIJA (CUERPO/NÚMEROS) --- */
+        /* --- CANDADO 2: COLUMNA # DE LAS FILAS (1, 2, 3...) --- */
         .management-table td:first-child {
-            position: sticky !important; /* <--- ¡CANDADO ABAJO TAMBIÉN! */
+            /* Sticky Horizontal */
+            position: -webkit-sticky !important; /* Safari */
+            position: sticky !important;
             left: 0 !important;
-            z-index: 15 !important; 
+            z-index: 15 !important;
+            
             font-weight: bold;
             color: #0a66c2;
-            border-right: 1px solid #e0e0e0; 
-            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-            background-color: white; /* Fondo base obligatorio */
+            border-right: 1px solid #e0e0e0; /* La línea divisoria */
+            background-color: white; /* Fondo por defecto */
             
             width: 30px !important;
             padding-left: 2px !important;
             padding-right: 2px !important;
             text-align: center !important;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
         }
 
-        /* TEXTO GRANDE PARA VACANTE Y UBICACIÓN */
+        /* Texto Grande Vacante y Ubicación */
         .management-table td:nth-child(3), 
         .management-table td:nth-child(4) { 
-            font-size: 15px !important; 
-            font-weight: 600; 
+            font-size: 15px !important; font-weight: 600; 
         }
 
-        .management-table td:last-child {
-            text-align: right; width: 1%;
-        }
+        .management-table td:last-child { text-align: right; width: 1%; }
         
-        .actions-flex {
-            display: flex; justify-content: flex-end; align-items: center; gap: 5px;
-        }
+        .actions-flex { display: flex; justify-content: flex-end; align-items: center; gap: 5px; }
 
-        /* --- EFECTOS CEBRA INTELIGENTES (Para que la columna fija cambie de color también) --- */
-        .management-table tr:nth-child(even) { background-color: #f8f9fa; }
-        .management-table tr:nth-child(even) td:first-child { background-color: #f8f9fa !important; } 
+        /* --- COLORES CEBRA (Aplicados también a la columna fija) --- */
+        .management-table tr:nth-child(even) td { background-color: #f8f9fa; }
+        .management-table tr:nth-child(even) td:first-child { background-color: #f8f9fa !important; }
 
-        .management-table tr:hover { background-color: #e3f2fd; }
-        .management-table tr:hover td:first-child { background-color: #e3f2fd !important; } 
+        .management-table tr:hover td { background-color: #e3f2fd; }
+        .management-table tr:hover td:first-child { background-color: #e3f2fd !important; }
 
-        /* Botones de Acción */
+        /* Botones Acción */
         .action-icon-btn {
             background: white; border: 1px solid #ddd; cursor: pointer;
             font-size: 15px; width: 28px; height: 28px; border-radius: 6px;
@@ -485,19 +494,12 @@
         }
         .action-icon-btn:hover { transform: translateY(-2px); border-color: #0a66c2; background: #f0f7ff; }
 
-        /* 3. AJUSTE EXCLUSIVO PARA PC */
+        /* 3. AJUSTE PC */
         @media (min-width: 1024px) {
             .job-table-container { overflow-x: visible; }
             .management-table { min-width: 100%; width: 100%; table-layout: auto; }
-            
-            .management-table td {
-                white-space: normal; word-wrap: break-word; max-width: 250px;
-            }
-
-            .management-table td:nth-child(6), 
-            .management-table td:last-child {  
-                white-space: nowrap; width: 1%; 
-            }
+            .management-table td { white-space: normal; word-wrap: break-word; max-width: 250px; }
+            .management-table td:nth-child(6), .management-table td:last-child { white-space: nowrap; width: 1%; }
             .header-select { max-width: 100%; }
         }
 
