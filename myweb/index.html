@@ -355,7 +355,7 @@
         .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
 
         /* =========================================================
-           BLOQUE 2 FINAL V6: AJUSTE MILIMÉTRICO (LÍNEA PEGADA A LA IZQ)
+           BLOQUE 2 FINAL V7: AHORA SÍ, COLUMNA # INMOVILIZADA 🔒
            ========================================================= */
 
         /* 1. Contador "Slim" Transparente */
@@ -403,23 +403,21 @@
             border-bottom: none; 
         }
 
-        /* --- COLUMNA # INMOVILIZADA (HEADER) - MÁS ANGOSTA --- */
+        /* --- COLUMNA # FIJA (HEADER) --- */
         .management-table th:first-child {
-            position: sticky;
-            left: 0;
-            z-index: 20; 
-            background-color: #0a66c2; 
+            position: sticky !important; /* <--- ¡AQUÍ ESTÁ EL CANDADO! */
+            left: 0 !important;
+            z-index: 20 !important; /* Por encima de todo */
+            background-color: #0a66c2 !important; 
             box-shadow: 2px 0 5px rgba(0,0,0,0.1); 
             
-            /* AQUÍ ESTÁ EL AJUSTE MILIMÉTRICO */
-            width: 30px !important;      /* Forzamos ancho mínimo */
-            padding-left: 2px !important;  /* Casi sin aire a la izq */
-            padding-right: 2px !important; /* Casi sin aire a la der */
+            width: 30px !important;
+            padding-left: 2px !important;
+            padding-right: 2px !important;
             text-align: center !important;
             border-top-left-radius: 11px;
         }
         
-        /* Esquina redonda derecha */
         .management-table th:last-child { border-top-right-radius: 11px; }
 
         /* Select del Filtro */
@@ -439,18 +437,17 @@
             white-space: nowrap; 
         }
 
-        /* --- COLUMNA # INMOVILIZADA (CUERPO) - MÁS ANGOSTA --- */
+        /* --- COLUMNA # FIJA (CUERPO/NÚMEROS) --- */
         .management-table td:first-child {
-            position: sticky;
-            left: 0;
-            z-index: 15; 
+            position: sticky !important; /* <--- ¡CANDADO ABAJO TAMBIÉN! */
+            left: 0 !important;
+            z-index: 15 !important; 
             font-weight: bold;
             color: #0a66c2;
             border-right: 1px solid #e0e0e0; 
             box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-            background-color: white; 
+            background-color: white; /* Fondo base obligatorio */
             
-            /* AQUÍ ESTÁ EL AJUSTE MILIMÉTRICO */
             width: 30px !important;
             padding-left: 2px !important;
             padding-right: 2px !important;
@@ -464,7 +461,6 @@
             font-weight: 600; 
         }
 
-        /* Alineación Derecha Acciones */
         .management-table td:last-child {
             text-align: right; width: 1%;
         }
@@ -473,12 +469,12 @@
             display: flex; justify-content: flex-end; align-items: center; gap: 5px;
         }
 
-        /* EFECTOS CEBRA */
+        /* --- EFECTOS CEBRA INTELIGENTES (Para que la columna fija cambie de color también) --- */
         .management-table tr:nth-child(even) { background-color: #f8f9fa; }
-        .management-table tr:nth-child(even) td:first-child { background-color: #f8f9fa; } 
+        .management-table tr:nth-child(even) td:first-child { background-color: #f8f9fa !important; } 
 
         .management-table tr:hover { background-color: #e3f2fd; }
-        .management-table tr:hover td:first-child { background-color: #e3f2fd; } 
+        .management-table tr:hover td:first-child { background-color: #e3f2fd !important; } 
 
         /* Botones de Acción */
         .action-icon-btn {
@@ -506,7 +502,6 @@
         }
 
         
-
         
         #flyerTemplate { width: 1080px; min-height: 1080px; height: auto; position: fixed; top: 0; left: -9999px; z-index: -1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: 'Arial Black', 'Arial', sans-serif; text-align: center; padding: 80px 60px; box-sizing: border-box; background: #0a192d; }
         .flyer-badge-top { background-color: #FF9800; color: white; font-size: 55px; padding: 15px 80px; border-radius: 10px; text-transform: uppercase; letter-spacing: 4px; font-weight: 900; margin-bottom: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 4px solid #FFF; transform: skew(-10deg); z-index: 2; position: relative; }
