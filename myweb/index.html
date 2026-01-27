@@ -354,38 +354,114 @@
         .recruiters-table tr:hover { background-color: #f9f9f9; }
         .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
 
-        /* ESTILOS PARA LA TABLA DE GESTIÓN (RECLUTADOR) */
-        .job-table-container { overflow-x: auto; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        .management-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        
-        /* --- FIX V18.2: Sticky Títulos Tabla Corregido --- */
-        .management-table th {
-            background: #0a66c2; color: white; padding: 15px; text-align: left; font-weight: 600; 
-            z-index: 950;
-        }
-        
-        /* CORRECCIÓN BARRA AZUL + CURSOR DE ORDENAR (V18.1) */
-        body.admin-mode .management-table th {
-            position: relative; 
-            top: 0;
-            z-index: 1;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            cursor: pointer; /* Manita para indicar clic */
-            user-select: none; /* Evita que se seleccione el texto al dar clic rápido */
-            transition: background 0.2s;
-        }
-        body.admin-mode .management-table th:hover {
-            background-color: #004182; /* Color un poco más oscuro al pasar el mouse */
-        }
-        /* Ocultar botones delicados en modo Reclutador */
-        body.recruiter-view .admin-only { display: none !important; }
+        /* =========================================================
+           BLOQUE 2 FINAL V4: DE LUJO (ESQUINAS REDONDAS PERFECTAS)
+           ========================================================= */
 
-        .management-table td { padding: 8px 10px; border-bottom: 1px solid #eee; color: #333; }
-        .management-table tr:hover { background: #f5f5f5; }
+        /* 1. Contador "Slim" Transparente */
+        .detailed-counter {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 5px !important;
+            margin-top: 10px !important;
+            margin-bottom: 10px !important;
+            display: flex; flex-wrap: wrap; gap: 15px; align-items: center;
+            font-size: 13px; color: white !important; font-weight: 700;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
         
-        .action-icon-btn { background: none; border: none; cursor: pointer; font-size: 16px; margin-right: 5px; padding: 5px; border-radius: 4px; }
-        .action-icon-btn:hover { background: #e3f2fd; }
-        .management-table td:last-child { white-space: nowrap; display: flex; gap: 5px; align-items: center; }
+        .counter-tag { display: inline-flex; align-items: center; gap: 5px; }
+        .tag-total { color: #fff; } 
+        .tag-active { color: #69f0ae; }
+        .tag-inactive { color: #ff8a80; }
+
+        /* 2. CONFIGURACIÓN BASE (MÓVIL) */
+        .job-table-container {
+            width: 100%; 
+            overflow-x: auto; 
+            background: white;
+            border-radius: 12px; /* Curva del contenedor */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 50px; 
+            border: 1px solid #e0e0e0;
+            -webkit-overflow-scrolling: touch; 
+        }
+
+        .management-table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            min-width: 900px; 
+        }
+
+        .management-table th {
+            background: #0a66c2; color: white; 
+            padding: 10px 8px; 
+            text-align: left; font-size: 13px; font-weight: 700; 
+            text-transform: uppercase; white-space: nowrap;
+            position: sticky; top: 0; z-index: 10; vertical-align: middle;
+            border-bottom: none; /* Quitamos borde inferior para que se vea limpio */
+        }
+
+        /* --- AQUÍ ESTÁ EL TRUCO DE LAS ESQUINAS --- */
+        .management-table th:first-child {
+            border-top-left-radius: 11px; /* Redondea la esquina izq */
+        }
+        .management-table th:last-child {
+            border-top-right-radius: 11px; /* Redondea la esquina der */
+        }
+        /* ------------------------------------------ */
+
+        .header-select {
+            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+            color: white; padding: 2px 4px; border-radius: 4px;
+            font-size: 11px; font-weight: bold; width: 100%; max-width: 180px;
+            outline: none; cursor: pointer;
+        }
+        .header-select option { color: #333; background: white; }
+
+        .management-table td {
+            padding: 8px 8px; 
+            border-bottom: 1px solid #f0f0f0; 
+            color: #333; font-size: 13px; vertical-align: middle;
+            white-space: nowrap; 
+        }
+
+        .management-table td:last-child {
+            text-align: right; width: 1%;
+        }
+        
+        .actions-flex {
+            display: flex; justify-content: flex-end; align-items: center; gap: 5px;
+        }
+
+        .management-table tr:nth-child(even) { background-color: #f8f9fa; }
+        .management-table tr:hover { background-color: #e3f2fd; }
+
+        .action-icon-btn {
+            background: white; border: 1px solid #ddd; cursor: pointer;
+            font-size: 15px; width: 28px; height: 28px; border-radius: 6px;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .action-icon-btn:hover { transform: translateY(-2px); border-color: #0a66c2; background: #f0f7ff; }
+
+        /* 3. AJUSTE EXCLUSIVO PARA PC */
+        @media (min-width: 1024px) {
+            .job-table-container { overflow-x: visible; }
+            .management-table { min-width: 100%; width: 100%; table-layout: auto; }
+            
+            .management-table td {
+                white-space: normal; word-wrap: break-word; max-width: 250px;
+            }
+
+            .management-table td:nth-child(6), 
+            .management-table td:last-child {  
+                white-space: nowrap; width: 1%; 
+            }
+            .header-select { max-width: 100%; }
+        }
+
+        
 
         #flyerTemplate { width: 1080px; min-height: 1080px; height: auto; position: fixed; top: 0; left: -9999px; z-index: -1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: 'Arial Black', 'Arial', sans-serif; text-align: center; padding: 80px 60px; box-sizing: border-box; background: #0a192d; }
         .flyer-badge-top { background-color: #FF9800; color: white; font-size: 55px; padding: 15px 80px; border-radius: 10px; text-transform: uppercase; letter-spacing: 4px; font-weight: 900; margin-bottom: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 4px solid #FFF; transform: skew(-10deg); z-index: 2; position: relative; }
@@ -746,7 +822,7 @@
             .job-table-container { margin-top: 5px !important; border: none !important; }
         }
 
-    </style>
+    </style>    
 </head>
 <body>
 
@@ -857,8 +933,17 @@
                     </select>
                 </div>
             </div>
-            <div class="grid-header"><div class="job-counter" id="jobCounter"></div></div>
+
+<div id="universalCounter" class="detailed-counter" style="display:none;">
+                <span class="counter-tag tag-total" id="countTotal">Total: 0</span>
+                <span class="counter-tag tag-active" id="countActive">🟢 0 Vigentes</span>
+                <span class="counter-tag tag-inactive" id="countInactive">🔴 0 No Vigentes</span>
+            </div>
             
+            <div id="tableHint" style="font-size: 12px; color: #999; text-align: right; margin-bottom: 5px; display: none;">
+                Desliza la tabla ➡️
+            </div>
+
             <div id="skeletonLoader" class="job-grid">
                 <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-text"></div><div class="skeleton sk-text"></div><div class="skeleton sk-tag"></div></div>
                 <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-text"></div><div class="skeleton sk-text"></div><div class="skeleton sk-tag"></div></div>
@@ -870,18 +955,26 @@
                 <table class="management-table">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th onclick="window.handleSort('company')" title="Ordenar por Empresa">Empresa ↕️</th>
-                            <th onclick="window.handleSort('title')" title="Ordenar por Título">Título ↕️</th>
-                            <th onclick="window.handleSort('location')" title="Ordenar por Ubicación">Ubicación ↕️</th>
-                            <th onclick="window.handleSort('salary')">Salario</th>
-                            <th onclick="window.handleSort('status')" title="Ordenar por Estatus">Estatus ↕️</th>
-                            <th>Acciones</th>
+                            <th style="width: 40px;">#</th>
+                            
+                            <th>
+                                <select id="headerCompanyFilter" class="header-select" onchange="renderJobsTable()">
+                                    <option value="">🏢 EMPRESAS</option>
+                                    </select>
+                            </th>
+
+                            <th onclick="window.handleSort('title')" style="cursor:pointer;">💼 Vacante ↕️</th>
+                            <th onclick="window.handleSort('location')" style="cursor:pointer;">📍 Ubicación ↕️</th>
+                            <th onclick="window.handleSort('salary')" style="cursor:pointer;">💰 Salario</th>
+                            <th onclick="window.handleSort('status')" style="cursor:pointer; text-align:center;">Estado ↕️</th>
+                            <th style="text-align:right;">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="jobTableBody"></tbody>
+                    <tbody id="jobTableBody">
+                        </tbody>
                 </table>
             </div>
+            
             <div id="paginationContainer" class="pagination-container" style="display:none;"></div>
             
             <div id="recruiterBanner" onclick="contactCentralOffice()">
@@ -2004,71 +2097,116 @@
             renderJobsTable(); // Redibuja la tabla
         }
 
-        function renderJobsTable() {
+        // --- FUNCIÓN TABLA (LÓGICA V19.3: Filtro Total + Vigente) ---
+        window.renderJobsTable = function() {
             let keys = Object.keys(jobs);
+            
+            // 1. LLENAR SELECT (Con todas las empresas)
+            const companySelect = document.getElementById('headerCompanyFilter');
+            if (companySelect && companySelect.options.length <= 1) {
+                const companies = [...new Set(Object.values(jobs).map(j => j.company.trim()))].sort();
+                companies.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c; opt.textContent = c;
+                    companySelect.appendChild(opt);
+                });
+            }
 
-            // LÓGICA DE ORDENAMIENTO
-            if (currentSortCol) {
+            // 2. APLICAR FILTRO DE EMPRESA
+            const selectedCompany = companySelect ? companySelect.value : '';
+            if (selectedCompany) {
+                keys = keys.filter(id => jobs[id].company === selectedCompany);
+            }
+
+            // 3. ACTUALIZAR CONTADOR (Llamada al absoluto)
+            updateUniversalCounter(); 
+
+            // 4. ORDENAMIENTO
+            if (currentSortCol && currentSortCol !== 'company') {
                 keys.sort((a, b) => {
                     let valA = '', valB = '';
-                    const jA = jobs[a];
-                    const jB = jobs[b];
-
-                    // Definir qué valor comparar según la columna
+                    const jA = jobs[a]; const jB = jobs[b];
                     switch(currentSortCol) {
-                        case 'company': valA = jA.company; valB = jB.company; break;
                         case 'title': valA = jA.title; valB = jB.title; break;
                         case 'status': valA = jA.status; valB = jB.status; break;
                         case 'location': valA = jA.city + jA.state; valB = jB.city + jB.state; break;
                         case 'salary': valA = jA.salary; valB = jB.salary; break;
                         default: return 0;
                     }
-
-                    // Limpiar textos para comparar bien (minúsculas y sin acentos)
-                    valA = valA ? valA.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
-                    valB = valB ? valB.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
-
+                    valA = valA ? valA.toString().toLowerCase() : "";
+                    valB = valB ? valB.toString().toLowerCase() : "";
                     if (valA < valB) return currentSortAsc ? -1 : 1;
                     if (valA > valB) return currentSortAsc ? 1 : -1;
                     return 0;
                 });
             } else {
-                // Orden por defecto (Fecha/ID descendente)
                 keys.sort((a,b) => b.localeCompare(a));
             }
 
+            // 5. DIBUJAR TABLA
             const tableBody = document.getElementById('jobTableBody');
-            let html = '';
-            let count = 1;
-
-            keys.forEach(id => {
+            tableBody.innerHTML = keys.map((id, index) => {
                 const j = jobs[id];
                 const loc = `${j.city}, ${j.state}`;
-                const salary = j.salary || 'N/A';
                 
-                // Estatus en una línea
+                // TEXTO CORREGIDO: "Vigente"
                 const statusBadge = j.status === 'No Vigente' 
-                    ? '<span style="white-space: nowrap; background:#ffebee; color:#c62828; padding:5px 10px; border-radius:15px; font-weight:bold; font-size:12px;">🔴 No Vigente</span>' 
-                    : '<span style="white-space: nowrap; background:#e8f5e9; color:#2e7d32; padding:5px 10px; border-radius:15px; font-weight:bold; font-size:12px;">🟢 Vigente</span>';
+                    ? '<span style="background:#ffebee; color:#c62828; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:11px;">🔴 No Vigente</span>' 
+                    : '<span style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:11px;">🟢 Vigente</span>';
 
-                html += `
+                return `
                     <tr>
-                        <td>${count}</td>
+                        <td>${index + 1}</td>
                         <td style="font-weight:bold; color:#0a66c2;">${j.company}</td>
                         <td>${j.title}</td>
                         <td>${loc}</td>
-                        <td style="color:#d32f2f; font-weight:bold;">${salary}</td>
-                        <td>${statusBadge}</td>
+                        <td style="color:#d32f2f; font-weight:bold;">${j.salary || 'N/A'}</td>
+                        <td style="text-align:center;">${statusBadge}</td>
                         <td>
-                             <button class="action-icon-btn" title="Descargar Flyer" onclick="window.generateFlyer('${id}')">🖼️</button>
-                             <button class="action-icon-btn" title="Copiar Link" onclick="window.copyJobLink('${id}')">🔗</button>
-                             ${isAdmin && !isRecruiterMode ? `<button class="action-icon-btn" title="Editar" onclick="window.editJob('${id}')">✏️</button>` : ''}
+                             <div class="actions-flex">
+                                 <button class="action-icon-btn" title="Flyer" onclick="window.generateFlyer('${id}')">🖼️</button>
+                                 <button class="action-icon-btn" title="Link" onclick="window.copyJobLink('${id}')">🔗</button>
+                                 ${isAdmin && !isRecruiterMode ? `<button class="action-icon-btn" title="Editar" onclick="window.editJob('${id}')">✏️</button>` : ''}
+                             </div>
                         </td>
                     </tr>
                 `;
-                count++;
-            });
-            tableBody.innerHTML = html;
+            }).join('');
+        }
+
+        // --- FUNCIÓN CONTADOR INTELIGENTE (OBSERVACIÓN 1) ---
+        function updateUniversalCounter() { 
+            const counterDiv = document.getElementById('universalCounter');
+            if(!counterDiv) return;
+            
+            const allJobs = Object.values(jobs); 
+            const total = allJobs.length;
+
+            // Si no hay vacantes, ocultamos
+            if (total === 0) { 
+                counterDiv.style.display = 'none'; 
+                return; 
+            } else {
+                counterDiv.style.display = 'flex';
+            }
+
+            const vigentes = allJobs.filter(j => j.status !== 'No Vigente').length;
+            const noVigentes = total - vigentes;
+
+            // --- AQUÍ ESTÁ EL CAMBIO DE LÓGICA ---
+            if (!isAdmin && !isRecruiterMode) {
+                // MODO USUARIO: Solo mostramos lo positivo
+                counterDiv.innerHTML = `
+                    <span class="counter-tag tag-active" style="font-size: 15px;">🚀 ${vigentes} Vacantes Disponibles</span>
+                `;
+            } else {
+                // MODO ADMIN/RECLUTADOR: Mostramos el reporte completo
+                counterDiv.innerHTML = `
+                    <span class="counter-tag tag-total">Total: ${total}</span>
+                    <span class="counter-tag tag-active">🟢 ${vigentes} Vigentes</span>
+                    <span class="counter-tag tag-inactive">🔴 ${noVigentes} No Vigentes</span>
+                `;
+            }
         }
 
         function renderJobs() {
@@ -2131,7 +2269,7 @@
                 return matchState && matchCity && matchSearch;
             });
 
-            document.getElementById('jobCounter').textContent = `${matchedKeys.length} vacantes encontradas`;
+            updateUniversalCounter();
             
             if (matchedKeys.length === 0) {
                 document.getElementById('jobGrid').innerHTML = '';
