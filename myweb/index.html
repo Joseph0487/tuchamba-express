@@ -1245,6 +1245,42 @@
             }
         }
 
+        /* --- CORRECCIÓN FINAL: BOTÓN COPIAR LINK (AZULITO RESTAURADO) 💎 --- */
+        body .header-buttons .copy-link-btn {
+            background-color: #e3f2fd !important; /* Fondo Azul Clarito */
+            color: #0d47a1 !important;            /* Letras Azul Fuerte */
+            border: 1px solid #90caf9 !important; /* Borde sutil */
+            
+            border-radius: 50px !important;       /* Óvalo perfecto */
+            padding: 0 15px !important;
+            font-weight: 800 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+            
+            /* Aseguramos alineación y tamaño */
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 32px !important; 
+            font-size: 12px !important;
+            cursor: pointer !important;
+            margin: 0 !important;
+        }
+
+        /* Efecto al pasar el mouse */
+        body .header-buttons .copy-link-btn:hover {
+            background-color: #bbdefb !important; /* Azul un poco más fuerte */
+            transform: translateY(-1px) !important;
+        }
+        
+        /* Ajuste específico para móvil para que no se deforme */
+        @media (max-width: 768px) {
+            body .header-buttons .copy-link-btn {
+                height: 30px !important;
+                font-size: 11px !important;
+            }
+        }
+
+        
 
     </style>    
 </head>
