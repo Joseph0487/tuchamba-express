@@ -738,6 +738,7 @@
             margin: 0 !important;
         }
        /* --- CORRECCIÓN FINAL V30 (Sin Botón de Nueva Vacante) --- */
+        /* --- CORRECCIÓN FINAL V31 (ESTÉTICA MÓVIL PULIDA) --- */
         @media (max-width: 768px) {
 
             /* 1. ENCABEZADO (Limpio en una línea) */
@@ -750,42 +751,52 @@
             .header-buttons button, .header-buttons span { padding: 4px 8px !important; font-size: 11px !important; height: 30px !important; }
             #viewToggleBtn { display: none !important; }
 
-            /* 2. CONTENEDOR GRID (Reclutador) */
+            /* 2. CONTENEDOR GRID (PANEL DE ACCIONES) */
             body.recruiter-view #adminControls {
                 position: static !important;
-                padding: 5px !important;
+                padding: 10px !important;
                 background: #f4f6f8 !important;
+                /* AQUÍ ESTÁ EL REDONDEO QUE PEDISTE */
+                border-radius: 16px !important; 
+                margin: 10px !important; /* Separación de los bordes */
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
             }
+            
             body.recruiter-view .admin-controls-wrapper {
                 display: grid !important;
                 grid-template-columns: 1fr 1fr !important; /* 2 columnas exactas */
-                gap: 5px !important;
+                gap: 8px !important; /* Un poco más de aire entre botones */
                 margin: 0 !important;
             }
 
-            /* --- ELEMENTOS DE LA CUADRÍCULA --- */
+            /* --- ELEMENTOS DE LA CUADRÍCULA (CENTRADO DE TEXTO) --- */
             
-            /* POSICIÓN 1: Tarjeta de Vistas (Texto) */
+            /* REGLA GENERAL PARA CENTRAR TODO EN EL GRID */
+            body.recruiter-view .admin-controls-wrapper > * {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important; /* <--- ESTO CENTRA EL TEXTO */
+                text-align: center !important;
+            }
+
+            /* POSICIÓN 1: Tarjeta de Vistas */
             body.recruiter-view .metrics-card {
                 order: 1 !important;
                 width: 100% !important; height: 40px !important;
-                display: flex !important; align-items: center !important; justify-content: center !important;
                 font-size: 11px !important; padding: 0 !important; margin: 0 !important;
                 background: white !important; border: 1px solid #ccc !important;
                 border-left: 4px solid #0a66c2 !important;
+                border-radius: 8px !important; /* Esquinas suaves */
             }
-            /* Aseguramos que el texto de visitas SÍ se vea */
             body.recruiter-view .metrics-card span { display: inline !important; }
 
-            /* POSICIÓN 2: Botón MÉTRICAS (Morado) */
+            /* POSICIÓN 2: Botón MÉTRICAS */
             body.recruiter-view button.metrics-btn {
-                display: flex !important; /* Forzamos visibilidad */
                 order: 2 !important;
                 width: 100% !important; height: 40px !important;
-                background: #7b1fa2 !important; /* Morado */
+                background: #7b1fa2 !important; 
                 color: white !important;
-                font-size: 12px !important; border-radius: 6px !important;
-                align-items: center !important; justify-content: center !important;
+                font-size: 12px !important; border-radius: 8px !important;
                 padding: 0 !important; margin: 0 !important;
             }
 
@@ -793,19 +804,18 @@
             body.recruiter-view button[onclick="exportToExcel()"] {
                 order: 3 !important;
                 height: 40px !important; width: 100% !important; font-size: 12px !important; padding: 0 !important;
+                border-radius: 8px !important;
             }
 
             /* POSICIÓN 4: Botón Plantilla */
             body.recruiter-view button[onclick="downloadTemplate()"] {
                 order: 4 !important;
                 height: 40px !important; width: 100% !important; font-size: 12px !important; padding: 0 !important;
+                border-radius: 8px !important;
             }
 
             /* 3. ELIMINAR EL BOTÓN VERDE (+ NUEVA) */
-            /* En modo reclutador, lo ocultamos por completo */
-            body.recruiter-view button.add-job-btn {
-                display: none !important;
-            }
+            body.recruiter-view button.add-job-btn { display: none !important; }
 
             /* 4. OCULTAR LO QUE SOBRA */
             body.recruiter-view .team-btn,
@@ -822,6 +832,7 @@
             .job-table-container { margin-top: 5px !important; border: none !important; }
         }
 
+       
     </style>    
 </head>
 <body>
@@ -2097,11 +2108,11 @@
             renderJobsTable(); // Redibuja la tabla
         }
 
-        // --- FUNCIÓN TABLA (LÓGICA V19.3: Filtro Total + Vigente) ---
+        // --- FUNCIÓN TABLA (LÓGICA V19.4: Filtro Trim + Diseño) ---
         window.renderJobsTable = function() {
             let keys = Object.keys(jobs);
             
-            // 1. LLENAR SELECT (Con todas las empresas)
+            // 1. LLENAR SELECT (Con todas las empresas, limpiando espacios)
             const companySelect = document.getElementById('headerCompanyFilter');
             if (companySelect && companySelect.options.length <= 1) {
                 const companies = [...new Set(Object.values(jobs).map(j => j.company.trim()))].sort();
@@ -2112,13 +2123,13 @@
                 });
             }
 
-            // 2. APLICAR FILTRO DE EMPRESA
+            // 2. APLICAR FILTRO DE EMPRESA (Corrección: Usamos trim() para que coincida exacto)
             const selectedCompany = companySelect ? companySelect.value : '';
             if (selectedCompany) {
-                keys = keys.filter(id => jobs[id].company === selectedCompany);
+                keys = keys.filter(id => jobs[id].company.trim() === selectedCompany);
             }
 
-            // 3. ACTUALIZAR CONTADOR (Llamada al absoluto)
+            // 3. ACTUALIZAR CONTADOR
             updateUniversalCounter(); 
 
             // 4. ORDENAMIENTO
@@ -2149,7 +2160,7 @@
                 const j = jobs[id];
                 const loc = `${j.city}, ${j.state}`;
                 
-                // TEXTO CORREGIDO: "Vigente"
+                // TEXTO: "Vigente" / "No Vigente"
                 const statusBadge = j.status === 'No Vigente' 
                     ? '<span style="background:#ffebee; color:#c62828; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:11px;">🔴 No Vigente</span>' 
                     : '<span style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:11px;">🟢 Vigente</span>';
