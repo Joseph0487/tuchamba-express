@@ -1153,6 +1153,40 @@
             }
         }
 
+        /* =========================================================
+           CORRECCIÓN FINAL V2: ENCABEZADOS TABLA MÓVIL (UNIFORMES)
+           ========================================================= */
+        @media (max-width: 768px) {
+            
+            .management-table th {
+                /* 1. Fuente y Color */
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+                color: #ffffff !important;       /* Blanco Puro */
+                font-weight: 800 !important;     /* Negrita fuerte */
+                background-color: #0a66c2 !important;
+                
+                /* 2. LA CLAVE DEL TAMAÑO (Evita que el cel decida por ti) */
+                font-size: 11px !important;      
+                -webkit-text-size-adjust: 100% !important; /* Prohibido auto-escalar */
+                text-size-adjust: 100% !important;
+                
+                /* 3. Espaciado y Alineación */
+                text-transform: uppercase !important; 
+                white-space: nowrap !important;  /* Obliga a estar en 1 sola línea */
+                padding: 12px 5px !important;    /* Relleno idéntico para todos */
+                vertical-align: middle !important;
+                line-height: 1 !important;       /* Altura de línea compacta */
+            }
+
+            /* 4. Ajuste para el Select "EMPRESAS" dentro del título */
+            .management-table th select#headerCompanyFilter {
+                font-size: 11px !important;      /* Mismo tamaño que el texto */
+                font-weight: 800 !important;
+                height: 20px !important;         /* Altura controlada */
+                margin: 0 !important;
+            }
+        }
+
 
     </style>    
 </head>
