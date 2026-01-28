@@ -1581,7 +1581,55 @@
             button[onclick*="downloadTemplate"] { grid-column: span 2 !important; font-size: 10px !important; }
         }
 
+        /* =========================================================
+           CORRECCIONES POST-PRODUCCIÓN (V22.1) 🚑
+           (Arreglo de Reclutador Móvil y Lupa Fantasma)
+           ========================================================= */
 
+        /* 1. MATAR LA LUPA EN MODO USUARIO/INVITADO 🕵️‍♂️🚫 */
+        /* Aseguramos que la lupa SOLO se vea si tienes la clase .admin-mode */
+        #adminSearchToggle { display: none !important; }
+        
+        /* Solo si eres Admin Y estás en celular, aparece la lupa */
+        @media (max-width: 768px) {
+            body.admin-mode #adminSearchToggle {
+                display: inline-flex !important;
+            }
+        }
+
+        /* 2. REPARACIÓN MODO RECLUTADOR MÓVIL (GRID 2x2) 📱 */
+        @media (max-width: 768px) {
+            /* Forzamos al contenedor a usar 2 columnas simples */
+            body.recruiter-view .admin-controls-wrapper {
+                grid-template-columns: 1fr 1fr !important; /* 2 Columnas iguales */
+                gap: 10px !important;
+                display: grid !important;
+            }
+
+            /* Reseteamos los botones para que no se estiren raro (quitamos el span 3 o span 2 del admin) */
+            body.recruiter-view .admin-controls-wrapper button {
+                grid-column: auto !important; /* Que ocupen solo 1 espacio */
+                width: 100% !important;
+                margin: 0 !important;
+            }
+            
+            /* Ajuste específico para el botón "Vista" en Reclutador */
+            body.recruiter-view #viewToggleBtn {
+                grid-column: auto !important; /* Le quitamos el "span 3" del admin */
+            }
+        }
+
+        /* 3. HOMOLOGACIÓN TÍTULOS TABLA (RECLUTADOR MÓVIL) 📏 */
+        /* Forzamos que en el celular del reclutador se vea igual que en PC */
+        @media (max-width: 768px) {
+            body.recruiter-view .management-table th {
+                font-size: 13px !important;      /* Tamaño grande legible */
+                font-weight: 800 !important;     /* Negrita fuerte */
+                text-transform: uppercase !important;
+                padding: 10px 5px !important;
+                letter-spacing: 0.5px !important;
+            }
+        }
 
 
        
