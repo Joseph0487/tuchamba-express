@@ -1024,6 +1024,36 @@
             display: flex !important; /* Solo aquí aparece */
         }
 
+        /* --- BLOQUE 1: MEJORAS VISUALES V20.2 --- */
+
+        /* TAREA 5: Botón Compartir Moderno (Letra clara y negrita) */
+        .share-btn { 
+            background: #25D366 !important; 
+            color: white !important; /* Blanco puro para contraste máximo */
+            border: none !important; 
+            padding: 8px 16px !important; 
+            border-radius: 6px !important; 
+            cursor: pointer !important; 
+            font-weight: 800 !important; /* Letra gorda */
+            font-size: 14px !important; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+        }
+
+        /* TAREA 11: Homologar Encabezados de Tabla (PC y Celular iguales) */
+        .management-table th {
+            font-size: 13px !important; /* Tamaño estándar para todos */
+            vertical-align: middle !important;
+            padding: 10px 5px !important;
+            text-transform: uppercase !important;
+        }
+        
+        /* Ajuste específico para que en celular no se hagan microscópicas */
+        @media (max-width: 768px) {
+            .management-table th {
+                font-size: 12px !important; /* Mínimo legible */
+                white-space: nowrap !important;
+            }
+        }
 
        
     </style>    
@@ -1317,12 +1347,17 @@
                     </div>
                 </div>
 
-                <div style="display:flex; gap:10px; margin-top:10px;">
-                    <button class="btn-primary" style="flex:1; display:flex; justify-content:center; align-items:center; gap:8px;" id="btnSaveRecruiter" onclick="saveRecruiter()">
-                        💾 Guardar Reclutador
-                    </button>
-                    <button class="tool-btn" style="background:#666; display:none;" id="btnCancelRecruiter" onclick="resetRecruiterForm()">Cancelar</button>
-                </div>
+                <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+                        <button class="btn-primary" style="flex:1;" id="btnSaveRecruiter" onclick="saveRecruiter()">
+                            💾 Guardar
+                        </button>
+                        
+                        <button class="tool-btn" style="background:#2e7d32; flex:1; justify-content:center;" onclick="downloadRecruitersDB()">
+                            📥 Base
+                        </button>
+
+                        <button class="tool-btn" style="background:#666; display:none; width:100%; justify-content:center;" id="btnCancelRecruiter" onclick="resetRecruiterForm()">Cancelar Edición</button>
+                    </div>
             </div>
 
             <h3 style="font-size:16px; margin-bottom:10px; color:#555;">📂 Directorio Activo</h3>
@@ -1391,7 +1426,18 @@
         const today = new Date();
         const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
         const urlParams = new URLSearchParams(window.location.search);
+        // --- TAREA 13: LOGICA DE REFERIDOS ---
         const refCode = urlParams.get('ref');
+        
+        if (refCode) {
+            sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
+            
+            // Ocultar el botón de "Ingresa aquí" si viene de un referido
+            document.addEventListener("DOMContentLoaded", () => {
+                const adminLink = document.querySelector('.admin-toggle-link');
+                if(adminLink) adminLink.style.display = 'none';
+            });
+        }
         
         if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
 
@@ -2625,10 +2671,61 @@
             }
         }
 
+       // --- TAREA 12: FILTROS INTELIGENTES ---
         window.filterJobs = function() {
             currentPage = 1; 
+            const searchText = normalizeText(document.getElementById('searchInput').value);
+            
+            // 1. Primero actualizamos los municipios disponibles
+            updateSmartFilters(searchText);
+
+            // 2. Luego filtramos visualmente
             applyFilterAndRender();
         }
+
+        function updateSmartFilters(searchText) {
+            const stateSelect = document.getElementById('stateFilter');
+            const citySelect = document.getElementById('cityFilter');
+            const selectedState = stateSelect.value;
+            const selectedCity = citySelect.value;
+
+            // Filtramos vacantes considerando si están VIGENTES
+            const availableJobs = Object.values(jobs).filter(j => {
+                // REGLA DE ORO: Si no es Admin, ocultamos las NO VIGENTES del filtro
+                if (!isAdmin && j.status === 'No Vigente') return false;
+                
+                if (!searchText) return true;
+                const fullText = normalizeText(`${j.title} ${j.company} ${j.tags} ${j.description}`);
+                return fullText.includes(searchText);
+            });
+
+            const availableStates = new Set();
+            const availableCities = new Set();
+
+            availableJobs.forEach(j => {
+                if (j.state) availableStates.add(j.state);
+                if (!selectedState || j.state === selectedState) {
+                    if (j.city) availableCities.add(j.city);
+                }
+            });
+
+            // Reconstruir Estados
+            let stateHtml = '<option value="">📍 Estado</option>';
+            [...availableStates].sort().forEach(s => {
+                stateHtml += `<option value="${s}" ${s === selectedState ? 'selected' : ''}>${s}</option>`;
+            });
+            stateSelect.innerHTML = stateHtml;
+
+            // Reconstruir Municipios
+            let cityHtml = '<option value="">🏙️ Municipio</option>';
+            [...availableCities].sort().forEach(c => {
+                cityHtml += `<option value="${c}" ${c === selectedCity ? 'selected' : ''}>${c}</option>`;
+            });
+            citySelect.innerHTML = cityHtml;
+        }
+        
+        // Agregar esto para que al cambiar estado, se refresquen los municipios
+        window.handleStateChange = function() { filterJobs(); }
 
         window.loadMoreJobs = function() {
             displayLimit += 20;
@@ -2952,9 +3049,29 @@
             };
             reader.readAsArrayBuffer(file);
         }
+
+        // --- TAREA 2: DESCARGAR BASE RECLUTADORES ---
+        window.downloadRecruitersDB = function() {
+            if (!recruiters || Object.keys(recruiters).length === 0) return window.showToast("❌ Sin datos");
+            
+            const data = Object.values(recruiters).map(r => ({
+                'NOMBRE': r.name,
+                'NÚMERO': r.phone,
+                'CÓDIGO/USUARIO': r.code,
+                'LINK PERSONAL': `${window.location.origin}/?ref=${r.code.toLowerCase()}`
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Reclutadores");
+            
+            const dateStr = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(wb, `Base_Reclutadores_${dateStr}.xlsx`);
+            window.showToast("✅ Base descargada");
+        }
+
+
+
     </script>
 </body>
 </html>
-
-
-
