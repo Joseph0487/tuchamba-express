@@ -1800,10 +1800,19 @@
                 document.body.classList.add('admin-mode');
 
                 if (isRecruiterMode) {
-                    // ACTIVAMOS LA VISTA RECLUTADOR (Oculta botones)
+                    // ACTIVAMOS LA VISTA RECLUTADOR
                     document.body.classList.add('recruiter-view');
-                    document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator" style="background:#e3f2fd; color:#0d47a1; border-color:#90caf9;">Modo Reclutador</span>';
+                    
+                    // --- CORRECCIÓN: GENERAR EL BOTÓN AZUL REAL (NO UN TEXTO) ---
+                    // Esto crea el botón físico para que las reglas de alineación funcionen
+                    const recLink = `${window.location.origin}/?ref=${refCode}`;
+                    document.getElementById('modeIndicator').innerHTML = `
+                        <button class="copy-link-btn" onclick="copyRecruiterLink('${recLink}')" title="Copiar mi link">
+                            🔗 Copiar Link
+                        </button>`;
+                    
                     document.getElementById('viewToggleBtn').style.display = 'none'; 
+                } 
                 } else {
                     document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator">Super Admin</span>';
                     document.getElementById('viewToggleBtn').style.display = 'inline-flex'; 
@@ -3187,10 +3196,17 @@
             window.showToast("✅ Base descargada");
         }
 
+        // --- FUNCIÓN RECUPERADA: COPIAR LINK ---
+        window.copyRecruiterLink = function(link) {
+            navigator.clipboard.writeText(link).then(() => {
+                window.showToast("✅ Link copiado al portapapeles");
+            }).catch(err => {
+                window.showToast("❌ Error al copiar"); // Fallback simple
+                prompt("Copia tu link manualmente:", link);
+            });
+        }
 
 
     </script>
 </body>
 </html>
-
-
