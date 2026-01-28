@@ -1026,17 +1026,64 @@
 
         /* --- BLOQUE 1: MEJORAS VISUALES V20.2 --- */
 
-        /* TAREA 5: Botón Compartir Moderno (Letra clara y negrita) */
-        .share-btn { 
-            background: #25D366 !important; 
-            color: white !important; /* Blanco puro para contraste máximo */
-            border: none !important; 
-            padding: 8px 16px !important; 
-            border-radius: 6px !important; 
-            cursor: pointer !important; 
-            font-weight: 800 !important; /* Letra gorda */
-            font-size: 14px !important; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+        /* =========================================================
+           CORRECCIÓN DEFINITIVA: BOTÓN COMPARTIR "PREMIUM" 💎
+           (Atacamos por ID para que nada nos gane)
+           ========================================================= */
+        #mainShareBtn {
+            /* 1. Fondo Degradado (Más moderno que el color plano) */
+            background: linear-gradient(135deg, #25D366 0%, #075E54 100%) !important;
+            
+            /* 2. Texto Ultra Legible */
+            color: #ffffff !important;
+            font-weight: 900 !important; /* Letra muy gorda */
+            font-size: 13px !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important; /* Sombra negra tras la letra */
+            letter-spacing: 0.5px !important;
+            
+            /* 3. Forma y Bordes */
+            border: 1px solid rgba(255,255,255,0.2) !important; /* Borde sutil brillante */
+            border-radius: 50px !important; /* Píldora perfecta */
+            padding: 0 20px !important;     /* Más ancho para que respiren las letras */
+            height: 36px !important;        /* Altura cómoda */
+            
+            /* 4. Efectos 3D */
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4) !important; /* Resplandor verde */
+            
+            /* 5. Asegurar Alineación */
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+
+        /* Efecto al pasar el mouse */
+        #mainShareBtn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6) !important;
+            filter: brightness(1.1);
+        }
+
+        /* Efecto al dar clic */
+        #mainShareBtn:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* AJUSTE PARA MÓVIL (Para que no robe mucho espacio) */
+        @media (max-width: 768px) {
+            #mainShareBtn {
+                height: 32px !important;
+                padding: 0 15px !important;
+                font-size: 12px !important;
+            }
+        }
+
+        /* Efecto al pasar el mouse (se ilumina un poco) */
+        body .header-buttons .share-btn:hover {
+            background: #00e676 !important; 
+            transform: translateY(-1px) !important;
         }
 
         /* TAREA 11: Homologar Encabezados de Tabla (PC y Celular iguales) */
@@ -1118,7 +1165,7 @@
             <div class="header">
                 <h1>Portal de Vacantes</h1>
                 <div class="header-buttons">
-                    <button class="share-btn" onclick="shareApp()">📤 Compartir</button>
+                    <button id="mainShareBtn" class="share-btn" onclick="shareApp()">📤 Compartir</button>
                     <span id="modeIndicator"></span>
                     <button id="viewToggleBtn" class="tool-btn" style="display:none; background:#00796b;" onclick="toggleViewMode()">👁️ Cambiar Vista</button>
                     <button class="admin-btn" style="background: #333;" onclick="logout()">Salir</button>
@@ -3075,3 +3122,5 @@
     </script>
 </body>
 </html>
+
+
