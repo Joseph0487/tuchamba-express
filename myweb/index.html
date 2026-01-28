@@ -1631,7 +1631,15 @@
             }
         }
 
-
+        /* =========================================================
+           CORRECCIÓN FINAL: MATAR BOTÓN MÓVIL EN PC (V22.2) ☠️
+           (Ese botón "Filtros de Búsqueda" NO debe existir en escritorio)
+           ========================================================= */
+        @media (min-width: 769px) {
+            #mobileFilterToggle { 
+                display: none !important; /* ¡Adiós para siempre en PC! */
+            }
+        }
        
     </style>    
 </head>
@@ -2063,6 +2071,7 @@
                 isAdmin = true; 
                 currentUserEmail = user.email; 
                 setAdminMode(true); 
+                window.scrollTo(0, 0); // <--- ¡AQUÍ! Pega esta línea
             } else {
                 isAdmin = false;
                 currentUserEmail = "";
