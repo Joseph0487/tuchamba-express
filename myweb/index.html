@@ -1193,6 +1193,56 @@
             vertical-align: middle !important;
         }
 
+        /* =========================================================
+           TAREA 11: HOMOLOGACIÓN DE ENCABEZADOS DE TABLA 📏
+           (Letra uniforme en PC y Celular)
+           ========================================================= */
+        .management-table th {
+            font-size: 13px !important;      /* Tamaño estándar legible */
+            text-transform: uppercase !important; /* Todo en mayúsculas para uniformidad */
+            padding: 12px 8px !important;    /* Espaciado cómodo */
+            vertical-align: middle !important;
+            letter-spacing: 0.5px !important; /* Un poco de aire entre letras */
+            font-weight: 700 !important;
+        }
+
+        /* Ajuste fino para móviles (para que no se vean gigantes) */
+        @media (max-width: 768px) {
+            .management-table th {
+                font-size: 12px !important; /* Un pelito más chico en cel, pero legible */
+                padding: 10px 5px !important;
+            }
+        }
+
+        /* =========================================================
+           TAREA 14: CORRECCIÓN DE COLUMNA FIJA "#" (MODO RECLUTADOR) 🧱
+           (Hacemos que el # sea el rey y nadie pase por encima de él)
+           ========================================================= */
+        
+        /* 1. Elevamos el nivel de la primera columna (#) */
+        body.recruiter-view .management-table th:first-child,
+        body.recruiter-view .management-table td:first-child {
+            position: sticky !important;
+            left: 0 !important;
+            z-index: 50 !important; /* ¡NIVEL DIOS! (Muy alto) */
+            
+            /* Le ponemos fondo sólido para que no se trasluzca lo que pasa por abajo */
+            background-color: #f8f9fa !important; 
+            border-right: 2px solid #e0e0e0 !important; /* Borde fuerte para separar */
+        }
+
+        /* 2. Aseguramos que el encabezado del # tenga el color correcto */
+        body.recruiter-view .management-table th:first-child {
+            background-color: #2c3e50 !important; /* El gris oscuro del header */
+            color: white !important;
+            z-index: 60 !important; /* El encabezado debe ser aún más alto que las celdas */
+        }
+
+        /* 3. Los demás encabezados deben estar ABAJO del # */
+        body.recruiter-view .management-table th:not(:first-child) {
+            z-index: 10 !important; /* Nivel bajo */
+        }
+
        
     </style>    
 </head>
