@@ -1172,6 +1172,27 @@
             }
         }
 
+        /* =========================================================
+           CORRECCIÓN: ALINEACIÓN VERTICAL PERFECTA (V20.4) 📐
+           (Esto centra el botón de "Copiar Link" con los demás)
+           ========================================================= */
+        
+        /* 1. El contenedor invisible ahora se comporta bien */
+        #modeIndicator {
+            display: flex !important;       /* Lo volvemos flexible */
+            align-items: center !important; /* Lo centramos verticalmente */
+            height: 100% !important;        /* Que ocupe la misma altura */
+            margin: 0 !important;           /* Sin márgenes raros */
+        }
+
+        /* 2. Aseguramos que el botón azul no flote raro */
+        #modeIndicator .copy-link-btn {
+            margin: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            vertical-align: middle !important;
+        }
+
        
     </style>    
 </head>
