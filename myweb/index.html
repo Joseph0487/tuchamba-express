@@ -1125,38 +1125,50 @@
             }
         }
 
-        /* =========================================================
-           CORRECCIÓN MÓVIL: ENCABEZADO PERFECTO (UNA SOLA LÍNEA) 📏
-           ========================================================= */
+        /* =================================================================
+           CORRECCIÓN FINAL MÓVIL: HOMOLOGACIÓN TOTAL (V20.3) 📏
+           (Incluye: Compartir, Salir y el Rebelde "Copiar Link")
+           ================================================================= */
         @media (max-width: 768px) {
             
-            /* 1. El Contenedor: Obligar a una sola fila centrada */
+            /* 1. CONTENEDOR: Forzar una sola línea centrada */
             .header-buttons {
                 display: flex !important;
-                flex-wrap: nowrap !important; /* PROHIBIDO bajar de línea */
-                align-items: center !important; /* Centrados verticalmente */
-                gap: 5px !important; /* Espacio pequeñito entre ellos */
+                flex-wrap: nowrap !important;   /* Prohibido bajar de línea */
+                align-items: center !important; /* Alineación vertical perfecta */
+                gap: 5px !important;            /* Espacio mínimo vital */
             }
 
-            /* 2. Todos los Botones (Admin, Share, Salir): Uniformes */
+            /* 2. LA DIETA PAREJA: Todos los botones al mismo tamaño */
+            /* AGREGAMOS AQUÍ: .copy-link-btn y #btnRecruiterLink */
             .header-buttons button, 
             .header-buttons a,
-            #mainShareBtn {
-                height: 30px !important;       /* Altura compacta uniforme */
-                padding: 0 10px !important;    /* Menos relleno a los lados */
-                font-size: 11px !important;    /* Letra legible pero chica */
-                white-space: nowrap !important; /* Que el texto no se parta */
+            #mainShareBtn,
+            .copy-link-btn {
+                height: 30px !important;        /* Altura compacta para todos */
+                line-height: 1 !important;      /* Centrado de texto vertical */
+                padding: 0 10px !important;     /* Relleno lateral igual */
+                font-size: 11px !important;     /* Letra chica uniforme */
+                white-space: nowrap !important; /* Texto en una línea */
                 
-                /* Centrado perfecto del contenido */
-                display: flex !important;
+                /* Centrado del contenido interno (íconos + texto) */
+                display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
+                
+                margin: 0 !important; /* Sin márgenes extraños */
             }
 
-            /* 3. Ajuste especial para el "Orange Cream" en celular */
+            /* 3. Ajuste Específico para el Botón Azul (Copiar Link) en Celular */
+            .copy-link-btn {
+                border-radius: 50px !important; /* Mantener óvalo */
+                background-color: #e3f2fd !important; /* Asegurar fondo azul */
+                width: auto !important; /* Que se ajuste al texto */
+            }
+
+            /* 4. Ajuste Específico para el Botón Naranja (Compartir) */
             #mainShareBtn {
-                /* Aseguramos que el estilo naranja se mantenga pero en chiquito */
-                border-width: 1px !important; 
+                border-width: 1px !important;
             }
         }
 
@@ -3180,3 +3192,5 @@
     </script>
 </body>
 </html>
+
+
