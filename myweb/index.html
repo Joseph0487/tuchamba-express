@@ -1125,6 +1125,41 @@
             }
         }
 
+        /* =========================================================
+           CORRECCIÓN MÓVIL: ENCABEZADO PERFECTO (UNA SOLA LÍNEA) 📏
+           ========================================================= */
+        @media (max-width: 768px) {
+            
+            /* 1. El Contenedor: Obligar a una sola fila centrada */
+            .header-buttons {
+                display: flex !important;
+                flex-wrap: nowrap !important; /* PROHIBIDO bajar de línea */
+                align-items: center !important; /* Centrados verticalmente */
+                gap: 5px !important; /* Espacio pequeñito entre ellos */
+            }
+
+            /* 2. Todos los Botones (Admin, Share, Salir): Uniformes */
+            .header-buttons button, 
+            .header-buttons a,
+            #mainShareBtn {
+                height: 30px !important;       /* Altura compacta uniforme */
+                padding: 0 10px !important;    /* Menos relleno a los lados */
+                font-size: 11px !important;    /* Letra legible pero chica */
+                white-space: nowrap !important; /* Que el texto no se parta */
+                
+                /* Centrado perfecto del contenido */
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            /* 3. Ajuste especial para el "Orange Cream" en celular */
+            #mainShareBtn {
+                /* Aseguramos que el estilo naranja se mantenga pero en chiquito */
+                border-width: 1px !important; 
+            }
+        }
+
        
     </style>    
 </head>
@@ -3145,5 +3180,3 @@
     </script>
 </body>
 </html>
-
-
