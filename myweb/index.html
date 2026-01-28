@@ -1474,8 +1474,8 @@
                 display: flex; align-items: center; justify-content: center;
             }
 
-            /* Métricas PC */
-            body.admin-mode .metrics-card.desktop-only {
+            /* Métricas PC (Le quitamos el "body.admin-mode" para que aplique a TODOS) */
+            .metrics-card.desktop-only {
                 display: flex !important;
                 flex-direction: row !important;
                 gap: 15px !important;
@@ -1485,6 +1485,10 @@
                 border-radius: 50px !important;
                 height: 38px !important;
                 align-items: center;
+                
+                /* AGREGAMOS ESTAS 2 LÍNEAS PARA EL TAMAÑO */
+                font-size: 15px !important; 
+                font-weight: 800 !important;
             }
             #mobileMetricsPanel { display: none !important; }
         }
@@ -1649,7 +1653,38 @@
             display: none !important;
         }
 
+        /* =========================================================
+           CORRECCIÓN FINAL: IGUALAR TAMAÑOS PC (V22.5) 👔
+           (Le ponemos el traje 'Grande' al Reclutador para que se vea igual al Admin)
+           ========================================================= */
+        @media (min-width: 769px) {
+            /* Apuntamos a AMBOS modos explícitamente para ganar la prioridad */
+            body.admin-mode .metrics-card.desktop-only,
+            body.recruiter-view .metrics-card.desktop-only {
+                /* 1. TAMAÑO FÍSICO (Crecemos de 32px a 38px) */
+                height: 38px !important;      
+                padding: 5px 20px !important; 
+                border-radius: 50px !important;
+                
+                /* 2. TAMAÑO DE LETRA (Crecemos de 12px a 15px) */
+                font-size: 12px !important;   
+                font-weight: 800 !important;
 
+                /* 3. ESTÉTICA */
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                gap: 15px !important;
+                background: #f8f9fa !important;
+                border: 1px solid #ddd !important;
+                width: auto !important; /* Que no se estire a lo ancho */
+            }
+            
+            /* Un toquecito extra al número para que resalte */
+            .metrics-card.desktop-only .m-number {
+                font-size: 13px !important;
+            }
+        }
 
 
        
