@@ -1361,6 +1361,40 @@
             box-shadow: none !important;
         }
 
+        /* =========================================================
+           CORRECCIÓN MAESTRA: BOTÓN COMPARTIR "SMART" (V20.8) 🧠
+           (Arregla el problema del botón pegado en el celular)
+           ========================================================= */
+
+        /* 1. RESETEO PREVENTIVO (Para quitar lo pegado en celular) */
+        #mainShareBtn:hover {
+            /* Regresamos al estado normal por defecto */
+            background-color: #ffe0b2 !important; 
+            border-color: #bf360c !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* 2. EFECTO "CLIC" UNIVERSAL (Celular y PC) */
+        /* Esto pasa cuando presionas (el dedazo o el clic) */
+        #mainShareBtn:active {
+            background-color: #ffb74d !important; /* Naranja intenso momentáneo */
+            border-color: #e65100 !important;
+            transform: scale(0.95) !important; /* Se hunde un poquito */
+            transition: all 0.1s !important;
+        }
+
+        /* 3. EFECTO "HOVER" SOLO PARA PC 🖥️ */
+        /* Esta regla @media (hover: hover) es la magia. 
+           Solo se activa si el navegador detecta un mouse real. */
+        @media (hover: hover) {
+            #mainShareBtn:hover {
+                background-color: #ffcc80 !important; /* Naranja suave */
+                border-color: #ef6c00 !important;
+                transform: translateY(-1px) !important; /* Se levanta un poquito */
+                box-shadow: 0 2px 5px rgba(230, 81, 0, 0.2) !important;
+            }
+        }
 
 
 
