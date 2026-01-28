@@ -1326,74 +1326,78 @@
         }
 
         /* =========================================================
-           CORRECCIÓN FINAL: INTERACCIÓN BOTÓN COMPARTIR (V20.7) 🍊
-           (Quitamos el negro y ponemos un naranja intenso al tocar)
-           ========================================================= */
-        
-        /* 1. ESTADO HOVER (Pasar el mouse / Tocar en cel) */
-        #mainShareBtn:hover,
-        #mainShareBtn:focus {
-            /* Cambio de color: De Crema Pálido a Naranja "Cheddar" Suave */
-            background-color: #ffcc80 !important; 
-            
-            /* El borde se pone un poco más serio */
-            border-color: #ef6c00 !important;
-            
-            /* Aseguramos que la letra siga siendo color ladrillo oscuro */
-            color: #bf360c !important;
-            
-            /* Un saltito pequeño para que se sienta vivo */
-            transform: translateY(-1px) !important;
-            
-            /* ¡IMPORTANTE! Matamos cualquier rastro de negro anterior */
-            box-shadow: 0 2px 5px rgba(230, 81, 0, 0.2) !important; 
-        }
-
-        /* 2. ESTADO ACTIVE (El momento exacto del clic/dedazo) */
-        #mainShareBtn:active {
-            /* Se pone un poquito más oscuro para sentir el "clic" */
-            background-color: #ffb74d !important; 
-            
-            /* Efecto de hundirse (como botón real) */
-            transform: scale(0.96) !important;
-            
-            /* Quitamos sombras para que parezca aplastado */
-            box-shadow: none !important;
-        }
-
-       /* =========================================================
-           CORRECCIÓN DEFINITIVA: ANTI-PEGAJOSO MÓVIL (V20.9) 🧼
-           (Matamos el rastro del :focus que se queda pegado)
+           ESTILO FINAL: BOTÓN "CYAN FRESH" (V21.0) 🧼
+           (Color Turquesa Vibrante + Fix Anti-Pegajoso Móvil)
            ========================================================= */
 
-        /* 1. RESETEO TOTAL (Hover y Focus forzados a la normalidad) */
-        /* Esto asegura que si el cel lo deja "seleccionado" (:focus), se vea normal (Crema) */
+        /* 1. ESTADO BASE (El color bonito de tu imagen) */
+        #mainShareBtn {
+            background-color: #00E5FF !important; /* Turquesa Brillante */
+            /* Un degradado sutil para que se vea 3D como la imagen */
+            background: linear-gradient(180deg, #26c6da 0%, #00bcd4 100%) !important;
+            
+            color: white !important;
+            border: none !important;
+            border-radius: 50px !important; /* Redondito */
+            
+            /* Tamaño PC */
+            padding: 0 20px !important;
+            height: 34px !important;
+            font-weight: 800 !important;
+            font-size: 13px !important;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2) !important; /* Sombra letra */
+            
+            /* Sombra suave del botón */
+            box-shadow: 0 4px 6px rgba(0, 188, 212, 0.3) !important;
+            
+            /* Alineación */
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+            cursor: pointer !important;
+            transition: transform 0.1s, background 0.2s !important;
+            outline: none !important; /* Quita el cuadro azul de selección */
+        }
+
+        /* 2. TRUCO MÓVIL: Si se queda "seleccionado" (:focus), NO CAMBIA */
+        /* Esto evita que se quede oscuro cuando quitas el dedo */
         #mainShareBtn:hover,
         #mainShareBtn:focus {
-            background-color: #ffe0b2 !important; /* Regresa a Crema */
-            color: #bf360c !important;            /* Letra Ladrillo */
-            border-color: #bf360c !important;
+            background: linear-gradient(180deg, #26c6da 0%, #00bcd4 100%) !important;
             transform: none !important;
-            box-shadow: none !important;
-            outline: none !important; /* Quitar anillo azul de Chrome */
+            box-shadow: 0 4px 6px rgba(0, 188, 212, 0.3) !important;
         }
 
-        /* 2. EL CLIC (Solo dura el instante que el dedo toca) */
+        /* 3. EL CLIC (Solo mientras presionas el dedo) */
         #mainShareBtn:active {
-            background-color: #ffb74d !important; /* Naranja Intenso */
-            border-color: #e65100 !important;
-            transform: scale(0.95) !important;    /* Se hunde */
-            transition: all 0.05s !important;
+            background: #0097a7 !important; /* Turquesa Oscuro Sólido */
+            box-shadow: none !important;    /* Quitamos sombra para que se hunda */
+            transform: scale(0.96) !important; /* Efecto rebote */
         }
 
-        /* 3. HOVER SOLO EN PC (Donde sí hay mouse) */
-        /* Esta regla revive el efecto bonito SOLO si hay un mouse real */
+        /* 4. HOVER SOLO EN PC (Donde hay mouse real) */
         @media (hover: hover) {
             #mainShareBtn:hover {
-                background-color: #ffcc80 !important; /* Naranja Suave */
-                border-color: #ef6c00 !important;
-                transform: translateY(-1px) !important; 
-                box-shadow: 0 2px 5px rgba(230, 81, 0, 0.2) !important;
+                /* Se pone un poquito más brillante */
+                background: linear-gradient(180deg, #4dd0e1 0%, #26c6da 100%) !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 12px rgba(0, 188, 212, 0.4) !important;
+            }
+            #mainShareBtn:active {
+                background: #00838f !important;
+                transform: scale(0.95) !important;
+                box-shadow: none !important;
+            }
+        }
+
+        /* 5. REGLA DE ORO MÓVIL (Alineación perfecta) */
+        @media (max-width: 768px) {
+            #mainShareBtn {
+                height: 30px !important;        /* Misma altura que los otros */
+                font-size: 11px !important;
+                padding: 0 15px !important;
+                box-shadow: 0 2px 4px rgba(0, 188, 212, 0.3) !important;
             }
         }
 
