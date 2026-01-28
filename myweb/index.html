@@ -285,18 +285,8 @@
         .whatsapp-btn-large:active { transform: scale(0.98); animation: none; }
         .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; opacity: 0.7; animation: none; }
 
-        /* --- AJUSTE V20.2: BOTÓN COMPARTIR (BLANCO CLÁSICO) --- */
-        .share-btn { 
-            background: #25D366; 
-            color: white !important; /* <--- Regresamos al blanco puro */
-            border: none; 
-            padding: 8px 16px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-weight: 800 !important; /* Mantenemos la negrita para que resalte */
-            font-size: 14px; 
-        }
-
+        .share-btn { background: #25D366; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        
         #adminControls {
             z-index: 1001;
             background: rgba(240, 242, 245, 0.95);
@@ -876,23 +866,13 @@
                 display: flex !important; align-items: center !important; justify-content: center !important;
             }
 
-            /* 5. TABLA STICKY (CORREGIDO JERARQUÍA) */
-            
-            /* A. Todos los encabezados del reclutador (Nivel Alto) */
+            /* 5. TABLA STICKY */
             body.recruiter-view .management-table th {
-                position: sticky !important; 
-                top: 0 !important; 
-                z-index: 1000 !important; /* Nivel base alto */
+                position: sticky !important; top: 0 !important; z-index: 1000 !important;
                 padding: 10px 5px !important;
             }
-
-            /* B. EXCEPCIÓN: La columna # debe ganarles a todos (El Rey) */
-            body.recruiter-view .management-table th:first-child {
-                z-index: 1005 !important; /* <--- 5 puntos más arriba que el resto */
-                left: 0 !important; /* Aseguramos que esté pegado a la izquierda */
-            }
-
             .job-table-container { margin-top: 5px !important; border: none !important; }
+        }
 
         /* =========================================================
            BLOQUE FINAL: PC RECLUTADOR (ULTRA SLIM V3)
@@ -1045,363 +1025,16 @@
         }
 
 
-        /* =========================================================
-           BOTÓN COPIAR LINK (MODO RECLUTADOR)
-           ========================================================= */
-        .copy-link-btn {
-            background: #e3f2fd; /* Fondo azulito suave */
-            color: #0d47a1;      /* Texto azul fuerte */
-            border: 1px solid #90caf9;
-            padding: 6px 15px;
-            border-radius: 50px; /* Óvalo perfecto */
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        /* Efecto al pasar el mouse (Hover) */
-        .copy-link-btn:hover {
-            background: #bbdefb;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        /* Efecto al dar clic (Active) */
-        .copy-link-btn:active {
-            transform: translateY(0);
-            background: #90caf9;
-        }
-
-        /* =========================================================
-           CORRECCIÓN FINAL: CENTRADO BOTÓN LINK (MÓVIL Y PC)
-           ========================================================= */
-        
-        /* 1. Asegurar que el texto e icono estén siempre al centro */
-        .copy-link-btn {
-            justify-content: center !important; 
-            text-align: center !important;
-        }
-
-        /* 2. Ajuste específico para Celular (Para que se alinee con Compartir/Salir) */
-        @media (max-width: 768px) {
-            
-            /* Reseteamos el contenedor SPAN para que no estorbe */
-            .header-buttons #modeIndicator {
-                padding: 0 !important;
-                background: transparent !important;
-                border: none !important;
-                height: auto !important;
-                display: flex !important;
-                align-items: center !important;
-            }
-
-            /* Forzamos al botón a tener el tamaño exacto de los otros */
-            .copy-link-btn {
-                height: 30px !important;      /* Misma altura que el botón Salir */
-                font-size: 11px !important;   /* Misma letra */
-                padding: 0 10px !important;   /* Relleno lateral equilibrado */
-                width: auto !important;
-                margin: 0 !important;
-                border-radius: 50px !important; /* Mantiene la forma ovalada */
-            }
-        }
-
-       /* --- ESTILO TÍTULOS TABLA MÓVIL (BLANCOS) --- */
-        @media (max-width: 768px) {
-            .management-table th {
-                color: #ffffff !important;   /* Blanco Puro */
-                font-weight: 800 !important; /* Negrita */
-                text-transform: uppercase !important;
-                font-size: 11px !important;
-                letter-spacing: 0.5px !important;
-                padding-top: 12px !important;
-                padding-bottom: 12px !important;
-            }
-            
-            /* Para que el select de "EMPRESAS" no se vea raro */
-            .management-table th select {
-                color: #333 !important; 
-                font-weight: 800 !important;
-                font-size: 11px !important;
-            }
-        }
-
-        /* =========================================================
-           CORRECCIÓN FINAL: ENCABEZADOS TABLA MÓVIL (VISTA PRO)
-           ========================================================= */
-        @media (max-width: 768px) {
-            
-            /* 1. Estilo General de los Títulos (TH) */
-            .management-table th {
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-                font-size: 11px !important;      /* Tamaño estándar para todos */
-                font-weight: 800 !important;     /* Negrita fuerte */
-                color: #ffffff !important;       /* BLANCO PURO */
-                text-transform: uppercase !important; 
-                letter-spacing: 0.5px !important;
-                vertical-align: middle !important;
-                padding-top: 12px !important;
-                padding-bottom: 12px !important;
-                background-color: #0a66c2 !important; /* Fondo azul asegurado */
-            }
-
-            /* 2. Ajuste especial para el Select "EMPRESAS" (Para que no se vea feo) */
-            .management-table th select#headerCompanyFilter {
-                font-family: inherit !important;
-                font-weight: 800 !important;
-                font-size: 11px !important;
-                color: #333 !important; /* El texto dentro del select debe ser oscuro para leerse */
-                background: white !important;
-                border-radius: 4px !important;
-                border: none !important;
-                padding: 2px 5px !important;
-                text-transform: uppercase !important;
-                width: 100% !important;
-                max-width: 120px !important; /* Que no se ensanche demasiado */
-            }
-
-            /* 3. Asegurar que la esquina # también respete esto */
-            .management-table th:first-child {
-                font-size: 11px !important;
-                color: #ffffff !important;
-            }
-        }
-
-        /* =========================================================
-           CORRECCIÓN FINAL V2: ENCABEZADOS TABLA MÓVIL (UNIFORMES)
-           ========================================================= */
-        @media (max-width: 768px) {
-            
-            .management-table th {
-                /* 1. Fuente y Color */
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-                color: #ffffff !important;       /* Blanco Puro */
-                font-weight: 800 !important;     /* Negrita fuerte */
-                background-color: #0a66c2 !important;
-                
-                /* 2. LA CLAVE DEL TAMAÑO (Evita que el cel decida por ti) */
-                font-size: 11px !important;      
-                -webkit-text-size-adjust: 100% !important; /* Prohibido auto-escalar */
-                text-size-adjust: 100% !important;
-                
-                /* 3. Espaciado y Alineación */
-                text-transform: uppercase !important; 
-                white-space: nowrap !important;  /* Obliga a estar en 1 sola línea */
-                padding: 12px 5px !important;    /* Relleno idéntico para todos */
-                vertical-align: middle !important;
-                line-height: 1 !important;       /* Altura de línea compacta */
-            }
-
-            /* 4. Ajuste para el Select "EMPRESAS" dentro del título */
-            .management-table th select#headerCompanyFilter {
-                font-size: 11px !important;      /* Mismo tamaño que el texto */
-                font-weight: 800 !important;
-                height: 20px !important;         /* Altura controlada */
-                margin: 0 !important;
-            }
-        }
-
-        /* =========================================================
-           FASE 4: PANEL SUPER ADMIN MÓVIL (GRID ORGANIZADO) 🛠️📱
-           ========================================================= */
-        @media (max-width: 768px) {
-            
-            /* 1. Contenedor Principal (Solo para Super Admin) */
-            body.admin-mode:not(.recruiter-view) .admin-controls-wrapper {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important; /* 2 Columnas */
-                gap: 8px !important;
-                padding: 5px !important;
-            }
-
-            /* 2. La Tarjeta de Vistas (Encabezado) */
-            body.admin-mode:not(.recruiter-view) .metrics-card {
-                grid-column: span 2 !important; /* Ocupa las 2 columnas (ancho total) */
-                justify-content: center !important;
-                background: #fff !important;
-                border: 1px solid #ddd !important;
-                border-left: 4px solid #0d47a1 !important; /* Borde azul elegante */
-                margin-bottom: 5px !important;
-                height: 40px !important;
-            }
-
-            /* 3. Todos los Botones del Admin (Uniformes) */
-            body.admin-mode:not(.recruiter-view) button,
-            body.admin-mode:not(.recruiter-view) .tool-btn,
-            body.admin-mode:not(.recruiter-view) .add-job-btn {
-                width: 100% !important;
-                height: 42px !important; /* Altura cómoda para el dedo */
-                margin: 0 !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                font-size: 12px !important;
-                border-radius: 8px !important;
-                padding: 0 !important;
-            }
-
-            /* 4. Colores Específicos para identificar rápido */
-            /* Nueva Vacante (Verde fuerte) */
-            body.admin-mode:not(.recruiter-view) .add-job-btn { 
-                background-color: #2e7d32 !important; 
-                grid-column: span 2 !important; /* Botón grande para "Nueva" */
-                font-size: 14px !important;
-                font-weight: 800 !important;
-            }
-            
-            /* Equipo (Naranja) */
-            body.admin-mode:not(.recruiter-view) .team-btn { background-color: #ef6c00 !important; }
-            
-            /* Ajustes (Gris Oscuro) */
-            body.admin-mode:not(.recruiter-view) .settings-btn { background-color: #455a64 !important; }
-            
-            /* Métricas (Morado) */
-            body.admin-mode:not(.recruiter-view) .metrics-btn { background-color: #7b1fa2 !important; }
-        }
-
-        /* =========================================================
-           FASE 4 FINAL: ADMIN PANEL (PÍLDORA PC + GRID MÓVIL) 💎
-           ========================================================= */
-
-        /* --- 1. ESTILO MÓVIL (GRID ORGANIZADO) --- */
-        @media (max-width: 768px) {
-            
-            /* El Contenedor del Panel */
-            body.admin-mode:not(.recruiter-view) #adminControls {
-                padding: 10px !important;
-                background: #f0f2f5 !important; /* Fondo gris suave */
-                position: relative !important;
-                top: 0 !important;
-                box-shadow: none !important;
-            }
-
-            /* La Cuadrícula (Grid) */
-            body.admin-mode:not(.recruiter-view) .admin-controls-wrapper {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important; /* 2 Columnas idénticas */
-                gap: 8px !important;
-                margin-bottom: 5px !important;
-            }
-
-            /* A. Tarjeta de Métricas (Fila 1 - Ancho Completo) */
-            body.admin-mode:not(.recruiter-view) .metrics-card {
-                grid-column: span 2 !important; 
-                width: 100% !important;
-                justify-content: center !important;
-                height: 40px !important;
-                margin: 0 !important;
-                border: 1px solid #ddd !important;
-                border-left: 4px solid #0a66c2 !important;
-            }
-
-            /* B. Botón "NUEVA" (Fila 2 - Ancho Completo para resaltar) */
-            body.admin-mode:not(.recruiter-view) .add-job-btn {
-                grid-column: span 2 !important; 
-                width: 100% !important;
-                background-color: #2e7d32 !important;
-                height: 45px !important;
-                font-size: 14px !important;
-                font-weight: 800 !important;
-                margin: 0 !important;
-            }
-
-            /* C. El resto de botones (Cuadrícula 2x2) */
-            body.admin-mode:not(.recruiter-view) button,
-            body.admin-mode:not(.recruiter-view) .tool-btn {
-                width: 100% !important;
-                height: 42px !important;
-                margin: 0 !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                font-size: 12px !important;
-                border-radius: 8px !important;
-                padding: 0 !important;
-            }
-
-            /* Colores de identificación */
-            body.admin-mode:not(.recruiter-view) .team-btn { background-color: #ef6c00 !important; }
-            body.admin-mode:not(.recruiter-view) .settings-btn { background-color: #455a64 !important; }
-            body.admin-mode:not(.recruiter-view) .metrics-btn { background-color: #7b1fa2 !important; }
-            
-            /* Input file oculto */
-            #excelFile { display: none !important; }
-        }
-
-        /* --- 2. ESTILO PC (PÍLDORA FLOTANTE "REDONDA") --- */
-        @media (min-width: 769px) {
-            
-            /* Convertimos la barra en una Píldora Flotante */
-            body.admin-mode #adminControls {
-                position: sticky !important;
-                top: 10px !important;
-                margin: 10px auto 20px auto !important; /* Centrado con margen */
-                width: 95% !important; /* Casi todo el ancho */
-                max-width: 1200px !important;
-                
-                background: #ffffff !important;
-                border-radius: 50px !important; /* <--- LA CLAVE REDONDA */
-                border: 1px solid #e0e0e0 !important;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.08) !important;
-                
-                padding: 8px 20px !important;
-                z-index: 900 !important;
-            }
-
-            /* Alineación de los botones adentro */
-            body.admin-mode .admin-controls-wrapper {
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-                gap: 10px !important;
-                flex-wrap: nowrap !important; /* Todo en una línea */
-            }
-
-            /* Hacemos los botones de Admin un poco más estilizados en PC */
-            body.admin-mode .tool-btn, 
-            body.admin-mode .add-job-btn {
-                border-radius: 20px !important; /* Botones redonditos también */
-                padding: 8px 20px !important;
-                height: 36px !important;
-                display: flex; align-items: center; justify-content: center;
-                transition: transform 0.2s;
-            }
-            
-            body.admin-mode .tool-btn:hover, 
-            body.admin-mode .add-job-btn:hover {
-                transform: translateY(-2px);
-            }
-
-            /* Tarjeta de métricas estilo píldora */
-            body.admin-mode .metrics-card {
-                border-radius: 20px !important;
-                height: 36px !important;
-                background: #f8f9fa !important;
-                border: 1px solid #ddd !important;
-                border-left: 4px solid #0a66c2 !important;
-                padding: 0 15px !important;
-                display: flex; align-items: center;
-            }
-        }
-
-
+       
     </style>    
 </head>
 <body>
 
     <div id="globalBackground"></div>
 
-    
-    
     <div id="flyerTemplate">
         <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center center / cover no-repeat; opacity: 0.1; z-index: 0;"></div>
-        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: rgba(10, 25, 45, 0.2); z-index: 1;"></div>
+        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: rgba(10, 25, 45, 0.85); z-index: 1;"></div>
         <div class="flyer-badge-top">¡SE SOLICITA!</div>
         <div class="flyer-company">RECONOCIDA EMPRESA BUSCA:</div>
         <div id="flyerTitle" class="flyer-title">CHOFER 3.5 TON</div>
@@ -1635,7 +1268,6 @@
     </div>
 
     <div class="modal" id="metricsModal"><div class="modal-content"><button class="close-btn" onclick="closeMetricsModal()">×</button><h2>📊 Exportar Métricas</h2><p style="margin-bottom:10px; color:#666;">Selecciona los meses que deseas incluir en el reporte:</p><div id="metricsMonthList" style="margin: 15px 0; max-height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px; background:#f9f9f9;"><p style="text-align:center; color:#999;">Cargando historial...</p></div><button class="btn-primary" style="width:100%" onclick="downloadSelectedMetrics()">📥 Descargar Excel Consolidado</button></div></div>
-    
     <div class="modal" id="teamModal">
         <div class="modal-content">
             <div class="modal-header-pro">
@@ -1685,16 +1317,11 @@
                     </div>
                 </div>
 
-                <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+                <div style="display:flex; gap:10px; margin-top:10px;">
                     <button class="btn-primary" style="flex:1; display:flex; justify-content:center; align-items:center; gap:8px;" id="btnSaveRecruiter" onclick="saveRecruiter()">
-                        💾 Guardar
+                        💾 Guardar Reclutador
                     </button>
-                    
-                    <button class="tool-btn" style="background:#2e7d32; flex:1; justify-content:center; display:flex; align-items:center; gap:5px;" onclick="downloadRecruitersDB()">
-                        📥 Base
-                    </button>
-
-                    <button class="tool-btn" style="background:#666; display:none; width:100%; justify-content:center;" id="btnCancelRecruiter" onclick="resetRecruiterForm()">Cancelar Edición</button>
+                    <button class="tool-btn" style="background:#666; display:none;" id="btnCancelRecruiter" onclick="resetRecruiterForm()">Cancelar</button>
                 </div>
             </div>
 
@@ -1716,8 +1343,6 @@
             </div>
         </div>
     </div>
-
-
     <div class="modal" id="settingsModal"><div class="modal-content"><button class="close-btn" onclick="closeSettingsModal()">×</button><h2>⚙️ Ajustes del Sistema</h2><div class="form-group"><label>📞 Teléfono Oficina Central (Respaldo)</label><div style="display:flex; gap:10px;"><input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1;"><button class="btn-primary" id="btnSaveCentral" onclick="saveCentralConfig()">Guardar</button></div><p style="font-size:12px; color:#666; margin-top:5px;">Este número se usa si la vacante no tiene contacto o está mal escrito.</p></div><div class="danger-section"><h3 style="color:#d32f2f; margin-bottom:10px;">⚠️ Zona de Peligro (Admin)</h3><p style="font-size:13px; color:#666; margin-bottom:10px;">Acciones irreversibles protegidas por contraseña.</p><button class="danger-btn" onclick="performSafeAction('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button><button class="danger-btn" onclick="performSafeAction('deleteJobs')">🔥 Borrar TODAS las Vacantes</button></div></div></div>
     <div class="modal" id="privacyModal"><div class="modal-content"><button class="close-btn" onclick="closePrivacyModal()">×</button><h2>🔒 Aviso de Privacidad</h2><div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto;"><p style="font-size: 12px; color: #666; margin-bottom: 15px;"><strong>Última actualización: Enero 2026</strong></p><p style="margin-bottom: 15px;">En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, <strong>TuChamba Express</strong> informa:</p><p style="margin-bottom:5px;"><strong>1. Responsable de los datos:</strong></p><p style="margin-bottom:15px;">TuChamba Express actúa como enlace entre candidatos y empresas reclutadoras.</p><p style="margin-bottom:5px;"><strong>2. Datos recopilados:</strong></p><p style="margin-bottom:15px;">Podemos recopilar datos de contacto (como número telefónico) con el único fin de facilitar la comunicación para procesos de reclutamiento.</p><p style="margin-bottom:5px;"><strong>3. Uso de la información:</strong></p><p style="margin-bottom:5px;">Los datos proporcionados serán utilizados exclusivamente para:</p><ul style="margin-left: 20px; margin-bottom: 15px;"><li>Contactar al candidato respecto a la vacante de interés.</li><li>Agendar entrevistas laborales.</li><li>Procesos internos de selección.</li></ul><p style="margin-bottom:5px;"><strong>4. Compartir datos:</strong></p><p style="margin-bottom:15px;">Su información de contacto será compartida únicamente con la empresa o reclutador responsable de la vacante a la que usted decida postularse voluntariamente.</p><p style="margin-bottom:5px;"><strong>5. Examen Médico:</strong></p><p style="margin-bottom:0;">Al utilizar esta plataforma, usted reconoce que algunas empresas contratantes pueden requerir, como parte de su proceso de selección y conforme a la ley, la realización de exámenes médicos y/o pruebas de detección de sustancias.</p></div></div></div>
 
@@ -1768,16 +1393,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
         
-        if (refCode) {
-            sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
-            
-            // --- NUEVO: OCULTAR ACCESO RECLUTADOR SI ES REFERIDO ---
-            // Usamos un listener para asegurar que el botón ya exista antes de ocultarlo
-            document.addEventListener("DOMContentLoaded", () => {
-                const adminLink = document.querySelector('.admin-toggle-link');
-                if(adminLink) adminLink.style.display = 'none';
-            });
-        }
+        if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('searchInput').value = '';
@@ -2008,10 +1624,8 @@
                 btn.disabled = false; 
             }
         }
-
         function setAdminMode(enableAdmin) {
-            document.getElementById('loginScreen').style.display = 'none'; 
-            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block';
             
             const isRefMode = !!refCode;
             
@@ -2023,24 +1637,11 @@
                 document.body.classList.add('admin-mode');
 
                 if (isRecruiterMode) {
-                    // ACTIVAMOS LA VISTA RECLUTADOR
+                    // ACTIVAMOS LA VISTA RECLUTADOR (Oculta botones)
                     document.body.classList.add('recruiter-view');
-                    
-                    // --- AQUÍ ESTÁ EL CAMBIO: BOTÓN DE COPIAR LINK ---
-                    // Obtenemos el código del reclutador activo
-                    let myRecCode = sessionStorage.getItem('recruiterCode') || '';
-                    if(!myRecCode && activeRecruiter) myRecCode = activeRecruiter.code;
-                    
-                    // Creamos el botón funcional
-                    document.getElementById('modeIndicator').innerHTML = `
-                        <button class="copy-link-btn" onclick="copyMyRecruiterLink('${myRecCode}')">
-                            🔗 Copiar Link
-                        </button>
-                    `;
-                    
+                    document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator" style="background:#e3f2fd; color:#0d47a1; border-color:#90caf9;">Modo Reclutador</span>';
                     document.getElementById('viewToggleBtn').style.display = 'none'; 
                 } else {
-                    // MODO SUPER ADMIN (Se queda igual)
                     document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator">Super Admin</span>';
                     document.getElementById('viewToggleBtn').style.display = 'inline-flex'; 
                 }
@@ -2051,19 +1652,6 @@
                 document.getElementById('viewToggleBtn').style.display = 'none';
             }
             loadData();
-        }
-
-        // --- NUEVA FUNCIÓN PARA COPIAR EL LINK DEL RECLUTADOR ---
-        window.copyMyRecruiterLink = function(code) {
-            if(!code) return window.showToast('❌ Error: No se encontró tu código');
-            
-            const link = `${window.location.origin}/?ref=${code}`;
-            navigator.clipboard.writeText(link).then(() => {
-                window.showToast('✅ ¡Link de Reclutador Copiado!');
-            }).catch(err => {
-                console.error(err);
-                prompt("Copia tu link manualmente:", link);
-            });
         }
 
         window.toggleViewMode = function(forceMode) {
@@ -3240,30 +2828,6 @@
             const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Vacantes"); XLSX.writeFile(wb, "Respaldo_Completo.xlsx");
         }
-
-        // --- NUEVA FUNCIÓN: DESCARGAR BASE DE RECLUTADORES ---
-        window.downloadRecruitersDB = function() {
-            if (!recruiters || Object.keys(recruiters).length === 0) {
-                return window.showToast("❌ No hay reclutadores registrados");
-            }
-
-            const data = Object.values(recruiters).map(r => ({
-                'NOMBRE': r.name,
-                'NÚMERO': r.phone,
-                'CÓDIGO/USUARIO': r.code,
-                'LINK PERSONAL': `${window.location.origin}/?ref=${r.code.toLowerCase()}`
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Reclutadores");
-            
-            // Nombre del archivo con fecha
-            const dateStr = new Date().toISOString().split('T')[0];
-            XLSX.writeFile(wb, `Base_Reclutadores_${dateStr}.xlsx`);
-            window.showToast("✅ Base descargada correctamente");
-        }
-
 
         window.downloadTemplate = function() {
             const data = [{
