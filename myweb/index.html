@@ -1275,6 +1275,94 @@
             }
         }
 
+        /* =========================================================
+           RETOQUES FINALES NOCTURNOS (V20.5) 🌙
+           (Más contraste en tabla y fichas para mejor lectura)
+           ========================================================= */
+
+        /* 1. EFECTO CEBRA MÁS MARCADO (TABLA) */
+        /* Cambiamos el gris pálido por un "Gris Azulado" más notorio */
+        .management-table tr:nth-child(even) td {
+            background-color: #eceff1 !important; 
+        }
+        
+        /* ¡OJO! Esto obliga a la columna fija (#) a oscurecerse también */
+        body .management-table tr:nth-child(even) td:first-child,
+        body.recruiter-view .management-table tr:nth-child(even) td:first-child {
+            background-color: #eceff1 !important;
+        }
+
+        /* 2. RECUADROS EN MODAL DE VACANTE (Zona, Sueldo, etc.) */
+        /* Antes era #f8f9fa (casi blanco), ahora es #eef0f2 (Gris sólido) */
+        .job-details {
+            background-color: #eef0f2 !important; 
+            border: 1px solid #e0e0e0 !important; /* Un bordecito fino ayuda */
+        }
+
+        /* 3. LISTAS DE REQUISITOS Y BENEFICIOS */
+        /* También las oscurecemos para que resalten */
+        .item-list li {
+            background-color: #eef0f2 !important;
+            border: 1px solid #e0e0e0 !important;
+            color: #222 !important; /* Letra un poco más negra */
+        }
+        
+        /* =========================================================
+           CORRECCIÓN: EFECTO HOVER EN TABLA (V20.6) 🖱️
+           (Para que se ilumine al pasar el mouse, aunque tenga fondo oscuro)
+           ========================================================= */
+        
+        /* Cuando el mouse pasa por CUALQUIER fila de la tabla */
+        .management-table tr:hover td {
+            background-color: #fff9c4 !important; /* Un amarillo pálido bonito para resaltar */
+            color: #000 !important; /* Letras negras para contraste total */
+            cursor: pointer;
+        }
+
+        /* Corrección específica para que la columna "#" también se ilumine */
+        body.recruiter-view .management-table tr:hover td:first-child {
+            background-color: #fff9c4 !important;
+            border-right: 2px solid #fbc02d !important; /* Borde dorado al resaltar */
+        }
+
+        /* =========================================================
+           CORRECCIÓN FINAL: INTERACCIÓN BOTÓN COMPARTIR (V20.7) 🍊
+           (Quitamos el negro y ponemos un naranja intenso al tocar)
+           ========================================================= */
+        
+        /* 1. ESTADO HOVER (Pasar el mouse / Tocar en cel) */
+        #mainShareBtn:hover,
+        #mainShareBtn:focus {
+            /* Cambio de color: De Crema Pálido a Naranja "Cheddar" Suave */
+            background-color: #ffcc80 !important; 
+            
+            /* El borde se pone un poco más serio */
+            border-color: #ef6c00 !important;
+            
+            /* Aseguramos que la letra siga siendo color ladrillo oscuro */
+            color: #bf360c !important;
+            
+            /* Un saltito pequeño para que se sienta vivo */
+            transform: translateY(-1px) !important;
+            
+            /* ¡IMPORTANTE! Matamos cualquier rastro de negro anterior */
+            box-shadow: 0 2px 5px rgba(230, 81, 0, 0.2) !important; 
+        }
+
+        /* 2. ESTADO ACTIVE (El momento exacto del clic/dedazo) */
+        #mainShareBtn:active {
+            /* Se pone un poquito más oscuro para sentir el "clic" */
+            background-color: #ffb74d !important; 
+            
+            /* Efecto de hundirse (como botón real) */
+            transform: scale(0.96) !important;
+            
+            /* Quitamos sombras para que parezca aplastado */
+            box-shadow: none !important;
+        }
+
+
+
 
        
     </style>    
@@ -3319,7 +3407,11 @@
             });
         }
 
+
+
+
     </script>
 </body>
 </html>
+
 
