@@ -1243,6 +1243,39 @@
             z-index: 10 !important; /* Nivel bajo */
         }
 
+        /* =========================================================
+           RESTAURACIÓN PC: BOTÓN "COPIAR LINK" PREMIUM 💎
+           (Solo aplica en pantallas grandes, no toca el cel)
+           ========================================================= */
+        @media (min-width: 769px) {
+            .copy-link-btn {
+                background-color: #e3f2fd !important; /* Azulito Original */
+                color: #0d47a1 !important;            /* Letra Azul Fuerte */
+                border: 1px solid #90caf9 !important; 
+                
+                height: 36px !important;        /* Altura Cómoda PC */
+                padding: 0 20px !important;     /* Más aire a los lados */
+                border-radius: 50px !important; /* Óvalo perfecto */
+                font-size: 13px !important;     /* Letra tamaño normal */
+                font-weight: 700 !important;
+                
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+                margin: 0 !important;
+                cursor: pointer !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important; /* Espacio entre icono y texto */
+            }
+
+            /* Efecto Hover PC */
+            .copy-link-btn:hover {
+                background-color: #bbdefb !important;
+                transform: translateY(-1px) !important;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+            }
+        }
+
+
        
     </style>    
 </head>
@@ -3286,11 +3319,6 @@
             });
         }
 
-
-
-
     </script>
 </body>
 </html>
-
-
