@@ -1027,36 +1027,59 @@
         /* --- BLOQUE 1: MEJORAS VISUALES V20.2 --- */
 
         /* =========================================================
-           CORRECCIÓN DEFINITIVA: BOTÓN COMPARTIR "PREMIUM" 💎
-           (Atacamos por ID para que nada nos gane)
+           BOTÓN COMPARTIR: ESTILO "ORANGE CREAM" (V20.3) 🍊
+           (Fondo Pastel + Borde Oscuro Intenso)
            ========================================================= */
         #mainShareBtn {
-            /* 1. Fondo Degradado (Más moderno que el color plano) */
-            background: linear-gradient(135deg, #25D366 0%, #075E54 100%) !important;
+            /* 1. Fondo Naranja Pastel (Suave y limpio) */
+            background: #ffe0b2 !important; 
             
-            /* 2. Texto Ultra Legible */
-            color: #ffffff !important;
-            font-weight: 900 !important; /* Letra muy gorda */
+            /* 2. Texto y Borde: Naranja Quemado (Tirándole a Negro/Ladrillo) */
+            color: #bf360c !important; 
+            border: 1px solid #bf360c !important; 
+            
+            /* 3. Tipografía Gruesa para que se lea perfecto sobre el pastel */
+            font-weight: 800 !important; 
             font-size: 13px !important;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5) !important; /* Sombra negra tras la letra */
             letter-spacing: 0.5px !important;
             
-            /* 3. Forma y Bordes */
-            border: 1px solid rgba(255,255,255,0.2) !important; /* Borde sutil brillante */
-            border-radius: 50px !important; /* Píldora perfecta */
-            padding: 0 20px !important;     /* Más ancho para que respiren las letras */
-            height: 36px !important;        /* Altura cómoda */
+            /* 4. Forma Píldora */
+            border-radius: 50px !important;
+            padding: 0 20px !important;
+            height: 34px !important;
             
-            /* 4. Efectos 3D */
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4) !important; /* Resplandor verde */
+            /* 5. Sin sombras raras (Flat Design) */
+            box-shadow: none !important;
+            text-shadow: none !important;
             
-            /* 5. Asegurar Alineación */
+            /* 6. Alineación */
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
             margin: 0 !important;
             cursor: pointer !important;
             transition: all 0.2s ease !important;
+        }
+
+        /* Efecto Hover: Se invierten los colores o se oscurece un poco */
+        #mainShareBtn:hover {
+            background: #ffcc80 !important; /* Un poco más intenso al pasar el mouse */
+            transform: translateY(-1px) !important;
+        }
+
+        /* Efecto sutil al pasar el mouse (se pone negro total) */
+        #mainShareBtn:hover {
+            background: #000000 !important;
+            transform: scale(1.02) !important;
+        }
+
+        /* Ajuste Móvil */
+        @media (max-width: 768px) {
+            #mainShareBtn {
+                height: 32px !important;
+                font-size: 12px !important;
+                padding: 0 16px !important;
+            }
         }
 
         /* Efecto al pasar el mouse */
@@ -3122,5 +3145,3 @@
     </script>
 </body>
 </html>
-
-
