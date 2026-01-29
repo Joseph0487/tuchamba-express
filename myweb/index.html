@@ -2267,20 +2267,41 @@
             }
         });
 
+       // BUSCA ESTE BLOQUE Y REEMPLÁZALO COMPLETO:
+        
         onAuthStateChanged(auth, (user) => {
             const urlJobId = urlParams.get('id'); 
+            
+            // 1. VERIFICAMOS SI HAY SESIÓN DE RECLUTADOR GUARDADA
+            const isRecruiterSession = sessionStorage.getItem('isRecruiterSession') === 'true';
+
             if (user) { 
+                // CASO 1: SUPER ADMIN (LOGIN CON CORREO)
                 isAdmin = true; 
                 currentUserEmail = user.email; 
                 setAdminMode(true); 
-                window.scrollTo(0, 0); // <--- ¡AQUÍ! Pega esta línea
+                window.scrollTo(0, 0); 
             } else {
+                // NO HAY USUARIO DE FIREBASE
                 isAdmin = false;
                 currentUserEmail = "";
+
+                // CASO 2: ES RECLUTADOR (EL PARCHE QUE FALTABA)
+                if (isRecruiterSession) {
+                    // Si hay sesión de reclutador, NO hacemos nada aquí.
+                    // Dejamos que la función initRecruitersData cargue y abra el panel.
+                    console.log("⏳ Detectada sesión de reclutador, esperando carga de datos...");
+                    return; 
+                }
+
+                // CASO 3: INVITADO O LINK DIRECTO
                 if (sessionStorage.getItem('isGuest') === 'true' || urlJobId) { 
                     setAdminMode(false); 
                 } 
-                else { showLogin(); }
+                // CASO 4: NADIE (MOSTRAR LOGIN)
+                else { 
+                    showLogin(); 
+                }
             }
         });
 
