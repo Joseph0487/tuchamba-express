@@ -1685,9 +1685,39 @@
                 font-size: 13px !important;
             }
         }
+   
 
+        /* =========================================================
+           CORRECCIONES MODO RECLUTADOR - MÓVIL (PARCHE SEGURO) 📱
+           ========================================================= */
+        @media (max-width: 768px) {
+            
+            /* 1. OCULTAR LUPA (FILTROS) DEL PRIMER PANEL */
+            /* Solo en modo reclutador */
+            body.recruiter-view #adminSearchToggle,
+            body.recruiter-mode #adminSearchToggle {
+                display: none !important;
+            }
 
-       
+            /* 2. ELIMINAR EL PANEL DE "VISTAS" DUPLICADO (Tira suelta) */
+            /* Quitamos la tira gris y dejamos solo el botón de "Métricas" */
+            body.recruiter-view #mobileMetricsPanel,
+            body.recruiter-mode #mobileMetricsPanel {
+                display: none !important;
+            }
+
+            /* 3. HOMOLOGAR TÍTULOS DE VACANTES (Para que se vean parejos) */
+            body.recruiter-view .job-title,
+            body.recruiter-mode .job-title {
+                font-size: 16px !important;    /* Tamaño estándar */
+                font-weight: 700 !important;   /* Negrita */
+                line-height: 1.3 !important;   /* Espaciado limpio */
+                margin-bottom: 5px !important;
+                min-height: auto !important;   /* Evita espacios raros */
+            }
+        }
+
+      
     </style>    
 </head>
 <body>
