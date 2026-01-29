@@ -1991,13 +1991,28 @@
                 <div class="form-group">
                     <label>WhatsApp Contacto (Número Real)</label>
                     <div class="phone-group">
-                        <select id="jobPhoneCode" class="phone-select">
+                        <select id="recPhoneCode" class="phone-select">
                             <option value="+52">🇲🇽 +52</option>
-                            <option value="+1">🇺🇸 +1</option>
-                            <option value="+57">🇨🇴 +57</option>
                             <option value="+54">🇦🇷 +54</option>
-                            <option value="+51">🇵🇪 +51</option>
+                            <option value="+591">🇧🇴 +591</option>
+                            <option value="+55">🇧🇷 +55</option>
+                            <option value="+56">🇨🇱 +56</option>
+                            <option value="+57">🇨🇴 +57</option>
+                            <option value="+506">🇨🇷 +506</option>
+                            <option value="+53">🇨🇺 +53</option>
+                            <option value="+593">🇪🇨 +593</option>
+                            <option value="+503">🇸🇻 +503</option>
                             <option value="+34">🇪🇸 +34</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+502">🇬🇹 +502</option>
+                            <option value="+504">🇭🇳 +504</option>
+                            <option value="+505">🇳🇮 +505</option>
+                            <option value="+507">🇵🇦 +507</option>
+                            <option value="+595">🇵🇾 +595</option>
+                            <option value="+51">🇵🇪 +51</option>
+                            <option value="+1">🇩🇴 +1</option>
+                            <option value="+598">🇺🇾 +598</option>
+                            <option value="+58">🇻🇪 +58</option>
                         </select>
                         <input type="text" id="jobContact" placeholder="10 dígitos (Ej. 5512345678)" style="flex:1;">
                     </div>
@@ -2209,7 +2224,6 @@
         }
         window.closeMetricsModal = function() { document.getElementById('metricsModal').classList.remove('active'); }
 
-        window.openTeamModal = function() { document.getElementById('teamModal').classList.add('active'); resetRecruiterForm(); }
         window.closeTeamModal = function() { document.getElementById('teamModal').classList.remove('active'); }
 
         window.openSettingsModal = function() { document.getElementById('settingsModal').classList.add('active'); if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone; }
@@ -2675,31 +2689,7 @@
                 });
         }
 
-        window.openTeamModal = function() { document.getElementById('teamModal').classList.add('active'); resetRecruiterForm(); }
         window.closeTeamModal = function() { document.getElementById('teamModal').classList.remove('active'); }
-
-        window.saveRecruiter = function() {
-            const name = document.getElementById('recName').value.trim();
-            const rawPhone = document.getElementById('recPhone').value.trim();
-            const phoneCode = document.getElementById('recPhoneCode').value;
-            const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
-            
-            if(!name || !rawPhone || !code) return alert('Por favor, llena todos los campos.');
-            
-            let cleanPhone = rawPhone.replace(/\D/g, '');
-            const codeDigits = phoneCode.replace('+', '');
-            if (cleanPhone.startsWith(codeDigits)) {
-                cleanPhone = cleanPhone.substring(codeDigits.length);
-            }
-            
-            const finalPhone = phoneCode + cleanPhone;
-
-            const duplicateCheck = Object.entries(recruiters).find(([key, r]) => { return r.code === code && key !== editingRecruiterId; });
-            if (duplicateCheck) { return alert(`⚠️ ERROR: El código '${code}' ya está siendo usado por ${duplicateCheck[1].name}. Usa otro.`); }
-            
-            const idToSave = editingRecruiterId || 'rec-' + Date.now();
-            set(ref(db, 'recruiters/' + idToSave), { name, phone: finalPhone, code }).then(() => { window.showToast(editingRecruiterId ? '✅ Reclutador actualizado' : '✅ Reclutador agregado'); resetRecruiterForm(); });
-        }
 
         window.editRecruiter = function(id) {
             const r = recruiters[id]; if(!r) return;
@@ -3798,7 +3788,12 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // --- TAREA 2: DESCARGAR BASE RECLUTADORES ---
+        /* =========================================================
+           BLOQUE DE RECUPERACIÓN TOTAL (V22.FIX) 🚑
+           (Incluye: Descargas, Equipo, Directorio y Accesos)
+           ========================================================= */
+
+        // 1. DESCARGAR BASE (Si ya la tienes arriba, no dupliques, pero si la borraste, aquí va)
         window.downloadRecruitersDB = function() {
             if (!recruiters || Object.keys(recruiters).length === 0) return window.showToast("❌ Sin datos");
             
@@ -3816,29 +3811,144 @@
             const dateStr = new Date().toISOString().split('T')[0];
             XLSX.writeFile(wb, `Base_Reclutadores_${dateStr}.xlsx`);
             window.showToast("✅ Base descargada");
-        }
+        };
 
-        // --- FUNCIÓN RECUPERADA: COPIAR LINK ---
+        // 2. MÓDULO DE EQUIPO (EL QUE FALTABA)
+        window.openTeamModal = function() {
+            const modal = document.getElementById('teamModal');
+            if (modal) {
+                modal.classList.add('active');
+                modal.style.display = 'flex';
+                resetRecruiterForm(); 
+                renderRecruitersTable(); // <--- PINTA LA LISTA
+            }
+        };
+
+        window.closeTeamModal = function() {
+            const modal = document.getElementById('teamModal');
+            if(modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            }
+        };
+
+        window.renderRecruitersTable = function() {
+            const list = document.getElementById('recruitersList');
+            if (!list) return;
+
+            if (!recruiters || Object.keys(recruiters).length === 0) {
+                list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#888;">No hay reclutadores en el equipo.</td></tr>';
+                return;
+            }
+
+            list.innerHTML = Object.keys(recruiters).map(key => {
+                const r = recruiters[key];
+                const personalLink = `${window.location.origin}/?ref=${r.code.toLowerCase()}`;
+                
+                return `
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 12px 10px;">
+                        <div style="font-weight: 700; color: #333; font-size: 14px;">${r.name}</div>
+                        <div style="font-size: 12px; color: #666;">📱 ${r.phone}</div>
+                    </td>
+                    <td style="padding: 12px 10px;">
+                        <span style="background: #e3f2fd; color: #1565c0; padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 12px;">
+                            ${r.code}
+                        </span>
+                    </td>
+                    <td style="padding: 12px 10px; text-align: center;">
+                        <button onclick="copyRecruiterLink('${personalLink}')" 
+                                title="Copiar Link"
+                                style="background: #f5f5f5; border: 1px solid #ddd; padding: 6px 10px; border-radius: 4px; cursor: pointer;">
+                            🔗
+                        </button>
+                    </td>
+                    <td style="padding: 12px 10px; text-align: right;">
+                        <button onclick="editRecruiter('${key}')" title="Editar" style="border: none; background: transparent; font-size: 16px; cursor: pointer; margin-right: 8px;">✏️</button>
+                        <button onclick="deleteRecruiter('${key}')" title="Eliminar" style="border: none; background: transparent; font-size: 16px; cursor: pointer; color: #d32f2f;">🗑️</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.saveRecruiter = function() {
+            const name = document.getElementById('recName').value.trim();
+            const rawPhone = document.getElementById('recPhone').value.trim();
+            const phoneCode = document.getElementById('recPhoneCode').value;
+            const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
+
+            if (!name || !rawPhone || !code) return alert('⚠️ Llena todos los campos');
+
+            let cleanPhone = rawPhone.replace(/\D/g, '');
+            const codeDigits = phoneCode.replace('+', '');
+            if (cleanPhone.startsWith(codeDigits)) cleanPhone = cleanPhone.substring(codeDigits.length);
+            const finalPhone = phoneCode + cleanPhone;
+
+            const duplicateCheck = Object.entries(recruiters).find(([key, r]) => { 
+                return r.code === code && key !== editingRecruiterId; 
+            });
+            if (duplicateCheck) return alert(`⚠️ El código '${code}' ya existe.`); 
+
+            const recruiterData = { name, phone: finalPhone, code };
+            const idToSave = editingRecruiterId || 'rec-' + Date.now();
+
+            set(ref(db, 'recruiters/' + idToSave), recruiterData)
+                .then(() => {
+                    window.showToast(editingRecruiterId ? '✅ Actualizado' : '✅ Agregado');
+                    resetRecruiterForm();    
+                    renderRecruitersTable(); 
+                });
+        };
+
+        window.editRecruiter = function(key) {
+            const r = recruiters[key];
+            document.getElementById('recName').value = r.name;
+            document.getElementById('recCode').value = r.code;
+            document.getElementById('recPhone').value = r.phone.replace(/^\+\d{2,3}/, ''); 
+            editingRecruiterId = key;
+            
+            document.getElementById('btnSaveRecruiter').innerHTML = "🔄 Actualizar";
+            document.getElementById('btnCancelRecruiter').style.display = 'inline-block';
+        };
+
+        window.deleteRecruiter = function(key) {
+            if (confirm("¿Eliminar?")) {
+                remove(ref(db, 'recruiters/' + key))
+                    .then(() => {
+                        window.showToast("🗑️ Eliminado");
+                        renderRecruitersTable();
+                    });
+            }
+        };
+
+        window.resetRecruiterForm = function() {
+            document.getElementById('recName').value = '';
+            document.getElementById('recCode').value = '';
+            document.getElementById('recPhone').value = '';
+            editingRecruiterId = null;
+            document.getElementById('btnSaveRecruiter').innerHTML = "💾 Guardar";
+            document.getElementById('btnCancelRecruiter').style.display = 'none';
+        };
+
+        // 3. HERRAMIENTAS EXTRA (Copiado y Buscador)
         window.copyRecruiterLink = function(link) {
             navigator.clipboard.writeText(link).then(() => {
-                window.showToast("✅ Link copiado al portapapeles");
-            }).catch(err => {
-                window.showToast("❌ Error al copiar"); // Fallback simple
-                prompt("Copia tu link manualmente:", link);
-            });
-        }
+                window.showToast("✅ Link copiado");
+            }).catch(() => prompt("Copia manual:", link));
+        };
 
         window.toggleAdminSearch = function() {
             const searchBar = document.getElementById('userStickyTools');
-            searchBar.classList.toggle('active');
-            
-            // Si se muestra, poner foco en el input
-            if(searchBar.classList.contains('active')) {
-                setTimeout(() => document.getElementById('searchInput').focus(), 100);
+            if(searchBar) {
+                searchBar.classList.toggle('active');
+                if(searchBar.classList.contains('active')) {
+                    setTimeout(() => {
+                        const input = document.getElementById('searchInput');
+                        if(input) input.focus();
+                    }, 100);
+                }
             }
-        }
-
-
+        };
 
 
 
