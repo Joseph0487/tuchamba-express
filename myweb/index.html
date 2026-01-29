@@ -1718,6 +1718,56 @@
         }
 
       
+
+
+        /* =========================================================
+           CORRECCIONES RECLUTADOR MÓVIL (V22.FINAL) 📱
+           (Parche Seguro: Lupa, Vistas Duplicadas y Títulos)
+           ========================================================= */
+        @media (max-width: 768px) {
+            
+            /* 1. OCULTAR LUPA (FILTROS) DEL PRIMER PANEL */
+            /* Se oculta solo en la vista de reclutador */
+            body.recruiter-view #adminSearchToggle {
+                display: none !important;
+            }
+
+            /* 2. ELIMINAR EL PANEL DE "VISTAS" DUPLICADO (El suelto) */
+            /* Dejamos solo el que está integrado en los botones */
+            body.recruiter-view #mobileMetricsPanel {
+                display: none !important;
+            }
+
+            /* 3. HOMOLOGAR TÍTULOS DE VACANTES */
+            /* Forzamos un tamaño idéntico para todos */
+            body.recruiter-view .job-title {
+                font-size: 16px !important;  /* Tamaño estándar y legible */
+                line-height: 1.3 !important; /* Espaciado limpio */
+                font-weight: 700 !important; /* Negrita */
+                margin-bottom: 5px !important;
+                min-height: auto !important; /* Evita huecos extraños */
+            }
+        }
+
+        /* HOMOLOGACIÓN DE TÍTULOS (Admin y Reclutador) */
+    .job-title {
+        font-size: 16px !important;       /* Tamaño fijo para todos */
+        line-height: 1.3 !important;      /* Interlineado parejo */
+        font-weight: 800 !important;      /* Grosor idéntico */
+        
+        /* ESTO ES LO CLAVE PARA QUE NO SE DESAJUSTEN EN CELULAR: */
+        -webkit-text-size-adjust: 100% !important; 
+        text-size-adjust: 100% !important;
+        
+        /* Asegura que no hereden tamaños raros */
+        margin-bottom: 5px !important;
+        display: block !important;
+    }
+
+
+
+
+
     </style>    
 </head>
 <body>
