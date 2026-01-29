@@ -1749,29 +1749,7 @@
             }
         }
 
-        /* =========================================================
-           CORRECCIÓN FINAL: TÍTULOS RECLUTADOR (HOMOLOGACIÓN)
-           ========================================================= */
-        @media (max-width: 768px) {
-            
-            /* 1. APLASTAR EL ESTILO DE 26PX Y UNIFICAR TODO A 16PX */
-            /* Apuntamos directo al contenedor #jobGrid para asegurar */
-            body.recruiter-view #jobGrid h2,
-            body.recruiter-view #jobGrid .job-title,
-            body.recruiter-view #jobGrid h3 {
-                font-size: 16px !important;       /* El tamaño que querías */
-                line-height: 1.3 !important;      /* Espaciado correcto */
-                font-weight: 700 !important;      /* Negrita estándar */
-                margin-top: 5px !important;
-                margin-bottom: 5px !important;
-                text-size-adjust: none !important; /* Evita que el cel lo cambie */
-            }
 
-            /* 2. OCULTAR FILTROS Y PANELES SOBRANTES (LO QUE PEDISTE) */
-            body.recruiter-view #adminSearchToggle { display: none !important; }
-            body.recruiter-view #recruiterMetricsPanel { display: none !important; }
-            body.recruiter-view #mobileMetricsPanel { display: none !important; }
-        }
 
 
 
