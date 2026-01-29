@@ -1750,33 +1750,71 @@
         }
 
       /* =========================================================
-           CORRECCIÓN FINAL: TABLA COMPACTA MÓVIL (V22.MAX) 📱
-           (Texto centrado, filas delgadas y ajuste automático)
+           CORRECCIÓN ÚNICA: TABLA DIRECTORIO (MÓVIL) 📱
+           (Cero scroll horizontal, texto apilado y centrado)
            ========================================================= */
         @media (max-width: 768px) {
             
-            /* 1. TABLA COMPACTA Y CENTRADA */
-            #recruitersList tr td {
-                text-align: center !important;     /* Todo centrado horizontalmente */
-                vertical-align: middle !important; /* Centrado verticalmente */
-                padding: 4px 2px !important;       /* Relleno mínimo para ganar espacio */
-                font-size: 12px !important;        /* Letra ajustada */
-                line-height: 1.1 !important;       /* Líneas de texto pegaditas */
+            /* 1. TRANSFORMAMOS LAS FILAS EN CAJAS FLEXIBLES */
+            /* Esto permite controlar el ancho exacto de cada columna */
+            #recruitersList tr {
+                display: flex !important;
+                width: 100% !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                border-bottom: 1px solid #ddd !important;
             }
 
-            /* 2. AJUSTE DE TEXTO (Nombre/Apellido en varias líneas) */
-            #recruitersList tr td div {
-                white-space: normal !important;    /* Permite saltos de línea */
+            /* 2. ESTILO GENERAL DE CELDAS (Todo centrado y pequeño) */
+            #recruitersList td {
+                display: flex !important;
+                flex-direction: column !important; /* Apila contenido verticalmente */
+                justify-content: center !important;
+                align-items: center !important;
+                text-align: center !important;
+                
+                padding: 6px 2px !important;       /* Relleno mínimo */
+                font-size: 11px !important;        /* Letra compacta */
+                line-height: 1.1 !important;       /* Renglones pegaditos */
                 word-wrap: break-word !important;  /* Rompe palabras largas */
-                max-width: 90px !important;        /* Fuerza el salto si es muy ancho */
-                margin: 0 auto !important;         /* Centra el bloque de texto */
+                white-space: normal !important;    /* Permite varias líneas */
             }
 
-            /* 3. BOTONES DE ACCIÓN MÁS COMPACTOS */
+            /* 3. DISTRIBUCIÓN DE ANCHOS (Para que quepa todo) */
+            
+            /* Columna 1: NOMBRE (Le damos más espacio: 35%) */
+            #recruitersList td:nth-child(1) {
+                flex: 0 0 35% !important; 
+                max-width: 35% !important;
+            }
+            /* Forzamos que el nombre y teléfono se ajusten */
+            #recruitersList td:nth-child(1) div {
+                width: 100% !important;
+                white-space: normal !important;
+            }
+
+            /* Columna 2: CÓDIGO (20%) */
+            #recruitersList td:nth-child(2) {
+                flex: 0 0 20% !important;
+            }
+
+            /* Columna 3: LINK (15%) */
+            #recruitersList td:nth-child(3) {
+                flex: 0 0 15% !important;
+            }
+
+            /* Columna 4: ACCIONES (30%) */
+            #recruitersList td:nth-child(4) {
+                flex: 0 0 30% !important;
+                flex-direction: row !important; /* Los botones uno al lado del otro */
+                gap: 5px !important;
+            }
+
+            /* 4. BOTONES MÁS PEQUEÑOS */
             #recruitersList button {
-                padding: 4px 6px !important;       /* Botones más chicos */
-                font-size: 14px !important;        /* Íconos legibles */
-                margin: 0 2px !important;          /* Separación mínima */
+                font-size: 14px !important;
+                padding: 2px !important;
+                margin: 0 !important;
             }
         }
 
