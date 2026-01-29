@@ -2373,21 +2373,19 @@
             setAdminMode(false); 
         }
 
-        // FUNCIÓN SALIR (SIN PARPADEO) 🚪
+        // FUNCIÓN SALIR (CORREGIDA V23 - REDIRECCIÓN LIMPIA)
         window.logout = function() { 
             if(confirm("¿Cerrar sesión?")) {
-                // 1. Borramos memoria (llaves)
+                // 1. Borramos memoria
                 sessionStorage.clear();
                 localStorage.removeItem('iamsuperadmin');
                 
-                // 2. OJO: AQUÍ QUITAMOS LA LÍNEA QUE BORRABA LOS ESTILOS
-                // (Así se queda bonita hasta que se recargue)
-
-                // 3. Bye bye en Firebase y recarga
+                // 2. Cerramos sesión en Firebase
                 signOut(auth).then(() => { 
-                    window.location.reload(); 
+                    // EN LUGAR DE RECARGAR (reload), NOS VAMOS AL INICIO LIMPIO (origin)
+                    window.location.href = window.location.origin; 
                 }).catch(() => {
-                    window.location.reload(); // Si falla, nos vamos igual
+                    window.location.href = window.location.origin; 
                 });
             }
         };
