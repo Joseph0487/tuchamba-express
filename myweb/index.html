@@ -2349,18 +2349,6 @@ body.loading {
             }
         }
 
-        window.addEventListener('load', function() {
-    if (performance.navigation.type === 1) { // Si es recarga
-        localStorage.clear();
-        sessionStorage.clear();
-    }
-    // Chequeo extra para Firebase
-    if (typeof db !== 'undefined' && db) {
-        // Si Firebase está inicializado, fuerza reconexión
-        firebase.database().goOnline();
-    }
-});
-
         function deleteAllJobs() {
             remove(ref(db, 'jobs')).then(() => {
                 window.showToast("🔥 Todas las vacantes eliminadas");
