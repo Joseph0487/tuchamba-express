@@ -2461,31 +2461,37 @@
                 setAdminMode(false); 
             }
 
-            // FUNCIÓN SALIR OPTIMIZADA (V23.1 - SIN PANTALLA BLANCA) 🚀
-            window.logout = function() {
-                if (confirm("¿Cerrar sesión?")) {
-                    // 1. Feedback visual inmediato (para que sepas que sí le picaste)
-                    document.body.style.transition = "opacity 0.3s";
-                    document.body.style.opacity = "0.5";
-                    
-                    // 2. Limpieza de memoria
-                    localStorage.removeItem('iamsuperadmin');
-                    localStorage.clear();
-                    sessionStorage.clear();    
-                    
-                    // 3. Salida Rápida (Sin reload)
-                    if (typeof auth !== 'undefined' && auth) {
-                        signOut(auth).then(() => {
-                            // TRUCO: Redirigir a la raíz en lugar de recargar
-                            window.location.href = window.location.origin; 
-                        }).catch(() => {
-                            window.location.href = window.location.origin;
-                        });
-                    } else {
+            // FUNCIÓN SALIR BLINDADA (V23.2 - FIX INVITADO) 🛡️
+        window.logout = function() {
+            if (confirm("¿Cerrar sesión?")) {
+                // 1. Efecto visual para que sepas que sí jaló
+                document.body.style.transition = "opacity 0.3s";
+                document.body.style.opacity = "0.5";
+                
+                // 2. Borrado de memoria local (Tus credenciales)
+                localStorage.removeItem('iamsuperadmin');
+                localStorage.clear();
+                sessionStorage.clear();    
+                
+                // 3. DECISIÓN INTELIGENTE:
+                // ¿Hay un usuario real de Firebase conectado?
+                const user = auth.currentUser;
+
+                if (user) {
+                    // CASO A: Eres Admin (Esperamos a Firebase)
+                    signOut(auth).then(() => {
+                        window.location.href = window.location.origin; 
+                    }).catch((error) => {
+                        // Si falla, te sacamos de todas formas
+                        console.error("Error al salir:", error);
                         window.location.href = window.location.origin;
-                    }
+                    });
+                } else {
+                    // CASO B: Eres Invitado (TE VAS DIRECTO, SIN ESPERAS) 🚀
+                    window.location.href = window.location.origin;
                 }
-            };
+            }
+        };
 
             function showLogin() { 
                 document.getElementById('loginScreen').style.display = 'block'; 
