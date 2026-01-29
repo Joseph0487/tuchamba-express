@@ -2360,15 +2360,24 @@
             setAdminMode(false); 
         }
 
+        // FUNCIÓN SALIR (SIN PARPADEO) 🚪
         window.logout = function() { 
-            document.body.classList.remove('admin-mode');
-            sessionStorage.clear(); // Limpia memoria
-            localStorage.removeItem('iamsuperadmin');
-            
-            signOut(auth).then(() => { 
-                window.location.reload(); // Recarga simple y limpia
-            }); 
-        }
+            if(confirm("¿Cerrar sesión?")) {
+                // 1. Borramos memoria (llaves)
+                sessionStorage.clear();
+                localStorage.removeItem('iamsuperadmin');
+                
+                // 2. OJO: AQUÍ QUITAMOS LA LÍNEA QUE BORRABA LOS ESTILOS
+                // (Así se queda bonita hasta que se recargue)
+
+                // 3. Bye bye en Firebase y recarga
+                signOut(auth).then(() => { 
+                    window.location.reload(); 
+                }).catch(() => {
+                    window.location.reload(); // Si falla, nos vamos igual
+                });
+            }
+        };
 
         function showLogin() { 
             document.getElementById('loginScreen').style.display = 'block'; 
