@@ -1686,38 +1686,11 @@
             }
         }
 
-        /* =========================================================
-           CORRECCIONES MODO RECLUTADOR - MÓVIL (V22.FINAL) 📱
-           (Limpieza visual y ajuste de textos)
-           ========================================================= */
-        @media (max-width: 768px) {
-            
-            /* 1. OCULTAR LUPA (Filtros) del primer panel */
-            body.recruiter-view #adminSearchToggle {
-                display: none !important;
-            }
-
-            /* 2. ELIMINAR EL PANEL DE VISTAS DUPLICADO (El individual) */
-            /* Se queda solo el que vive dentro del bloque de botones */
-            body.recruiter-view #recruiterMetricsPanel {
-                display: none !important;
-            }
-
-            /* 3. HOMOLOGAR TÍTULOS DE VACANTES (Para que no se vean dispares) */
-            body.recruiter-view .job-title {
-                font-size: 16px !important;    /* Tamaño fijo y legible */
-                line-height: 1.3 !important;   /* Espaciado limpio */
-                font-weight: 700 !important;   /* Negrita estándar */
-                margin-bottom: 5px !important;
-            }
-        }
 
        
     </style>    
 </head>
 <body>
-
-    
 
     <div id="globalBackground"></div>
 
@@ -2168,6 +2141,9 @@
             populateMetricsList(); 
         }
         window.closeMetricsModal = function() { document.getElementById('metricsModal').classList.remove('active'); }
+
+        window.openTeamModal = function() { document.getElementById('teamModal').classList.add('active'); resetRecruiterForm(); }
+        window.closeTeamModal = function() { document.getElementById('teamModal').classList.remove('active'); }
 
         window.openSettingsModal = function() { document.getElementById('settingsModal').classList.add('active'); if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone; }
         window.closeSettingsModal = function() { document.getElementById('settingsModal').classList.remove('active'); }
@@ -2622,6 +2598,54 @@
                     setTimeout(() => { btn.style.backgroundColor = '#0a66c2'; btn.textContent = originalText; }, 2000);
                 });
         }
+
+        window.openTeamModal = function() { document.getElementById('teamModal').classList.add('active'); resetRecruiterForm(); }
+        window.closeTeamModal = function() { document.getElementById('teamModal').classList.remove('active'); }
+
+        window.saveRecruiter = function() {
+            const name = document.getElementById('recName').value.trim();
+            const rawPhone = document.getElementById('recPhone').value.trim();
+            const phoneCode = document.getElementById('recPhoneCode').value;
+            const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
+            
+            if(!name || !rawPhone || !code) return alert('Por favor, llena todos los campos.');
+            
+            let cleanPhone = rawPhone.replace(/\D/g, '');
+            const codeDigits = phoneCode.replace('+', '');
+            if (cleanPhone.startsWith(codeDigits)) {
+                cleanPhone = cleanPhone.substring(codeDigits.length);
+            }
+            
+            const finalPhone = phoneCode + cleanPhone;
+
+            const duplicateCheck = Object.entries(recruiters).find(([key, r]) => { return r.code === code && key !== editingRecruiterId; });
+            if (duplicateCheck) { return alert(`⚠️ ERROR: El código '${code}' ya está siendo usado por ${duplicateCheck[1].name}. Usa otro.`); }
+            
+            const idToSave = editingRecruiterId || 'rec-' + Date.now();
+            set(ref(db, 'recruiters/' + idToSave), { name, phone: finalPhone, code }).then(() => { window.showToast(editingRecruiterId ? '✅ Reclutador actualizado' : '✅ Reclutador agregado'); resetRecruiterForm(); });
+        }
+
+        window.editRecruiter = function(id) {
+            const r = recruiters[id]; if(!r) return;
+            document.getElementById('recName').value = r.name; 
+            
+            let phoneVal = r.phone;
+            if(phoneVal.startsWith('+52')) { document.getElementById('recPhoneCode').value = '+52'; phoneVal = phoneVal.replace('+52',''); }
+            else if(phoneVal.startsWith('+1')) { document.getElementById('recPhoneCode').value = '+1'; phoneVal = phoneVal.replace('+1',''); }
+            document.getElementById('recPhone').value = phoneVal; 
+
+            document.getElementById('recCode').value = r.code;
+            editingRecruiterId = id; const btn = document.getElementById('btnSaveRecruiter'); btn.textContent = "Guardar Cambios"; btn.style.backgroundColor = "#f57c00"; 
+            document.getElementById('btnCancelRecruiter').style.display = 'block';
+        }
+
+        window.resetRecruiterForm = function() {
+            document.getElementById('recName').value = ''; document.getElementById('recPhone').value = ''; document.getElementById('recCode').value = ''; editingRecruiterId = null;
+            const btn = document.getElementById('btnSaveRecruiter'); btn.textContent = "Agregar"; btn.style.backgroundColor = "#0a66c2"; 
+            document.getElementById('btnCancelRecruiter').style.display = 'none';
+        }
+
+        window.deleteRecruiter = function(id) { if(confirm('¿Seguro que quieres eliminar a este reclutador?')) { remove(ref(db, 'recruiters/' + id)); if(editingRecruiterId === id) resetRecruiterForm(); } }
         
         window.copyLink = function(code) { 
             const link = `${window.location.origin}/?ref=${code}`; 
@@ -3504,6 +3528,7 @@
             document.getElementById('viewModal').classList.remove('active'); 
         }
         window.closeFormModal = function() { document.getElementById('formModal').classList.remove('active'); }
+        window.closeTeamModal = function() { document.getElementById('teamModal').classList.remove('active'); }
         
         window.openJobForm = function() {
             currentEditId = null; document.getElementById('formTitle').textContent = 'Nueva Vacante'; document.getElementById('jobForm').reset();
@@ -3697,12 +3722,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-        /* =========================================================
-           BLOQUE FINAL MAESTRO (V22.13) 👑
-           (Incluye: Descargas, Login Recuperado y Gestión de Equipo)
-           ========================================================= */
-
-        // 1. DESCARGAR BASE DE RECLUTADORES
+        // --- TAREA 2: DESCARGAR BASE RECLUTADORES ---
         window.downloadRecruitersDB = function() {
             if (!recruiters || Object.keys(recruiters).length === 0) return window.showToast("❌ Sin datos");
             
@@ -3720,182 +3740,30 @@
             const dateStr = new Date().toISOString().split('T')[0];
             XLSX.writeFile(wb, `Base_Reclutadores_${dateStr}.xlsx`);
             window.showToast("✅ Base descargada");
-        };
+        }
 
-        // 2. FUNCIONES DE ACCESO (¡LAS QUE FALTABAN!) 🚨
-        window.enterAsGuest = function() {
-            sessionStorage.setItem('isGuest', 'true');
-            setAdminMode(false);
-            window.showToast("👋 Bienvenido Visitante");
-            
-            // Ocultar intro y mostrar app
-            const intro = document.getElementById('introSection');
-            const app = document.getElementById('appContent');
-            if(intro) intro.style.display = 'none';
-            if(app) app.style.display = 'block';
-            
-            window.scrollTo(0, 0);
-        };
-
-        window.showLogin = function() {
-            const modal = document.getElementById('loginModal');
-            if(modal) modal.style.display = 'flex';
-        };
-
-        window.closeLogin = function() {
-            const modal = document.getElementById('loginModal');
-            if(modal) modal.style.display = 'none';
-        };
-
-        // 3. BUSCADOR / LUPA DE ADMIN
-        window.toggleAdminSearch = function() {
-            const searchBar = document.getElementById('userStickyTools');
-            if(searchBar) {
-                searchBar.classList.toggle('active');
-                if(searchBar.classList.contains('active')) {
-                    setTimeout(() => {
-                        const input = document.getElementById('searchInput');
-                        if(input) input.focus();
-                    }, 100);
-                }
-            }
-        };
-
-        // 4. MÓDULO DE EQUIPO (MODAL, TABLA Y ACCIONES)
-        
-        // A. Abrir Modal
-        window.openTeamModal = function() {
-            const modal = document.getElementById('teamModal');
-            if (modal) {
-                modal.classList.add('active');
-                modal.style.display = 'flex';
-                resetRecruiterForm(); 
-                renderRecruitersTable(); // Pinta la tabla al abrir
-            }
-        };
-
-        // B. Cerrar Modal
-        window.closeTeamModal = function() {
-            const modal = document.getElementById('teamModal');
-            if (modal) {
-                modal.classList.remove('active');
-                modal.style.display = 'none';
-            }
-        };
-
-        // C. Renderizar Tabla
-        window.renderRecruitersTable = function() {
-            const list = document.getElementById('recruitersList');
-            if (!list) return;
-
-            if (!recruiters || Object.keys(recruiters).length === 0) {
-                list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#888;">No hay reclutadores en el equipo.</td></tr>';
-                return;
-            }
-
-            list.innerHTML = Object.keys(recruiters).map(key => {
-                const r = recruiters[key];
-                const personalLink = `${window.location.origin}/?ref=${r.code.toLowerCase()}`;
-                
-                return `
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 12px 10px;">
-                        <div style="font-weight: 700; color: #333; font-size: 14px;">${r.name}</div>
-                        <div style="font-size: 12px; color: #666;">📱 ${r.phone}</div>
-                    </td>
-                    <td style="padding: 12px 10px;">
-                        <span style="background: #e3f2fd; color: #1565c0; padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 12px;">
-                            ${r.code}
-                        </span>
-                    </td>
-                    <td style="padding: 12px 10px; text-align: center;">
-                        <button onclick="copyRecruiterLink('${personalLink}')" 
-                                title="Copiar Link Personal"
-                                style="background: #f5f5f5; border: 1px solid #ddd; padding: 6px 10px; border-radius: 4px; cursor: pointer;">
-                            🔗
-                        </button>
-                    </td>
-                    <td style="padding: 12px 10px; text-align: right;">
-                        <button onclick="editRecruiter('${key}')" title="Editar" style="border: none; background: transparent; font-size: 16px; cursor: pointer; margin-right: 8px;">✏️</button>
-                        <button onclick="deleteRecruiter('${key}')" title="Eliminar" style="border: none; background: transparent; font-size: 16px; cursor: pointer; color: #d32f2f;">🗑️</button>
-                    </td>
-                </tr>`;
-            }).join('');
-        };
-
-        // D. Guardar (Nuevo/Editar)
-        window.saveRecruiter = function() {
-            const name = document.getElementById('recName').value.trim();
-            const rawPhone = document.getElementById('recPhone').value.trim();
-            const phoneCode = document.getElementById('recPhoneCode').value;
-            const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
-
-            if (!name || !rawPhone || !code) return alert('⚠️ Por favor, llena todos los campos.');
-
-            let cleanPhone = rawPhone.replace(/\D/g, '');
-            const codeDigits = phoneCode.replace('+', '');
-            if (cleanPhone.startsWith(codeDigits)) cleanPhone = cleanPhone.substring(codeDigits.length);
-            const finalPhone = phoneCode + cleanPhone;
-
-            const duplicateCheck = Object.entries(recruiters).find(([key, r]) => { 
-                return r.code === code && key !== editingRecruiterId; 
-            });
-            if (duplicateCheck) return alert(`⚠️ El código '${code}' ya lo usa ${duplicateCheck[1].name}.`); 
-
-            const recruiterData = { name, phone: finalPhone, code };
-            const idToSave = editingRecruiterId || 'rec-' + Date.now();
-
-            set(ref(db, 'recruiters/' + idToSave), recruiterData)
-                .then(() => {
-                    window.showToast(editingRecruiterId ? '✅ Actualizado' : '✅ Agregado');
-                    resetRecruiterForm();    
-                    renderRecruitersTable(); 
-                });
-        };
-
-        // E. Auxiliares
-        let editingRecruiterId = null;
-
-        window.editRecruiter = function(key) {
-            const r = recruiters[key];
-            document.getElementById('recName').value = r.name;
-            document.getElementById('recCode').value = r.code;
-            document.getElementById('recPhone').value = r.phone.replace(/^\+\d{2,3}/, ''); 
-            editingRecruiterId = key;
-            const btnSave = document.getElementById('btnSaveRecruiter');
-            const btnCancel = document.getElementById('btnCancelRecruiter');
-            if(btnSave) btnSave.innerHTML = "🔄 Actualizar";
-            if(btnCancel) btnCancel.style.display = 'inline-block';
-        };
-
-        window.deleteRecruiter = function(key) {
-            if (confirm("¿Eliminar este reclutador?")) {
-                remove(ref(db, 'recruiters/' + key))
-                    .then(() => {
-                        window.showToast("🗑️ Eliminado");
-                        renderRecruitersTable();
-                    });
-            }
-        };
-
-        window.resetRecruiterForm = function() {
-            document.getElementById('recName').value = '';
-            document.getElementById('recCode').value = '';
-            document.getElementById('recPhone').value = '';
-            editingRecruiterId = null;
-            const btnSave = document.getElementById('btnSaveRecruiter');
-            const btnCancel = document.getElementById('btnCancelRecruiter');
-            if(btnSave) btnSave.innerHTML = "💾 Guardar";
-            if(btnCancel) btnCancel.style.display = 'none';
-        };
-
+        // --- FUNCIÓN RECUPERADA: COPIAR LINK ---
         window.copyRecruiterLink = function(link) {
             navigator.clipboard.writeText(link).then(() => {
-                window.showToast("✅ Link copiado");
-            }).catch(() => {
-                prompt("Copia el link manualmente:", link);
+                window.showToast("✅ Link copiado al portapapeles");
+            }).catch(err => {
+                window.showToast("❌ Error al copiar"); // Fallback simple
+                prompt("Copia tu link manualmente:", link);
             });
-        };
+        }
+
+        window.toggleAdminSearch = function() {
+            const searchBar = document.getElementById('userStickyTools');
+            searchBar.classList.toggle('active');
+            
+            // Si se muestra, poner foco en el input
+            if(searchBar.classList.contains('active')) {
+                setTimeout(() => document.getElementById('searchInput').focus(), 100);
+            }
+        }
+
+
+
 
 
     </script>
