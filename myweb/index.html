@@ -1749,38 +1749,7 @@
             }
         }
 
-        /* =========================================================
-           AJUSTES VISUALES FINALES (MÓVIL) 🛠️
-           (Arregla desbordes en tabla y separa botones de riesgo)
-           ========================================================= */
-        @media (max-width: 768px) {
-            
-            /* 1. ARREGLAR TABLA DE EQUIPO (Para que el texto no se salga) */
-            /* Obligamos a la tabla a respetar el ancho de la pantalla */
-            .recruiters-table {
-                table-layout: fixed !important; 
-                width: 100% !important;
-            }
-            
-            /* Hacemos que el texto largo se parta en varias líneas */
-            .recruiters-table td {
-                white-space: normal !important;    /* Permite renglones */
-                word-wrap: break-word !important;  /* Rompe palabras largas */
-                overflow-wrap: break-word !important;
-                font-size: 13px !important;        /* Letra ajustada */
-                padding: 8px 4px !important;       /* Espaciado compacto */
-            }
-
-            /* 2. SEPARAR BOTONES DE AJUSTES (Zona de Peligro) */
-            /* Los ponemos en bloque para que ocupen todo el ancho y se separen */
-            .danger-section button, 
-            .danger-btn {
-                display: block !important;         /* Uno por línea */
-                width: 100% !important;            /* Ancho completo */
-                margin-bottom: 15px !important;    /* Espacio abajo */
-                margin-left: 0 !important;         /* Sin margen izquierdo */
-            }
-        }
+        
 
 
 
@@ -2113,7 +2082,6 @@
                             📥 Base
                         </button>
 
-                        <button class="tool-btn" style="background:#666; display:none; width:100%; justify-content:center;" id="btnCancelRecruiter" onclick="resetRecruiterForm()">Cancelar Edición</button>
                     </div>
             </div>
 
@@ -3955,13 +3923,15 @@
         };
 
         window.resetRecruiterForm = function() {
-            document.getElementById('recName').value = '';
-            document.getElementById('recCode').value = '';
-            document.getElementById('recPhone').value = '';
-            editingRecruiterId = null;
-            document.getElementById('btnSaveRecruiter').innerHTML = "💾 Guardar";
-            document.getElementById('btnCancelRecruiter').style.display = 'none';
-        };
+        document.getElementById('recName').value = '';
+        document.getElementById('recCode').value = '';
+        document.getElementById('recPhone').value = '';
+        editingRecruiterId = null;
+        
+        // Solo reseteamos el botón de Guardar
+        const btnSave = document.getElementById('btnSaveRecruiter');
+        if(btnSave) btnSave.innerHTML = "💾 Guardar";
+    };
 
         // 3. HERRAMIENTAS EXTRA (Copiado y Buscador)
         window.copyRecruiterLink = function(link) {
