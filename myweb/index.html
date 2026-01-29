@@ -3936,33 +3936,43 @@
             return;
         }
 
-        // Aquí construimos la tabla LIMPIA, sin estilos inline que estorben
-        list.innerHTML = Object.keys(recruiters).map(key => {
-            const r = recruiters[key];
-            const personalLink = `${window.location.origin}/?ref=${r.code.toLowerCase()}`;
-            
-            return `
-            <tr class="rec-row">
-                <td class="col-info">
-                    <div class="rec-name">${r.name}</div>
-                    <div class="rec-phone">${r.phone}</div>
-                </td>
+        /* --- MOTOR DE TABLA OPTIMIZADO (V23.CLEAN) --- */
+        window.renderRecruitersTable = function() {
+            const list = document.getElementById('recruitersList');
+            if (!list) return;
+
+            if (!recruiters || Object.keys(recruiters).length === 0) {
+                list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#888; font-size:12px;">Sin equipo asignado.</td></tr>';
+                return;
+            }
+
+            // Aquí construimos la tabla LIMPIA
+            list.innerHTML = Object.keys(recruiters).map(key => {
+                const r = recruiters[key];
+                const personalLink = `${window.location.origin}/?ref=${r.code.toLowerCase()}`;
                 
-                <td class="col-code">
-                    <span class="code-badge">${r.code}</span>
-                </td>
-                
-                <td class="col-link">
-                    <button onclick="copyRecruiterLink('${personalLink}')">🔗</button>
-                </td>
-                
-                <td class="col-actions">
-                    <button class="btn-edit" onclick="editRecruiter('${key}')">✏️</button>
-                    <button class="btn-del" onclick="deleteRecruiter('${key}')">🗑️</button>
-                </td>
-            </tr>`;
-        }).join('');
-    };
+                return `
+                <tr class="rec-row">
+                    <td class="col-info">
+                        <div class="rec-name">${r.name}</div>
+                        <div class="rec-phone">${r.phone}</div>
+                    </td>
+                    
+                    <td class="col-code">
+                        <span class="code-badge">${r.code}</span>
+                    </td>
+                    
+                    <td class="col-link">
+                        <button onclick="copyRecruiterLink('${personalLink}')" class="btn-icon-small" title="Copiar Link">🔗</button>
+                    </td>
+                    
+                    <td class="col-actions">
+                        <button class="btn-icon-small" onclick="editRecruiter('${key}')" title="Editar">✏️</button>
+                        <button class="btn-icon-small" onclick="deleteRecruiter('${key}')" title="Eliminar" style="color:#d32f2f;">🗑️</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        };
 
         list.innerHTML = Object.keys(recruiters).map(key => {
             const r = recruiters[key];
