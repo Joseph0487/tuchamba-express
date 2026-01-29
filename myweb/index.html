@@ -1749,82 +1749,8 @@
             }
         }
 
-        /* =========================================================
-           DISEÑO DE TABLA "EQUIPO" - MÓVIL PERFECTO 📱
-           (Compacto, centrado y sin scroll)
-           ========================================================= */
-        @media (max-width: 768px) {
-            
-            /* 1. LA TABLA */
-            #recruitersList tr {
-                display: flex !important;
-                width: 100% !important;
-                border-bottom: 1px solid #eee !important;
-                align-items: center !important; /* Centrado vertical perfecto */
-                padding: 4px 0 !important;      /* Fila delgadita */
-            }
+        
 
-            /* 2. LAS CELDAS (Alineación y Espacio) */
-            #recruitersList td {
-                padding: 0 2px !important;
-                text-align: center !important;
-                border: none !important;
-            }
-
-            /* --- COLUMNA 1: NOMBRE (40%) --- */
-            .col-info { flex: 0 0 40% !important; max-width: 40% !important; }
-            
-            .rec-name { 
-                font-size: 11px !important; 
-                font-weight: 700 !important; 
-                line-height: 1.1 !important;
-                color: #222 !important;
-                word-wrap: break-word !important; /* Si el nombre es largo, baja de renglón */
-            }
-            .rec-phone { 
-                font-size: 9px !important; 
-                color: #888 !important; 
-                margin-top: 1px !important; 
-            }
-
-            /* --- COLUMNA 2: CÓDIGO (20%) --- */
-            .col-code { flex: 0 0 20% !important; }
-            
-            .code-badge {
-                background: #e3f2fd !important;
-                color: #1565c0 !important;
-                font-size: 9px !important;
-                font-weight: 700 !important;
-                padding: 2px 4px !important;
-                border-radius: 4px !important;
-                display: inline-block !important;
-            }
-
-            /* --- COLUMNA 3: LINK (15%) --- */
-            .col-link { flex: 0 0 15% !important; }
-            .col-link button {
-                background: #f5f5f5 !important;
-                border: 1px solid #ddd !important;
-                border-radius: 4px !important;
-                padding: 2px 5px !important;
-                font-size: 12px !important;
-            }
-
-            /* --- COLUMNA 4: ACCIONES (25%) --- */
-            .col-actions { 
-                flex: 0 0 25% !important; 
-                display: flex !important; 
-                justify-content: center !important; 
-                gap: 5px !important; 
-            }
-            .col-actions button {
-                background: transparent !important;
-                border: none !important;
-                font-size: 14px !important;
-                padding: 2px !important;
-            }
-            .btn-del { color: #d32f2f !important; }
-        }
 
 
 
@@ -2267,41 +2193,20 @@
             }
         });
 
-       // BUSCA ESTE BLOQUE Y REEMPLÁZALO COMPLETO:
-        
         onAuthStateChanged(auth, (user) => {
             const urlJobId = urlParams.get('id'); 
-            
-            // 1. VERIFICAMOS SI HAY SESIÓN DE RECLUTADOR GUARDADA
-            const isRecruiterSession = sessionStorage.getItem('isRecruiterSession') === 'true';
-
             if (user) { 
-                // CASO 1: SUPER ADMIN (LOGIN CON CORREO)
                 isAdmin = true; 
                 currentUserEmail = user.email; 
                 setAdminMode(true); 
-                window.scrollTo(0, 0); 
+                window.scrollTo(0, 0); // <--- ¡AQUÍ! Pega esta línea
             } else {
-                // NO HAY USUARIO DE FIREBASE
                 isAdmin = false;
                 currentUserEmail = "";
-
-                // CASO 2: ES RECLUTADOR (EL PARCHE QUE FALTABA)
-                if (isRecruiterSession) {
-                    // Si hay sesión de reclutador, NO hacemos nada aquí.
-                    // Dejamos que la función initRecruitersData cargue y abra el panel.
-                    console.log("⏳ Detectada sesión de reclutador, esperando carga de datos...");
-                    return; 
-                }
-
-                // CASO 3: INVITADO O LINK DIRECTO
                 if (sessionStorage.getItem('isGuest') === 'true' || urlJobId) { 
                     setAdminMode(false); 
                 } 
-                // CASO 4: NADIE (MOSTRAR LOGIN)
-                else { 
-                    showLogin(); 
-                }
+                else { showLogin(); }
             }
         });
 
@@ -3926,81 +3831,44 @@
             }
         };
 
-        /* --- MOTOR DE TABLA OPTIMIZADO (V23.CLEAN) --- */
-    window.renderRecruitersTable = function() {
-        const list = document.getElementById('recruitersList');
-        if (!list) return;
-
-        if (!recruiters || Object.keys(recruiters).length === 0) {
-            list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#888; font-size:12px;">Sin equipo asignado.</td></tr>';
-            return;
-        }
-
-        /* --- MOTOR DE TABLA OPTIMIZADO (V23.CLEAN) --- */
         window.renderRecruitersTable = function() {
             const list = document.getElementById('recruitersList');
             if (!list) return;
 
             if (!recruiters || Object.keys(recruiters).length === 0) {
-                list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#888; font-size:12px;">Sin equipo asignado.</td></tr>';
+                list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#888;">No hay reclutadores en el equipo.</td></tr>';
                 return;
             }
 
-            // Aquí construimos la tabla LIMPIA
             list.innerHTML = Object.keys(recruiters).map(key => {
                 const r = recruiters[key];
                 const personalLink = `${window.location.origin}/?ref=${r.code.toLowerCase()}`;
                 
                 return `
-                <tr class="rec-row">
-                    <td class="col-info">
-                        <div class="rec-name">${r.name}</div>
-                        <div class="rec-phone">${r.phone}</div>
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 12px 10px;">
+                        <div style="font-weight: 700; color: #333; font-size: 14px;">${r.name}</div>
+                        <div style="font-size: 12px; color: #666;">📱 ${r.phone}</div>
                     </td>
-                    
-                    <td class="col-code">
-                        <span class="code-badge">${r.code}</span>
+                    <td style="padding: 12px 10px;">
+                        <span style="background: #e3f2fd; color: #1565c0; padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 12px;">
+                            ${r.code}
+                        </span>
                     </td>
-                    
-                    <td class="col-link">
-                        <button onclick="copyRecruiterLink('${personalLink}')" class="btn-icon-small" title="Copiar Link">🔗</button>
+                    <td style="padding: 12px 10px; text-align: center;">
+                        <button onclick="copyRecruiterLink('${personalLink}')" 
+                                title="Copiar Link"
+                                style="background: #f5f5f5; border: 1px solid #ddd; padding: 6px 10px; border-radius: 4px; cursor: pointer;">
+                            🔗
+                        </button>
                     </td>
-                    
-                    <td class="col-actions">
-                        <button class="btn-icon-small" onclick="editRecruiter('${key}')" title="Editar">✏️</button>
-                        <button class="btn-icon-small" onclick="deleteRecruiter('${key}')" title="Eliminar" style="color:#d32f2f;">🗑️</button>
+                    <td style="padding: 12px 10px; text-align: right;">
+                        <button onclick="editRecruiter('${key}')" title="Editar" style="border: none; background: transparent; font-size: 16px; cursor: pointer; margin-right: 8px;">✏️</button>
+                        <button onclick="deleteRecruiter('${key}')" title="Eliminar" style="border: none; background: transparent; font-size: 16px; cursor: pointer; color: #d32f2f;">🗑️</button>
                     </td>
                 </tr>`;
             }).join('');
         };
-
-        list.innerHTML = Object.keys(recruiters).map(key => {
-            const r = recruiters[key];
-            const personalLink = `${window.location.origin}/?ref=${r.code.toLowerCase()}`;
-            
-            // NOTA: Ya no hay estilos "style=" aquí, todo lo controla el CSS
-            return `
-            <tr>
-                <td>
-                    <div class="rec-name">${r.name}</div>
-                    <div class="rec-phone">📱 ${r.phone}</div>
-                </td>
-                
-                <td>
-                    <span class="rec-code">${r.code}</span>
-                </td>
-                
-                <td>
-                    <button class="action-btn link-btn" onclick="copyRecruiterLink('${personalLink}')">🔗</button>
-                </td>
-                
-                <td>
-                    <button class="action-btn edit-btn" onclick="editRecruiter('${key}')">✏️</button>
-                    <button class="action-btn delete-btn" onclick="deleteRecruiter('${key}')">🗑️</button>
-                </td>
-            </tr>`;
-        }).join('');
-    };
 
         window.saveRecruiter = function() {
             const name = document.getElementById('recName').value.trim();
