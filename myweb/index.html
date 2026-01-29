@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
@@ -20,6 +21,10 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -31,6 +36,12 @@
             background-color: #f0f2f5; 
             overflow-anchor: none;  /* <--- ESTA ES LA LÍNEA MÁGICA */
         }
+        body {
+    transition: all 0.3s ease; /* Suaviza cambios de estilo */
+}
+body.loading {
+    opacity: 0; /* Esconde temporalmente durante carga */
+}
 
         /* Fondo Global Fijo */
         #globalBackground {
@@ -568,6 +579,26 @@
         .recruiters-table th { color: #495057; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; padding: 12px 15px; letter-spacing: 0.5px; }
         .recruiters-table td { padding: 12px 15px; border-bottom: 1px solid #f1f3f5; color: #333; font-size: 0.9rem; vertical-align: middle; }
         .recruiters-table tr:hover { background: #fffde7; }
+        @media (max-width: 768px) {
+    .recruiters-table th {
+        font-size: 0.75rem; /* Letra más chica para encabezados (era 0.8rem) */
+        padding: 8px 10px; /* Reduce padding para ahorrar espacio */
+    }
+    .recruiters-table td {
+        font-size: 0.85rem; /* Letra principal más chica (era 0.9rem) */
+        padding: 8px 10px; /* Reduce padding */
+    }
+    .recruiters-table td:first-child {
+        text-align: justify; /* Justifica los nombres para que se distribuyan mejor */
+        word-break: break-word; /* Rompe palabras largas si es necesario */
+    }
+    .recruiters-table td:nth-child(2) {
+        font-size: 0.75rem; /* Código más chico */
+    }
+    .table-container-pro {
+        overflow-x: auto; /* Permite scroll horizontal si aún no cabe */
+    }
+}
 
         /* Botones de acción pequeños */
         .btn-icon-small { border: none; background: transparent; cursor: pointer; font-size: 16px; padding: 5px; border-radius: 4px; transition: background 0.2s; }
@@ -579,6 +610,15 @@
         .danger-zone-pro {
             background: #fff5f5; border: 1px solid #ffc9c9; border-radius: 12px; padding: 20px;
             position: relative; overflow: hidden; margin-top: 10px;
+        }
+        @media (max-width: 768px) {
+        .danger-zone-pro .danger-btn {
+        margin-top: 15px; /* Separa más los botones en celular */
+        padding: 12px; /* Un poquito más alto para que se vea mejor */
+        }
+        .danger-zone-pro {
+        padding: 15px; /* Reduce padding general para que quepa mejor */
+        }
         }
         .danger-zone-pro::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #ff6b6b; }
         .danger-title { color: #c92a2a; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 1rem; }
@@ -2261,6 +2301,18 @@
             }
         }
 
+        window.addEventListener('load', function() {
+    if (performance.navigation.type === 1) { // Si es recarga
+        localStorage.clear();
+        sessionStorage.clear();
+    }
+    // Chequeo extra para Firebase
+    if (typeof db !== 'undefined' && db) {
+        // Si Firebase está inicializado, fuerza reconexión
+        firebase.database().goOnline();
+    }
+});
+
         function deleteAllJobs() {
             remove(ref(db, 'jobs')).then(() => {
                 window.showToast("🔥 Todas las vacantes eliminadas");
@@ -2373,22 +2425,28 @@
             setAdminMode(false); 
         }
 
-        // FUNCIÓN SALIR (CORREGIDA V23 - REDIRECCIÓN LIMPIA)
-        window.logout = function() { 
-            if(confirm("¿Cerrar sesión?")) {
-                // 1. Borramos memoria
-                sessionStorage.clear();
-                localStorage.removeItem('iamsuperadmin');
-                
-                // 2. Cerramos sesión en Firebase
-                signOut(auth).then(() => { 
-                    // EN LUGAR DE RECARGAR (reload), NOS VAMOS AL INICIO LIMPIO (origin)
-                    window.location.href = window.location.origin; 
-                }).catch(() => {
-                    window.location.href = window.location.origin; 
+        window.logout = function() {
+    if (confirm("¿Cerrar sesión?")) {
+        document.body.classList.add('loading');
+        
+        localStorage.removeItem('iamsuperadmin');
+        localStorage.clear(); // Limpia TODO localStorage
+        sessionStorage.clear(); // Limpia sessionStorage    
+        
+        if (typeof auth !== 'undefined' && auth) {
+            signOut(auth)
+                .then(() => {
+                    setTimeout(() => location.reload(), 400);
+                })
+                .catch((error) => {
+                    console.error("Error al cerrar Firebase:", error);
+                    setTimeout(() => location.reload(), 400);
                 });
-            }
-        };
+        } else {
+            setTimeout(() => location.reload(), 300);
+        }
+    }
+};
 
         function showLogin() { 
             document.getElementById('loginScreen').style.display = 'block'; 
