@@ -1749,33 +1749,36 @@
             }
         }
 
-       /* =========================================================
-           AJUSTES VISUALES FINALES (MÓVIL) 🛠️
-           (Arregla desbordes en tabla y separa botones de riesgo)
+      /* =========================================================
+           CORRECCIÓN FINAL: TABLA COMPACTA MÓVIL (V22.MAX) 📱
+           (Texto centrado, filas delgadas y ajuste automático)
            ========================================================= */
         @media (max-width: 768px) {
             
-            /* 1. ARREGLAR TABLA DE EQUIPO (Para que el texto no se salga) */
-            /* Apuntamos al contenedor padre para forzar el ajuste */
+            /* 1. TABLA COMPACTA Y CENTRADA */
             #recruitersList tr td {
-                font-size: 13px !important;        /* Letra más pequeña para que quepa */
-                padding: 8px 4px !important;       /* Menos relleno */
-                white-space: normal !important;    /* Permite múltiples líneas */
+                text-align: center !important;     /* Todo centrado horizontalmente */
+                vertical-align: middle !important; /* Centrado verticalmente */
+                padding: 4px 2px !important;       /* Relleno mínimo para ganar espacio */
+                font-size: 12px !important;        /* Letra ajustada */
+                line-height: 1.1 !important;       /* Líneas de texto pegaditas */
+            }
+
+            /* 2. AJUSTE DE TEXTO (Nombre/Apellido en varias líneas) */
+            #recruitersList tr td div {
+                white-space: normal !important;    /* Permite saltos de línea */
                 word-wrap: break-word !important;  /* Rompe palabras largas */
-                word-break: break-all !important;  /* Fuerza el quiebre si es necesario */
-                max-width: 100px !important;       /* Límite de ancho para forzar salto */
+                max-width: 90px !important;        /* Fuerza el salto si es muy ancho */
+                margin: 0 auto !important;         /* Centra el bloque de texto */
             }
 
-            /* 2. SEPARAR BOTONES DE AJUSTES (Zona de Peligro) */
-            /* Separamos los botones dentro de la sección de peligro */
-            .danger-section button.danger-btn {
-                display: block !important;         /* Hace que cada botón ocupe su propia línea */
-                width: 100% !important;            /* Ancho completo */
-                margin-bottom: 15px !important;    /* Espacio vital entre ellos */
-                margin-left: 0 !important;         /* Quita márgenes laterales */
+            /* 3. BOTONES DE ACCIÓN MÁS COMPACTOS */
+            #recruitersList button {
+                padding: 4px 6px !important;       /* Botones más chicos */
+                font-size: 14px !important;        /* Íconos legibles */
+                margin: 0 2px !important;          /* Separación mínima */
             }
-        } 
-
+        }
 
 
 
