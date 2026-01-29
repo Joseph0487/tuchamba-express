@@ -1749,67 +1749,74 @@
             }
         }
 
-      //* =========================================================
-           ESTILO TABLA EQUIPO (MÓVIL Y DESKTOP UNIFICADO) 🛠️
+      /* =========================================================
+           CORRECCIÓN FINAL: TABLA EQUIPO (ROMPE-ESTILOS VIEJOS) 🛠️
+           (Obliga al diseño compacto aunque el JS tenga estilos viejos)
            ========================================================= */
-        
-        /* Reglas base para celular (Flexbox) */
         @media (max-width: 768px) {
+            
+            /* 1. FORZAMOS A LA FILA A SER FLEXIBLE (Para controlar anchos) */
             #recruitersList tr {
                 display: flex !important;
                 width: 100% !important;
-                border-bottom: 1px solid #eee !important;
-                padding: 5px 0 !important;
                 align-items: center !important;
+                border-bottom: 1px solid #ddd !important;
+                padding: 5px 0 !important;
             }
 
+            /* 2. APLASTAMOS LOS ESTILOS DE LAS CELDAS */
             #recruitersList td {
                 display: flex !important;
-                flex-direction: column !important;
+                flex-direction: column !important; /* Apila Nombre y Teléfono verticalmente */
                 justify-content: center !important;
                 align-items: center !important;
                 text-align: center !important;
-                padding: 2px !important;
+                
+                /* AQUÍ APLASTAMOS EL PADDING DE 12px DEL JS VIEJO */
+                padding: 2px !important;      
+                height: auto !important;
+                border: none !important;
+            }
+
+            /* 3. COLUMNAS A LA MEDIDA (Suman 100%) */
+            
+            /* NOMBRE (35%) */
+            #recruitersList td:nth-child(1) { flex: 0 0 35% !important; max-width: 35% !important; }
+            
+            /* CÓDIGO (20%) */
+            #recruitersList td:nth-child(2) { flex: 0 0 20% !important; max-width: 20% !important; }
+            
+            /* LINK (15%) */
+            #recruitersList td:nth-child(3) { flex: 0 0 15% !important; max-width: 15% !important; }
+            
+            /* ACCIONES (30%) */
+            #recruitersList td:nth-child(4) { flex: 0 0 30% !important; max-width: 30% !important; flex-direction: row !important; gap: 5px !important; }
+
+            /* 4. ARREGLAR TEXTO (NOMBRE Y TELÉFONO) */
+            /* Esto es clave: Obliga a los DIVs viejos a encogerse la letra */
+            #recruitersList td div {
+                font-size: 11px !important;        /* Aplasta el 14px viejo */
+                line-height: 1.1 !important;
+                white-space: normal !important;    /* Permite renglones */
                 word-wrap: break-word !important;
+                text-align: center !important;
+                width: 100% !important;
+            }
+            
+            /* El teléfono un poco más chico y gris */
+            #recruitersList td div:nth-child(2) {
+                font-size: 9px !important; 
+                color: #666 !important;
+                margin-top: 2px !important;
             }
 
-            /* 1. NOMBRE (40%) */
-            #recruitersList td:nth-child(1) {
-                flex: 0 0 40% !important;
-                max-width: 40% !important;
+            /* 5. BOTONES CHIQUITOS */
+            #recruitersList button {
+                padding: 4px !important;
+                font-size: 14px !important;
+                margin: 0 !important;
             }
-            .rec-name { font-weight: bold; font-size: 12px; line-height: 1.1; }
-            .rec-phone { font-size: 10px; color: #666; margin-top: 2px; }
-
-            /* 2. CÓDIGO (20%) */
-            #recruitersList td:nth-child(2) { flex: 0 0 20% !important; }
-            .rec-code { 
-                background: #e3f2fd; color: #1565c0; 
-                padding: 2px 4px; border-radius: 4px; 
-                font-weight: bold; font-size: 10px; 
-            }
-
-            /* 3. LINK (15%) */
-            #recruitersList td:nth-child(3) { flex: 0 0 15% !important; }
-
-            /* 4. ACCIONES (25%) */
-            #recruitersList td:nth-child(4) { 
-                flex: 0 0 25% !important; 
-                flex-direction: row !important; 
-                gap: 8px !important;
-            }
-
-            /* BOTONES */
-            .action-btn {
-                background: none; border: none; cursor: pointer;
-                font-size: 16px !important; padding: 0 !important;
-            }
-            .link-btn { background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; padding: 2px 6px !important; font-size: 12px !important; }
-            .delete-btn { color: #d32f2f; }
         }
-
-
-
 
 
 
