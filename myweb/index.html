@@ -1749,75 +1749,82 @@
             }
         }
 
-      /* =========================================================
-           CORRECCIÓN FINAL: TABLA EQUIPO (ROMPE-ESTILOS VIEJOS) 🛠️
-           (Obliga al diseño compacto aunque el JS tenga estilos viejos)
+        /* =========================================================
+           DISEÑO DE TABLA "EQUIPO" - MÓVIL PERFECTO 📱
+           (Compacto, centrado y sin scroll)
            ========================================================= */
         @media (max-width: 768px) {
             
-            /* 1. FORZAMOS A LA FILA A SER FLEXIBLE (Para controlar anchos) */
+            /* 1. LA TABLA */
             #recruitersList tr {
                 display: flex !important;
                 width: 100% !important;
-                align-items: center !important;
-                border-bottom: 1px solid #ddd !important;
-                padding: 5px 0 !important;
+                border-bottom: 1px solid #eee !important;
+                align-items: center !important; /* Centrado vertical perfecto */
+                padding: 4px 0 !important;      /* Fila delgadita */
             }
 
-            /* 2. APLASTAMOS LOS ESTILOS DE LAS CELDAS */
+            /* 2. LAS CELDAS (Alineación y Espacio) */
             #recruitersList td {
-                display: flex !important;
-                flex-direction: column !important; /* Apila Nombre y Teléfono verticalmente */
-                justify-content: center !important;
-                align-items: center !important;
+                padding: 0 2px !important;
                 text-align: center !important;
-                
-                /* AQUÍ APLASTAMOS EL PADDING DE 12px DEL JS VIEJO */
-                padding: 2px !important;      
-                height: auto !important;
                 border: none !important;
             }
 
-            /* 3. COLUMNAS A LA MEDIDA (Suman 100%) */
+            /* --- COLUMNA 1: NOMBRE (40%) --- */
+            .col-info { flex: 0 0 40% !important; max-width: 40% !important; }
             
-            /* NOMBRE (35%) */
-            #recruitersList td:nth-child(1) { flex: 0 0 35% !important; max-width: 35% !important; }
-            
-            /* CÓDIGO (20%) */
-            #recruitersList td:nth-child(2) { flex: 0 0 20% !important; max-width: 20% !important; }
-            
-            /* LINK (15%) */
-            #recruitersList td:nth-child(3) { flex: 0 0 15% !important; max-width: 15% !important; }
-            
-            /* ACCIONES (30%) */
-            #recruitersList td:nth-child(4) { flex: 0 0 30% !important; max-width: 30% !important; flex-direction: row !important; gap: 5px !important; }
-
-            /* 4. ARREGLAR TEXTO (NOMBRE Y TELÉFONO) */
-            /* Esto es clave: Obliga a los DIVs viejos a encogerse la letra */
-            #recruitersList td div {
-                font-size: 11px !important;        /* Aplasta el 14px viejo */
+            .rec-name { 
+                font-size: 11px !important; 
+                font-weight: 700 !important; 
                 line-height: 1.1 !important;
-                white-space: normal !important;    /* Permite renglones */
-                word-wrap: break-word !important;
-                text-align: center !important;
-                width: 100% !important;
+                color: #222 !important;
+                word-wrap: break-word !important; /* Si el nombre es largo, baja de renglón */
             }
-            
-            /* El teléfono un poco más chico y gris */
-            #recruitersList td div:nth-child(2) {
+            .rec-phone { 
                 font-size: 9px !important; 
-                color: #666 !important;
-                margin-top: 2px !important;
+                color: #888 !important; 
+                margin-top: 1px !important; 
             }
 
-            /* 5. BOTONES CHIQUITOS */
-            #recruitersList button {
-                padding: 4px !important;
+            /* --- COLUMNA 2: CÓDIGO (20%) --- */
+            .col-code { flex: 0 0 20% !important; }
+            
+            .code-badge {
+                background: #e3f2fd !important;
+                color: #1565c0 !important;
+                font-size: 9px !important;
+                font-weight: 700 !important;
+                padding: 2px 4px !important;
+                border-radius: 4px !important;
+                display: inline-block !important;
+            }
+
+            /* --- COLUMNA 3: LINK (15%) --- */
+            .col-link { flex: 0 0 15% !important; }
+            .col-link button {
+                background: #f5f5f5 !important;
+                border: 1px solid #ddd !important;
+                border-radius: 4px !important;
+                padding: 2px 5px !important;
+                font-size: 12px !important;
+            }
+
+            /* --- COLUMNA 4: ACCIONES (25%) --- */
+            .col-actions { 
+                flex: 0 0 25% !important; 
+                display: flex !important; 
+                justify-content: center !important; 
+                gap: 5px !important; 
+            }
+            .col-actions button {
+                background: transparent !important;
+                border: none !important;
                 font-size: 14px !important;
-                margin: 0 !important;
+                padding: 2px !important;
             }
+            .btn-del { color: #d32f2f !important; }
         }
-
 
 
 
@@ -3898,14 +3905,43 @@
             }
         };
 
-        window.renderRecruitersTable = function() {
+        /* --- MOTOR DE TABLA OPTIMIZADO (V23.CLEAN) --- */
+    window.renderRecruitersTable = function() {
         const list = document.getElementById('recruitersList');
         if (!list) return;
 
         if (!recruiters || Object.keys(recruiters).length === 0) {
-            list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#888;">No hay reclutadores en el equipo.</td></tr>';
+            list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#888; font-size:12px;">Sin equipo asignado.</td></tr>';
             return;
         }
+
+        // Aquí construimos la tabla LIMPIA, sin estilos inline que estorben
+        list.innerHTML = Object.keys(recruiters).map(key => {
+            const r = recruiters[key];
+            const personalLink = `${window.location.origin}/?ref=${r.code.toLowerCase()}`;
+            
+            return `
+            <tr class="rec-row">
+                <td class="col-info">
+                    <div class="rec-name">${r.name}</div>
+                    <div class="rec-phone">${r.phone}</div>
+                </td>
+                
+                <td class="col-code">
+                    <span class="code-badge">${r.code}</span>
+                </td>
+                
+                <td class="col-link">
+                    <button onclick="copyRecruiterLink('${personalLink}')">🔗</button>
+                </td>
+                
+                <td class="col-actions">
+                    <button class="btn-edit" onclick="editRecruiter('${key}')">✏️</button>
+                    <button class="btn-del" onclick="deleteRecruiter('${key}')">🗑️</button>
+                </td>
+            </tr>`;
+        }).join('');
+    };
 
         list.innerHTML = Object.keys(recruiters).map(key => {
             const r = recruiters[key];
