@@ -2082,7 +2082,6 @@
                             📥 Base
                         </button>
 
-                        <button class="tool-btn" style="background:#666; display:none; width:100%; justify-content:center;" id="btnCancelRecruiter" onclick="resetRecruiterForm()">Cancelar Edición</button>
                     </div>
             </div>
 
@@ -3901,15 +3900,17 @@
         };
 
         window.editRecruiter = function(key) {
-            const r = recruiters[key];
-            document.getElementById('recName').value = r.name;
-            document.getElementById('recCode').value = r.code;
-            document.getElementById('recPhone').value = r.phone.replace(/^\+\d{2,3}/, ''); 
-            editingRecruiterId = key;
-            
-            document.getElementById('btnSaveRecruiter').innerHTML = "🔄 Actualizar";
-            document.getElementById('btnCancelRecruiter').style.display = 'inline-block';
-        };
+        const r = recruiters[key];
+        document.getElementById('recName').value = r.name;
+        document.getElementById('recCode').value = r.code;
+        document.getElementById('recPhone').value = r.phone.replace(/^\+\d{2,3}/, ''); 
+        
+        editingRecruiterId = key;
+        
+        // Solo cambiamos el botón de Guardar, ignoramos el de cancelar
+        const btnSave = document.getElementById('btnSaveRecruiter');
+        if(btnSave) btnSave.innerHTML = "🔄 Actualizar";
+    };
 
         window.deleteRecruiter = function(key) {
             if (confirm("¿Eliminar?")) {
@@ -3922,14 +3923,15 @@
         };
 
         window.resetRecruiterForm = function() {
-            document.getElementById('recName').value = '';
-            document.getElementById('recCode').value = '';
-            document.getElementById('recPhone').value = '';
-            editingRecruiterId = null;
-            document.getElementById('btnSaveRecruiter').innerHTML = "💾 Guardar";
-            document.getElementById('btnCancelRecruiter').style.display = 'none';
-        };
-
+        document.getElementById('recName').value = '';
+        document.getElementById('recCode').value = '';
+        document.getElementById('recPhone').value = '';
+        editingRecruiterId = null;
+        
+        // Solo reseteamos el botón de Guardar
+        const btnSave = document.getElementById('btnSaveRecruiter');
+        if(btnSave) btnSave.innerHTML = "💾 Guardar";
+    };
         // 3. HERRAMIENTAS EXTRA (Copiado y Buscador)
         window.copyRecruiterLink = function(link) {
             navigator.clipboard.writeText(link).then(() => {
