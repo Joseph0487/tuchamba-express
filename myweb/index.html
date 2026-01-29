@@ -1749,7 +1749,30 @@
             }
         }
 
+        /* =========================================================
+           AJUSTES VISUALES FINALES (ADMIN MÓVIL) 🛠️
+           (Arregla desborde en tabla y separa botones de peligro)
+           ========================================================= */
+        @media (max-width: 768px) {
+            
+            /* 1. ARREGLAR TABLA DE EQUIPO (Para que el texto no se salga) */
+            /* Forzamos que el texto se rompa si es muy largo y ajustamos tamaño */
+            #recruitersList td {
+                word-break: break-word !important; /* Rompe palabras largas */
+                white-space: normal !important;    /* Permite varias líneas */
+                font-size: 13px !important;        /* Letra un poco más chica para que quepa */
+                padding: 10px 5px !important;      /* Menos relleno lateral */
+                max-width: 120px;                  /* Límite de ancho por celda */
+            }
 
+            /* 2. SEPARAR BOTONES DE AJUSTES (Zona de Peligro) */
+            /* Les ponemos un margen abajo para que no estén pegados */
+            .danger-btn {
+                margin-bottom: 15px !important;    /* Espacio entre botones */
+                display: block !important;         /* Asegura que ocupen su propia línea */
+                width: 100% !important;            /* Ancho completo para fácil clic */
+            }
+        }
 
 
 
