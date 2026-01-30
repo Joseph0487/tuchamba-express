@@ -2473,35 +2473,43 @@
                 setAdminMode(false); 
             }
 
-            // FUNCIÓN SALIR BLINDADA (V23.2 - FIX INVITADO) 🛡️
+        // FUNCIÓN SALIR A PRUEBA DE FALLOS (V23.6 - ANTIZOMBIE) 🧟‍♂️🔫
         window.logout = function() {
-            if (confirm("¿Cerrar sesión?")) {
-                // 1. Efecto visual para que sepas que sí jaló
-                document.body.style.transition = "opacity 0.3s";
-                document.body.style.opacity = "0.5";
-                
-                // 2. Borrado de memoria local (Tus credenciales)
-                localStorage.removeItem('iamsuperadmin');
-                localStorage.clear();
-                sessionStorage.clear();    
-                
-                // 3. DECISIÓN INTELIGENTE:
-                // ¿Hay un usuario real de Firebase conectado?
-                const user = auth.currentUser;
+            if (!confirm("¿Salir de la aplicación?")) return;
 
-                if (user) {
-                    // CASO A: Eres Admin (Esperamos a Firebase)
-                    signOut(auth).then(() => {
-                        window.location.href = window.location.origin; 
-                    }).catch((error) => {
-                        // Si falla, te sacamos de todas formas
-                        console.error("Error al salir:", error);
-                        window.location.href = window.location.origin;
-                    });
+            // 1. Feedback visual (para que sepas que el click sí entró)
+            document.body.style.opacity = "0.5";
+            document.body.style.pointerEvents = "none"; // Evita doble click
+
+            // 2. Limpieza de memoria local
+            localStorage.removeItem('iamsuperadmin');
+            localStorage.removeItem('isGuest'); // Aseguramos borrar rastro de invitado
+            localStorage.clear();
+            sessionStorage.clear();    
+
+            // 3. INTENTO DE SALIDA SEGURA
+            try {
+                // Verificamos si 'auth' existe y si está listo
+                if (typeof auth !== 'undefined' && auth && auth.currentUser) {
+                    signOut(auth)
+                        .then(() => {
+                            window.location.href = window.location.origin; 
+                        })
+                        .catch((error) => {
+                            // Si Firebase falla, NOS VAMOS IGUAL
+                            console.error("Error Firebase, forzando salida:", error);
+                            window.location.href = window.location.origin;
+                        });
                 } else {
-                    // CASO B: Eres Invitado (TE VAS DIRECTO, SIN ESPERAS) 🚀
+                    // Si no hay auth o somos invitados -> VÁMONOS DIRECTO
                     window.location.href = window.location.origin;
                 }
+            } catch (e) {
+                // 4. LA RED DE SEGURIDAD TOTAL
+                // Si el código de arriba falla por CUALQUIER razón (ej. Firebase dormido),
+                // esto se ejecuta sí o sí.
+                console.error("Error crítico al salir, forzando redirección:", e);
+                window.location.href = window.location.origin;
             }
         };
 
