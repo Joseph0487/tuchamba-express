@@ -2331,48 +2331,46 @@
             window.openPrivacyModal = function() { document.getElementById('privacyModal').classList.add('active'); }
             window.closePrivacyModal = function() { document.getElementById('privacyModal').classList.remove('active'); }
 
-            // FUNCIÓN ZONA DE PELIGRO (REPARADA V23.6) ⚠️
+            // FUNCIÓN ZONA DE PELIGRO (COMPATIBLE SIN CAMBIAR IMPORTS) 🛠️
             window.performSafeAction = function(action) {
-                console.log("Intentando acción peligrosa:", action); // Para depurar
-
-                // 1. CHEQUEO DE SEGURIDAD SIMPLIFICADO
-                // Quitamos "!currentUserEmail" para que no falle si el correo tarda en cargar
+                // 1. Solo validamos isAdmin (quitamos el email para que no falle)
                 if (!isAdmin) {
                     alert("⛔ Acceso denegado. No tienes permisos de Administrador.");
                     return;
                 }
 
-                // 2. CONFIRMACIÓN
-                if(confirm("⚠️ ¿ESTÁS REALMENTE SEGURO?\n\nEsta acción borrará los datos permanentemente y no se puede deshacer.")) {
+                if(confirm("⚠️ ¿ESTÁS REALMENTE SEGURO?\n\nEsta acción borrará los datos permanentemente.")) {
                     
                     // CASO A: RESETEAR MÉTRICAS
                     if (action === 'resetMetrics') {
-                        const updates = {};
-                        updates['siteStats'] = null; // Borrar nodo completo
-                        updates['jobStats'] = null;  // Borrar nodo completo
-                        updates['clickLogs'] = null; // Borrar nodo completo
-
-                        // Usamos 'update' en la raíz (/) para borrar los 3 de un golpe atómico
-                        // (Es más seguro que Promise.all)
-                        const rootRef = ref(db);
-                        import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js").then(module => {
-                            module.update(rootRef, updates)
-                                .then(() => {
-                                    window.showToast("✅ Métricas reseteadas a 0 correctamente");
-                                    // Refrescamos visualmente los contadores a 0
-                                    if(document.getElementById('totalVisits')) document.getElementById('totalVisits').innerText = "0";
-                                    if(document.getElementById('monthlyVisits')) document.getElementById('monthlyVisits').innerText = "0";
-                                })
-                                .catch(error => {
-                                    console.error("Error al borrar:", error);
-                                    alert("❌ Error: " + error.message);
-                                });
+                        // Como NO importamos 'update', usamos 'remove' 3 veces al mismo tiempo.
+                        // Esto funciona con lo que ya tienes arriba.
+                        Promise.all([
+                            remove(ref(db, 'siteStats')),
+                            remove(ref(db, 'jobStats')),
+                            remove(ref(db, 'clickLogs'))
+                        ]).then(() => {
+                            window.showToast("✅ Métricas reseteadas a 0");
+                            // Ponemos visualmente en cero
+                            if(document.getElementById('totalVisits')) document.getElementById('totalVisits').innerText = "0";
+                            if(document.getElementById('monthlyVisits')) document.getElementById('monthlyVisits').innerText = "0";
+                        }).catch(error => {
+                            console.error(error);
+                            alert("❌ Error al borrar: " + error.message);
                         });
                     }
 
                     // CASO B: BORRAR VACANTES
                     if (action === 'deleteJobs') {
-                        deleteAllJobs();
+                        remove(ref(db, 'jobs'))
+                            .then(() => {
+                                window.showToast("🔥 Todas las vacantes eliminadas");
+                                jobs = {};
+                                renderJobs();
+                            })
+                            .catch(error => {
+                                alert("❌ Error: " + error.message);
+                            });
                     }
                 }
             }
