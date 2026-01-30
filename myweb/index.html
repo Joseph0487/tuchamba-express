@@ -8,7 +8,8 @@
         default-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.gstatic.com https://images.unsplash.com;
         script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://html2canvas.hertzen.com https://*.gstatic.com https://cdn.sheetjs.com https://*.googleapis.com https://*.firebaseio.com;
         connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com;
-        style-src 'self' 'unsafe-inline';
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        font-src 'self' https://fonts.gstatic.com;
         img-src 'self' data: https:;">
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
