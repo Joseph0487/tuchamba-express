@@ -2650,29 +2650,35 @@
             initRecruitersData();
 
 
-        // FUNCIÓN CARGA DE DATOS (OPTIMIZADA V23.1) ⚡
-            function loadData() {
-                // 1. PRIORIDAD TOTAL: Cargar Vacantes primero
-                onValue(ref(db, 'jobs'), (s) => { 
-                    jobs = s.val() || {}; 
-                    
-                    // Matamos el esqueleto de carga DE INMEDIATO
-                    const skel = document.getElementById('skeletonLoader');
-                    if(skel) skel.style.display = 'none'; 
-                    
-                    if (isRecruiterMode) {
-                        toggleViewMode('table');
-                    } else {
-                        document.getElementById('jobGrid').style.display = 'grid';
-                        document.getElementById('jobTableContainer').style.display = 'none';
-                    }
+        // FUNCIÓN CARGA DE DATOS (OPTIMIZADA V23.1 + FIX SCROLL) ⚡
+        function loadData() {
+            // 1. PRIORIDAD TOTAL: Cargar Vacantes primero
+            onValue(ref(db, 'jobs'), (s) => { 
+                jobs = s.val() || {}; 
+                
+                // Matamos el esqueleto de carga DE INMEDIATO
+                const skel = document.getElementById('skeletonLoader');
+                if(skel) skel.style.display = 'none'; 
+                
+                // 👇👇👇 AQUÍ VA LA MAGIA (Línea Nueva) 👇👇👇
+                window.scrollTo(0, 0);
+                // 👆👆👆 ESTO HACE QUE EL CELULAR SUBA AL INICIO
 
-                    populateFilters(jobs); 
-                    if (currentViewMode === 'grid') renderJobs(); 
-                    else renderJobsTable();
-                    
-                    checkUrlForJob(); // Revisar si hay ?id=...
-                });
+                if (isRecruiterMode) {
+                    toggleViewMode('table');
+                } else {
+                    document.getElementById('jobGrid').style.display = 'grid';
+                    document.getElementById('jobTableContainer').style.display = 'none';
+                }
+
+                populateFilters(jobs); 
+                if (currentViewMode === 'grid') renderJobs(); 
+                else renderJobsTable();
+                
+                checkUrlForJob(); // Revisar si hay ?id=...
+            });
+
+            // ... (el resto de la función loadData que sigue abajo con los setTimeout se queda igual) ...
 
                 // 2. SEGUNDO PLANO: Cargar estadísticas y configuración (Sin bloquear la pantalla)
                 // Esto corre "por detrás" mientras el usuario ya está viendo vacantes
