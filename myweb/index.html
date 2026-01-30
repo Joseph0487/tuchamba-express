@@ -2496,45 +2496,50 @@
                 setAdminMode(false); 
             }
 
-        // FUNCIÓN SALIR A PRUEBA DE FALLOS (V23.6 - ANTIZOMBIE) 🧟‍♂️🔫
+        // FUNCIÓN SALIR INTELIGENTE (V24.1 - PRESERVA REFERIDOS) 🧠🔗
         window.logout = function() {
             if (!confirm("¿Salir de la aplicación?")) return;
 
-            // 1. Feedback visual (para que sepas que el click sí entró)
+            // 1. CAPTURAR EL CÓDIGO ANTES DE BORRAR MEMORIA
+            // Buscamos si hay un referido en la URL o en la memoria actual
+            const urlParams = new URLSearchParams(window.location.search);
+            let savedRef = urlParams.get('ref'); 
+            if (!savedRef) {
+                savedRef = sessionStorage.getItem('recruiterCode');
+            }
+
+            // 2. Feedback visual
             document.body.style.opacity = "0.5";
-            document.body.style.pointerEvents = "none"; // Evita doble click
+            document.body.style.pointerEvents = "none";
 
-            // 2. Limpieza de memoria local
+            // 3. LIMPIEZA TOTAL (Igual que antes)
             localStorage.removeItem('iamsuperadmin');
-            localStorage.removeItem('isGuest'); // Aseguramos borrar rastro de invitado
+            localStorage.removeItem('isGuest');
             localStorage.clear();
-            sessionStorage.clear();    
+            sessionStorage.clear(); // Aquí se borra el código viejo...
 
-            // 3. INTENTO DE SALIDA SEGURA
+            // 4. PREPARAR EL DESTINO
+            // Si teníamos referido, lo volvemos a pegar a la URL de destino
+            let targetUrl = window.location.origin;
+            if (savedRef) {
+                targetUrl += `/?ref=${savedRef}`; // <--- ¡AQUÍ ESTÁ EL TRUCO!
+            }
+
+            // 5. SALIDA SEGURA
             try {
-                // Verificamos si 'auth' existe y si está listo
                 if (typeof auth !== 'undefined' && auth && auth.currentUser) {
                     signOut(auth)
-                        .then(() => {
-                            window.location.href = window.location.origin; 
-                        })
-                        .catch((error) => {
-                            // Si Firebase falla, NOS VAMOS IGUAL
-                            console.error("Error Firebase, forzando salida:", error);
-                            window.location.href = window.location.origin;
-                        });
+                        .then(() => { window.location.href = targetUrl; })
+                        .catch(() => { window.location.href = targetUrl; });
                 } else {
-                    // Si no hay auth o somos invitados -> VÁMONOS DIRECTO
-                    window.location.href = window.location.origin;
+                    window.location.href = targetUrl;
                 }
             } catch (e) {
-                // 4. LA RED DE SEGURIDAD TOTAL
-                // Si el código de arriba falla por CUALQUIER razón (ej. Firebase dormido),
-                // esto se ejecuta sí o sí.
-                console.error("Error crítico al salir, forzando redirección:", e);
-                window.location.href = window.location.origin;
+                console.error("Forzando salida:", e);
+                window.location.href = targetUrl;
             }
         };
+
 
             function showLogin() { 
                 document.getElementById('loginScreen').style.display = 'block'; 
