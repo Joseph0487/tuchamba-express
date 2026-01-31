@@ -305,6 +305,7 @@
             .sticky-footer { position: sticky; bottom: 0; background: white; padding: 15px 20px 20px; margin: 20px -30px -30px; border-top: 1px solid #eee; text-align: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100; }
             @keyframes heartbeat { 0% { transform: scale(1); } 15% { transform: scale(1.05); } 30% { transform: scale(1); } 100% { transform: scale(1); } }
             /* BOTÓN WHATSAPP NIVEL MARKETING (V24.2) 💸 */
+           /* BOTÓN WHATSAPP NIVEL MARKETING V24.3 (ADAPTABLE) 💸 */
             .whatsapp-btn-large { 
                 display: flex; 
                 align-items: center; 
@@ -314,18 +315,34 @@
                 color: white; 
                 text-decoration: none; 
                 
-                /* CAMBIOS AQUÍ: MÁS GRANDE Y GORDO */
-                padding: 16px 20px;    /* Antes: 12px (Más alto para dedo gordo) */
-                font-size: 18px;       /* Antes: 14px (Letra que grita "Pícale") */
-                border-radius: 16px;   /* Un poco más curvo para verse moderno */
-                letter-spacing: 0.5px; /* Separamos un pelito las letras para leer mejor */
+                /* BASE PARA PC (GIGANTE) */
+                padding: 16px 20px;     
+                font-size: 18px;        
+                border-radius: 16px;   
+                letter-spacing: 0.5px; 
                 
-                font-weight: 800;      /* Negrita extra fuerte */
-                box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); /* Sombra más brillante */
+                font-weight: 800;      
+                box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); 
                 border: none; 
                 cursor: pointer; 
-                animation: heartbeat 1.5s infinite ease-in-out; /* Latido un poco más rápido (urgencia) */
-                white-space: nowrap; 
+                animation: heartbeat 1.5s infinite ease-in-out; 
+                white-space: nowrap; /* ⚠️ ESTO OBLIGA A UNA SOLA LÍNEA */
+                overflow: hidden;    /* Seguridad: Si sobra algo, que no rompa el sitio */
+                text-overflow: ellipsis; 
+            }
+
+            /* --- EL TRUCO PARA CELULAR --- */
+            @media (max-width: 768px) {
+                .whatsapp-btn-large {
+                    /* 1. Letra un poco más chica (pero legible) para que quepa todo */
+                    font-size: 14px !important; 
+                    
+                    /* 2. Quitamos relleno lateral (aprovechamos todo el ancho del botón) */
+                    padding: 16px 8px !important; 
+                    
+                    /* 3. Apretamos un poquito las letras */
+                    letter-spacing: 0 !important; 
+                }
             }
             .whatsapp-btn-large:active { transform: scale(0.98); animation: none; }
             .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; opacity: 0.7; animation: none; }
