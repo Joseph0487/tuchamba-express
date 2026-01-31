@@ -624,22 +624,31 @@
             .flyer-badge-top { background-color: #FF9800; color: white; font-size: 55px; padding: 15px 80px; border-radius: 10px; text-transform: uppercase; letter-spacing: 4px; font-weight: 900; margin-bottom: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 4px solid #FFF; transform: skew(-10deg); z-index: 2; position: relative; }
             .flyer-title { font-size: 90px; font-weight: 900; line-height: 1.1; margin-bottom: 20px; text-shadow: 0 5px 20px rgba(0,0,0,0.9); max-width: 95%; text-transform: uppercase; color: #FFFFFF; z-index: 2; position: relative; }
             .flyer-company { font-size: 35px; color: #BBDEFB; font-family: 'Segoe UI', sans-serif; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; z-index: 2; position: relative; }
-            .flyer-salary { font-size: 100px; color: #C6FF00; font-weight: 900; margin-bottom: 50px; text-shadow: 0 5px 20px rgba(0,0,0,0.9); z-index: 2; position: relative; }
-            /* ... aquí estaba .flyer-salary ... */
+            /* --- REEMPLAZA TU CLASE .flyer-salary Y AGREGA LA NUEVA .flyer-location --- */
+            
+            .flyer-salary { 
+                font-size: 100px; 
+                color: #C6FF00; 
+                font-weight: 900; 
+                margin-bottom: 10px; /* <--- REDUCIDO (Antes 50px) para que quepa la ciudad */
+                text-shadow: 0 5px 20px rgba(0,0,0,0.9); 
+                z-index: 2; 
+                position: relative; 
+            }
 
-            /* NUEVO ESTILO PARA UBICACIÓN EN FLYER (V24.4) 📍 */
+            /* NUEVA CLASE: UBICACIÓN GIGANTE */
             .flyer-location { 
-                font-size: 45px;          /* Grande pero menos que el sueldo */
-                color: #FFFFFF;           /* Blanco para contraste */
+                font-size: 50px;          
+                color: #FFFFFF !important; /* Blanco forzoso */
                 font-family: 'Segoe UI', sans-serif; 
-                font-weight: 700; 
-                margin-top: -20px;        /* Lo pegamos un poco al sueldo */
-                margin-bottom: 40px;      /* Espacio antes de los beneficios */
+                font-weight: 800; 
+                margin-top: 0px;        
+                margin-bottom: 50px;      
                 text-transform: uppercase; 
-                letter-spacing: 1px;
-                text-shadow: 0 4px 10px rgba(0,0,0,0.9); /* Sombra para leerse bien */
-                z-index: 2; position: relative; 
-                display: flex; align-items: center; gap: 10px;
+                text-shadow: 0 4px 10px rgba(0,0,0,0.9); 
+                z-index: 10; 
+                position: relative; 
+                display: block;           
             }
             .flyer-benefits-container { background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 30px; padding: 40px; width: 90%; margin-bottom: 60px; backdrop-filter: blur(10px); z-index: 2; position: relative; }
             .flyer-benefits-title { font-size: 40px; color: #FFD740; margin-bottom: 30px; text-transform: uppercase; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 15px; display: inline-block; }
