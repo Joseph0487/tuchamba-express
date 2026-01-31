@@ -1905,18 +1905,36 @@
         <div id="flyerTemplate">
             <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1080&q=60') center center / cover no-repeat; opacity: 0.1; z-index: 0;"></div>
             <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: rgba(10, 25, 45, 0.05); z-index: 1;"></div>
+            
             <div class="flyer-badge-top">¡SE SOLICITA!</div>
             <div class="flyer-company">RECONOCIDA EMPRESA BUSCA:</div>
-            <div id="flyerTitle" class="flyer-title">CHOFER 3.5 TON</div>
-            <div id="flyerSalary" class="flyer-salary">$12,000</div>
+            
+            <div id="flyerTitle" class="flyer-title">PUESTO VACANTE</div>
+            
+            <div id="flyerSalary" class="flyer-salary" style="margin-bottom: 5px;">$0,000</div>
+            
+            <div id="flyerLocation" style="
+                font-size: 50px; 
+                color: #FFFFFF !important; 
+                font-family: sans-serif; 
+                font-weight: 800; 
+                margin-top: 5px; 
+                margin-bottom: 40px; 
+                text-transform: uppercase; 
+                text-shadow: 0 4px 10px rgba(0,0,0,1); 
+                z-index: 10; 
+                position: relative; 
+                display: block;">
+                📍 UBICACIÓN PENDIENTE
+            </div>
+
             <div class="flyer-benefits-container">
                 <div class="flyer-benefits-title">OFRECEMOS:</div>
                 <ul id="flyerBenefitsList" class="flyer-benefits-list">
-                    <li>✅ Pago Semanal</li>
                     <li>✅ Prestaciones de Ley</li>
-                    <li>✅ Contratación Inmediata</li>
                 </ul>
             </div>
+            
             <div class="flyer-cta-box">
                 🔗 DALE CLIC AL LINK DE LA PUBLICACIÓN PARA CONOCER DETALLES Y AGENDAR ENTREVISTA
                 <div id="flyerQr"></div>
@@ -3157,15 +3175,43 @@
                 push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
             }
 
+            // FUNCIÓN FLYER V24.6 (Depurada)
             window.generateFlyer = function(jobId) {
                 const j = jobs[jobId];
                 if (!j) return;
 
-                window.showToast("🎨 Creando Flyer...");
+                window.showToast("🎨 Diseñando Flyer...");
 
+                // 1. Datos Básicos
                 document.getElementById('flyerTitle').innerText = j.title;
                 document.getElementById('flyerSalary').innerText = j.salary || 'Sueldo Competitivo';
                 
+                // 2. LÓGICA DE UBICACIÓN (Reforzada)
+                let locText = "";
+                
+                // Intentamos armar "Monterrey, Nuevo León"
+                if (j.city) {
+                    locText = j.city;
+                    if (j.state) locText += `, ${j.state}`;
+                } 
+                // Si falla, usamos el campo libre "location"
+                else if (j.location) {
+                    locText = j.location;
+                } 
+                // Si falla todo, ponemos un default
+                else {
+                    locText = "MÉXICO";
+                }
+
+                // INYECTAMOS EL TEXTO EN MAYÚSCULAS
+                const locElement = document.getElementById('flyerLocation');
+                if(locElement) {
+                    locElement.innerText = "📍 " + locText.toUpperCase();
+                } else {
+                    console.error("❌ ERROR: No encontré el div 'flyerLocation' en el HTML");
+                }
+
+                // 3. Beneficios
                 const benefitsList = document.getElementById('flyerBenefitsList');
                 benefitsList.innerHTML = '';
                 if(j.benefits && j.benefits.length > 0) {
@@ -3175,12 +3221,12 @@
                         benefitsList.appendChild(li);
                     });
                 } else {
-                    benefitsList.innerHTML = '<li>✅ Prestaciones de Ley</li><li>✅ Contratación Inmediata</li><li>✅ Excelente Ambiente</li>';
+                    benefitsList.innerHTML = '<li>✅ Prestaciones de Ley</li><li>✅ Contratación Inmediata</li>';
                 }
 
+                // 4. QR
                 const qrContainer = document.getElementById('flyerQr');
                 qrContainer.innerHTML = ''; 
-                
                 const refCode = sessionStorage.getItem('recruiterCode');
                 const jobLink = `${window.location.origin}/?id=${jobId}${refCode ? '&ref='+refCode : ''}`;
 
@@ -3193,6 +3239,7 @@
                     correctLevel : QRCode.CorrectLevel.H
                 });
 
+                // 5. GENERAR IMAGEN (Con 1 segundo de espera para asegurar renderizado)
                 setTimeout(() => {
                     const flyerNode = document.getElementById('flyerTemplate');
                     
@@ -3206,12 +3253,12 @@
                         link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
                         link.href = canvas.toDataURL();
                         link.click();
-                        window.showToast("✅ ¡Flyer descargado!");
+                        window.showToast("✅ ¡Flyer listo!");
                     }).catch(err => {
                         console.error(err);
-                        alert("Error al generar imagen: " + err.message);
+                        alert("Error: " + err.message);
                     });
-                }, 500); 
+                }, 1000);
             }
 
             const visitsRef = ref(db, 'siteStats/visits');
