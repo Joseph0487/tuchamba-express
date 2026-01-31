@@ -304,7 +304,29 @@
 
             .sticky-footer { position: sticky; bottom: 0; background: white; padding: 15px 20px 20px; margin: 20px -30px -30px; border-top: 1px solid #eee; text-align: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100; }
             @keyframes heartbeat { 0% { transform: scale(1); } 15% { transform: scale(1.05); } 30% { transform: scale(1); } 100% { transform: scale(1); } }
-            .whatsapp-btn-large { display: flex; align-items: center; justify-content: center; width: 100%; background-color: #25D366; color: white; text-decoration: none; padding: 12px 15px; border-radius: 12px; font-weight: bold; font-size: 14px; box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3); border: none; cursor: pointer; animation: heartbeat 2s infinite ease-in-out; white-space: nowrap; }
+            /* BOTÓN WHATSAPP NIVEL MARKETING (V24.2) 💸 */
+            .whatsapp-btn-large { 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                width: 100%; 
+                background-color: #25D366; 
+                color: white; 
+                text-decoration: none; 
+                
+                /* CAMBIOS AQUÍ: MÁS GRANDE Y GORDO */
+                padding: 16px 20px;    /* Antes: 12px (Más alto para dedo gordo) */
+                font-size: 18px;       /* Antes: 14px (Letra que grita "Pícale") */
+                border-radius: 16px;   /* Un poco más curvo para verse moderno */
+                letter-spacing: 0.5px; /* Separamos un pelito las letras para leer mejor */
+                
+                font-weight: 800;      /* Negrita extra fuerte */
+                box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); /* Sombra más brillante */
+                border: none; 
+                cursor: pointer; 
+                animation: heartbeat 1.5s infinite ease-in-out; /* Latido un poco más rápido (urgencia) */
+                white-space: nowrap; 
+            }
             .whatsapp-btn-large:active { transform: scale(0.98); animation: none; }
             .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; opacity: 0.7; animation: none; }
 
