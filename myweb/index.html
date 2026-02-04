@@ -3102,11 +3102,13 @@
 
                 let detailRows = Object.values(detailMap).map(d => ({
                     'ID Vacante': d.jobId,
-                    'Vacante': d.title,
                     'Reclutador': d.recruiter,
+                    'Empresa': d.company || 'N/A',   // <--- NUEVO: EMPRESA
+                    'Vacante': d.title,
                     'Vistas Totales (Histórico)': d.views, 
                     'Clics (Meses selecc.)': d.clicks,
-                    'Conversion %': d.views > 0 ? ((d.clicks / d.views) * 100).toFixed(1) + '%' : '0%'
+                    'Conversion %': d.views > 0 ? ((d.clicks / d.views) * 100).toFixed(1) + '%' : '0%',
+                    'WhatsApp Destino': d.whatsapp || '' // <--- NUEVO: WHATSAPP
                 }));
 
                 if (detailRows.length === 0) detailRows = [{'Mensaje': 'Aún no hay interacción detallada registrada'}];
@@ -3297,7 +3299,7 @@
                     salary: document.getElementById('jobSalary').value,
                     description: document.getElementById('jobDescription').value,
                     schedule: document.getElementById('jobSchedule').value, 
-                    tags: document.getElementById('jobTags').value,
+                    // BORRADO: tags
                     contact: finalPhone, 
                     status: document.getElementById('jobStatus').value,
                     agency: document.getElementById('jobAgency').value,
@@ -3513,13 +3515,13 @@
             }
 
             function applyFilterAndRender() {
-                if (currentViewMode === 'table') return; 
+                if (currentViewMode === 'table') return;
 
                 const stateVal = document.getElementById('stateFilter').value;
                 const cityVal = document.getElementById('cityFilter').value;
                 const searchInput = document.getElementById('searchInput');
                 const searchText = normalizeText(searchInput.value);
-                
+
                 const clearBtn = document.getElementById('clearSearchBtn');
                 clearBtn.style.display = searchText.length > 0 ? 'flex' : 'none';
 
@@ -3529,18 +3531,18 @@
 
                     const matchState = stateVal === '' || j.state === stateVal;
                     const matchCity = cityVal === '' || j.city === cityVal;
-                    
+
                     let matchSearch = true;
                     if(searchText) {
-                        const fullText = normalizeText(`${j.title} ${j.company} ${j.tags} ${j.description}`);
+                        const fullText = normalizeText(`${j.title} ${j.company} ${j.description}`);
                         matchSearch = fullText.includes(searchText);
                     }
 
                     return matchState && matchCity && matchSearch;
                 });
 
-                updateUniversalCounter(); // <--- OJO: Aquí ya está corregido también (sin parámetros)
-                
+                updateUniversalCounter();
+
                 if (matchedKeys.length === 0) {
                     document.getElementById('jobGrid').innerHTML = '';
                     document.getElementById('paginationContainer').style.display = 'none';
@@ -3559,17 +3561,14 @@
                 const grid = document.getElementById('jobGrid');
                 grid.innerHTML = visibleKeys.map(id => {
                     const j = jobs[id];
-                    // AQUÍ ESTABA EL ERROR: Agregué .trim() que faltaba
-                    const tags = j.tags ? j.tags.split(',').map(t => t.trim()).filter(t => t) : [];
-                    const isVigente = j.status !== 'No Vigente';
                     
+                    const isVigente = j.status !== 'No Vigente';
                     let statusBadge = '<span class="badge-closed">Cerrada</span>';
                     if(isVigente) statusBadge = '<span class="badge-vigente">🟢 Vigente</span>';
 
                     const showAdminButtons = isAdmin && !refCode;
                     const showNamePublicly = j.showCompany === true || j.showCompany === 'true';
                     const finalCompanyName = (isAdmin && !refCode) || showNamePublicly ? j.company : "Empresa Confidencial";
-                    
                     const verifiedHtml = showNamePublicly ? '<span class="verified-badge" title="Empresa Verificada">✓</span>' : '';
 
                     let displayLocation = j.location;
@@ -3578,7 +3577,6 @@
                     const niceDate = formatDateFriendly(j.fecha);
                     const dateHtml = niceDate ? `<span class="card-header-date">📅 Publicación: ${niceDate}</span>` : '';
                     const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
-
                     const featuredBadge = j.isFeatured ? '<div class="badge-featured">⭐ DESTACADA</div>' : '';
 
                     return `
@@ -3592,10 +3590,7 @@
                             </div>` : ''}
                             
                             <div class="card-header-top">
-                                <div>
-                                    ${statusBadge}
-                                    ${newBadge}
-                                </div>
+                                <div>${statusBadge} ${newBadge}</div>
                             </div>
                             ${dateHtml}
                             
@@ -3609,8 +3604,6 @@
                             
                             <div class="location">📍 ${displayLocation}</div>
                             <div class="salary-text">💰 ${j.salary || 'A convenir'}</div>
-                            
-                            ${tags.length > 0 ? `<div class="tags">${tags.slice(0,3).map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
                         </div>
                     `;
                 }).join('');
@@ -3931,7 +3924,6 @@
                         'Fecha': j.fecha, 
                         'Salario': j.salary, 'Descripción': j.description, 
                         'Jornada': j.schedule, 
-                        'Etiquetas': j.tags,
                         'Requisitos': (j.requirements||[]).join(' | '), 
                         'Beneficios': (j.benefits||[]).join(' | '),
                         'Contacto': j.contact, 'Estatus': j.status, 'Tipo de Servicio o Agencia': j.agency,
@@ -4036,26 +4028,23 @@
                             }
 
                             const jobData = {
-                                title: title, 
-                                company: company, 
-                                showCompany: showCompanyRaw === 'SI', 
-                                state: state, city: city, zone: zone,
-                                location: (city && state) ? `${city}, ${state}` : legacyLoc, 
-                                
-                                fecha: row[findKey(row, 'fecha')] || '', 
-                                
-                                salary: row[findKey(row, 'salario')] || '', 
-                                description: row[findKey(row, 'descripción')] || '',
-                                schedule: row[findKey(row, 'jornada')] || 'Horario a definir',
-                                tags: row[findKey(row, 'etiquetas')] || '',
-                                requirements: (row[findKey(row, 'requisitos')]) ? String(row[findKey(row, 'requisitos')]).split(' | ') : [],
-                                benefits: (row[findKey(row, 'beneficios')]) ? String(row[findKey(row, 'beneficios')]).split(/\s*\|\s*/) : [],
-                                contact: contactRaw, 
-                                status: row[findKey(row, 'estatus')] || 'Vigente',
-                                agency: row[findKey(row, 'tipo de servicio o agencia')] || '',
-                                
-                                isFeatured: isFeaturedRaw === 'SI' 
-                            };
+                        title: title, 
+                        company: company, 
+                        showCompany: showCompanyRaw === 'SI', 
+                        state: state, city: city, zone: zone,
+                        location: (city && state) ? `${city}, ${state}` : legacyLoc, 
+                        fecha: row[findKey(row, 'fecha')] || '', 
+                        salary: row[findKey(row, 'salario')] || '', 
+                        description: row[findKey(row, 'descripción')] || '',
+                        schedule: row[findKey(row, 'jornada')] || 'Horario a definir',
+                        // BORRADO: tags
+                        requirements: (row[findKey(row, 'requisitos')]) ? String(row[findKey(row, 'requisitos')]).split(' | ') : [],
+                        benefits: (row[findKey(row, 'beneficios')]) ? String(row[findKey(row, 'beneficios')]).split(/\s*\|\s*/) : [],
+                        contact: contactRaw, 
+                        status: row[findKey(row, 'estatus')] || 'Vigente',
+                        agency: row[findKey(row, 'tipo de servicio o agencia')] || '',
+                        isFeatured: isFeaturedRaw === 'SI' 
+                    };
                             set(ref(db, 'jobs/' + id), jobData);
                             count++;
                         });
