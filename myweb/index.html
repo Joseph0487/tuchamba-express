@@ -3065,8 +3065,9 @@
                 }));
                 if (recruiterRows.length === 0) recruiterRows = [{'Reclutador': 'Sin datos', 'Clics': 0}];
 
-                const detailMap = {}; 
+               const detailMap = {}; 
 
+                // 1. LOGICA DE VISTAS (Aquí faltaba guardar los datos nuevos)
                 Object.keys(jobs).forEach(jobId => {
                     const j = jobs[jobId];
                     const s = jobStats[jobId] || {};
@@ -3080,35 +3081,59 @@
                             }
 
                             const key = `${jobId}_${recName}`;
-                            if (!detailMap[key]) detailMap[key] = { jobId: jobId, title: j.title, recruiter: recName, views: 0, clicks: 0 };
+                            
+                            // CORRECCIÓN AQUÍ: Agregamos company y whatsapp
+                            if (!detailMap[key]) detailMap[key] = { 
+                                jobId: jobId, 
+                                title: j.title, 
+                                company: j.company || 'Sin Empresa', // <--- AGREGADO
+                                whatsapp: j.whatsapp || 'Sin Num',   // <--- AGREGADO
+                                recruiter: recName, 
+                                views: 0, 
+                                clicks: 0 
+                            };
                             
                             detailMap[key].views = s.viewsByRecruiter[recCode];
                         });
                     }
                 });
 
+                // 2. LOGICA DE CLICS (Aquí también faltaba)
                 Object.values(clickLogs).forEach(l => {
                     if(l && l.jobId && l.timestamp && typeof l.timestamp === 'string' && selectedMonths.includes(l.timestamp.substring(0,7))) {
                         const j = jobs[l.jobId];
                         const jobTitle = j ? j.title : 'Vacante Borrada';
+                        const jobCompany = j ? j.company : 'N/A'; // <--- RECUPERAMOS
+                        const jobWa = j ? j.whatsapp : 'N/A';     // <--- RECUPERAMOS
                         const recName = l.recruiter || 'Orgánico';
                         
                         const key = `${l.jobId}_${recName}`;
-                        if (!detailMap[key]) detailMap[key] = { jobId: l.jobId, title: jobTitle, recruiter: recName, views: 0, clicks: 0 };
+                        
+                        // CORRECCIÓN AQUÍ: Agregamos company y whatsapp
+                        if (!detailMap[key]) detailMap[key] = { 
+                            jobId: l.jobId, 
+                            title: jobTitle, 
+                            company: jobCompany, // <--- AGREGADO
+                            whatsapp: jobWa,     // <--- AGREGADO
+                            recruiter: recName, 
+                            views: 0, 
+                            clicks: 0 
+                        };
                         
                         detailMap[key].clicks++;
                     }
                 });
 
+                // 3. GENERAR EXCEL FINAL
                 let detailRows = Object.values(detailMap).map(d => ({
                     'ID Vacante': d.jobId,
                     'Reclutador': d.recruiter,
-                    'Empresa': d.company || 'N/A',   // <--- NUEVO: EMPRESA
+                    'Empresa': d.company,          // <--- AHORA SÍ YA TIENE DATOS
                     'Vacante': d.title,
                     'Vistas Totales (Histórico)': d.views, 
                     'Clics (Meses selecc.)': d.clicks,
                     'Conversion %': d.views > 0 ? ((d.clicks / d.views) * 100).toFixed(1) + '%' : '0%',
-                    'WhatsApp Destino': d.whatsapp || '' // <--- NUEVO: WHATSAPP
+                    'WhatsApp Destino': d.whatsapp // <--- AHORA SÍ YA TIENE DATOS
                 }));
 
                 if (detailRows.length === 0) detailRows = [{'Mensaje': 'Aún no hay interacción detallada registrada'}];
