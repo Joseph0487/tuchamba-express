@@ -3814,11 +3814,19 @@
                     const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                     const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                     
+                    // CAMBIO DEL BOTÓN WHATSAPP (V25.5) - Sándwich de Texto
                     contactHtml = `<div class="sticky-footer">
-                                        <p style="font-size:12px; color:#666; margin-bottom:5px;">👇 Respuesta Inmediata 👇</p>
+                                        <p style="font-size:12px; color:#666; margin-bottom:5px; font-weight:600;">
+                                            👇🏻 Respuesta Inmediata 👇🏻
+                                        </p>
+                                        
                                         <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
-                                            📅 ¡Haz Clic para Agendar Entrevista! 📲
+                                            📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC <i class="fab fa-whatsapp" style="font-size:1.2em; margin-left:5px;"></i>
                                         </button>
+                                        
+                                        <p style="font-size:12px; color:#666; margin-top:5px; font-weight:600;">
+                                            👆🏻 ¡No pierdas tu oportunidad, postúlate ahora! 👆🏻
+                                        </p>
                                 </div>`;
                 }
 
