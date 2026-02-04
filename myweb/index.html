@@ -3814,14 +3814,16 @@
                     const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                     const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                     
-                    // CAMBIO DEL BOTÓN WHATSAPP (V25.5) - Sándwich de Texto
+                    // CAMBIO V25.6: BOTÓN CON TU IMAGEN "favicon_2"
                     contactHtml = `<div class="sticky-footer">
                                         <p style="font-size:12px; color:#666; margin-bottom:5px; font-weight:600;">
                                             👇🏻 Respuesta Inmediata 👇🏻
                                         </p>
                                         
-                                        <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
-                                            📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC <i class="fab fa-whatsapp" style="font-size:1.2em; margin-left:5px;"></i>
+                                        <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC 
+                                            
+                                            <img src="favicon_2.png" alt="WA" style="height: 28px; width: auto; vertical-align: middle;">
                                         </button>
                                         
                                         <p style="font-size:12px; color:#666; margin-top:5px; font-weight:600;">
