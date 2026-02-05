@@ -433,8 +433,23 @@
             .badge-vigente { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
             .badge-closed { background: #ffebee; color: #c62828; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
             .badge-new { background: #fff3e0; color: #e65100; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; margin-left: 5px; border: 1px solid #ffcc80; }
-            .job-title { font-size: 1.2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 5px !important; line-height: 1.2; }
-            .company-name { font-size: 0.9rem; color: #0a66c2; font-weight: 600; display: flex; align-items: center; margin-top: 0px !important; margin-bottom: 3px !important; }
+            .job-title { 
+            font-size: 1.2rem !important; 
+            font-weight: 800 !important; 
+            color: #1a1a1a !important; 
+            margin-bottom: 8px !important; /* Aumentamos a 8px para que se note el aire */
+            line-height: 1.2 !important; 
+            display: block !important; /* Forzamos a que sea un bloque independiente */
+            }
+            .company-name { 
+            font-size: 0.9rem !important; 
+            color: #0a66c2 !important; 
+            font-weight: 600 !important; 
+            display: flex !important; 
+            align-items: center !important; 
+            margin-top: 0px !important; 
+            margin-bottom: 8px !important; /* Le damos espacio también abajo hacia la ubicación */
+            }
             .location { font-size: 0.9rem; color: #555; margin-top: 6px !important; display: flex; align-items: center; gap: 4px; }
             .salary-text { color: #d32f2f; font-weight: 800; font-size: 1.3rem; margin-top: 5px; }
             .company-logo { width: 48px; height: 48px; background: linear-gradient(135deg, #0a66c2 0%, #004182 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; flex-shrink: 0; }
