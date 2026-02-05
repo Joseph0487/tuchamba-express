@@ -3687,33 +3687,35 @@
                     const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
                     const featuredBadge = j.isFeatured ? '<div class="badge-featured">⭐ DESTACADA</div>' : '';
 
+                    /* --- REEMPLAZO DIRECTO EN EL MOTOR DE CARDS (V26.7) --- */
                     return `
-                        <div class="job-card" onclick="window.openViewModal('${id}')">
-                            ${featuredBadge}
-                            ${showAdminButtons ? `<button class="more-btn" onclick="event.stopPropagation(); window.toggleMenu('${id}')">⋮</button>
-                            <div class="admin-actions" id="menu-${id}">
-                                <button class="admin-action" onclick="event.stopPropagation(); window.editJob('${id}')">✏️ Editar</button>
-                                <button class="admin-action" onclick="event.stopPropagation(); window.generateFlyer('${id}')">🖼️ Descargar Flyer</button>
-                                <button class="admin-action delete" onclick="event.stopPropagation(); window.deleteJob('${id}')">🗑️ Eliminar</button>
-                            </div>` : ''}
-                            
-                            <div class="card-header-top">
-                                <div>${statusBadge} ${newBadge}</div>
+                        <div class="job-card" onclick="window.openViewModal('${id}')" style="padding: 14px !important;">
+                        ${featuredBadge}
+                        ${showAdminButtons ? `<button class="more-btn" onclick="event.stopPropagation(); window.toggleMenu('${id}')">⋮</button>
+                        <div class="admin-actions" id="menu-${id}">
+                            <button class="admin-action" onclick="event.stopPropagation(); window.editJob('${id}')">✏️ Editar</button>
+                            <button class="admin-action" onclick="event.stopPropagation(); window.generateFlyer('${id}')">🖼️ Descargar Flyer</button>
+                            <button class="admin-action delete" onclick="event.stopPropagation(); window.deleteJob('${id}')">🗑️ Eliminar</button>
+                        </div>` : ''}
+        
+                        <div class="card-header-top" style="margin-bottom: 4px !important;">
+                            <div>${statusBadge} ${newBadge}</div>
+                        </div>
+                        ${dateHtml}
+        
+                        <div style="display: flex; align-items: center !important; gap: 12px !important; margin-top: 10px !important; margin-bottom: 12px !important;">
+                            <div class="company-logo" style="flex-shrink: 0;">${j.company.charAt(0)}</div>
+                            <div style="display: flex; flex-direction: column; gap: 6px !important;"> 
+                                <div class="job-title" style="margin: 0 !important; line-height: 1.2 !important;">${j.title}</div>
+                                <div class="company-name" style="margin: 0 !important; color: #0a66c2; font-weight: 600;">${finalCompanyName} ${verifiedHtml}</div>
                             </div>
-                            ${dateHtml}
-                            
-                            <div style="display: flex; gap: 15px; margin-bottom: 15px; margin-top: 10px;">
-                                <div class="company-logo">${j.company.charAt(0)}</div>
-                                <div>
-                                    <div class="job-title">${j.title}</div>
-                                    <div class="company-name">${finalCompanyName} ${verifiedHtml}</div>
-                                </div>
-                            </div>
-                            
-                            <div class="location">📍 ${displayLocation}</div>
-                            <div class="salary-text">💰 ${j.salary || 'A convenir'}</div>
+                        </div>
+        
+                        <div class="location" style="margin-top: 8px !important;">📍 ${displayLocation}</div>
+                        <div class="salary-text" style="margin-top: 6px !important;">💰 ${j.salary || 'A convenir'}</div>
                         </div>
                     `;
+
                 }).join('');
 
                 renderPaginationControls(totalPages);
