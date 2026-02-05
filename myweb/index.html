@@ -2004,7 +2004,7 @@
                         <button class="tool-btn settings-btn admin-only" onclick="openSettingsModal()">⚙️ Ajustes</button>
                         <button class="tool-btn admin-only" onclick="document.getElementById('excelFile').click()">📤 Cargar</button>
                         <button class="tool-btn" onclick="downloadTemplate()">📋 Plantilla</button>
-
+                        <button class="tool-btn" onclick="window.downloadSitemap()" style="background-color: #FF9800; color: white;">🗺️ Sitemap SEO</button>
                         <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
                     </div>
                 </div>
@@ -2303,21 +2303,42 @@
 
             const today = new Date();
             const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
-            const urlParams = new URLSearchParams(window.location.search);
-            // --- TAREA 13: LOGICA DE REFERIDOS ---
-            const refCode = urlParams.get('ref');
             
+            // --- TAREA 13: LÓGICA DE REFERIDOS BLINDADA (V24.8) ---
+            // --- CONTROL DE ACCESO Y BOTÓN DE LOGIN ---
+            const urlParams = new URLSearchParams(window.location.search);
+            let refCode = urlParams.get('ref') || localStorage.getItem('recruiterCode');
+
+            function actualizarBotonLogin() {
+            const botonAdmin = document.querySelector('.admin-toggle-link');
+            if (!botonAdmin) return; // Si aún no existe el botón en la pantalla, no hace nada.
+
             if (refCode) {
-                sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
-                
-                // Ocultar el botón de "Ingresa aquí" si viene de un referido
+            // Si hay un código de referido, escondemos el botón de "Ingresa aquí" para no confundir al candidato.
+            botonAdmin.style.display = 'none';
+            localStorage.setItem('recruiterCode', refCode.toUpperCase());
+            } else {
+            // Si no hay referido (link original), nos aseguramos de que el botón SIEMPRE aparezca.
+            botonAdmin.style.display = 'block';
+            }
+            }
+
+            // Ejecutamos la revisión en tres momentos clave para que nunca falle:
+            actualizarBotonLogin(); // 1. En cuanto carga el script.
+            document.addEventListener("DOMContentLoaded", actualizarBotonLogin); // 2. Cuando el diseño está listo.
+            window.addEventListener('load', actualizarBotonLogin); // 3. Por si las dudas, al final de todo.
+
+            // 2. Validamos y guardamos (o renovamos)
+            if (refCode) {
+                refCode = refCode.toUpperCase(); // Siempre mayúsculas
+                localStorage.setItem('recruiterCode', refCode); // Usamos localStorage (Persistente)
+
+                // 3. UX: Ocultar el botón de "Ingresa aquí" para no distraer al candidato referido
                 document.addEventListener("DOMContentLoaded", () => {
                     const adminLink = document.querySelector('.admin-toggle-link');
                     if(adminLink) adminLink.style.display = 'none';
                 });
             }
-            
-            if (refCode) sessionStorage.setItem('recruiterCode', refCode.toLowerCase());
 
             document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('searchInput').value = '';
@@ -2599,11 +2620,10 @@
                 sessionStorage.setItem('isGuest', 'true'); 
                 isAdmin = false; 
                 isRecruiterMode = false;
-                
+                // Limpiamos la búsqueda pero NO el código de reclutador si es que existe
                 document.getElementById('searchInput').value = '';
-                document.getElementById('stateFilter').value = '';
-                document.getElementById('cityFilter').value = '';
-
+                // Ejecutamos la función que acabamos de crear para que el botón se porte bien
+                actualizarBotonLogin(); 
                 setAdminMode(false); 
             }
 
@@ -2903,10 +2923,14 @@
             }
 
             function checkActiveRecruiter() {
-                const savedCode = sessionStorage.getItem('recruiterCode');
+                // CORRECCIÓN V25.10: Usar localStorage (Persistente)
+                const savedCode = localStorage.getItem('recruiterCode');
+                
                 activeRecruiter = null; 
                 if (savedCode && recruiters) {
-                    const foundKey = Object.keys(recruiters).find(key => recruiters[key].code.toLowerCase() === savedCode);
+                    const foundKey = Object.keys(recruiters).find(key => 
+                        recruiters[key].code.toLowerCase() === savedCode.toLowerCase()
+                    );
                     if (foundKey) { 
                         activeRecruiter = recruiters[foundKey]; 
                     }
@@ -2989,7 +3013,8 @@
             }
 
             window.copyJobLink = function(jobId) {
-                const refCode = sessionStorage.getItem('recruiterCode');
+                // CORRECCIÓN: Usar localStorage
+                const refCode = localStorage.getItem('recruiterCode');
                 const url = `${window.location.origin}/?id=${jobId}${refCode ? '&ref='+refCode : ''}`;
                 navigator.clipboard.writeText(url).then(() => window.showToast('🔗 Link de vacante copiado'));
             }
@@ -3255,11 +3280,15 @@
                     benefitsList.innerHTML = '<li>✅ Prestaciones de Ley</li><li>✅ Contratación Inmediata</li>';
                 }
 
-                // 4. QR
+                // 4. QR (Versión corregida para Reclutadores)
                 const qrContainer = document.getElementById('flyerQr');
                 qrContainer.innerHTML = ''; 
-                const refCode = sessionStorage.getItem('recruiterCode');
-                const jobLink = `${window.location.origin}/?id=${jobId}${refCode ? '&ref='+refCode : ''}`;
+
+                // Aquí el sistema revisa: ¿Eres un reclutador con sesión iniciada o vienes de un link de referido?
+                let codeForFlyer = activeRecruiter ? activeRecruiter.code : localStorage.getItem('recruiterCode');
+
+                // Construimos el link: Si hay código, se lo pegamos; si no, va normal.
+                const jobLink = `${window.location.origin}/?id=${jobId}${codeForFlyer ? '&ref=' + codeForFlyer.toLowerCase() : ''}`;
 
                 new QRCode(qrContainer, {
                     text: jobLink,
@@ -3794,6 +3823,7 @@
 
             window.openViewModal = function(id) {
                 const j = jobs[id];
+                updateJobSEO(j, id);
                 const isRefMode = !!refCode;
 
                 if (!isAdmin || isRefMode) {
@@ -3913,6 +3943,7 @@
                 document.getElementById('viewModal').classList.add('active');
             }
 
+
             window.closeViewModal = function() { 
                 document.title = "TuChamba Express | Vacantes Urgentes en Nuevo León, CDMX y EdoMex 2026";
                 document.getElementById('viewModal').classList.remove('active'); 
@@ -4013,15 +4044,17 @@
             }
 
             window.shareApp = async function() {
-                const refCode = sessionStorage.getItem('recruiterCode');
+                // CORRECCIÓN: Usar localStorage
+                const refCode = localStorage.getItem('recruiterCode');
                 const encodedRef = refCode ? encodeURIComponent(refCode) : '';
-                const url = encodedRef ? `${window.location.origin}/?ref=${encodedRef}` : window.location.href;
+                const url = encodedRef ? `${window.location.origin}/?ref=${encodedRef}` : window.location.origin;
                 
                 const data = { 
-                    title: 'TuChamba', 
+                    title: 'TuChamba Express', 
                     text: '¡Checa esta vacante! Contratación rápida en CDMX, NL y EdoMex. Detalles aquí:', 
-                    url: url 
+                    url: url
                 };
+
                 if(navigator.share) await navigator.share(data); else window.open(`https://wa.me/?text=${encodeURIComponent(data.text+' '+data.url)}`);
             }
             
@@ -4106,6 +4139,114 @@
                     e.target.value = '';
                 };
                 reader.readAsArrayBuffer(file);
+                };
+                
+                // --- MOTOR SEO (V25.10) ---
+            function updateJobSEO(j, id) {
+                // A. Título de Pestaña Atractivo
+                document.title = `${j.title} en ${j.city} | TuChamba Express`;
+
+                // B. Meta Descripción (Para Google y compartir link)
+                const metaDesc = document.querySelector('meta[name="description"]');
+                if (metaDesc) {
+                    metaDesc.setAttribute("content", `Vacante: ${j.title} ($${j.salary}) en ${j.city}. ¡Postúlate hoy mismo vía WhatsApp!`);
+                }
+
+                // C. JSON-LD (Datos Estructurados para Google Jobs)
+                const oldScript = document.getElementById('job-schema');
+                if (oldScript) oldScript.remove();
+
+                // Convertir fecha de Excel (DD/MM/YYYY) a ISO (YYYY-MM-DD)
+                let isoDate = new Date().toISOString().split('T')[0];
+                if (j.fecha && j.fecha.includes('/')) {
+                    const p = j.fecha.split('/');
+                    if(p.length === 3) isoDate = `${p[2]}-${p[1]}-${p[0]}`;
+                }
+
+                const schemaData = {
+                    "@context": "https://schema.org/",
+                    "@type": "JobPosting",
+                    "title": j.title,
+                    "description": j.description,
+                    "identifier": { "@type": "PropertyValue", "name": "TuChamba", "value": id },
+                    "datePosted": isoDate,
+                    "validThrough": "2026-12-31",
+                    "employmentType": "FULL_TIME",
+                    "hiringOrganization": {
+                        "@type": "Organization",
+                        "name": (j.showCompany === true || j.showCompany === 'true') ? j.company : "Empresa Confidencial",
+                        "logo": "https://tuchamba-express.vercel.app/favicon.png"
+                    },
+                    "jobLocation": {
+                        "@type": "Place",
+                        "address": {
+                            "@type": "PostalAddress",
+                            "addressLocality": j.city,
+                            "addressRegion": j.state,
+                            "addressCountry": "MX"
+                        }
+                    },
+                    "baseSalary": {
+                        "@type": "MonetaryAmount",
+                        "currency": "MXN",
+                        "value": {
+                            "@type": "QuantitativeValue",
+                            "value": parseFloat(j.salary.replace(/[^0-9.]/g, '')) || 0,
+                            "unitText": "MONTH"
+                        }
+                    }
+                };
+
+                const script = document.createElement('script');
+                script.id = 'job-schema';
+                script.type = 'application/ld+json';
+                script.text = JSON.stringify(schemaData);
+                document.head.appendChild(script);
+            }
+            
+            // --- HERRAMIENTA ADMIN: GENERADOR DE SITEMAP (V25.10) ---
+            window.downloadSitemap = function() {
+                // 1. Cabecera estándar de XML para Google
+                let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+                xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+                // 2. Agregamos la página de inicio (La más importante)
+                xml += '  <url>\n';
+                xml += '    <loc>https://tuchamba-express.vercel.app/</loc>\n';
+                xml += '    <changefreq>daily</changefreq>\n';
+                xml += '    <priority>1.0</priority>\n';
+                xml += '  </url>\n';
+
+                // 3. Recorremos todas las vacantes VIGENTES
+                Object.keys(jobs).forEach(id => {
+                    const j = jobs[id];
+                    if (j.status !== 'No Vigente') {
+                        // Limpiamos el título para la URL (Quitamos acentos, espacios y símbolos raros)
+                        const safeTitle = j.title
+                            .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Quitar acentos
+                            .replace(/[^a-zA-Z0-9]/g, '-') // Símbolos a guiones
+                            .toLowerCase();
+
+                        // Construimos la URL Canónica (SIN referidos, para que Google indexe la original)
+                        const url = `https://tuchamba-express.vercel.app/?id=${id}&t=${safeTitle}`;
+                        
+                        xml += '  <url>\n';
+                        xml += `    <loc>${url}</loc>\n`;
+                        xml += '    <lastmod>' + new Date().toISOString().split('T')[0] + '</lastmod>\n';
+                        xml += '    <changefreq>weekly</changefreq>\n';
+                        xml += '    <priority>0.8</priority>\n';
+                        xml += '  </url>\n';
+                    }
+                });
+
+                xml += '</urlset>';
+
+                // 4. Descargar el archivo sitemap.xml
+                const blob = new Blob([xml], { type: 'text/xml' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'sitemap.xml';
+                link.click();
             }
 
             /* =========================================================
