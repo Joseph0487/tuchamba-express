@@ -2304,24 +2304,34 @@
             const today = new Date();
             const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
             
-            // --- TAREA 13: LÓGICA DE REFERIDOS BLINDADA (V24.8) ---
-            // --- CONTROL DE ACCESO Y BOTÓN DE LOGIN ---
+            // --- TAREA 13: LÓGICA DE REFERIDOS BLINDADA (V26.2) ---
             const urlParams = new URLSearchParams(window.location.search);
-            let refCode = urlParams.get('ref') || localStorage.getItem('recruiterCode');
-
+            // 1. Detectamos si la URL trae un referido hoy
+            let refEnUrl = urlParams.get('ref');
+            // 2. Si hay referido en URL, lo guardamos para que mande los WhatsApps a ese reclutador
+            if (refEnUrl) {
+            localStorage.setItem('recruiterCode', refEnUrl.toUpperCase());
+            }
+            // 3. El código "maestro" de la sesión es lo que está en memoria
+            let refCode = localStorage.getItem('recruiterCode');
             function actualizarBotonLogin() {
-            const botonAdmin = document.querySelector('.admin-toggle-link');
-            if (!botonAdmin) return; // Si aún no existe el botón en la pantalla, no hace nada.
+                    const botonAdmin = document.querySelector('.admin-toggle-link');
+                    if (!botonAdmin) return;
 
-            if (refCode) {
-            // Si hay un código de referido, escondemos el botón de "Ingresa aquí" para no confundir al candidato.
-            botonAdmin.style.display = 'none';
-            localStorage.setItem('recruiterCode', refCode.toUpperCase());
-            } else {
-            // Si no hay referido (link original), nos aseguramos de que el botón SIEMPRE aparezca.
-            botonAdmin.style.display = 'block';
+                    // LÓGICA DE VISIBILIDAD:
+                    // Solo ocultamos el botón si la URL trae un ?ref=... 
+                    // Si la URL está limpia (Original), el botón APARECE para que puedas loguearte.
+                    if (urlParams.has('ref')) {
+                        botonAdmin.style.display = 'none';
+                    } else {
+                        botonAdmin.style.display = 'block';
+                    }
             }
-            }
+
+            // Ejecutamos la revisión
+            actualizarBotonLogin();
+            document.addEventListener("DOMContentLoaded", actualizarBotonLogin);
+            window.addEventListener('load', actualizarBotonLogin);
 
             // Ejecutamos la revisión en tres momentos clave para que nunca falle:
             actualizarBotonLogin(); // 1. En cuanto carga el script.
@@ -3013,10 +3023,16 @@
             }
 
             window.copyJobLink = function(jobId) {
-                // CORRECCIÓN: Usar localStorage
-                const refCode = localStorage.getItem('recruiterCode');
-                const url = `${window.location.origin}/?id=${jobId}${refCode ? '&ref='+refCode : ''}`;
-                navigator.clipboard.writeText(url).then(() => window.showToast('🔗 Link de vacante copiado'));
+                // Revisamos quién es el reclutador dueño de esta sesión
+                const savedRef = activeRecruiter ? activeRecruiter.code : localStorage.getItem('recruiterCode');
+                // Armamos la URL pegando el ID de la vacante y el código de referido si existe
+                const urlParaCompartir = `${window.location.origin}/?id=${jobId}${savedRef ? '&ref=' + savedRef.toLowerCase() : ''}`;
+                // Lo mandamos al portapapeles
+                navigator.clipboard.writeText(urlParaCompartir).then(() => {
+                    window.showToast('🔗 Link con referido copiado al portapapeles');
+                }).catch(err => {
+                    console.error("Error al copiar:", err);
+                });
             }
             
             function renderRecruitersTable() {
@@ -3280,24 +3296,22 @@
                     benefitsList.innerHTML = '<li>✅ Prestaciones de Ley</li><li>✅ Contratación Inmediata</li>';
                 }
 
-                // 4. QR (Versión corregida para Reclutadores)
-                const qrContainer = document.getElementById('flyerQr');
-                qrContainer.innerHTML = ''; 
-
-                // Aquí el sistema revisa: ¿Eres un reclutador con sesión iniciada o vienes de un link de referido?
-                let codeForFlyer = activeRecruiter ? activeRecruiter.code : localStorage.getItem('recruiterCode');
-
-                // Construimos el link: Si hay código, se lo pegamos; si no, va normal.
-                const jobLink = `${window.location.origin}/?id=${jobId}${codeForFlyer ? '&ref=' + codeForFlyer.toLowerCase() : ''}`;
-
-                new QRCode(qrContainer, {
-                    text: jobLink,
-                    width: 256,
-                    height: 256,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
-                });
+                // 4. QR (Versión corregida para Comisiones)
+                    const qrContainer = document.getElementById('flyerQr');
+                    qrContainer.innerHTML = ''; 
+                    // Buscamos quién es el dueño de este flyer
+                    let dueñoDelFlyer = activeRecruiter ? activeRecruiter.code : localStorage.getItem('recruiterCode');
+                    // Si hay un dueño, le pegamos su placa (ref) al link del QR
+                    const linkDelQr = `${window.location.origin}/?id=${jobId}${dueñoDelFlyer ? '&ref=' + dueñoDelFlyer.toLowerCase() : ''}`;
+                    new QRCode(qrContainer, {
+                        text: linkDelQr,
+                        width: 256,
+                        height: 256,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.H
+                    }
+                );
 
                 // 5. GENERAR IMAGEN (Con 1 segundo de espera para asegurar renderizado)
                 setTimeout(() => {
