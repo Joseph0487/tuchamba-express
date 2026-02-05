@@ -417,40 +417,34 @@
             .badge-featured { position: absolute; top: 15px; right: 40px; background: linear-gradient(135deg, #6200ea 0%, #3700b3 100%); color: white; padding: 5px 12px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; box-shadow: 0 4px 8px rgba(98, 0, 234, 0.3); z-index: 4; display: flex; align-items: center; gap: 5px; border: none; letter-spacing: 0.5px; }
             .verified-badge { display: inline-flex; align-items: center; justify-content: center; background-color: #1da1f2; color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; margin-left: 6px; vertical-align: middle; }
             .card-header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; margin-right: 35px; }
+            /* =========================================================
+            CORRECCIÓN FINAL: FECHA SUAVE Y LEGIBLE (V22.10) ☁️
+            (Equilibrio: Se lee bien, pero no roba atención)
+            ========================================================= */
             .card-header-date { 
-            display: inline-flex !important;
-            align-items: center !important;
-            padding: 3px 8px !important;
-            border-radius: 4px !important;
-            margin-bottom: 5px !important; /* Reducimos de 10px a 5px */
-            gap: 5px !important;
-            background-color: #f5f5f5 !important; 
-            color: #444 !important;               
-            border: 1px solid #e0e0e0 !important; 
-            font-size: 0.75rem !important; 
-            font-weight: 600 !important;          
+                /* 1. Estructura */
+                display: inline-flex !important;
+                align-items: center !important;
+                padding: 3px 8px !important;
+                border-radius: 4px !important;
+                margin-bottom: 10px !important;
+                gap: 5px !important;
+
+                /* 2. Colores Suaves (El ajuste que pediste) */
+                background-color: #f5f5f5 !important; /* Gris clarito elegante */
+                color: #444 !important;               /* Gris oscuro legible (no negro) */
+                border: 1px solid #e0e0e0 !important; /* Borde muy sutil */
+                
+                /* 3. Texto */
+                font-size: 0.75rem !important; 
+                font-weight: 600 !important;          /* Seminegrita (no tan gruesa) */
             }
             .badge-vigente { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
             .badge-closed { background: #ffebee; color: #c62828; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
             .badge-new { background: #fff3e0; color: #e65100; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; margin-left: 5px; border: 1px solid #ffcc80; }
-            .job-title { 
-            font-size: 1.2rem !important; 
-            font-weight: 800 !important; 
-            color: #1a1a1a !important; 
-            margin-bottom: 8px !important; /* Aumentamos a 8px para que se note el aire */
-            line-height: 1.2 !important; 
-            display: block !important; /* Forzamos a que sea un bloque independiente */
-            }
-            .company-name { 
-            font-size: 0.9rem !important; 
-            color: #0a66c2 !important; 
-            font-weight: 600 !important; 
-            display: flex !important; 
-            align-items: center !important; 
-            margin-top: 0px !important; 
-            margin-bottom: 8px !important; /* Le damos espacio también abajo hacia la ubicación */
-            }
-            .location { font-size: 0.9rem; color: #555; margin-top: 6px !important; display: flex; align-items: center; gap: 4px; }
+            .job-title { font-size: 1.2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; line-height: 1.3; }
+            .company-name { font-size: 0.9rem; color: #0a66c2; font-weight: 600; display: flex; align-items: center; }
+            .location { font-size: 0.9rem; color: #555; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
             .salary-text { color: #d32f2f; font-weight: 800; font-size: 1.3rem; margin-top: 5px; }
             .company-logo { width: 48px; height: 48px; background: linear-gradient(135deg, #0a66c2 0%, #004182 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; flex-shrink: 0; }
             .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
@@ -474,15 +468,8 @@
             .modal.active { display: flex; align-items: center; justify-content: center; }
             .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; overflow-x: hidden; padding-bottom: 0; }
             .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
-            .detail-item { 
-            font-size: 15px; 
-            display: flex; 
-            flex-direction: column; /* Regresamos a uno arriba del otro como antes */
-            align-items: flex-start; 
-            gap: 2px; /* Unimos un poquito el título con su dato */
-            margin-bottom: 6px !important; /* Separación sana entre bloques */
-            line-height: 1.3 !important; 
-            }
+            .job-details { display: grid; gap: 15px; margin-bottom: 25px; margin-top: 15px; }
+            .detail-item { font-size: 15px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 10px; line-height: 1.4; word-break: break-word; }
             .modal-share-btn { background: #455a64; color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; white-space: nowrap; }
             .view-count-badge { background: #e3f2fd; color: #0277bd; font-size: 12px; padding: 6px 14px; border-radius: 50px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; border: 1px solid #bbdefb; }
             .agency-badge { background: #fff3e0; color: #ef6c00; font-size: 12px; padding: 6px 14px; border-radius: 50px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; border: 1px solid #ffe0b2; }
@@ -870,14 +857,13 @@
 
             /* 2. Pegar más los elementos internos */
             .card-header-top { margin-bottom: 4px !important; } /* Menos espacio arriba */
+            .card-header-date { margin-bottom: 8px !important; font-size: 0.7rem !important; }
             
-            /* --- CARDS: ALINEACIÓN REFINADA (V26.6) --- */
+            /* El bloque del Logo y Título */
             .job-card > div[style*="display: flex"] {
-            display: flex !important;
-            align-items: center !important; /* Centra el logo con el bloque de texto */
-            gap: 12px !important;
-            margin-top: 8px !important;
-            margin-bottom: 8px !important;
+                margin-top: 5px !important; /* Pegarlo a la fecha */
+                margin-bottom: 8px !important; /* Pegarlo a la ubicación */
+                gap: 10px !important; /* Acercar logo al texto */
             }
             
             /* Ajustar márgenes de textos clave */
@@ -1473,15 +1459,10 @@
             }
 
             /* 2. RECUADROS EN MODAL DE VACANTE (Zona, Sueldo, etc.) */
-            .job-details { 
-            display: grid; 
-            gap: 4px !important; /* Espacio sutil entre Zona, Sueldo y Jornada */
-            margin-bottom: 15px; 
-            margin-top: 10px; 
-            background-color: #eef0f2 !important; 
-            border: 1px solid #e0e0e0 !important; 
-            padding: 12px !important; /* Mantenemos el aire interno */
-            border-radius: 12px;
+            /* Antes era #f8f9fa (casi blanco), ahora es #eef0f2 (Gris sólido) */
+            .job-details {
+                background-color: #eef0f2 !important; 
+                border: 1px solid #e0e0e0 !important; /* Un bordecito fino ayuda */
             }
 
             /* 3. LISTAS DE REQUISITOS Y BENEFICIOS */
@@ -1708,27 +1689,12 @@
                     position: static !important;
                 }
 
-                /* EL GRID DE TERCIAS (3 BOTONES POR FILA) */
+                /* EL GRID 2-3-3 */
                 body.admin-mode .admin-controls-wrapper {
-                display: grid !important;
-                grid-template-columns: repeat(3, 1fr) !important; /* Fuerza 3 columnas iguales */
-                gap: 8px !important; 
+                    display: grid !important;
+                    grid-template-columns: repeat(6, 1fr) !important; 
+                    gap: 8px !important; /* Un poco más de aire ahora que hay fondo */
                 }
-
-                /* POSICIONES Y TAMAÑOS */
-                #viewToggleBtn { grid-column: span 1 !important; background: #004d40 !important; }
-                .add-job-btn   { grid-column: span 1 !important; }
-                /* El Sitemap ahora ocupa el tercer lugar de la primera fila */
-                button[onclick*="downloadSitemap"] { grid-column: span 1 !important; font-size: 10px !important; }
-
-                /* El resto de los botones se acomodan solos en filas de 3 */
-                button[onclick*="exportToExcel"] { grid-column: span 1 !important; font-size: 10px !important; }
-                .metrics-btn                     { grid-column: span 1 !important; font-size: 10px !important; }
-                .team-btn                        { grid-column: span 1 !important; font-size: 10px !important; }
-
-                .settings-btn                    { grid-column: span 1 !important; font-size: 10px !important; }
-                button[onclick*="excelFile"]     { grid-column: span 1 !important; font-size: 10px !important; }
-                button[onclick*="downloadTemplate"] { grid-column: span 1 !important; font-size: 10px !important; }
 
                 /* Estilo Base Botones Móvil */
                 body.admin-mode button {
@@ -2036,7 +2002,7 @@
                         <button class="tool-btn team-btn admin-only" onclick="openTeamModal()">👥 Equipo</button>
                         
                         <button class="tool-btn settings-btn admin-only" onclick="openSettingsModal()">⚙️ Ajustes</button>
-                        <button class="tool-btn admin-only" onclick="window.downloadSitemap()" style="background-color: #FF9800; color: white;">🗺️ Sitemap SEO</button>
+                        <button class="tool-btn admin-only" onclick="document.getElementById('excelFile').click()">📤 Cargar</button>
                         <button class="tool-btn" onclick="downloadTemplate()">📋 Plantilla</button>
                         <button class="tool-btn" onclick="window.downloadSitemap()" style="background-color: #FF9800; color: white;">🗺️ Sitemap SEO</button>
                         <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
@@ -3702,35 +3668,33 @@
                     const newBadge = isNewJob(j.fecha) ? '<span class="badge-new">🔥 Nueva</span>' : '';
                     const featuredBadge = j.isFeatured ? '<div class="badge-featured">⭐ DESTACADA</div>' : '';
 
-                    /* --- REEMPLAZO DIRECTO EN EL MOTOR DE CARDS (V26.7) --- */
                     return `
-                        <div class="job-card" onclick="window.openViewModal('${id}')" style="padding: 14px !important;">
-                        ${featuredBadge}
-                        ${showAdminButtons ? `<button class="more-btn" onclick="event.stopPropagation(); window.toggleMenu('${id}')">⋮</button>
-                        <div class="admin-actions" id="menu-${id}">
-                            <button class="admin-action" onclick="event.stopPropagation(); window.editJob('${id}')">✏️ Editar</button>
-                            <button class="admin-action" onclick="event.stopPropagation(); window.generateFlyer('${id}')">🖼️ Descargar Flyer</button>
-                            <button class="admin-action delete" onclick="event.stopPropagation(); window.deleteJob('${id}')">🗑️ Eliminar</button>
-                        </div>` : ''}
-        
-                        <div class="card-header-top" style="margin-bottom: 4px !important;">
-                            <div>${statusBadge} ${newBadge}</div>
-                        </div>
-                        ${dateHtml}
-        
-                        <div style="display: flex; align-items: center !important; gap: 12px !important; margin-top: 10px !important; margin-bottom: 12px !important;">
-                            <div class="company-logo" style="flex-shrink: 0;">${j.company.charAt(0)}</div>
-                            <div style="display: flex; flex-direction: column; gap: 6px !important;"> 
-                                <div class="job-title" style="margin: 0 !important; line-height: 1.2 !important;">${j.title}</div>
-                                <div class="company-name" style="margin: 0 !important; color: #0a66c2; font-weight: 600;">${finalCompanyName} ${verifiedHtml}</div>
+                        <div class="job-card" onclick="window.openViewModal('${id}')">
+                            ${featuredBadge}
+                            ${showAdminButtons ? `<button class="more-btn" onclick="event.stopPropagation(); window.toggleMenu('${id}')">⋮</button>
+                            <div class="admin-actions" id="menu-${id}">
+                                <button class="admin-action" onclick="event.stopPropagation(); window.editJob('${id}')">✏️ Editar</button>
+                                <button class="admin-action" onclick="event.stopPropagation(); window.generateFlyer('${id}')">🖼️ Descargar Flyer</button>
+                                <button class="admin-action delete" onclick="event.stopPropagation(); window.deleteJob('${id}')">🗑️ Eliminar</button>
+                            </div>` : ''}
+                            
+                            <div class="card-header-top">
+                                <div>${statusBadge} ${newBadge}</div>
                             </div>
-                        </div>
-        
-                        <div class="location" style="margin-top: 8px !important;">📍 ${displayLocation}</div>
-                        <div class="salary-text" style="margin-top: 6px !important;">💰 ${j.salary || 'A convenir'}</div>
+                            ${dateHtml}
+                            
+                            <div style="display: flex; gap: 15px; margin-bottom: 15px; margin-top: 10px;">
+                                <div class="company-logo">${j.company.charAt(0)}</div>
+                                <div>
+                                    <div class="job-title">${j.title}</div>
+                                    <div class="company-name">${finalCompanyName} ${verifiedHtml}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="location">📍 ${displayLocation}</div>
+                            <div class="salary-text">💰 ${j.salary || 'A convenir'}</div>
                         </div>
                     `;
-
                 }).join('');
 
                 renderPaginationControls(totalPages);
