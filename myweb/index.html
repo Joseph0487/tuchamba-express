@@ -334,9 +334,22 @@
             .page-btn:disabled { background: #f9f9f9; color: #ccc; cursor: not-allowed; border-color: #eee; }
             .page-info { width: 100%; text-align: center; font-size: 13px; color: #666; margin-top: 10px; }
 
-            .sticky-footer { position: sticky; bottom: 0; background: white; padding: 15px 20px 20px; margin: 20px -30px -30px; border-top: 1px solid #eee; text-align: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); z-index: 100; }
+            .sticky-footer { 
+                position: sticky; 
+                bottom: 0; 
+                background: white; 
+                /* AJUSTE: Padding más controlado */
+                padding: 10px 15px 15px; 
+                /* AJUSTE: Margen negativo solo lateral para pegar a los bordes */
+                margin: 15px -20px -20px; 
+                border-top: 1px solid #eee; 
+                text-align: center; 
+                box-shadow: 0 -4px 10px rgba(0,0,0,0.05); 
+                z-index: 100; 
+            }
             @keyframes heartbeat { 0% { transform: scale(1); } 15% { transform: scale(1.05); } 30% { transform: scale(1); } 100% { transform: scale(1); } }
-            /* BOTÓN WHATSAPP NIVEL MARKETING V24.4 (BORDE A BORDE) 💸 */
+            
+            /* BOTÓN WHATSAPP SLIM FIT (V25.8) - Estilizado para PC y Celular */
             .whatsapp-btn-large { 
                 display: flex; 
                 align-items: center; 
@@ -346,34 +359,32 @@
                 color: white; 
                 text-decoration: none; 
                 
-                /* ESTILO PC (Se mantiene igual de genial) */
-                padding: 16px 20px;     
-                font-size: 18px;        
-                border-radius: 16px;   
+                /* ESTILO BASE (PC): Más delgado y elegante */
+                padding: 10px 15px;      /* Reduje el relleno vertical */
+                font-size: 16px;         /* Letra legible pero no gigante */
+                border-radius: 12px;     
                 letter-spacing: 0.5px; 
-                
                 font-weight: 800;      
-                box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); 
+                box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); 
                 border: none; 
                 cursor: pointer; 
-                animation: heartbeat 1.5s infinite ease-in-out; 
+                animation: heartbeat 2.5s infinite; 
                 white-space: nowrap; 
-                overflow: hidden; text-overflow: ellipsis; 
+                overflow: hidden; 
+                text-overflow: ellipsis; 
             }
 
-            /* --- AJUSTE QUIRÚRGICO PARA CELULAR --- */
+            /* --- AJUSTE MÓVIL (Para que no se vea gordo en el cel) --- */
             @media (max-width: 768px) {
                 .whatsapp-btn-large {
-                    /* 1. Subimos la letra (de 14px a 16.5px) ¡Casi tamaño PC! */
-                    font-size: 16.5px !important; 
+                    /* En celular mantenemos la letra casi igual pero ajustamos espacios */
+                    font-size: 15px !important; 
                     
-                    /* 2. Padding lateral MÍNIMO (2px = 1 milímetro) */
-                    /* Esto pega el texto a los bordes para ganar espacio */
-                    padding: 16px 2px !important; 
+                    /* Padding lateral mínimo para que quepa el texto largo */
+                    padding: 12px 5px !important; 
                     
-                    /* 3. EL TRUCO: Juntamos las letras un pelito (-0.5px) */
-                    /* Visualmente no se nota, pero hace que quepa la frase entera */
-                    letter-spacing: -0.5px !important; 
+                    /* Juntamos un pelín las letras para asegurar que quepa "EMPIEZA YA" */
+                    letter-spacing: -0.3px !important; 
                 }
             }
             
@@ -3814,20 +3825,17 @@
                     const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                     const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                     
-                    // CAMBIO V25.6: BOTÓN CON TU IMAGEN "favicon_2"
-                    contactHtml = `<div class="sticky-footer">
-                                        <p style="font-size:12px; color:#666; margin-bottom:5px; font-weight:600;">
+                    // CAMBIO V25.7: Sándwich Compacto (Sin espacios extra)
+                    contactHtml = `<div class="sticky-footer" style="padding: 10px 15px 15px;"> <p style="font-size:11px; color:#666; margin: 0 0 4px 0; font-weight:600;">
                                             👇🏻 Respuesta Inmediata 👇🏻
                                         </p>
                                         
-                                        <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                                            📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC 
-                                            
-                                            <img src="favicon_2.png" alt="WA" style="height: 32px; width: auto; vertical-align: middle;">
-                                            </button>
+                                        <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <span style="white-space: nowrap;">¡PIDE INFORMES Y EMPIEZA YA! CLIC</span> 
+                                            <img src="favicon_2.png" alt="WA" style="height: 26px; width: auto;"> </button>
                                         
-                                        <p style="font-size:12px; color:#666; margin-top:5px; font-weight:600;">
-                                            👆🏻 ¡No pierdas tu oportunidad, postúlate ahora! 👆🏻
+                                        <p style="font-size:11px; color:#666; margin: 4px 0 0 0; font-weight:600;">
+                                            👆🏻 ¡No pierdas tu oportunidad! 👆🏻
                                         </p>
                                 </div>`;
                 }
