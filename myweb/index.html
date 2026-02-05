@@ -1708,12 +1708,27 @@
                     position: static !important;
                 }
 
-                /* EL GRID 2-3-3 */
+                /* EL GRID DE TERCIAS (3 BOTONES POR FILA) */
                 body.admin-mode .admin-controls-wrapper {
-                    display: grid !important;
-                    grid-template-columns: repeat(6, 1fr) !important; 
-                    gap: 8px !important; /* Un poco más de aire ahora que hay fondo */
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important; /* Fuerza 3 columnas iguales */
+                gap: 8px !important; 
                 }
+
+                /* POSICIONES Y TAMAÑOS */
+                #viewToggleBtn { grid-column: span 1 !important; background: #004d40 !important; }
+                .add-job-btn   { grid-column: span 1 !important; }
+                /* El Sitemap ahora ocupa el tercer lugar de la primera fila */
+                button[onclick*="downloadSitemap"] { grid-column: span 1 !important; font-size: 10px !important; }
+
+                /* El resto de los botones se acomodan solos en filas de 3 */
+                button[onclick*="exportToExcel"] { grid-column: span 1 !important; font-size: 10px !important; }
+                .metrics-btn                     { grid-column: span 1 !important; font-size: 10px !important; }
+                .team-btn                        { grid-column: span 1 !important; font-size: 10px !important; }
+
+                .settings-btn                    { grid-column: span 1 !important; font-size: 10px !important; }
+                button[onclick*="excelFile"]     { grid-column: span 1 !important; font-size: 10px !important; }
+                button[onclick*="downloadTemplate"] { grid-column: span 1 !important; font-size: 10px !important; }
 
                 /* Estilo Base Botones Móvil */
                 body.admin-mode button {
@@ -2021,7 +2036,7 @@
                         <button class="tool-btn team-btn admin-only" onclick="openTeamModal()">👥 Equipo</button>
                         
                         <button class="tool-btn settings-btn admin-only" onclick="openSettingsModal()">⚙️ Ajustes</button>
-                        <button class="tool-btn admin-only" onclick="document.getElementById('excelFile').click()">📤 Cargar</button>
+                        <button class="tool-btn admin-only" onclick="window.downloadSitemap()" style="background-color: #FF9800; color: white;">🗺️ Sitemap SEO</button>
                         <button class="tool-btn" onclick="downloadTemplate()">📋 Plantilla</button>
                         <button class="tool-btn" onclick="window.downloadSitemap()" style="background-color: #FF9800; color: white;">🗺️ Sitemap SEO</button>
                         <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
