@@ -4218,53 +4218,62 @@
                 document.head.appendChild(script);
             }
             
-        // --- HERRAMIENTA ADMIN: GENERADOR DE SITEMAP (V26.3 - FIX GOOGLE) ---
-        window.downloadSitemap = function() {
-            // 1. Cabecera con codificación explícita
-                let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-                xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+        // --- HERRAMIENTA ADMIN: GENERADOR DE SITEMAP (V26.4 - CORREGIDO) ---
+            window.downloadSitemap = function() {
+            // 1. Iniciamos el contenido del XML
+            let xmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n';
+            xmlContent += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-            // 2. Página de inicio
-                xml.innerHTML = ""; // Limpieza de seguridad
-                xml += '  <url>\n';
-                xml += '    <loc>https://tuchamba-express.vercel.app/</loc>\n';
-                xml += '    <changefreq>daily</changefreq>\n';
-                xml += '    <priority>1.0</priority>\n';
-                xml += '  </url>\n';
+            // 2. Página de inicio (Tu URL raíz)
+            xmlContent += '  <url>\n';
+            xmlContent += '    <loc>https://tuchamba-express.vercel.app/</loc>\n';
+            xmlContent += '    <changefreq>daily</changefreq>\n';
+            xmlContent += '    <priority>1.0</priority>\n';
+            xmlContent += '  </url>\n';
 
-            // 3. Recorremos vacantes VIGENTES
-                Object.keys(jobs).forEach(id => {
-                const j = jobs[id];
-                    if (j.status !== 'No Vigente') {
-                        const safeTitle = j.title
+            // 3. Agregamos las vacantes que estén VIGENTES
+            Object.keys(jobs).forEach(id => {
+            const j = jobs[id];
+            if (j.status !== 'No Vigente') {
+            // Limpiamos el título para la URL
+            const safeTitle = j.title
                 .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
                 .replace(/[^a-zA-Z0-9]/g, '-')
                 .toLowerCase();
 
-            // --- CORRECCIÓN CLAVE: El símbolo & debe ser &amp; para Google ---
+            // Construimos la URL y nos aseguramos de que los símbolos sean válidos para Google
             const urlBasica = `https://tuchamba-express.vercel.app/?id=${id}`;
-            const urlEscapada = urlBasica.replace(/&/g, '&amp;');
+            const urlLimpia = urlBasica.replace(/&/g, '&amp;');
             
-                xml += '  <url>\n';
-                xml += `    <loc>${urlEscapada}</loc>\n`;
-                xml += '    <lastmod>' + new Date().toISOString().split('T')[0] + '</lastmod>\n';
-                xml += '    <changefreq>weekly</changefreq>\n';
-                xml += '    <priority>0.8</priority>\n';
-                xml += '  </url>\n';
+            xmlContent += '  <url>\n';
+            xmlContent += `    <loc>${urlLimpia}</loc>\n`;
+            xmlContent += '    <lastmod>' + new Date().toISOString().split('T')[0] + '</lastmod>\n';
+            xmlContent += '    <changefreq>weekly</changefreq>\n';
+            xmlContent += '    <priority>0.8</priority>\n';
+            xmlContent += '  </url>\n';
             }
             });
 
-                xml += '</urlset>';
+            xmlContent += '</urlset>';
 
-            // 4. Descarga forzada con codificación UTF-8 correcta
-                const blob = new Blob([xml], { type: 'application/xml;charset=utf-8' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = 'sitemap.xml';
-                link.click();
-    
-            window.showToast("✅ Sitemap.xml generado correctamente");
-        }
+            // 4. Creamos el archivo y lo descargamos
+                try {
+            const blob = new Blob([xmlContent], { type: 'application/xml;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'sitemap.xml';
+        
+            // Lo agregamos al documento un milisegundo para darle clic y lo quitamos
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        
+            window.showToast("✅ Sitemap.xml listo para descargar");
+            } catch (err) {
+            console.error("Error al generar sitemap:", err);
+            alert("No se pudo generar el archivo: " + err.message);
+            }
+        }   
 
             /* =========================================================
             BLOQUE DE RECUPERACIÓN TOTAL (V22.FIX) 🚑
