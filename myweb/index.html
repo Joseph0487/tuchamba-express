@@ -2325,13 +2325,23 @@
                 document.getElementById('cityFilter').value = '';
             });
 
-            window.onpageshow = function(event) {
+            window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                // Limpieza extra + recarga limpia
+                document.getElementById('searchInput').value = '';
+                document.getElementById('stateFilter').value = '';
+                document.getElementById('cityFilter').value = '';
+                window.location.reload();
+            }
+            });
+
+            // === FORZAR RECARGA FRESCA CUANDO LA PÁGINA VIENE DE BFCACHE ===
+            window.addEventListener('pageshow', function(event) {
                 if (event.persisted) {
-                    document.getElementById('searchInput').value = '';
-                    document.getElementById('stateFilter').value = '';
-                    document.getElementById('cityFilter').value = '';
+                    // Se restauró desde caché → recargamos limpia
+                    window.location.reload();
                 }
-            };
+            });
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === "Escape") {
@@ -4281,5 +4291,3 @@
 
     </body>
     </html>
-
-
