@@ -4433,13 +4433,43 @@
             const btnSave = document.getElementById('btnSaveRecruiter');
             if(btnSave) btnSave.innerHTML = "💾 Guardar";
         };
+          
+        // COPIAR LINK PERSONAL DEL RECLUTADOR LOGUEADO (FIX: siempre toma el ref real)
+        window.copyRecruiterLink = function(specificLink = null) {
+            let linkToCopy;
 
-            // 3. HERRAMIENTAS EXTRA (Copiado y Buscador)
-            window.copyRecruiterLink = function(link) {
-                navigator.clipboard.writeText(link).then(() => {
-                    window.showToast("✅ Link copiado");
-                }).catch(() => prompt("Copia manual:", link));
-            };
+            if (specificLink) {
+                // Si se pasa un link específico (ej. desde la tabla de equipo)
+                linkToCopy = specificLink;
+            } else {
+                // Modo por defecto: link del reclutador ACTUAL logueado
+                const urlParams = new URLSearchParams(window.location.search);
+                let refCode = urlParams.get('ref');
+
+                // Fallbacks si no viene en la URL
+                if (!refCode) {
+            refCode = sessionStorage.getItem('recruiterCode') ||
+                      localStorage.getItem('recruiterCode') ||
+                      (window.activeRecruiter && window.activeRecruiter.code);
+                }
+
+                if (!refCode) {
+                    window.showToast("⚠️ No se detectó código de reclutador");
+                    return;
+             }
+
+            linkToCopy = `${window.location.origin}/?ref=${refCode.toLowerCase()}`;
+            }
+
+            navigator.clipboard.writeText(linkToCopy)
+                .then(() => {
+                    window.showToast(`✅ Link copiado: ${linkToCopy}`);
+                })
+                .catch(err => {
+                    console.error("Error al copiar:", err);
+                    prompt("Copia manual (Ctrl+C):", linkToCopy);
+                });
+        };
 
             window.toggleAdminSearch = function() {
                 const searchBar = document.getElementById('userStickyTools');
