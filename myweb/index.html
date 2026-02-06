@@ -2277,14 +2277,14 @@
 
             const app = initializeApp(firebaseConfig);
                 // --- ACTIVACIÓN DE APP CHECK (EL PASO FINAL) ---
-                import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
+                //import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
 
-                self.FIREBASE_APPCHECK_DEBUG_TOKEN = true; // Solo para pruebas, luego se quita
+                //self.FIREBASE_APPCHECK_DEBUG_TOKEN = true; // Solo para pruebas, luego se quita
 
-                const appCheck = initializeAppCheck(app, {
-                provider: new ReCaptchaEnterpriseProvider('TU_SITE_KEY_AQUÍ'), // <--- Aquí pondrás tu llave de Google
-                isTokenAutoRefreshEnabled: true
-                });
+                //const appCheck = initializeAppCheck(app, {
+                //provider: new ReCaptchaEnterpriseProvider('TU_SITE_KEY_AQUÍ'), // <--- Aquí pondrás tu llave de Google
+                //isTokenAutoRefreshEnabled: true
+                //});
             const auth = getAuth(app);
             const db = getDatabase(app);
 
@@ -2640,16 +2640,23 @@
                 }
             }
             
-            window.enterAsGuest = function() { 
-                sessionStorage.setItem('isGuest', 'true'); 
-                isAdmin = false; 
-                isRecruiterMode = false;
-                // Limpiamos la búsqueda pero NO el código de reclutador si es que existe
-                document.getElementById('searchInput').value = '';
-                // Ejecutamos la función que acabamos de crear para que el botón se porte bien
-                actualizarBotonLogin(); 
-                setAdminMode(false); 
-            }
+        window.enterAsGuest = function() { 
+            // 1. Guardamos el permiso
+            sessionStorage.setItem('isGuest', 'true'); 
+            isAdmin = false; 
+            isRecruiterMode = false;
+    
+            // 2. Limpiamos cualquier rastro de búsqueda anterior
+            document.getElementById('searchInput').value = '';
+    
+            // 3. ¡LA CLAVE!: Quitamos el login y mostramos la App
+            document.getElementById('loginScreen').style.display = 'none'; 
+            document.getElementById('mainApp').style.display = 'block';
+    
+            // 4. Cargamos las vacantes
+            actualizarBotonLogin(); 
+            loadData(); // <--- Esto jala las chambas de Firebase
+        }    
 
         // FUNCIÓN SALIR INTELIGENTE (V25.0 - SOLO PRESERVA REF SI ESTABA EN LA URL ORIGINAL)
         window.logout = function() {
@@ -3233,32 +3240,29 @@
 
             let lastClickTime = 0; 
             window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
-                onst now = Date.now();
-                // Si hacen clic más de una vez en menos de 5 segundos, se ignora.
+                const now = Date.now(); // <--- Aquí ya dice "const" correctamente
                 if (now - lastClickTime < 5000) return; 
                 lastClickTime = now;
 
                 btn.disabled = true;
                 btn.innerHTML = '🔄 Abriendo...';
 
-                // Registro de métricas en Firebase
                 const logRef = push(ref(db, 'clickLogs'));
                 set(logRef, {
                     jobId: jobId,
                     recruiter: recruiterName || 'directo',
-                    timestamp: serverTimestamp(),
+                    timestamp: new Date().toISOString(), // Usamos formato ISO para el Excel
                     userAgent: navigator.userAgent
                 });
 
-                // Incrementar contador
                 runTransaction(ref(db, `jobStats/${jobId}/whatsappClicks`), (c) => (c || 0) + 1);
 
                 setTimeout(() => {
-                    window.open(link, '_blank');
+                 window.open(link, '_blank');
                     btn.disabled = false;
                     btn.innerHTML = '¡PIDE INFORMES Y EMPIEZA YA! 📲';
                 }, 500);
-            };  
+            }; 
 
             window.registerClick = function(jobId, recruiterName) {
                 runTransaction(ref(db, `jobStats/${jobId}/whatsappClicks`), (c) => (c || 0) + 1);
