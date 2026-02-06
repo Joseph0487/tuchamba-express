@@ -2658,14 +2658,14 @@
             sessionStorage.clear();
 
             // 4. DESTINO
-                let targetUrl = window.location.origin;
+            let targetUrl = window.location.origin;
             if (savedRef) {
                 targetUrl += `/?ref=${savedRef}`;
             }
 
             // 5. SALIDA SEGURA
             try {
-                if (typeof auth !== 'undefined' && auth && auth.currentUser) {
+             if (typeof auth !== 'undefined' && auth && auth.currentUser) {
                     signOut(auth)
                         .then(() => { window.location.href = targetUrl; })
                         .catch(() => { window.location.href = targetUrl; });
@@ -2677,7 +2677,6 @@
                 window.location.href = targetUrl;
             }
         };
-
 
             function showLogin() { 
                 document.getElementById('loginScreen').style.display = 'block'; 
@@ -3293,22 +3292,39 @@
                     benefitsList.innerHTML = '<li>✅ Prestaciones de Ley</li><li>✅ Contratación Inmediata</li>';
                 }
 
-                // 4. QR (Versión corregida para Comisiones)
-                    const qrContainer = document.getElementById('flyerQr');
-                    qrContainer.innerHTML = ''; 
-                    // Buscamos quién es el dueño de este flyer
-                    let dueñoDelFlyer = activeRecruiter ? activeRecruiter.code : localStorage.getItem('recruiterCode');
-                    // Si hay un dueño, le pegamos su placa (ref) al link del QR
-                    const linkDelQr = `${window.location.origin}/?id=${jobId}${dueñoDelFlyer ? '&ref=' + dueñoDelFlyer.toLowerCase() : ''}`;
-                    new QRCode(qrContainer, {
-                        text: linkDelQr,
-                        width: 256,
-                        height: 256,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.H
-                    }
-                );
+                // 4. QR (FIX FINAL: Siempre incluye &ref= si existe en la URL o storage)
+                const qrContainer = document.getElementById('flyerQr');
+                qrContainer.innerHTML = ''; 
+
+                // Obtener el ref de forma confiable (igual que en logout)
+                const urlParams = new URLSearchParams(window.location.search);
+                let refCode = urlParams.get('ref');
+                
+                // Si no viene en la URL, intentamos fallback a storage (por si acaso)
+                if (!refCode) {
+                    refCode = sessionStorage.getItem('recruiterCode') || 
+                        localStorage.getItem('recruiterCode') || 
+                        (activeRecruiter && activeRecruiter.code);
+                }
+
+                // Construir la URL completa
+                let linkDelQr = `${window.location.origin}/?id=${jobId}`;
+                if (refCode) {
+                    linkDelQr += `&ref=${refCode.toLowerCase()}`;
+                }
+
+                // Generar QR
+                new QRCode(qrContainer, {
+                    text: linkDelQr,
+                    width: 256,
+                    height: 256,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                // Opcional: Mostrar la URL en consola para debug (puedes quitar después)
+                console.log("QR generado con URL:", linkDelQr);
 
                 // 5. GENERAR IMAGEN (Con 1 segundo de espera para asegurar renderizado)
                 setTimeout(() => {
