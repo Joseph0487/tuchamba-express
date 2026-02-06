@@ -4369,35 +4369,40 @@
             (Incluye: Descargas, Equipo, Directorio y Accesos)
             ========================================================= */
 
-            // 1. DESCARGAR BASE (Si ya la tienes arriba, no dupliques, pero si la borraste, aquí va)
+            // --- HERRAMIENTA CORREGIDA: DESCARGAR BASE DE RECLUTADORES ---
             window.downloadRecruiters = async function() {
                 try {
-                    // Aseguramos la librería primero
+                    // 1. CARGA PEREZOSA: Traemos la librería de Excel
                     await loadExternalLibrary("https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js", "XLSX");
 
-                    if(!Object.keys(recruiters).length) {
-                        alert('No hay datos de reclutadores para descargar.');
+                    // 2. VALIDACIÓN: Revisamos si hay datos
+                    if(!recruiters || Object.keys(recruiters).length === 0) {
+                        alert('⚠️ No hay reclutadores registrados para descargar.');
                         return;
                     }
                     
-                    window.showToast("📂 Generando base de reclutadores...");
+                    window.showToast("📂 Generando Excel de Reclutadores...");
 
+                    // 3. MAPEO DE DATOS: Preparamos las columnas
                     const data = Object.keys(recruiters).map(id => ({
                         'ID': id,
                         'Nombre': recruiters[id].name || 'N/A',
                         'Código': recruiters[id].code || 'N/A',
-                        'Teléfono': recruiters[id].phone || 'N/A'
+                        'Teléfono': recruiters[id].phone || 'No registrado'
                     }));
 
+                    // 4. GENERACIÓN DEL ARCHIVO
                     const ws = XLSX.utils.json_to_sheet(data);
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, "Reclutadores");
-                    XLSX.writeFile(wb, "Base_Reclutadores.xlsx");
                     
-                    window.showToast("✅ Descarga lista");
+                    // 5. DESCARGA
+                    XLSX.writeFile(wb, "Base_Reclutadores_TuChamba.xlsx");
+                    window.showToast("✅ Base descargada con éxito");
+
                 } catch (err) {
                     console.error("Error en descarga:", err);
-                    alert("Error al procesar el Excel: " + err.message);
+                    alert("❌ Error al procesar el archivo Excel: " + err.message);
                 }
             };
 
