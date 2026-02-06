@@ -4434,36 +4434,51 @@
             if(btnSave) btnSave.innerHTML = "💾 Guardar";
         };
           
-        // COPIAR LINK PERSONAL DEL RECLUTADOR LOGUEADO (FIX: siempre toma el ref real)
+        // COPIAR LINK PERSONAL - VERSIÓN DEBUG (para ver por qué falla)
         window.copyRecruiterLink = function(specificLink = null) {
             let linkToCopy;
+            let debugInfo = [];
 
             if (specificLink) {
-                // Si se pasa un link específico (ej. desde la tabla de equipo)
                 linkToCopy = specificLink;
+                debugInfo.push("Usando link específico pasado: " + specificLink);
             } else {
-                // Modo por defecto: link del reclutador ACTUAL logueado
+                // Intentamos obtener refCode de varias fuentes
                 const urlParams = new URLSearchParams(window.location.search);
                 let refCode = urlParams.get('ref');
+                debugInfo.push("De URL (?ref=): " + (refCode || "NO ENCONTRADO"));
 
-                // Fallbacks si no viene en la URL
                 if (!refCode) {
-            refCode = sessionStorage.getItem('recruiterCode') ||
-                      localStorage.getItem('recruiterCode') ||
-                      (window.activeRecruiter && window.activeRecruiter.code);
+                    refCode = sessionStorage.getItem('recruiterCode');
+                    debugInfo.push("De sessionStorage ('recruiterCode'): " + (refCode || "NO ENCONTRADO"));
                 }
 
                 if (!refCode) {
-                    window.showToast("⚠️ No se detectó código de reclutador");
-                    return;
-             }
+                    refCode = localStorage.getItem('recruiterCode');
+                    debugInfo.push("De localStorage ('recruiterCode'): " + (refCode || "NO ENCONTRADO"));
+                }
 
-            linkToCopy = `${window.location.origin}/?ref=${refCode.toLowerCase()}`;
+                if (!refCode && window.activeRecruiter && window.activeRecruiter.code) {
+                    refCode = window.activeRecruiter.code;
+                    debugInfo.push("De window.activeRecruiter.code: " + refCode);
+                }
+
+                if (!refCode) {
+                    window.showToast("⚠️ No se encontró código de reclutador en ninguna fuente");
+                    console.log("DEBUG copyRecruiterLink - Fuentes chequeadas:", debugInfo);
+                    console.log("URL actual:", window.location.href);
+                    return;
+                }
+
+                linkToCopy = `${window.location.origin}/?ref=${refCode.toLowerCase()}`;
+                debugInfo.push("Link final construido: " + linkToCopy);
             }
 
             navigator.clipboard.writeText(linkToCopy)
                 .then(() => {
-                    window.showToast(`✅ Link copiado: ${linkToCopy}`);
+                    window.showToast("✅ Link copiado: " + linkToCopy);
+                    console.log("DEBUG - Link COPIADO exitosamente:", linkToCopy);
+                    console.log("Fuentes chequeadas:", debugInfo);
                 })
                 .catch(err => {
                     console.error("Error al copiar:", err);
