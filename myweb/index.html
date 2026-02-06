@@ -3273,7 +3273,7 @@
                     userAgent: navigator.userAgent
                 });
 
-                runTransaction(ref(db, `jobStats/${jobId}/whatsappClicks`), (c) => (c || 0) + 1);
+                runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
 
                 setTimeout(() => {
                  window.open(link, '_blank');
@@ -3283,7 +3283,7 @@
             }; 
 
             window.registerClick = function(jobId, recruiterName) {
-                runTransaction(ref(db, `jobStats/${jobId}/whatsappClicks`), (c) => (c || 0) + 1);
+                runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
                 push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
             }
 
@@ -4198,10 +4198,10 @@
                                     isFeaturedRaw = String(row[featuredKey]).trim().toUpperCase();
                                 }
 
-                                // Limpieza de Teléfono y Lada
-                                let contactRaw = row[findKey(row, 'contacto')] || '';
+                                // Limpieza de Teléfono y Lada (Acepta múltiples nombres de columna)
+                                let contactRaw = row[findKey(row, 'contacto')] || row[findKey(row, 'whatsapp')] || row[findKey(row, 'telefono')] || '';
                                 contactRaw = String(contactRaw).replace(/\D/g, ''); 
-                                
+
                                 if(contactRaw.length === 10) {
                                     contactRaw = '+52' + contactRaw;
                                 } else if (contactRaw.length > 10 && !contactRaw.startsWith('+')) {
