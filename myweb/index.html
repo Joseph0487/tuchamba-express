@@ -65,8 +65,6 @@
         <meta property="og:url" content="https://tuchamba-express.vercel.app/">
         <meta property="og:type" content="website">
 
-        <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-        <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
         
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -1348,13 +1346,6 @@
                 }
             }
 
-
-
-
-
-
-
-
             /* =========================================================
             CORRECCIÓN: ALINEACIÓN VERTICAL PERFECTA (V20.4) 📐
             (Esto centra el botón de "Copiar Link" con los demás)
@@ -2292,6 +2283,23 @@
             appId: "1:242419485392:web:c486a767a1810ada876cd5"
             };
 
+            // Función para cargar librerías externas bajo demanda
+            async function loadExternalLibrary(url, libraryName) {
+                if (window[libraryName] || (libraryName === 'XLSX' && window.XLSX)) return true;
+                
+                window.showToast(`📥 Cargando herramienta de ${libraryName}...`);
+                return new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = url;
+                    script.onload = () => {
+                        console.log(`✅ ${libraryName} cargada con éxito`);
+                        resolve(true);
+                    };
+                    script.onerror = () => reject(new Error(`Error al cargar ${libraryName}`));
+                    document.head.appendChild(script);
+                });
+            }
+
             const app = initializeApp(firebaseConfig);
                 // --- ACTIVACIÓN DE APP CHECK (EL PASO FINAL) ---
                 //import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
@@ -3104,156 +3112,149 @@
                 ).join('');
             }
 
-            window.downloadSelectedMetrics = function() {
+            window.downloadSelectedMetrics = async function() {
                 const checkboxes = document.querySelectorAll('#metricsMonthList input:checked');
                 const selectedMonths = Array.from(checkboxes).map(cb => cb.value);
                 
                 if(selectedMonths.length === 0) return alert("Selecciona al menos un mes");
 
-                window.showToast("📊 Generando reporte detallado...");
+                try {
+                    // 1. CARGA PEREZOSA: Traemos la herramienta de Excel solo si vas a descargar reportes
+                    await loadExternalLibrary("https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js", "XLSX");
 
-                const dataRows = [];
-                
-                Object.keys(jobs).forEach(jobId => {
-                    const j = jobs[jobId];
-                    const s = jobStats[jobId] || {};
+                    window.showToast("📊 Generando reporte detallado...");
+
+                    const dataRows = [];
                     
-                    let totalViews = 0;
-                    let totalClicks = 0;
+                    Object.keys(jobs).forEach(jobId => {
+                        const j = jobs[jobId];
+                        const s = jobStats[jobId] || {};
+                        
+                        let totalViews = 0;
+                        selectedMonths.forEach(m => {
+                            if(s.monthlyViews && s.monthlyViews[m]) {
+                                totalViews += s.monthlyViews[m];
+                            }
+                        });
+                        
+                        const clicksInMonths = Object.values(clickLogs).filter(l => 
+                            l && l.jobId === jobId && 
+                            l.timestamp && typeof l.timestamp === 'string' &&
+                            selectedMonths.includes(l.timestamp.substring(0,7))
+                        ).length;
 
-                    selectedMonths.forEach(m => {
-                        if(s.monthlyViews && s.monthlyViews[m]) {
-                            totalViews += s.monthlyViews[m];
+                        dataRows.push({
+                            'ID': jobId,
+                            'Título': j.title,
+                            'Empresa': j.company,
+                            'Vistas (Meses selecc.)': totalViews,
+                            'Clics WhatsApp (Meses selecc.)': clicksInMonths,
+                            'Estatus': j.status
+                        });
+                    });
+
+                    const recruiterMap = {};
+                    let totalRecruiterClicks = 0;
+                    Object.values(clickLogs).forEach(l => {
+                        if(l && l.timestamp && typeof l.timestamp === 'string' && selectedMonths.includes(l.timestamp.substring(0,7))) {
+                            const recName = l.recruiter || 'Orgánico';
+                            if(!recruiterMap[recName]) recruiterMap[recName] = 0;
+                            recruiterMap[recName]++;
+                            totalRecruiterClicks++;
                         }
                     });
-                    
-                    const clicksInMonths = Object.values(clickLogs).filter(l => 
-                        l && l.jobId === jobId && 
-                        l.timestamp && typeof l.timestamp === 'string' &&
-                        selectedMonths.includes(l.timestamp.substring(0,7))
-                    ).length;
 
-                    dataRows.push({
-                        'ID': jobId,
-                        'Título': j.title,
-                        'Empresa': j.company,
-                        'Vistas (Meses selecc.)': totalViews,
-                        'Clics WhatsApp (Meses selecc.)': clicksInMonths,
-                        'Estatus': j.status
+                    let recruiterRows = Object.keys(recruiterMap).map(name => ({
+                        'Reclutador': name,
+                        'Clics Generados': recruiterMap[name],
+                        '% del Total': totalRecruiterClicks > 0 ? ((recruiterMap[name] / totalRecruiterClicks) * 100).toFixed(2) + '%' : '0%'
+                    }));
+
+                    if (recruiterRows.length === 0) recruiterRows = [{'Reclutador': 'Sin datos', 'Clics': 0}];
+
+                    const detailMap = {}; 
+
+                    // Lógica de cruce de datos para el detalle
+                    Object.keys(jobs).forEach(jobId => {
+                        const j = jobs[jobId];
+                        const s = jobStats[jobId] || {};
+                        
+                        if (s.viewsByRecruiter) {
+                            Object.keys(s.viewsByRecruiter).forEach(recCode => {
+                                let recName = 'Orgánico';
+                                if (recCode !== 'ORGANICO') {
+                                    const foundRec = Object.values(recruiters).find(r => r.code === recCode);
+                                    recName = foundRec ? foundRec.name : recCode;
+                                }
+
+                                const key = `${jobId}_${recName}`;
+                                
+                                if (!detailMap[key]) detailMap[key] = { 
+                                    jobId: jobId, 
+                                    title: j.title, 
+                                    company: j.company || 'Sin Empresa',
+                                    whatsapp: j.contact || 'Sin Num',
+                                    recruiter: recName, 
+                                    views: 0, 
+                                    clicks: 0 
+                                };
+                                
+                                detailMap[key].views = s.viewsByRecruiter[recCode];
+                            });
+                        }
                     });
-                });
 
-                const recruiterMap = {};
-                let totalRecruiterClicks = 0;
-                Object.values(clickLogs).forEach(l => {
-                    if(l && l.timestamp && typeof l.timestamp === 'string' && selectedMonths.includes(l.timestamp.substring(0,7))) {
-                        const recName = l.recruiter || 'Orgánico';
-                        if(!recruiterMap[recName]) recruiterMap[recName] = 0;
-                        recruiterMap[recName]++;
-                        totalRecruiterClicks++;
-                    }
-                });
-                let recruiterRows = Object.keys(recruiterMap).map(name => ({
-                    'Reclutador': name,
-                    'Clics Generados': recruiterMap[name],
-                    '% del Total': totalRecruiterClicks > 0 ? ((recruiterMap[name] / totalRecruiterClicks) * 100).toFixed(2) + '%' : '0%'
-                }));
-                if (recruiterRows.length === 0) recruiterRows = [{'Reclutador': 'Sin datos', 'Clics': 0}];
-
-               const detailMap = {}; 
-
-                // 1. LOGICA DE VISTAS (Aquí faltaba guardar los datos nuevos)
-                Object.keys(jobs).forEach(jobId => {
-                    const j = jobs[jobId];
-                    const s = jobStats[jobId] || {};
-                    
-                    if (s.viewsByRecruiter) {
-                        Object.keys(s.viewsByRecruiter).forEach(recCode => {
-                            let recName = 'Orgánico';
-                            if (recCode !== 'ORGANICO') {
-                                const foundRec = Object.values(recruiters).find(r => r.code === recCode);
-                                recName = foundRec ? foundRec.name : recCode;
-                            }
-
-                            const key = `${jobId}_${recName}`;
+                    Object.values(clickLogs).forEach(l => {
+                        if(l && l.jobId && l.timestamp && typeof l.timestamp === 'string' && selectedMonths.includes(l.timestamp.substring(0,7))) {
+                            const j = jobs[l.jobId];
+                            const recName = l.recruiter || 'Orgánico';
+                            const key = `${l.jobId}_${recName}`;
                             
-                            // CORRECCIÓN AQUÍ: Agregamos company y whatsapp
                             if (!detailMap[key]) detailMap[key] = { 
-                                jobId: jobId, 
-                                title: j.title, 
-                                company: j.company || 'Sin Empresa', // <--- AGREGADO
-                                whatsapp: j.whatsapp || 'Sin Num',   // <--- AGREGADO
+                                jobId: l.jobId, 
+                                title: j ? j.title : 'Vacante Borrada', 
+                                company: j ? j.company : 'N/A',
+                                whatsapp: j ? j.contact : 'N/A',
                                 recruiter: recName, 
                                 views: 0, 
                                 clicks: 0 
                             };
                             
-                            detailMap[key].views = s.viewsByRecruiter[recCode];
-                        });
-                    }
-                });
+                            detailMap[key].clicks++;
+                        }
+                    });
 
-                // 2. LOGICA DE CLICS (Aquí también faltaba)
-                Object.values(clickLogs).forEach(l => {
-                    if(l && l.jobId && l.timestamp && typeof l.timestamp === 'string' && selectedMonths.includes(l.timestamp.substring(0,7))) {
-                        const j = jobs[l.jobId];
-                        const jobTitle = j ? j.title : 'Vacante Borrada';
-                        const jobCompany = j ? j.company : 'N/A'; // <--- RECUPERAMOS
-                        const jobWa = j ? j.whatsapp : 'N/A';     // <--- RECUPERAMOS
-                        const recName = l.recruiter || 'Orgánico';
-                        
-                        const key = `${l.jobId}_${recName}`;
-                        
-                        // CORRECCIÓN AQUÍ: Agregamos company y whatsapp
-                        if (!detailMap[key]) detailMap[key] = { 
-                            jobId: l.jobId, 
-                            title: jobTitle, 
-                            company: jobCompany, // <--- AGREGADO
-                            whatsapp: jobWa,     // <--- AGREGADO
-                            recruiter: recName, 
-                            views: 0, 
-                            clicks: 0 
-                        };
-                        
-                        detailMap[key].clicks++;
-                    }
-                });
+                    let detailRows = Object.values(detailMap).map(d => ({
+                        'ID Vacante': d.jobId,
+                        'Reclutador': d.recruiter,
+                        'Empresa': d.company,
+                        'Vacante': d.title,
+                        'Vistas Totales (Histórico)': d.views, 
+                        'Clics (Meses selecc.)': d.clicks,
+                        'Conversion %': d.views > 0 ? ((d.clicks / d.views) * 100).toFixed(1) + '%' : '0%',
+                        'WhatsApp Destino': d.whatsapp
+                    }));
 
-                // 3. GENERAR EXCEL FINAL
-                let detailRows = Object.values(detailMap).map(d => ({
-                    'ID Vacante': d.jobId,
-                    'Reclutador': d.recruiter,
-                    'Empresa': d.company,          // <--- AHORA SÍ YA TIENE DATOS
-                    'Vacante': d.title,
-                    'Vistas Totales (Histórico)': d.views, 
-                    'Clics (Meses selecc.)': d.clicks,
-                    'Conversion %': d.views > 0 ? ((d.clicks / d.views) * 100).toFixed(1) + '%' : '0%',
-                    'WhatsApp Destino': d.whatsapp // <--- AHORA SÍ YA TIENE DATOS
-                }));
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataRows), "Desempeño Vacantes");
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(recruiterRows), "Rendimiento Equipo");
+                    
+                    const summaryRows = [
+                        { 'Métrica': 'Periodo Analizado', 'Valor': selectedMonths.join(', ') },
+                        { 'Métrica': 'Total Vistas', 'Valor': dataRows.reduce((a,b)=>a+b['Vistas (Meses selecc.)'],0) },
+                        { 'Métrica': 'Total Clics (Leads)', 'Valor': dataRows.reduce((a,b)=>a+b['Clics WhatsApp (Meses selecc.)'],0) }
+                    ];
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryRows), "Resumen Global");
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(detailRows.length ? detailRows : [{'Mensaje': 'Sin datos'}]), "Detalle Rec-Vacante");
 
-                if (detailRows.length === 0) detailRows = [{'Mensaje': 'Aún no hay interacción detallada registrada'}];
+                    XLSX.writeFile(wb, `Reporte_TuChamba_${selectedMonths.join('_')}.xlsx`);
+                    window.showToast("✅ Reporte generado correctamente");
 
-                const wb = XLSX.utils.book_new();
-                
-                const ws1 = XLSX.utils.json_to_sheet(dataRows);
-                XLSX.utils.book_append_sheet(wb, ws1, "Desempeño Vacantes");
-
-                const ws2 = XLSX.utils.json_to_sheet(recruiterRows);
-                XLSX.utils.book_append_sheet(wb, ws2, "Rendimiento Equipo");
-
-                const summaryRows = [
-                    { 'Métrica': 'Periodo Analizado', 'Valor': selectedMonths.join(', ') },
-                    { 'Métrica': 'Total Vistas', 'Valor': dataRows.reduce((a,b)=>a+b['Vistas (Meses selecc.)'],0) },
-                    { 'Métrica': 'Total Clics (Leads)', 'Valor': dataRows.reduce((a,b)=>a+b['Clics WhatsApp (Meses selecc.)'],0) }
-                ];
-                const ws3 = XLSX.utils.json_to_sheet(summaryRows);
-                XLSX.utils.book_append_sheet(wb, ws3, "Resumen Global");
-
-                const ws4 = XLSX.utils.json_to_sheet(detailRows);
-                XLSX.utils.book_append_sheet(wb, ws4, "Detalle Rec-Vacante");
-
-                XLSX.writeFile(wb, `Reporte_TuChamba_${selectedMonths.join('_')}.xlsx`);
-            }
+                } catch (err) {
+                    console.error(err);
+                    alert("❌ Error al procesar las métricas o cargar la herramienta.");
+                }
+            };
 
             let lastClickTime = 0; 
             window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
@@ -3286,110 +3287,94 @@
                 push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
             }
 
-            // FUNCIÓN FLYER V24.6 (Depurada)
-            window.generateFlyer = function(jobId) {
+            // FUNCIÓN FLYER (Depurada para gastar menos datos)
+            window.generateFlyer = async function(jobId) {
                 const j = jobs[jobId];
                 if (!j) return;
 
-                window.showToast("🎨 Diseñando Flyer...");
-
-                // 1. Datos Básicos
-                document.getElementById('flyerTitle').innerText = j.title;
-                document.getElementById('flyerSalary').innerText = j.salary || 'Sueldo Competitivo';
-                
-                // 2. LÓGICA DE UBICACIÓN (Reforzada)
-                let locText = "";
-                
-                // Intentamos armar "Monterrey, Nuevo León"
-                if (j.city) {
-                    locText = j.city;
-                    if (j.state) locText += `, ${j.state}`;
-                } 
-                // Si falla, usamos el campo libre "location"
-                else if (j.location) {
-                    locText = j.location;
-                } 
-                // Si falla todo, ponemos un default
-                else {
-                    locText = "MÉXICO";
-                }
-
-                // INYECTAMOS EL TEXTO EN MAYÚSCULAS
-                const locElement = document.getElementById('flyerLocation');
-                if(locElement) {
-                    locElement.innerText = "📍 " + locText.toUpperCase();
-                } else {
-                    console.error("❌ ERROR: No encontré el div 'flyerLocation' en el HTML");
-                }
-
-                // 3. Beneficios
-                const benefitsList = document.getElementById('flyerBenefitsList');
-                benefitsList.innerHTML = '';
-                if(j.benefits && j.benefits.length > 0) {
-                    j.benefits.slice(0, 4).forEach(ben => {
-                        const li = document.createElement('li');
-                        li.innerText = '✅ ' + ben;
-                        benefitsList.appendChild(li);
-                    });
-                } else {
-                    benefitsList.innerHTML = '<li>✅ Prestaciones de Ley</li><li>✅ Contratación Inmediata</li>';
-                }
-
-                // 4. QR (FIX FINAL: Siempre incluye &ref= si existe en la URL o storage)
-                const qrContainer = document.getElementById('flyerQr');
-                qrContainer.innerHTML = ''; 
-
-                // Obtener el ref de forma confiable (igual que en logout)
-                const urlParams = new URLSearchParams(window.location.search);
-                let refCode = urlParams.get('ref');
-                
-                // Si no viene en la URL, intentamos fallback a storage (por si acaso)
-                if (!refCode) {
-                    refCode = sessionStorage.getItem('recruiterCode') || 
-                        localStorage.getItem('recruiterCode') || 
-                        (activeRecruiter && activeRecruiter.code);
-                }
-
-                // Construir la URL completa
-                let linkDelQr = `${window.location.origin}/?id=${jobId}`;
-                if (refCode) {
-                    linkDelQr += `&ref=${refCode.toLowerCase()}`;
-                }
-
-                // Generar QR
-                new QRCode(qrContainer, {
-                    text: linkDelQr,
-                    width: 256,
-                    height: 256,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-
-                // Opcional: Mostrar la URL en consola para debug (puedes quitar después)
-                console.log("QR generado con URL:", linkDelQr);
-
-                // 5. GENERAR IMAGEN (Con 1 segundo de espera para asegurar renderizado)
-                setTimeout(() => {
-                    const flyerNode = document.getElementById('flyerTemplate');
+                try {
+                    // 1. CARGA PEREZOSA: Solo descarga la librería si no está presente
+                    await loadExternalLibrary("https://html2canvas.hertzen.com/dist/html2canvas.min.js", "html2canvas");
                     
-                    html2canvas(flyerNode, { 
-                        scale: 2, 
-                        useCORS: true, 
-                        allowTaint: false, 
-                        backgroundColor: null 
-                    }).then(canvas => {
-                        const link = document.createElement('a');
-                        link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
-                        link.href = canvas.toDataURL();
-                        link.click();
-                        window.showToast("✅ ¡Flyer listo!");
-                    }).catch(err => {
-                        console.error(err);
-                        alert("Error: " + err.message);
+                    window.showToast("🎨 Diseñando Flyer...");
+
+                    // 2. Datos Básicos
+                    document.getElementById('flyerTitle').innerText = j.title;
+                    document.getElementById('flyerSalary').innerText = j.salary || 'Sueldo Competitivo';
+                    
+                    let locText = "";
+                    if (j.city) {
+                        locText = j.city;
+                        if (j.state) locText += `, ${j.state}`;
+                    } else if (j.location) {
+                        locText = j.location;
+                    } else {
+                        locText = "MÉXICO";
+                    }
+
+                    const locElement = document.getElementById('flyerLocation');
+                    if(locElement) {
+                        locElement.innerText = "📍 " + locText.toUpperCase();
+                    }
+
+                    // 3. Beneficios
+                    const benefitsList = document.getElementById('flyerBenefitsList');
+                    benefitsList.innerHTML = '';
+                    if(j.benefits && j.benefits.length > 0) {
+                        j.benefits.slice(0, 4).forEach(ben => {
+                            const li = document.createElement('li');
+                            li.innerText = '✅ ' + ben;
+                            benefitsList.appendChild(li);
+                        });
+                    } else {
+                        benefitsList.innerHTML = '<li>✅ Prestaciones de Ley</li><li>✅ Contratación Inmediata</li>';
+                    }
+
+                    // 4. QR (Usa la librería qrcodejs que ya tienes cargada)
+                    const qrContainer = document.getElementById('flyerQr');
+                    qrContainer.innerHTML = ''; 
+
+                    const urlParams = new URLSearchParams(window.location.search);
+                    let refCode = urlParams.get('ref') || sessionStorage.getItem('recruiterCode') || localStorage.getItem('recruiterCode');
+
+                    let linkDelQr = `${window.location.origin}/?id=${jobId}`;
+                    if (refCode) linkDelQr += `&ref=${refCode.toLowerCase()}`;
+
+                    new QRCode(qrContainer, {
+                        text: linkDelQr,
+                        width: 256,
+                        height: 256,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
                     });
-                }, 1000);
-            }
+
+                    // 5. GENERAR IMAGEN (html2canvas ya está disponible gracias al await de arriba)
+                    setTimeout(() => {
+                        const flyerNode = document.getElementById('flyerTemplate');
+                        
+                        html2canvas(flyerNode, { 
+                            scale: 2, 
+                            useCORS: true, 
+                            allowTaint: false, 
+                            backgroundColor: null 
+                        }).then(canvas => {
+                            const link = document.createElement('a');
+                            link.download = `Flyer_${j.title.replace(/\s+/g, '_')}.png`;
+                            link.href = canvas.toDataURL();
+                            link.click();
+                            window.showToast("✅ ¡Flyer listo!");
+                        }).catch(err => {
+                            console.error(err);
+                            alert("Error al generar imagen: " + err.message);
+                        });
+                    }, 1000);
+
+                } catch (err) {
+                    console.error(err);
+                    alert("❌ No se pudo cargar la herramienta de diseño: " + err.message);
+                }
+            };
 
             const visitsRef = ref(db, 'siteStats/visits');
             const monthlyRef = ref(db, `siteStats/monthly/${currentMonthKey}`);
@@ -4074,50 +4059,71 @@
             window.removeItem = function(type, i) { (type==='req'?tempReqs:tempBens).splice(i,1); updateList(type+'List', (type==='req'?tempReqs:tempBens), type); }
             function updateList(id, arr, type) { document.getElementById(id).innerHTML = arr.map((item,i)=>`<li>${item}<button onclick="removeItem('${type}',${i})" style="color:red;border:none;background:none;cursor:pointer">×</button></li>`).join(''); }
 
-            window.exportToExcel = function() {
+            window.exportToExcel = async function() {
                 if(!Object.keys(jobs).length) return alert('Sin datos');
-                const data = Object.keys(jobs).map(id => {
-                    const j = jobs[id];
-                    return { 
-                        'ID': id, 'Título': j.title, 'Empresa': j.company, 
-                        'Mostrar Empresa Publicamente': (j.showCompany === true || j.showCompany === 'true') ? 'SI' : 'NO',
-                        'Estado': j.state, 'Municipio': j.city, 'Zona': j.zone, 
-                        'Fecha': j.fecha, 
-                        'Salario': j.salary, 'Descripción': j.description, 
-                        'Jornada': j.schedule, 
-                        'Requisitos': (j.requirements||[]).join(' | '), 
-                        'Beneficios': (j.benefits||[]).join(' | '),
-                        'Contacto': j.contact, 'Estatus': j.status, 'Tipo de Servicio o Agencia': j.agency,
-                        'IMPULSAR': j.isFeatured ? 'SI' : 'NO' 
-                    };
-                });
-                const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Vacantes"); XLSX.writeFile(wb, "Respaldo_Completo.xlsx");
+                
+                try {
+                    // Carga la librería de Excel si no está
+                    await loadExternalLibrary("https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js", "XLSX");
+                    
+                    const data = Object.keys(jobs).map(id => {
+                        const j = jobs[id];
+                        return { 
+                            'ID': id, 'Título': j.title, 'Empresa': j.company, 
+                            'Mostrar Empresa Publicamente': (j.showCompany === true || j.showCompany === 'true') ? 'SI' : 'NO',
+                            'Estado': j.state, 'Municipio': j.city, 'Zona': j.zone, 
+                            'Fecha': j.fecha, 
+                            'Salario': j.salary, 'Descripción': j.description, 
+                            'Jornada': j.schedule, 
+                            'Requisitos': (j.requirements||[]).join(' | '), 
+                            'Beneficios': (j.benefits||[]).join(' | '),
+                            'Contacto': j.contact, 'Estatus': j.status, 'Tipo de Servicio o Agencia': j.agency,
+                            'IMPULSAR': j.isFeatured ? 'SI' : 'NO' 
+                        };
+                    });
+                    const ws = XLSX.utils.json_to_sheet(data); 
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Vacantes"); 
+                    XLSX.writeFile(wb, "Respaldo_Completo.xlsx");
+                } catch (err) {
+                    alert("No se pudo cargar la función de Excel: " + err.message);
+                }
             }
 
-            window.downloadTemplate = function() {
-                const data = [{
-                    'ID': 'ej-1', 
-                    'FECHA': '15/01/2026', 
-                    'TÍTULO': 'Ejemplo', 
-                    'EMPRESA': 'Empresa', 
-                    'MOSTRAR EMPRESA PUBLICAMENTE': 'SI',
-                    'ESTADO': 'CDMX', 
-                    'MUNICIPIO': 'Coyoacán', 
-                    'ZONA': 'Centro',
-                    'SALARIO': '10000', 
-                    'DESCRIPCIÓN': 'Desc...', 
-                    'JORNADA': 'Lunes a Viernes', 
-                    'ETIQUETAS': '#Ventas', 
-                    'REQUISITOS': 'Req 1 | Req 2', 
-                    'BENEFICIOS': 'Ben 1 | Ben 2', 
-                    'CONTACTO': '5512345678', 
-                    'ESTATUS': 'Vigente', 
-                    'TIPO DE SERVICIO O AGENCIA': 'Agencia Interna',
-                    'IMPULSAR': 'SI'
-                }];
-                const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); XLSX.writeFile(wb, 'plantilla.xlsx');
+            window.downloadTemplate = async function() {
+                try {
+                    // Carga la librería de Excel antes de generar la plantilla
+                    await loadExternalLibrary("https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js", "XLSX");
+
+                    const data = [{
+                        'ID': 'ej-1', 
+                        'FECHA': '15/01/2026', 
+                        'TÍTULO': 'Ejemplo', 
+                        'EMPRESA': 'Empresa S.A.', 
+                        'MOSTRAR EMPRESA PUBLICAMENTE': 'SI',
+                        'ESTADO': 'CDMX', 
+                        'MUNICIPIO': 'Coyoacán', 
+                        'ZONA': 'Centro',
+                        'SALARIO': '10000', 
+                        'DESCRIPCIÓN': 'Descripción del puesto...', 
+                        'JORNADA': 'Lunes a Viernes', 
+                        'REQUISITOS': 'Req 1 | Req 2', 
+                        'BENEFICIOS': 'Ben 1 | Ben 2', 
+                        'CONTACTO': '5512345678', 
+                        'ESTATUS': 'Vigente', 
+                        'TIPO DE SERVICIO O AGENCIA': 'Agencia Interna',
+                        'IMPULSAR': 'SI'
+                    }];
+                    const ws = XLSX.utils.json_to_sheet(data); 
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'Plantilla'); 
+                    XLSX.writeFile(wb, 'plantilla_tuchamba.xlsx');
+                    
+                    window.showToast("✅ Plantilla descargada");
+                } catch (err) {
+                    console.error(err);
+                    alert("❌ Error al cargar la herramienta de Excel.");
+                }
             }
 
             window.shareApp = async function() {
@@ -4135,88 +4141,113 @@
                 if(navigator.share) await navigator.share(data); else window.open(`https://wa.me/?text=${encodeURIComponent(data.text+' '+data.url)}`);
             }
             
-            window.importFromExcel = function(e) {
+            window.importFromExcel = async function(e) {
                 const file = e.target.files[0];
                 if (!file) return;
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    try {
-                        const data = new Uint8Array(evt.target.result);
-                        const wb = XLSX.read(data, {type:'array'});
-                        const ws = wb.Sheets[wb.SheetNames[0]];
-                        const json = XLSX.utils.sheet_to_json(ws);
-                        if(!json.length) { alert('Archivo vacío'); return; }
-                        let count = 0;
-                        
-                        const normalizeKey = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
-                        const findKey = (row, keyName) => {
-                            return Object.keys(row).find(k => normalizeKey(k) === normalizeKey(keyName));
-                        };
+                try {
+                    // 1. CARGA PEREZOSA: Solo descargamos la herramienta si intentas usarla
+                    await loadExternalLibrary("https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js", "XLSX");
 
-                        json.forEach((row, i) => {
-                            const titleKey = findKey(row, 'título');
-                            const companyKey = findKey(row, 'empresa');
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        try {
+                            const data = new Uint8Array(evt.target.result);
+                            const wb = XLSX.read(data, {type:'array'});
+                            const ws = wb.Sheets[wb.SheetNames[0]];
+                            const json = XLSX.utils.sheet_to_json(ws);
                             
-                            const title = titleKey ? row[titleKey] : null;
-                            const company = companyKey ? row[companyKey] : null;
-                            
-                            if(!title || !company) return;
-                            
-                            const id = row['ID'] || 'job-'+Date.now()+'-'+i;
-                            const state = row[findKey(row, 'estado')] || ''; 
-                            const city = row[findKey(row, 'municipio')] || ''; 
-                            const zone = row[findKey(row, 'zona')] || '';
-                            const legacyLoc = row['Ubicación'] || ''; 
-
-                            const showCompKey = findKey(row, 'mostrar empresa publicamente');
-                            let showCompanyRaw = 'SI';
-                            if (showCompKey && row[showCompKey]) {
-                                showCompanyRaw = String(row[showCompKey]).trim().toUpperCase();
+                            if(!json.length) { 
+                                alert('⚠️ El archivo parece estar vacío.'); 
+                                return; 
                             }
 
-                            const featuredKey = findKey(row, 'impulsar') || findKey(row, 'destacar') || findKey(row, 'top');
-                            let isFeaturedRaw = 'NO';
-                            if(featuredKey && row[featuredKey]) {
-                                isFeaturedRaw = String(row[featuredKey]).trim().toUpperCase();
-                            }
+                            let count = 0;
+                            // Tus funciones de limpieza de texto
+                            const normalizeKey = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+                            const findKey = (row, keyName) => {
+                                return Object.keys(row).find(k => normalizeKey(k) === normalizeKey(keyName));
+                            };
 
-                            let contactRaw = row[findKey(row, 'contacto')] || '';
-                            contactRaw = String(contactRaw).replace(/\D/g, ''); 
-                            
-                            if(contactRaw.length === 10) {
-                                contactRaw = '+52' + contactRaw;
-                            } else if (contactRaw.length > 10 && !contactRaw.startsWith('+')) {
-                                contactRaw = '+' + contactRaw;
-                            }
+                            json.forEach((row, i) => {
+                                const titleKey = findKey(row, 'título');
+                                const companyKey = findKey(row, 'empresa');
+                                const title = titleKey ? row[titleKey] : null;
+                                const company = companyKey ? row[companyKey] : null;
+                                
+                                if(!title || !company) return;
+                                
+                                // Lógica de IDs y Ubicación
+                                const id = row['ID'] || 'job-' + Date.now() + '-' + i;
+                                const state = row[findKey(row, 'estado')] || ''; 
+                                const city = row[findKey(row, 'municipio')] || ''; 
+                                const zone = row[findKey(row, 'zona')] || '';
+                                const legacyLoc = row['Ubicación'] || ''; 
 
-                            const jobData = {
-                        title: title, 
-                        company: company, 
-                        showCompany: showCompanyRaw === 'SI', 
-                        state: state, city: city, zone: zone,
-                        location: (city && state) ? `${city}, ${state}` : legacyLoc, 
-                        fecha: row[findKey(row, 'fecha')] || '', 
-                        salary: row[findKey(row, 'salario')] || '', 
-                        description: row[findKey(row, 'descripción')] || '',
-                        schedule: row[findKey(row, 'jornada')] || 'Horario a definir',
-                        // BORRADO: tags
-                        requirements: (row[findKey(row, 'requisitos')]) ? String(row[findKey(row, 'requisitos')]).split(' | ') : [],
-                        benefits: (row[findKey(row, 'beneficios')]) ? String(row[findKey(row, 'beneficios')]).split(/\s*\|\s*/) : [],
-                        contact: contactRaw, 
-                        status: row[findKey(row, 'estatus')] || 'Vigente',
-                        agency: row[findKey(row, 'tipo de servicio o agencia')] || '',
-                        isFeatured: isFeaturedRaw === 'SI' 
+                                // Configuración de visibilidad
+                                const showCompKey = findKey(row, 'mostrar empresa publicamente');
+                                let showCompanyRaw = 'SI';
+                                if (showCompKey && row[showCompKey]) {
+                                    showCompanyRaw = String(row[showCompKey]).trim().toUpperCase();
+                                }
+
+                                // Configuración de Vacante Destacada
+                                const featuredKey = findKey(row, 'impulsar') || findKey(row, 'destacar') || findKey(row, 'top');
+                                let isFeaturedRaw = 'NO';
+                                if(featuredKey && row[featuredKey]) {
+                                    isFeaturedRaw = String(row[featuredKey]).trim().toUpperCase();
+                                }
+
+                                // Limpieza de Teléfono y Lada
+                                let contactRaw = row[findKey(row, 'contacto')] || '';
+                                contactRaw = String(contactRaw).replace(/\D/g, ''); 
+                                
+                                if(contactRaw.length === 10) {
+                                    contactRaw = '+52' + contactRaw;
+                                } else if (contactRaw.length > 10 && !contactRaw.startsWith('+')) {
+                                    contactRaw = '+' + contactRaw;
+                                }
+
+                                // Armado del objeto para Firebase
+                                const jobData = {
+                                    title: title, 
+                                    company: company, 
+                                    showCompany: showCompanyRaw === 'SI', 
+                                    state: state, 
+                                    city: city, 
+                                    zone: zone,
+                                    location: (city && state) ? `${city}, ${state}` : legacyLoc, 
+                                    fecha: row[findKey(row, 'fecha')] || '', 
+                                    salary: row[findKey(row, 'salario')] || '', 
+                                    description: row[findKey(row, 'descripción')] || '',
+                                    schedule: row[findKey(row, 'jornada')] || 'Horario a definir',
+                                    requirements: (row[findKey(row, 'requisitos')]) ? String(row[findKey(row, 'requisitos')]).split(' | ') : [],
+                                    benefits: (row[findKey(row, 'beneficios')]) ? String(row[findKey(row, 'beneficios')]).split(/\s*\|\s*/) : [],
+                                    contact: contactRaw, 
+                                    status: row[findKey(row, 'estatus')] || 'Vigente',
+                                    agency: row[findKey(row, 'tipo de servicio o agencia')] || '',
+                                    isFeatured: isFeaturedRaw === 'SI' 
+                                };
+
+                                // Guardado en tiempo real
+                                set(ref(db, 'jobs/' + id), jobData);
+                                count++;
+                            });
+
+                            window.showToast(`✅ ${count} vacantes cargadas con éxito`);
+                        } catch(err) { 
+                            console.error(err);
+                            alert('❌ Error al procesar los datos del archivo.'); 
+                        }
+                        e.target.value = ''; 
                     };
-                            set(ref(db, 'jobs/' + id), jobData);
-                            count++;
-                        });
-                        window.showToast(`✅ ${count} vacantes cargadas`);
-                    } catch(err) { alert('Error: ' + err.message); }
-                    e.target.value = '';
-                };
-                reader.readAsArrayBuffer(file);
-                };
+                    reader.readAsArrayBuffer(file);
+
+                } catch (err) {
+                    console.error(err);
+                    alert("❌ No se pudo cargar la librería necesaria para importar el archivo.");
+                }
+            };
                 
                 // --- MOTOR SEO (V25.10) ---
             function updateJobSEO(j, id) {
