@@ -1295,48 +1295,65 @@
             CORRECCIÓN FINAL MÓVIL: HOMOLOGACIÓN TOTAL (V20.3) 📏
             (Incluye: Compartir, Salir y el Rebelde "Copiar Link")
             ================================================================= */
-            @media (max-width: 768px) {
-                
-                /* 1. CONTENEDOR: Forzar una sola línea centrada */
+           @media (max-width: 768px) {
+                /* 1. CONTENEDOR: Forzamos que todo quepa en una línea sin saltar */
                 .header-buttons {
                     display: flex !important;
-                    flex-wrap: nowrap !important;   /* Prohibido bajar de línea */
-                    align-items: center !important; /* Alineación vertical perfecta */
-                    gap: 5px !important;            /* Espacio mínimo vital */
+                    flex-wrap: nowrap !important;   
+                    align-items: center !important; 
+                    gap: 6px !important;            
+                    width: auto !important;
                 }
 
-                /* 2. LA DIETA PAREJA: Todos los botones al mismo tamaño */
-                /* AGREGAMOS AQUÍ: .copy-link-btn y #btnRecruiterLink */
-                .header-buttons button, 
+                /* 2. BOTONES SECUNDARIOS (Compartir, Copiar Link, etc.) */
+                .header-buttons button:not([onclick="logout()"]), 
                 .header-buttons a,
                 #mainShareBtn,
                 .copy-link-btn {
-                    height: 30px !important;        /* Altura compacta para todos */
-                    line-height: 1 !important;      /* Centrado de texto vertical */
-                    padding: 0 10px !important;     /* Relleno lateral igual */
-                    font-size: 11px !important;     /* Letra chica uniforme */
-                    white-space: nowrap !important; /* Texto en una línea */
-                    
-                    /* Centrado del contenido interno (íconos + texto) */
+                    height: 32px !important;
+                    padding: 0 10px !important;
+                    font-size: 11px !important;
+                    white-space: nowrap !important;
                     display: inline-flex !important;
                     align-items: center !important;
                     justify-content: center !important;
-                    
-                    margin: 0 !important; /* Sin márgenes extraños */
+                    flex-shrink: 1 !important; /* Se encogen si es necesario */
+                    margin: 0 !important;
                 }
 
-                /* 3. Ajuste Específico para el Botón Azul (Copiar Link) en Celular */
+                /* 3. EL BOTÓN DE SALIR (PROTAGONISTA) */
+                .header-buttons button[onclick="logout()"] {
+                    height: 32px !important;
+                    padding: 0 18px !important; /* Más ancho para que sea fácil de picar */
+                    font-size: 13px !important; /* Letra más grande que el resto */
+                    font-weight: 900 !important; /* Letra bien gruesa */
+                    background-color: #333 !important; /* Negro sólido */
+                    color: white !important;
+                    border-radius: 50px !important;
+                    flex-grow: 2 !important; /* Toma el espacio extra disponible */
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    white-space: nowrap !important;
+                    margin: 0 !important;
+                }
+
+                /* 4. Ajustes de color específicos que ya tenías */
                 .copy-link-btn {
-                    border-radius: 50px !important; /* Mantener óvalo */
-                    background-color: #e3f2fd !important; /* Asegurar fondo azul */
-                    width: auto !important; /* Que se ajuste al texto */
+                    background-color: #e3f2fd !important;
                 }
 
-                /* 4. Ajuste Específico para el Botón Naranja (Compartir) */
                 #mainShareBtn {
                     border-width: 1px !important;
                 }
             }
+
+
+
+
+
+
+
 
             /* =========================================================
             CORRECCIÓN: ALINEACIÓN VERTICAL PERFECTA (V20.4) 📐
