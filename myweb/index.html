@@ -1688,14 +1688,30 @@
                     margin: 10px 5px !important; /* Margen externo */
                     position: static !important;
                 }
-
-                /* EL GRID 2-3-3 */
+                
+            /* EL GRID 2-3-3 */
                 body.admin-mode .admin-controls-wrapper {
-                    display: grid !important;
-                    grid-template-columns: repeat(6, 1fr) !important; 
-                    gap: 8px !important; /* Un poco más de aire ahora que hay fondo */
-                }
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important; 
+                gap: 6px !important;
+                padding: 5px !important;
+            }
 
+            body.admin-mode .admin-controls-wrapper button, 
+            body.admin-mode .admin-controls-wrapper .tool-btn,
+            body.admin-mode .admin-controls-wrapper #viewToggleBtn,
+            body.admin-mode .admin-controls-wrapper .add-job-btn {
+                grid-column: span 1 !important; 
+                width: 100% !important;
+                height: 50px !important;
+                font-size: 9px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                text-align: center !important;
+            }
+                
                 /* Estilo Base Botones Móvil */
                 body.admin-mode button {
                     margin: 0 !important;
@@ -2000,9 +2016,8 @@
                         <button class="tool-btn" onclick="exportToExcel()">📦 Respaldo</button> 
                         <button class="tool-btn metrics-btn" onclick="openMetricsModal()">📊 Métricas</button>
                         <button class="tool-btn team-btn admin-only" onclick="openTeamModal()">👥 Equipo</button>
-                        
                         <button class="tool-btn settings-btn admin-only" onclick="openSettingsModal()">⚙️ Ajustes</button>
-                        <button class="tool-btn admin-only" onclick="document.getElementById('excelFile').click()">📤 Cargar</button>
+                        <button class="tool-btn admin-only" onclick="window.downloadSitemap()" style="background-color: #FF9800; color: white; display: none;">🗺️ Sitemap SEO</button>
                         <button class="tool-btn" onclick="downloadTemplate()">📋 Plantilla</button>
                         <button class="tool-btn" onclick="window.downloadSitemap()" style="background-color: #FF9800; color: white;">🗺️ Sitemap SEO</button>
                         <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
@@ -2304,29 +2319,29 @@
             const today = new Date();
             const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
             
-            // --- TAREA 13: LÓGICA DE REFERIDOS BLINDADA (V26.2) ---
+        // --- TAREA 13: LÓGICA DE REFERIDOS BLINDADA (V26.2) ---
+         // --- LÓGICA DE REFERIDOS INTELIGENTE (V26.9) ---
             const urlParams = new URLSearchParams(window.location.search);
-            // 1. Detectamos si la URL trae un referido hoy
             let refEnUrl = urlParams.get('ref');
-            // 2. Si hay referido en URL, lo guardamos para que mande los WhatsApps a ese reclutador
-            if (refEnUrl) {
-            localStorage.setItem('recruiterCode', refEnUrl.toUpperCase());
-            }
-            // 3. El código "maestro" de la sesión es lo que está en memoria
-            let refCode = localStorage.getItem('recruiterCode');
-            function actualizarBotonLogin() {
-                    const botonAdmin = document.querySelector('.admin-toggle-link');
-                    if (!botonAdmin) return;
 
-                    // LÓGICA DE VISIBILIDAD:
-                    // Solo ocultamos el botón si la URL trae un ?ref=... 
-                    // Si la URL está limpia (Original), el botón APARECE para que puedas loguearte.
-                    if (urlParams.has('ref')) {
-                        botonAdmin.style.display = 'none';
-                    } else {
-                        botonAdmin.style.display = 'block';
-                    }
-            }
+            if (refEnUrl) {
+                localStorage.setItem('recruiterCode', refEnUrl.toUpperCase());
+            } 
+
+                let refCode = localStorage.getItem('recruiterCode');
+
+        function actualizarBotonLogin() {
+                const botonAdmin = document.querySelector('.admin-toggle-link');
+                if (!botonAdmin) return;
+    
+                // Si la URL tiene ?ref= se oculta (Vista Candidato).
+                // Si la URL NO tiene ?ref= aparece (Vista Admin/Reclu).
+                if (urlParams.has('ref')) {
+                    botonAdmin.style.display = 'none';
+                } else {
+                    botonAdmin.style.display = 'block';
+                }
+        }
 
             // Ejecutamos la revisión
             actualizarBotonLogin();
@@ -2641,32 +2656,28 @@
         window.logout = function() {
             if (!confirm("¿Salir de la aplicación?")) return;
 
-            // 1. CAPTURAR EL CÓDIGO ANTES DE BORRAR MEMORIA
-            // Buscamos si hay un referido en la URL o en la memoria actual
+            // 1. Detectamos si la URL actual tiene un referido
             const urlParams = new URLSearchParams(window.location.search);
-            let savedRef = urlParams.get('ref'); 
-            if (!savedRef) {
-                savedRef = sessionStorage.getItem('recruiterCode');
-            }
+            const tieneRefEnUrl = urlParams.get('ref');
 
-            // 2. Feedback visual
             document.body.style.opacity = "0.5";
             document.body.style.pointerEvents = "none";
 
-            // 3. LIMPIEZA TOTAL (Igual que antes)
+            // 2. Limpieza de credenciales
             localStorage.removeItem('iamsuperadmin');
             localStorage.removeItem('isGuest');
-            localStorage.clear();
-            sessionStorage.clear(); // Aquí se borra el código viejo...
+            // Nota: No usamos .clear() para no romper el almacenamiento de otros datos, 
+            // pero si prefieres reset total usa localStorage.clear();
 
-            // 4. PREPARAR EL DESTINO
-            // Si teníamos referido, lo volvemos a pegar a la URL de destino
-            let targetUrl = window.location.origin;
-            if (savedRef) {
-                targetUrl += `/?ref=${savedRef}`; // <--- ¡AQUÍ ESTÁ EL TRUCO!
+            // 3. Determinar destino
+            let targetUrl = window.location.origin + window.location.pathname;
+    
+            // Si la barra de direcciones tiene ref, lo mantiene. 
+            // Si entraste limpio (Admin/Reclu), sales limpio.
+            if (tieneRefEnUrl) {
+                targetUrl += `?ref=${tieneRefEnUrl}`;
             }
 
-            // 5. SALIDA SEGURA
             try {
                 if (typeof auth !== 'undefined' && auth && auth.currentUser) {
                     signOut(auth)
@@ -2676,11 +2687,9 @@
                     window.location.href = targetUrl;
                 }
             } catch (e) {
-                console.error("Forzando salida:", e);
                 window.location.href = targetUrl;
             }
         };
-
 
             function showLogin() { 
                 document.getElementById('loginScreen').style.display = 'block'; 
