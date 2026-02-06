@@ -4372,23 +4372,32 @@
             ========================================================= */
 
             // 1. DESCARGAR BASE (Si ya la tienes arriba, no dupliques, pero si la borraste, aquí va)
-            window.downloadRecruitersDB = function() {
-                if (!recruiters || Object.keys(recruiters).length === 0) return window.showToast("❌ Sin datos");
-                
-                const data = Object.values(recruiters).map(r => ({
-                    'NOMBRE': r.name,
-                    'NÚMERO': r.phone,
-                    'CÓDIGO/USUARIO': r.code,
-                    'LINK PERSONAL': `${window.location.origin}/?ref=${r.code.toLowerCase()}`
-                }));
+            window.downloadRecruiters = async function() {
+                try {
+                    // 1. CARGA PEREZOSA: Traemos la librería de Excel si no está lista
+                    await loadExternalLibrary("https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js", "XLSX");
 
-                const ws = XLSX.utils.json_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Reclutadores");
-                
-                const dateStr = new Date().toISOString().split('T')[0];
-                XLSX.writeFile(wb, `Base_Reclutadores_${dateStr}.xlsx`);
-                window.showToast("✅ Base descargada");
+                    if(!Object.keys(recruiters).length) return alert('Sin datos de reclutadores');
+                    
+                    window.showToast("📂 Generando lista de reclutadores...");
+
+                    const data = Object.keys(recruiters).map(id => ({
+                        'ID': id,
+                        'Nombre': recruiters[id].name,
+                        'Código': recruiters[id].code,
+                        'Teléfono': recruiters[id].phone || 'No registrado'
+                    }));
+
+                    const ws = XLSX.utils.json_to_sheet(data);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Reclutadores");
+                    XLSX.writeFile(wb, "Base_Reclutadores.xlsx");
+                    
+                    window.showToast("✅ Descarga completa");
+                } catch (err) {
+                    console.error(err);
+                    alert("❌ Error al cargar la herramienta de Excel: " + err.message);
+                }
             };
 
             // 2. MÓDULO DE EQUIPO (EL QUE FALTABA)
