@@ -1111,6 +1111,9 @@
                 body.recruiter-view .metrics-btn { background: #7b1fa2 !important; }
                 body.recruiter-view button[onclick*="exportToExcel"] { background: #2c3e50 !important; }
                 body.recruiter-view button[onclick*="downloadTemplate"] { background: #455a64 !important; }
+                body.recruiter-view #seoSitemapBtn {
+                    display: none !important;
+                }
             }
 
             /* =========================================================
@@ -1707,17 +1710,17 @@
                     align-items: center; justify-content: center; gap: 4px;
                 }
 
-                /* POSICIONES */
-                #viewToggleBtn { grid-column: span 3 !important; background: #004d40 !important; }
-                .add-job-btn   { grid-column: span 3 !important; }
+                /* POSICIONES - 3 botones en primera fila (Vista + Sitemap + Nueva) */
+                #viewToggleBtn      { order: 1; grid-column: span 2 !important; background: #004d40 !important; }
+                #seoSitemapBtn      { order: 2; grid-column: span 2 !important; background: #FF9800 !important; color: white !important; }
+                .add-job-btn        { order: 3; grid-column: span 2 !important; }
 
-                button[onclick*="exportToExcel"] { grid-column: span 2 !important; font-size: 10px !important; }
-                .metrics-btn                     { grid-column: span 2 !important; font-size: 10px !important; }
-                .team-btn                        { grid-column: span 2 !important; font-size: 10px !important; }
-
-                .settings-btn                    { grid-column: span 2 !important; font-size: 10px !important; }
-                button[onclick*="excelFile"]     { grid-column: span 2 !important; font-size: 10px !important; }
-                button[onclick*="downloadTemplate"] { grid-column: span 2 !important; font-size: 10px !important; }
+                button[onclick*="exportToExcel"] { grid-column: span 2 !important; }
+                .metrics-btn                     { grid-column: span 2 !important; }
+                .team-btn                        { grid-column: span 2 !important; }
+                .settings-btn                    { grid-column: span 2 !important; }
+                button[onclick*="excelFile"]     { grid-column: span 2 !important; }
+                button[onclick*="downloadTemplate"] { grid-column: span 2 !important; }
             }
 
             /* =========================================================
@@ -1882,13 +1885,12 @@
                     margin-bottom: 5px !important;
                     min-height: auto !important; /* Evita huecos extraños */
                 }
+                                body.recruiter-view #seoSitemapBtn {
+                    display: none !important;
+                }
             }
 
-            
-
-
-
-
+        
 
         </style>    
     </head>
@@ -2000,11 +2002,10 @@
                         <button class="tool-btn" onclick="exportToExcel()">📦 Respaldo</button> 
                         <button class="tool-btn metrics-btn" onclick="openMetricsModal()">📊 Métricas</button>
                         <button class="tool-btn team-btn admin-only" onclick="openTeamModal()">👥 Equipo</button>
-                        
                         <button class="tool-btn settings-btn admin-only" onclick="openSettingsModal()">⚙️ Ajustes</button>
                         <button class="tool-btn admin-only" onclick="document.getElementById('excelFile').click()">📤 Cargar</button>
                         <button class="tool-btn" onclick="downloadTemplate()">📋 Plantilla</button>
-                        <button class="tool-btn" onclick="window.downloadSitemap()" style="background-color: #FF9800; color: white;">🗺️ Sitemap SEO</button>
+                        <button id="seoSitemapBtn" class="tool-btn" onclick="window.downloadSitemap()" style="background-color: #FF9800; color: white;">🗺️ Sitemap SEO</button>
                         <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
                     </div>
                 </div>
@@ -2637,33 +2638,29 @@
                 setAdminMode(false); 
             }
 
-        // FUNCIÓN SALIR INTELIGENTE (V24.1 - PRESERVA REFERIDOS) 🧠🔗
+        // FUNCIÓN SALIR INTELIGENTE (V25.0 - SOLO PRESERVA REF SI ESTABA EN LA URL ORIGINAL)
         window.logout = function() {
             if (!confirm("¿Salir de la aplicación?")) return;
 
-            // 1. CAPTURAR EL CÓDIGO ANTES DE BORRAR MEMORIA
-            // Buscamos si hay un referido en la URL o en la memoria actual
+            // 1. SOLO tomamos el ?ref= que realmente traía la URL al entrar
+            //    (Admin y Reclutador entran sin ?ref= → siempre salen al link limpio)
             const urlParams = new URLSearchParams(window.location.search);
-            let savedRef = urlParams.get('ref'); 
-            if (!savedRef) {
-                savedRef = sessionStorage.getItem('recruiterCode');
-            }
+            const savedRef = urlParams.get('ref');
 
             // 2. Feedback visual
             document.body.style.opacity = "0.5";
             document.body.style.pointerEvents = "none";
 
-            // 3. LIMPIEZA TOTAL (Igual que antes)
+            // 3. LIMPIEZA TOTAL
             localStorage.removeItem('iamsuperadmin');
             localStorage.removeItem('isGuest');
             localStorage.clear();
-            sessionStorage.clear(); // Aquí se borra el código viejo...
+            sessionStorage.clear();
 
-            // 4. PREPARAR EL DESTINO
-            // Si teníamos referido, lo volvemos a pegar a la URL de destino
-            let targetUrl = window.location.origin;
+            // 4. DESTINO
+                let targetUrl = window.location.origin;
             if (savedRef) {
-                targetUrl += `/?ref=${savedRef}`; // <--- ¡AQUÍ ESTÁ EL TRUCO!
+                targetUrl += `/?ref=${savedRef}`;
             }
 
             // 5. SALIDA SEGURA
