@@ -3258,29 +3258,42 @@
 
             let lastClickTime = 0; 
             window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
-                const now = Date.now(); // <--- Aquí ya dice "const" correctamente
+                const now = Date.now(); 
                 if (now - lastClickTime < 5000) return; 
                 lastClickTime = now;
+
+                // 1. Google Analytics (Añadimos el evento para que GA4 también lo mida)
+                if (typeof gtag === 'function') {
+                    const job = jobs[jobId] || {};
+                    gtag('event', 'contact_click', {
+                        'job_title': job.title || 'Desconocido',
+                        'job_id': jobId,
+                        'company': job.company || 'N/A',
+                        'recruiter': recruiterName || 'directo'
+                    });
+                }
 
                 btn.disabled = true;
                 btn.innerHTML = '🔄 Abriendo...';
 
+                // 2. Registro detallado en Firebase (Logs)
                 const logRef = push(ref(db, 'clickLogs'));
                 set(logRef, {
                     jobId: jobId,
                     recruiter: recruiterName || 'directo',
-                    timestamp: new Date().toISOString(), // Usamos formato ISO para el Excel
+                    timestamp: new Date().toISOString(),
                     userAgent: navigator.userAgent
                 });
 
+                // 3. Incremento del contador público (Coincide con tus reglas nuevas)
                 runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
 
                 setTimeout(() => {
-                 window.open(link, '_blank');
+                    window.open(link, '_blank');
                     btn.disabled = false;
                     btn.innerHTML = '¡PIDE INFORMES Y EMPIEZA YA! 📲';
                 }, 500);
-            }; 
+            };
 
             window.registerClick = function(jobId, recruiterName) {
                 runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
