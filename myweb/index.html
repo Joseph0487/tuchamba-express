@@ -2604,6 +2604,7 @@
                         sessionStorage.removeItem('isGuest');
                         // Guardamos sesión para sobrevivir al cierre de navegador
                         sessionStorage.setItem('recruiterCode', foundRec.code.toLowerCase());
+                        localStorage.setItem('recruiterCode', foundRec.code.toLowerCase());
                         sessionStorage.setItem('isRecruiterSession', 'true'); 
                         
                         // ÉXITO: Recarga limpia
@@ -4516,3 +4517,4 @@
 
     </body>
     </html>
+
