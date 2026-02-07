@@ -4411,7 +4411,7 @@
                         return {
                             'Nombre': r.name || 'N/A',
                             'Código': r.code || 'N/A',
-                            'Teléfono': r.phone || '', // Bajamos el número tal cual está en Firebase
+                            'Teléfono': r.phone || '', // Baja el número directo de la base
                             'Link Personal': `${window.location.origin}/?ref=${r.code.toLowerCase()}`
                         };
                     });
@@ -4497,21 +4497,15 @@
                 const name = document.getElementById('recName').value.trim();
                 const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
                 
+                // 1. Obtenemos los valores de los dos campos
                 const ladaSelect = document.getElementById('recPhoneCode').value; // Ej: +52
-                const ladaLimpia = ladaSelect.replace(/\D/g, ''); // 52
-                let numeroInput = document.getElementById('recPhone').value.trim().replace(/\D/g, ''); 
+                const numeroInput = document.getElementById('recPhone').value.trim();
                 
                 if (!name || !numeroInput || !code) return alert('⚠️ Llena todos los campos');
 
-                // --- VALIDACIÓN ANTIDUPLICADOS ---
-                // Si el usuario escribió un número que ya empieza con la lada seleccionada,
-                // se la quitamos del input para que al unirla no se repita.
-                if (numeroInput.startsWith(ladaLimpia) && numeroInput.length > 10) {
-                    numeroInput = numeroInput.substring(ladaLimpia.length);
-                }
-
-                // Unimos la lada del combo con el número limpio
-                const phoneFull = ladaLimpia + numeroInput; 
+                // 2. UNIÓN TOTAL: Pegamos lada + número y quitamos todo lo que no sea dígito
+                // Esto garantiza que se guarde como 529512348671
+                const phoneFull = (ladaSelect + numeroInput).replace(/\D/g, ''); 
 
                 const recruiterData = { 
                     name: name, 
@@ -4523,7 +4517,7 @@
 
                 set(ref(db, 'recruiters/' + idToSave), recruiterData)
                     .then(() => {
-                        window.showToast('✅ Guardado con éxito: ' + phoneFull); // Aquí verás el número real en el cuadro negro
+                        window.showToast('✅ Guardado en Base de Datos: ' + phoneFull);
                         resetRecruiterForm();    
                         renderRecruitersTable(); 
                     });
@@ -4536,17 +4530,9 @@
                 document.getElementById('recName').value = r.name;
                 document.getElementById('recCode').value = r.code;
                 
-                // --- LIMPIEZA PARA EL INPUT ---
-                // Tomamos el número de la base (ej: 52951...) y le quitamos la lada
-                // para que en el cuadrito solo veas los 10 dígitos.
-                const ladaActual = document.getElementById('recPhoneCode').value.replace(/\D/g, '');
-                let phoneDisplay = r.phone || '';
-                
-                if (phoneDisplay.startsWith(ladaActual)) {
-                    phoneDisplay = phoneDisplay.substring(ladaActual.length);
-                }
-                
-                document.getElementById('recPhone').value = phoneDisplay; 
+                // Cargamos el número tal cual está guardado (ej: 529512348671)
+                // Así puedes borrar los primeros dígitos si la lada estaba mal
+                document.getElementById('recPhone').value = r.phone; 
                 
                 editingRecruiterId = key;
                 const btnSave = document.getElementById('btnSaveRecruiter');
