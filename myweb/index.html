@@ -4387,49 +4387,51 @@
             (Incluye: Descargas, Equipo, Directorio y Accesos)
             ========================================================= */
 
-            // --- HERRAMIENTA CORREGIDA: DESCARGAR BASE DE RECLUTADORES ---
+            // --- HERRAMIENTA CORREGIDA: DESCARGAR BASE DE RECLUTADORES (SIN DUPLICADOS) ---
             window.downloadRecruiters = async function() {
+                // 1. Candado de seguridad para evitar doble descarga
+                if (window.isDownloadingRecruiters) return;
+                window.isDownloadingRecruiters = true;
+
                 try {
-                    // 1. CARGA PEREZOSA: Traemos la librería de Excel
+                    // 2. Carga la librería solo si no existe
                     await loadExternalLibrary("https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js", "XLSX");
 
-                    // 2. VALIDACIÓN: Revisamos si hay datos
                     if(!recruiters || Object.keys(recruiters).length === 0) {
-                        alert('⚠️ No hay reclutadores registrados para descargar.');
+                        alert('⚠️ No hay reclutadores registrados.');
+                        window.isDownloadingRecruiters = false;
                         return;
                     }
                     
-                    window.showToast("📂 Generando Excel de Reclutadores...");
+                    window.showToast("📂 Generando Excel...");
 
-                    // 3. MAPEO DE DATOS: Quitamos el signo + para que Excel no lo tome como fórmula
+                    // 3. Mapeo de datos (Puro número y sin ID)
                     const data = Object.keys(recruiters).map(id => {
                         const r = recruiters[id];
-                        // Limpiamos el teléfono de cualquier cosa que no sea número para el Excel
-                        const purePhone = r.phone ? r.phone.replace(/\D/g, '') : '';
-                        
                         return {
                             'Nombre': r.name || 'N/A',
                             'Código': r.code || 'N/A',
-                            'Teléfono': purePhone, // Solo números
+                            'Teléfono': r.phone ? r.phone.replace(/\D/g, '') : '',
                             'Link Personal': `${window.location.origin}/?ref=${r.code.toLowerCase()}`
                         };
                     });
 
-                    // 4. GENERACIÓN DEL ARCHIVO (Limpio de IDs técnicos)
+                    // 4. Generación y descarga
                     const ws = XLSX.utils.json_to_sheet(data);
                     const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Directorio Equipo");
+                    XLSX.utils.book_append_sheet(wb, ws, "Reclutadores");
                     
                     XLSX.writeFile(wb, "Base_Reclutadores_TuChamba.xlsx");
-                    window.showToast("✅ Base descargada con Links Personales");
-                    
-                    // 5. DESCARGA
-                    XLSX.writeFile(wb, "Base_Reclutadores_TuChamba.xlsx");
-                    window.showToast("✅ Base descargada con éxito");
+                    window.showToast("✅ Descarga completa");
 
                 } catch (err) {
-                    console.error("Error en descarga:", err);
-                    alert("❌ Error al procesar el archivo Excel: " + err.message);
+                    console.error("Error:", err);
+                    alert("❌ Error al descargar.");
+                } finally {
+                    // 5. Liberamos el candado después de un segundo
+                    setTimeout(() => {
+                        window.isDownloadingRecruiters = false;
+                    }, 1000);
                 }
             };
 
