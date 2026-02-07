@@ -2296,13 +2296,13 @@
                 <h3 style="font-size:16px; margin-bottom:10px; color:#555;">📂 Directorio Activo</h3>
                 <div class="table-container-pro" style="max-height: 350px; overflow-y: auto; position: relative; border: 1px solid #eee; border-radius: 10px;">
                     <table class="recruiters-table" style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-                        <thead style="position: sticky; top: 0; z-index: 10; background: #007bff;">
+                        <thead style="position: sticky; top: 0; z-index: 10; background: #007bff; color: white;">
                             <tr>
-                                <th style="width: 40px; color: white; padding: 12px 5px; font-size: 11px; text-align: center; border: none;">#</th>
-                                <th style="width: 40%; color: white; padding: 12px 10px; font-size: 11px; text-align: left; border: none;">Nombre</th>
-                                <th style="width: 80px; color: white; padding: 12px 10px; font-size: 11px; text-align: left; border: none;">Código</th>
-                                <th style="width: 60px; color: white; padding: 12px 5px; font-size: 11px; text-align: center; border: none;">Link</th>
-                                <th style="width: 90px; color: white; padding: 12px 10px; font-size: 11px; text-align: right; border: none;">Acciones</th>
+                                <th style="width: 40px; padding: 10px; font-size: 11px; text-align: center;">#</th>
+                                <th style="width: 45%; padding: 10px; font-size: 11px; text-align: left;">Nombre</th>
+                                <th style="width: 80px; padding: 10px; font-size: 11px; text-align: left;">Código</th>
+                                <th style="width: 50px; padding: 10px; font-size: 11px; text-align: center;">Link</th>
+                                <th style="width: 80px; padding: 10px; font-size: 11px; text-align: right;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="recruitersList">
@@ -4488,7 +4488,6 @@
                     return;
                 }
 
-                // Dibujamos la tabla
                 list.innerHTML = Object.keys(recruiters).map((key, index) => {
                     const r = recruiters[key];
                     const personalLink = `${window.location.origin}/?ref=${r.code.toLowerCase()}`;
@@ -4496,18 +4495,22 @@
                     return `
                     <tr style="border-bottom: 1px solid #eee;">
                         <td style="text-align: center; font-size: 11px; color: #888; font-weight: bold; padding: 10px;">${index + 1}</td>
-                        <td style="padding: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        
+                        <td style="padding: 10px;">
                             <div style="font-weight: bold; color: #333; font-size: 12px;">${r.name}</div>
                             <div style="font-size: 10px; color: #007bff;">📱 ${r.phone}</div>
                         </td>
+                        
                         <td style="padding: 10px;">
                             <span style="background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px;">
                                 ${r.code}
                             </span>
                         </td>
+                        
                         <td style="padding: 10px; text-align: center;">
                             <button onclick="copyRecruiterLink('${personalLink}')" style="background: #f5f5f5; border: 1px solid #ccc; padding: 6px; border-radius: 6px; cursor: pointer; font-size: 12px;">🔗</button>
                         </td>
+                        
                         <td style="padding: 10px; text-align: right; white-space: nowrap;">
                             <button onclick="editRecruiter('${key}')" style="border: none; background: transparent; cursor: pointer; font-size: 16px;">✏️</button>
                             <button onclick="deleteRecruiter('${key}')" style="border: none; background: transparent; cursor: pointer; font-size: 16px; color: #d32f2f; margin-left: 8px;">🗑️</button>
