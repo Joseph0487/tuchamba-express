@@ -4494,29 +4494,46 @@
             };
 
             window.saveRecruiter = function() {
-                const name = document.getElementById('recName').value.trim();
-                const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
-                const ladaCombo = document.getElementById('recPhoneCode').value.replace(/\D/g, ''); // Ej: 52 o 54
-                let numeroCaja = document.getElementById('recPhone').value.trim().replace(/\D/g, '');
+                // 1. Jalamos los elementos
+                const nameInput = document.getElementById('recName');
+                const codeInput = document.getElementById('recCode');
+                const ladaSelect = document.getElementById('recPhoneCode');
+                const phoneInput = document.getElementById('recPhone');
+
+                const name = nameInput.value.trim();
+                const code = codeInput.value.toUpperCase().replace(/\s/g, '');
+                
+                // 2. Limpiamos la lada (ej: +52 -> 52) y el número de la caja
+                const ladaLimpia = ladaSelect.value.replace(/\D/g, ''); 
+                let numeroCaja = phoneInput.value.trim().replace(/\D/g, '');
 
                 if (!name || !numeroCaja || !code) return alert('⚠️ Llena todos los campos');
 
-                // Si el usuario por error pegó el número con lada en la caja, se la quitamos para no duplicar
-                if (numeroCaja.startsWith(ladaCombo) && numeroCaja.length > 10) {
-                    numeroCaja = numeroCaja.substring(ladaCombo.length);
+                // 3. Evitamos duplicados: Si escribiste la lada en la caja, se la quitamos
+                if (numeroCaja.startsWith(ladaLimpia) && numeroCaja.length > 10) {
+                    numeroCaja = numeroCaja.substring(ladaLimpia.length);
                 }
 
-                const phoneFull = ladaCombo + numeroCaja; 
+                // 4. LA UNIÓN FINAL: Este es el número que va a misa
+                const phoneFull = ladaLimpia + numeroCaja; 
 
-                const recruiterData = { name, phone: phoneFull, code };
+                const recruiterData = { 
+                    name: name, 
+                    phone: phoneFull, 
+                    code: code 
+                };
+
                 const idToSave = editingRecruiterId || 'rec-' + Date.now();
 
+                // 5. Guardamos y mostramos la confirmación REAL
                 set(ref(db, 'recruiters/' + idToSave), recruiterData)
                     .then(() => {
-                        window.showToast('✅ Cambios guardados: ' + phoneFull);
+                        // El cuadrito negro ahora dirá exactamente lo que se mandó a la base
+                        window.showToast('✅ Guardado en Base: ' + phoneFull);
                         resetRecruiterForm();    
                         renderRecruitersTable(); 
-                    });
+                    })
+                    .catch(err => alert('❌ Error al guardar: ' + err.message));
             };
 
             window.editRecruiter = function(key) {
@@ -4530,28 +4547,25 @@
                 const ladaSelect = document.getElementById('recPhoneCode');
                 const phoneInput = document.getElementById('recPhone');
 
-                // --- MEMORIA DE LADA ---
+                // --- LÓGICA DE MEMORIA ---
                 let ladaEncontrada = "";
-                // Buscamos en el combo cuál país coincide con el inicio del teléfono
-                for (let option of ladaSelect.options) {
+                // Buscamos en el combo qué lada coincide con el inicio del número
+                for (let i = 0; i < ladaSelect.options.length; i++) {
+                    const option = ladaSelect.options[i];
                     const ladaLimpia = option.value.replace(/\D/g, ''); 
-                    if (fullPhone.startsWith(ladaLimpia) && ladaLimpia.length > 0) {
-                        ladaSelect.value = option.value; // Cambia el combo automáticamente
+                    if (ladaLimpia.length > 0 && fullPhone.startsWith(ladaLimpia)) {
+                        ladaSelect.selectedIndex = i; // Seleccionamos la opción correcta
                         ladaEncontrada = ladaLimpia;
                         break;
                     }
                 }
 
-                // Ponemos en el cuadro solo los números que faltan
-                if (ladaEncontrada) {
-                    phoneInput.value = fullPhone.substring(ladaEncontrada.length);
-                } else {
-                    phoneInput.value = fullPhone;
-                }
+                // Mostramos solo el resto del número en la caja
+                phoneInput.value = ladaEncontrada ? fullPhone.substring(ladaEncontrada.length) : fullPhone;
                 
                 editingRecruiterId = key;
                 document.getElementById('btnSaveRecruiter').innerHTML = "💾 Actualizar Reclutador";
-                window.showToast("✏️ Editando a: " + r.name);
+                window.showToast("✏️ Editando: " + r.name);
             };
 
             window.deleteRecruiter = function(key) {
