@@ -2254,7 +2254,7 @@
                                 <option value="+598">🇺🇾 +598</option>
                                 <option value="+58">🇻🇪 +58</option>
                             </select>
-                            <input type="text" id="recPhone" placeholder="10 dígitos" style="flex:1;">
+                            <input type="text" id="recPhone" placeholder="Número completo (ej. 521234567890)" style="flex: 1; min-width: 200px;">
                         </div>
                     </div>
 
@@ -4515,32 +4515,32 @@
             window.saveRecruiter = function() {
                 const name = document.getElementById('recName').value.trim();
                 const rawPhone = document.getElementById('recPhone').value.trim();
-                const phoneCode = document.getElementById('recPhoneCode').value; // El +52, +1, etc.
                 const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
 
                 if (!name || !rawPhone || !code) return alert('⚠️ Llena todos los campos');
 
-                // --- LIMPIEZA MAESTRA ---
-                // 1. Quitamos todo lo que no sea número del input
-                let cleanNumber = rawPhone.replace(/\D/g, ''); 
+                // --- NUEVA LÓGICA DE GUARDADO FIEL ---
+                // Solo quitamos espacios, guiones y paréntesis, pero dejamos los números intactos
+                // No le forzamos ladas extras si ya las trae o si tú lo escribiste largo
+                let cleanNumber = rawPhone.replace(/[\s\-\(\)]/g, ''); 
                 
-                // 2. Si el usuario pegó el número con todo y lada (ej. 5255...), se la quitamos para no duplicar
-                const ladaSinMas = phoneCode.replace('+', '');
-                if (cleanNumber.startsWith(ladaSinMas) && cleanNumber.length > 10) {
-                    cleanNumber = cleanNumber.substring(ladaSinMas.length);
+                // Si el número no empieza con '+', se lo ponemos para que WhatsApp lo reconozca
+                // Pero no recortamos nada. Si pusiste 12 dígitos, guarda 12.
+                if (!cleanNumber.startsWith('+')) {
+                    cleanNumber = '+' + cleanNumber;
                 }
 
-                // 3. Formato final internacional (E.164) que WhatsApp ama: +525512345678
-                const finalPhone = phoneCode + cleanNumber;
+                const recruiterData = { 
+                    name: name, 
+                    phone: cleanNumber, // Guardamos el número completo y limpio
+                    code: code 
+                };
 
-                if (cleanNumber.length < 10) return alert('⚠️ El número debe tener al menos 10 dígitos.');
-
-                const recruiterData = { name, phone: finalPhone, code };
                 const idToSave = editingRecruiterId || 'rec-' + Date.now();
 
                 set(ref(db, 'recruiters/' + idToSave), recruiterData)
                     .then(() => {
-                        window.showToast('✅ Teléfono homologado y guardado');
+                        window.showToast('✅ Datos guardados correctamente');
                         resetRecruiterForm();    
                         renderRecruitersTable(); 
                     });
@@ -4553,8 +4553,7 @@
                 document.getElementById('recName').value = r.name;
                 document.getElementById('recCode').value = r.code;
                 
-                // --- CAMBIO CLAVE: No intentamos adivinar la lada, 
-                // ponemos el número tal cual existe en la base para que no falten dígitos
+                // Ponemos el teléfono tal cual está en la base de datos
                 document.getElementById('recPhone').value = r.phone; 
                 
                 editingRecruiterId = key;
