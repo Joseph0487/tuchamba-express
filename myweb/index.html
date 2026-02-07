@@ -1898,6 +1898,29 @@
                 }
             }
 
+            /* Homologación visual del campo de teléfono */
+                .phone-group {
+                    display: flex !important;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    background: white;
+                }
+
+                .phone-select {
+                    border: none !important;
+                    background: #f0f2f5 !important;
+                    padding: 10px !important;
+                    font-weight: bold;
+                    border-right: 1px solid #ddd !important;
+                    width: 100px !important;
+                }
+
+                .phone-group input {
+                    border: none !important;
+                    flex: 1;
+                    padding: 10px !important;
+                }
         
 
         </style>    
@@ -3260,7 +3283,7 @@
                 if (now - lastClickTime < 5000) return; 
                 lastClickTime = now;
 
-                // 1. Google Analytics (Añadimos el evento para que GA4 también lo mida)
+                // 1. Google Analytics
                 if (typeof gtag === 'function') {
                     const job = jobs[jobId] || {};
                     gtag('event', 'contact_click', {
@@ -3283,11 +3306,16 @@
                     userAgent: navigator.userAgent
                 });
 
-                // 3. Incremento del contador público (Coincide con tus reglas nuevas)
+                // 3. Incremento del contador público
                 runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
 
+                // --- NUEVO: LIMPIEZA DEL ENLACE ANTES DE ABRIR ---
+                // Esto elimina espacios accidentales que rompen WhatsApp
+                const cleanLink = link.replace(/\s/g, '');
+
                 setTimeout(() => {
-                    window.open(link, '_blank');
+                    // --- MODIFICADO: Ahora abrimos cleanLink en lugar de link ---
+                    window.open(cleanLink, '_blank'); 
                     btn.disabled = false;
                     btn.innerHTML = '¡PIDE INFORMES Y EMPIEZA YA! 📲';
                 }, 500);
@@ -4210,12 +4238,14 @@
                                 }
 
                                 // Limpieza de Teléfono y Lada (Acepta múltiples nombres de columna)
-                                let contactRaw = row[findKey(row, 'contacto')] || row[findKey(row, 'whatsapp')] || row[findKey(row, 'telefono')] || '';
-                                contactRaw = String(contactRaw).replace(/\D/g, ''); 
-
-                                if(contactRaw.length === 10) {
+                                let contactRaw = row[findKey(row, 'contacto')] || row[findKey(row, 'whatsapp')] || '';
+                                    contactRaw = String(contactRaw).replace(/\D/g, ''); 
+                                    // Si el número viene de 10 dígitos, le ponemos el +52 por defecto (México)
+                                    if(contactRaw.length === 10) {
                                     contactRaw = '+52' + contactRaw;
-                                } else if (contactRaw.length > 10 && !contactRaw.startsWith('+')) {
+                                    } 
+                                    // Si ya trae lada pero no el '+', se lo ponemos
+                                    else if (contactRaw.length > 10 && !contactRaw.startsWith('+')) {
                                     contactRaw = '+' + contactRaw;
                                 }
 
@@ -4467,27 +4497,32 @@
             window.saveRecruiter = function() {
                 const name = document.getElementById('recName').value.trim();
                 const rawPhone = document.getElementById('recPhone').value.trim();
-                const phoneCode = document.getElementById('recPhoneCode').value;
+                const phoneCode = document.getElementById('recPhoneCode').value; // El +52, +1, etc.
                 const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
 
                 if (!name || !rawPhone || !code) return alert('⚠️ Llena todos los campos');
 
-                let cleanPhone = rawPhone.replace(/\D/g, '');
-                const codeDigits = phoneCode.replace('+', '');
-                if (cleanPhone.startsWith(codeDigits)) cleanPhone = cleanPhone.substring(codeDigits.length);
-                const finalPhone = phoneCode + cleanPhone;
+                // --- LIMPIEZA MAESTRA ---
+                // 1. Quitamos todo lo que no sea número del input
+                let cleanNumber = rawPhone.replace(/\D/g, ''); 
+                
+                // 2. Si el usuario pegó el número con todo y lada (ej. 5255...), se la quitamos para no duplicar
+                const ladaSinMas = phoneCode.replace('+', '');
+                if (cleanNumber.startsWith(ladaSinMas) && cleanNumber.length > 10) {
+                    cleanNumber = cleanNumber.substring(ladaSinMas.length);
+                }
 
-                const duplicateCheck = Object.entries(recruiters).find(([key, r]) => { 
-                    return r.code === code && key !== editingRecruiterId; 
-                });
-                if (duplicateCheck) return alert(`⚠️ El código '${code}' ya existe.`); 
+                // 3. Formato final internacional (E.164) que WhatsApp ama: +525512345678
+                const finalPhone = phoneCode + cleanNumber;
+
+                if (cleanNumber.length < 10) return alert('⚠️ El número debe tener al menos 10 dígitos.');
 
                 const recruiterData = { name, phone: finalPhone, code };
                 const idToSave = editingRecruiterId || 'rec-' + Date.now();
 
                 set(ref(db, 'recruiters/' + idToSave), recruiterData)
                     .then(() => {
-                        window.showToast(editingRecruiterId ? '✅ Actualizado' : '✅ Agregado');
+                        window.showToast('✅ Teléfono homologado y guardado');
                         resetRecruiterForm();    
                         renderRecruitersTable(); 
                     });
