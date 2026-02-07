@@ -2451,7 +2451,6 @@
                 const isRecruiterSession = sessionStorage.getItem('isRecruiterSession') === 'true';
 
                 if (user) {
-                    // --- TODO ESTO SE QUEDA IGUAL (VERIFICACIÓN DE ADMIN) ---
                     const roleRef = ref(db, 'userRoles/' + user.uid);
                     onValue(roleRef, (snapshot) => {
                         const roleData = snapshot.val();
@@ -2465,31 +2464,20 @@
                                 document.body.classList.add('admin-active-flag');
                             }
                         } else {
-                            console.warn("Acceso denegado: Rol insuficiente");
-                            alert("Tu cuenta no tiene permisos de Administrador.");
                             signOut(auth); 
                             setAdminMode(false);
                         }
-                    }, (error) => {
-                        console.error("Error verificando rol:", error);
-                        setAdminMode(false);
                     });
-
                 } else {
-                    // --- NO HAY USUARIO FIREBASE ---
                     isAdmin = false;
                     currentUserEmail = "";
                     localStorage.removeItem('iamsuperadmin');
                     document.body.classList.remove('admin-active-flag');
 
-                    if (isRecruiterSession) {
-                        console.log("⏳ Reclutador activo...");
-                        return; 
-                    }
+                    if (isRecruiterSession) return; 
 
-                    // --- AQUÍ ESTÁ EL AJUSTE PARA EL BOTÓN DE INVITADO ---
+                    // --- FIX INVITADO: ABRIR LA PUERTA ---
                     if (sessionStorage.getItem('isGuest') === 'true' || urlJobId) { 
-                        // Forzamos que se vea la app si ya es invitado
                         document.getElementById('loginScreen').style.display = 'none'; 
                         document.getElementById('mainApp').style.display = 'block';
                         setAdminMode(false); 
@@ -2498,7 +2486,7 @@
                         showLogin(); 
                     }
                 }
-            });      
+            });     
 
             window.onclick = function(event) {
                 if (event.target.classList.contains('modal')) {
@@ -2679,25 +2667,19 @@
             }
             
         window.enterAsGuest = function() { 
-            // 1. Guardamos el permiso en la sesión
             sessionStorage.setItem('isGuest', 'true'); 
             isAdmin = false; 
             isRecruiterMode = false;
     
-            // 2. Limpiamos cualquier rastro de búsqueda anterior
             const searchInput = document.getElementById('searchInput');
             if(searchInput) searchInput.value = '';
     
-            // 3. ¡LA CLAVE!: Ocultamos el login y mostramos la App manualmente
+            // --- CAMBIO VISUAL INMEDIATO ---
             document.getElementById('loginScreen').style.display = 'none'; 
             document.getElementById('mainApp').style.display = 'block';
     
-            // 4. Ejecutamos la carga de datos para que se vean las vacantes
             loadData(); 
-            
-            // 5. Opcional: Si tienes el botón de login de reclutador, actualizamos su visibilidad
             if(typeof actualizarBotonLogin === 'function') actualizarBotonLogin();
-            
             window.showToast("🔍 Entrando como invitado...");
         }   
 
@@ -4516,27 +4498,15 @@
 
                 if (!name || !rawPhone || !code) return alert('⚠️ Llena todos los campos');
 
-                // --- LÓGICA DE GUARDADO TOTALMENTE LIMPIA ---
-                // 1. Quitamos TODO lo que no sea un número (incluyendo signos +)
-                let pureNumbers = rawPhone.replace(/\D/g, '');            
-                // 2. No le agregamos NADA al inicio. Guardamos el churro de números tal cual.
-                const recruiterData = { 
-                    name: name, 
-                    phone: pureNumbers, 
-                    code: code 
-                };
+                // Solo números para la base de datos
+                let pureNumbers = rawPhone.replace(/\D/g, ''); 
 
-                const recruiterData = { 
-                    name: name, 
-                    phone: cleanNumber, // Guardamos el número completo y limpio
-                    code: code 
-                };
-
+                const recruiterData = { name, phone: pureNumbers, code };
                 const idToSave = editingRecruiterId || 'rec-' + Date.now();
 
                 set(ref(db, 'recruiters/' + idToSave), recruiterData)
                     .then(() => {
-                        window.showToast('✅ Datos guardados correctamente');
+                        window.showToast('✅ Datos guardados (sin signos)');
                         resetRecruiterForm();    
                         renderRecruitersTable(); 
                     });
@@ -4545,11 +4515,9 @@
             window.editRecruiter = function(key) {
                 const r = recruiters[key];
                 if(!r) return;
-
                 document.getElementById('recName').value = r.name;
                 document.getElementById('recCode').value = r.code;
-                
-                // Ponemos el teléfono tal cual está en la base de datos
+                // Mostramos el número limpio al editar
                 document.getElementById('recPhone').value = r.phone.replace(/\D/g, ''); 
                 
                 editingRecruiterId = key;
