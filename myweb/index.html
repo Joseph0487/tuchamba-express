@@ -2451,29 +2451,20 @@
                 const isRecruiterSession = sessionStorage.getItem('isRecruiterSession') === 'true';
 
                 if (user) {
-                    // --- USUARIO LOGUEADO: VERIFICAMOS ROL EN DB ---
-                    // Usamos onValue para seguridad en tiempo real
+                    // --- TODO ESTO SE QUEDA IGUAL (VERIFICACIÓN DE ADMIN) ---
                     const roleRef = ref(db, 'userRoles/' + user.uid);
-                    
                     onValue(roleRef, (snapshot) => {
                         const roleData = snapshot.val();
-                        
                         if (roleData && roleData.role === 'admin') {
-                            // ✅ ES ADMIN REAL
-                            console.log("👑 Rol Admin verificado en DB");
                             isAdmin = true; 
                             currentUserEmail = user.email; 
-                            
                             setAdminMode(true); 
                             localStorage.setItem('iamsuperadmin', 'true');
-                            
-                            // Evitamos spam de toasts
                             if(!document.body.classList.contains('admin-active-flag')) {
                                 window.showToast("✅ Modo Admin Activo");
                                 document.body.classList.add('admin-active-flag');
                             }
                         } else {
-                            // ⛔ TIENE LOGIN PERO NO ES ADMIN
                             console.warn("Acceso denegado: Rol insuficiente");
                             alert("Tu cuenta no tiene permisos de Administrador.");
                             signOut(auth); 
@@ -2491,22 +2482,23 @@
                     localStorage.removeItem('iamsuperadmin');
                     document.body.classList.remove('admin-active-flag');
 
-                    // A) RECLUTADOR POR CÓDIGO (NO LO TOCAMOS)
                     if (isRecruiterSession) {
                         console.log("⏳ Reclutador activo...");
                         return; 
                     }
 
-                    // B) INVITADO O LINK
+                    // --- AQUÍ ESTÁ EL AJUSTE PARA EL BOTÓN DE INVITADO ---
                     if (sessionStorage.getItem('isGuest') === 'true' || urlJobId) { 
+                        // Forzamos que se vea la app si ya es invitado
+                        document.getElementById('loginScreen').style.display = 'none'; 
+                        document.getElementById('mainApp').style.display = 'block';
                         setAdminMode(false); 
                     } 
-                    // C) NADIE -> LOGIN
                     else { 
                         showLogin(); 
                     }
                 }
-            });
+            });      
 
             window.onclick = function(event) {
                 if (event.target.classList.contains('modal')) {
@@ -2687,22 +2679,27 @@
             }
             
         window.enterAsGuest = function() { 
-            // 1. Guardamos el permiso
+            // 1. Guardamos el permiso en la sesión
             sessionStorage.setItem('isGuest', 'true'); 
             isAdmin = false; 
             isRecruiterMode = false;
     
             // 2. Limpiamos cualquier rastro de búsqueda anterior
-            document.getElementById('searchInput').value = '';
+            const searchInput = document.getElementById('searchInput');
+            if(searchInput) searchInput.value = '';
     
-            // 3. ¡LA CLAVE!: Quitamos el login y mostramos la App
+            // 3. ¡LA CLAVE!: Ocultamos el login y mostramos la App manualmente
             document.getElementById('loginScreen').style.display = 'none'; 
             document.getElementById('mainApp').style.display = 'block';
     
-            // 4. Cargamos las vacantes
-            actualizarBotonLogin(); 
-            loadData(); // <--- Esto jala las chambas de Firebase
-        }    
+            // 4. Ejecutamos la carga de datos para que se vean las vacantes
+            loadData(); 
+            
+            // 5. Opcional: Si tienes el botón de login de reclutador, actualizamos su visibilidad
+            if(typeof actualizarBotonLogin === 'function') actualizarBotonLogin();
+            
+            window.showToast("🔍 Entrando como invitado...");
+        }   
 
         // FUNCIÓN SALIR INTELIGENTE (V25.0 - SOLO PRESERVA REF SI ESTABA EN LA URL ORIGINAL)
         window.logout = function() {
@@ -4645,6 +4642,7 @@
                     }
                 }
             };
+
             
         </script>
 
