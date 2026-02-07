@@ -4519,16 +4519,15 @@
 
                 if (!name || !rawPhone || !code) return alert('⚠️ Llena todos los campos');
 
-                // --- NUEVA LÓGICA DE GUARDADO FIEL ---
-                // Solo quitamos espacios, guiones y paréntesis, pero dejamos los números intactos
-                // No le forzamos ladas extras si ya las trae o si tú lo escribiste largo
-                let cleanNumber = rawPhone.replace(/[\s\-\(\)]/g, ''); 
-                
-                // Si el número no empieza con '+', se lo ponemos para que WhatsApp lo reconozca
-                // Pero no recortamos nada. Si pusiste 12 dígitos, guarda 12.
-                if (!cleanNumber.startsWith('+')) {
-                    cleanNumber = '+' + cleanNumber;
-                }
+                // --- LÓGICA DE GUARDADO TOTALMENTE LIMPIA ---
+                // 1. Quitamos TODO lo que no sea un número (incluyendo signos +)
+                let pureNumbers = rawPhone.replace(/\D/g, '');            
+                // 2. No le agregamos NADA al inicio. Guardamos el churro de números tal cual.
+                const recruiterData = { 
+                    name: name, 
+                    phone: pureNumbers, 
+                    code: code 
+                };
 
                 const recruiterData = { 
                     name: name, 
@@ -4554,7 +4553,7 @@
                 document.getElementById('recCode').value = r.code;
                 
                 // Ponemos el teléfono tal cual está en la base de datos
-                document.getElementById('recPhone').value = r.phone; 
+                document.getElementById('recPhone').value = r.phone.replace(/\D/g, ''); 
                 
                 editingRecruiterId = key;
                 const btnSave = document.getElementById('btnSaveRecruiter');
@@ -4646,7 +4645,6 @@
                     }
                 }
             };
-
             
         </script>
 
