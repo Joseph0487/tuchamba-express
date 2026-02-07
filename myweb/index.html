@@ -2915,6 +2915,15 @@
                 else renderJobsTable();
                 
                 checkUrlForJob(); // Revisar si hay ?id=...
+                }, { onlyOnce: false }); // Mantenemos la escucha activa
+
+                // 2. Las estadísticas las cargamos por separado para que no estorben al renderizado
+                onValue(ref(db, 'jobStats'), (s) => { jobStats = s.val() || {}; });
+                onValue(ref(db, 'clickLogs'), (s) => { clickLogs = s.val() || {}; });
+                onValue(ref(db, 'settings/centralPhone'), (s) => { 
+                centralPhone = s.val() || '';
+                updateBanner();
+
             });
 
             // ... (el resto de la función loadData que sigue abajo con los setTimeout se queda igual) ...
@@ -2934,7 +2943,7 @@
             }
             
             // Función auxiliar para limpiar el loadData principal
-            function checkUrlForJob() {
+        function checkUrlForJob() {
                 const urlJobId = urlParams.get('id');
                 if (urlJobId && jobs[urlJobId]) {
                     const job = jobs[urlJobId];
@@ -4413,18 +4422,27 @@
                     
                     window.showToast("📂 Generando Excel de Reclutadores...");
 
-                    // 3. MAPEO DE DATOS: Preparamos las columnas
-                    const data = Object.keys(recruiters).map(id => ({
-                        'ID': id,
-                        'Nombre': recruiters[id].name || 'N/A',
-                        'Código': recruiters[id].code || 'N/A',
-                        'Teléfono': recruiters[id].phone || 'No registrado'
-                    }));
+                    // 3. MAPEO DE DATOS: Quitamos el signo + para que Excel no lo tome como fórmula
+                    const data = Object.keys(recruiters).map(id => {
+                        const r = recruiters[id];
+                        // Limpiamos el teléfono de cualquier cosa que no sea número para el Excel
+                        const purePhone = r.phone ? r.phone.replace(/\D/g, '') : '';
+                        
+                        return {
+                            'Nombre': r.name || 'N/A',
+                            'Código': r.code || 'N/A',
+                            'Teléfono': purePhone, // Solo números
+                            'Link Personal': `${window.location.origin}/?ref=${r.code.toLowerCase()}`
+                        };
+                    });
 
-                    // 4. GENERACIÓN DEL ARCHIVO
+                    // 4. GENERACIÓN DEL ARCHIVO (Limpio de IDs técnicos)
                     const ws = XLSX.utils.json_to_sheet(data);
                     const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Reclutadores");
+                    XLSX.utils.book_append_sheet(wb, ws, "Directorio Equipo");
+                    
+                    XLSX.writeFile(wb, "Base_Reclutadores_TuChamba.xlsx");
+                    window.showToast("✅ Base descargada con Links Personales");
                     
                     // 5. DESCARGA
                     XLSX.writeFile(wb, "Base_Reclutadores_TuChamba.xlsx");
@@ -4529,17 +4547,20 @@
             };
 
             window.editRecruiter = function(key) {
-            const r = recruiters[key];
-            document.getElementById('recName').value = r.name;
-            document.getElementById('recCode').value = r.code;
-            document.getElementById('recPhone').value = r.phone.replace(/^\+\d{2,3}/, ''); 
-            
-            editingRecruiterId = key;
-            
-            // Solo cambiamos el botón de Guardar, ignoramos el de cancelar
-            const btnSave = document.getElementById('btnSaveRecruiter');
-            if(btnSave) btnSave.innerHTML = "🔄 Actualizar";
-        };
+                const r = recruiters[key];
+                if(!r) return;
+
+                document.getElementById('recName').value = r.name;
+                document.getElementById('recCode').value = r.code;
+                
+                // --- CAMBIO CLAVE: No intentamos adivinar la lada, 
+                // ponemos el número tal cual existe en la base para que no falten dígitos
+                document.getElementById('recPhone').value = r.phone; 
+                
+                editingRecruiterId = key;
+                const btnSave = document.getElementById('btnSaveRecruiter');
+                if(btnSave) btnSave.innerHTML = "🔄 Actualizar";
+            };
 
             window.deleteRecruiter = function(key) {
                 if (confirm("¿Eliminar?")) {
