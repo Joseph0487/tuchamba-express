@@ -2267,20 +2267,6 @@
         <div class="modal" id="privacyModal"><div class="modal-content"><button class="close-btn" onclick="closePrivacyModal()">×</button><h2>🔒 Aviso de Privacidad</h2><div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto;"><p style="font-size: 12px; color: #666; margin-bottom: 15px;"><strong>Última actualización: Enero 2026</strong></p><p style="margin-bottom: 15px;">En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, <strong>TuChamba Express</strong> informa:</p><p style="margin-bottom:5px;"><strong>1. Responsable de los datos:</strong></p><p style="margin-bottom:15px;">TuChamba Express actúa como enlace entre candidatos y empresas reclutadoras.</p><p style="margin-bottom:5px;"><strong>2. Datos recopilados:</strong></p><p style="margin-bottom:15px;">Podemos recopilar datos de contacto (como número telefónico) con el único fin de facilitar la comunicación para procesos de reclutamiento.</p><p style="margin-bottom:5px;"><strong>3. Uso de la información:</strong></p><p style="margin-bottom:5px;">Los datos proporcionados serán utilizados exclusivamente para:</p><ul style="margin-left: 20px; margin-bottom: 15px;"><li>Contactar al candidato respecto a la vacante de interés.</li><li>Agendar entrevistas laborales.</li><li>Procesos internos de selección.</li></ul><p style="margin-bottom:5px;"><strong>4. Compartir datos:</strong></p><p style="margin-bottom:15px;">Su información de contacto será compartida únicamente con la empresa o reclutador responsable de la vacante a la que usted decida postularse voluntariamente.</p><p style="margin-bottom:5px;"><strong>5. Examen Médico:</strong></p><p style="margin-bottom:0;">Al utilizar esta plataforma, usted reconoce que algunas empresas contratantes pueden requerir, como parte de su proceso de selección y conforme a la ley, la realización de exámenes médicos y/o pruebas de detección de sustancias.</p></div></div></div>
 
         <script type="module">
-            // --- UTILIDADES CENTRALIZADAS (Reduce Deuda Técnica) ---
-            const PhoneUtils = {
-                clean: (raw) => {
-                    if (!raw) return '';
-                    let num = String(raw).replace(/\D/g, ''); 
-                    if (num.length === 10) num = '52' + num;   
-                    return num;
-                },
-                getLink: (phone, text = "") => {
-                    const cleanNum = PhoneUtils.clean(phone);
-                    return `https://wa.me/${cleanNum}?text=${encodeURIComponent(text)}`;
-                }
-            };
-
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
             import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
             import { getDatabase, ref, set, onValue, remove, runTransaction, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
@@ -3269,41 +3255,41 @@
             };
 
             let lastClickTime = 0; 
-            window.handleWhatsAppClick = function(btn, jobId, recruiterName) {
+            window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
                 const now = Date.now(); 
                 if (now - lastClickTime < 5000) return; 
                 lastClickTime = now;
 
-                const job = jobs[jobId] || {};
-                if(!job.contact) return alert("Contacto no disponible.");
-
+                // 1. Google Analytics (Añadimos el evento para que GA4 también lo mida)
                 if (typeof gtag === 'function') {
+                    const job = jobs[jobId] || {};
                     gtag('event', 'contact_click', {
-                        'job_title': job.title,
+                        'job_title': job.title || 'Desconocido',
                         'job_id': jobId,
-                        'recruiter': recruiterName
+                        'company': job.company || 'N/A',
+                        'recruiter': recruiterName || 'directo'
                     });
                 }
 
                 btn.disabled = true;
                 btn.innerHTML = '🔄 Abriendo...';
 
+                // 2. Registro detallado en Firebase (Logs)
                 const logRef = push(ref(db, 'clickLogs'));
                 set(logRef, {
                     jobId: jobId,
-                    recruiter: recruiterName,
+                    recruiter: recruiterName || 'directo',
                     timestamp: new Date().toISOString(),
                     userAgent: navigator.userAgent
                 });
+
+                // 3. Incremento del contador público (Coincide con tus reglas nuevas)
                 runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
 
-                const msg = `Hola, me interesa la vacante ${job.title} (Cód: ${jobId})`;
-                const secureLink = PhoneUtils.getLink(job.contact, msg);
-
                 setTimeout(() => {
-                    window.open(secureLink, '_blank');
+                    window.open(link, '_blank');
                     btn.disabled = false;
-                    btn.innerHTML = '📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC';
+                    btn.innerHTML = '¡PIDE INFORMES Y EMPIEZA YA! 📲';
                 }, 500);
             };
 
@@ -3428,8 +3414,15 @@
             window.saveJob = function(e) {
                 e.preventDefault();
                 
-                const rawPhone = document.getElementById('jobContact').value;
-                const finalPhone = PhoneUtils.clean(rawPhone); 
+                const phoneCode = document.getElementById('jobPhoneCode').value;
+                const rawPhone = document.getElementById('jobContact').value.trim();
+                
+                let cleanPhone = rawPhone.replace(/\D/g, '');
+                const codeDigits = phoneCode.replace('+', '');
+                if (cleanPhone.startsWith(codeDigits)) {
+                    cleanPhone = cleanPhone.substring(codeDigits.length);
+                }
+                const finalPhone = cleanPhone ? (phoneCode + cleanPhone) : '';
 
                 const isFeaturedVal = document.getElementById('jobIsFeatured').value === 'true';
 
@@ -3441,10 +3434,13 @@
                     city: document.getElementById('jobCity').value,
                     zone: document.getElementById('jobZone').value,
                     location: `${document.getElementById('jobCity').value}, ${document.getElementById('jobState').value}`,
+                    
                     fecha: document.getElementById('jobDate').value, 
+                    
                     salary: document.getElementById('jobSalary').value,
                     description: document.getElementById('jobDescription').value,
                     schedule: document.getElementById('jobSchedule').value, 
+                    // BORRADO: tags
                     contact: finalPhone, 
                     status: document.getElementById('jobStatus').value,
                     agency: document.getElementById('jobAgency').value,
@@ -3452,16 +3448,12 @@
                     benefits: tempBens,
                     isFeatured: isFeaturedVal 
                 };
-
-                const newJobRef = push(ref(db, 'jobs'));
-                set(newJobRef, jobData)
-                    .then(() => {
-                        window.showToast("✅ Vacante publicada con éxito");
-                        document.getElementById('jobForm').reset();
-                        bootstrap.Modal.getInstance(document.getElementById('jobModal')).hide();
-                    })
-                    .catch(err => alert("Error al guardar: " + err.message));
-            };
+                const id = currentEditId || 'job-' + Date.now();
+                set(ref(db, 'jobs/' + id), jobData).then(() => {
+                    window.showToast("✅ Vacante guardada");
+                    window.closeFormModal();
+                });
+            }
 
             window.deleteJob = function(id) { if(confirm('¿Borrar vacante?')) remove(ref(db, 'jobs/' + id)); }
 
@@ -3941,18 +3933,19 @@
                 }
 
                 if (targetPhone) {
+                    let msg = `Hola, vi la vacante ${j.title} (Cód: ${id})`;
+                    if(isReferral) msg += ` (Referido por ${activeRecruiter.name})`;
+                    const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                     const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                     
-                    // CAMBIO V25.8: Homologación y Reducción de Deuda Técnica
-                    contactHtml = `<div class="sticky-footer" style="padding: 10px 15px 15px;"> 
-                                        <p style="font-size:11px; color:#666; margin: 0 0 4px 0; font-weight:600;">
+                    // CAMBIO V25.7: Sándwich Compacto (Sin espacios extra)
+                    contactHtml = `<div class="sticky-footer" style="padding: 10px 15px 15px;"> <p style="font-size:11px; color:#666; margin: 0 0 4px 0; font-weight:600;">
                                             👇🏻 Respuesta Inmediata 👇🏻
                                         </p>
-                                        <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}')" class="whatsapp-btn-large">
-                                        style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                        
+                                        <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                                             <span style="white-space: nowrap;">📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC</span> 
-                                            <img src="favicon_2.png" alt="WA" style="height: 26px; width: auto;"> 
-                                        </button>
+                                            <img src="favicon_2.png" alt="WA" style="height: 26px; width: auto;"> </button>
                                         
                                         <p style="font-size:11px; color:#666; margin: 4px 0 0 0; font-weight:600;">
                                             👆🏻 ¡No pierdas tu oportunidad, postúlate ahora! 👆🏻
@@ -4216,19 +4209,15 @@
                                     isFeaturedRaw = String(row[featuredKey]).trim().toUpperCase();
                                 }
 
-                                // Localiza el contacto en el Excel (acepta varios nombres de columna)
-                                // 1. Capturamos el dato crudo del Excel
+                                // Limpieza de Teléfono y Lada (Acepta múltiples nombres de columna)
                                 let contactRaw = row[findKey(row, 'contacto')] || row[findKey(row, 'whatsapp')] || row[findKey(row, 'telefono')] || '';
-                                
-                                // 2. Aplicamos la limpieza centralizada (AQUÍ ES DONDE SE PONE)
-                                const finalContact = PhoneUtils.clean(contactRaw); 
+                                contactRaw = String(contactRaw).replace(/\D/g, ''); 
 
-                                // 3. Lo asignamos al objeto que se va a Firebase
-                                const jobData = {
-                                    title: row[findKey(row, 'puesto')] || 'Sin título',
-                                    company: row[findKey(row, 'empresa')] || 'Empresa Privada',
-                                    contact: finalContact, // <--- Guardamos el dato ya homologado
-                                };  
+                                if(contactRaw.length === 10) {
+                                    contactRaw = '+52' + contactRaw;
+                                } else if (contactRaw.length > 10 && !contactRaw.startsWith('+')) {
+                                    contactRaw = '+' + contactRaw;
+                                }
 
                                 // Armado del objeto para Firebase
                                 const jobData = {
@@ -4478,13 +4467,15 @@
             window.saveRecruiter = function() {
                 const name = document.getElementById('recName').value.trim();
                 const rawPhone = document.getElementById('recPhone').value.trim();
+                const phoneCode = document.getElementById('recPhoneCode').value;
                 const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
 
                 if (!name || !rawPhone || !code) return alert('⚠️ Llena todos los campos');
 
-                // --- CAMBIO CLAVE: Aquí usamos el motor PhoneUtils ---
-                // Esto borra como 6 líneas de código viejo y lo hace más seguro
-                const finalPhone = PhoneUtils.clean(rawPhone);
+                let cleanPhone = rawPhone.replace(/\D/g, '');
+                const codeDigits = phoneCode.replace('+', '');
+                if (cleanPhone.startsWith(codeDigits)) cleanPhone = cleanPhone.substring(codeDigits.length);
+                const finalPhone = phoneCode + cleanPhone;
 
                 const duplicateCheck = Object.entries(recruiters).find(([key, r]) => { 
                     return r.code === code && key !== editingRecruiterId; 
@@ -4499,8 +4490,7 @@
                         window.showToast(editingRecruiterId ? '✅ Actualizado' : '✅ Agregado');
                         resetRecruiterForm();    
                         renderRecruitersTable(); 
-                    })
-                    .catch(err => alert('Error al guardar: ' + err.message));
+                    });
             };
 
             window.editRecruiter = function(key) {
