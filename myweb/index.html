@@ -475,7 +475,25 @@
             .item-list li { background: #f9f9f9; padding: 10px 14px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; font-size: 15px; }
             .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
             .recruiters-table th, .recruiters-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
-            .recruiters-table th { background: #f9fafb; color: #666; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+            .recruiters-table th {
+                background-color: #007bff;
+                color: white;
+                padding: 12px 10px;
+                text-align: left;
+                font-size: 13px;
+                /* --- AQUÍ ESTÁ EL TRUCO --- */
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 20; /* Para que los nombres no se encimen al bajar */
+                box-shadow: 0 2px 2px rgba(0,0,0,0.1); /* Sombrita para que se vea la separación */
+            }
+            .col-num {
+                width: 40px;
+                text-align: center;
+                font-weight: bold;
+                background: #f1f3f5 !important;
+                color: #666 !important;
+            }
             .recruiters-table tr:hover { background-color: #f9f9f9; }
             .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
 
@@ -665,7 +683,11 @@
             
             /* Tabla Pro */
             .table-container-pro {
-                border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; margin-top: 10px;
+                max-height: 380px !important; /* Altura máxima antes de que aparezca el scroll */
+                overflow-y: auto !important;  /* Activa el scroll vertical */
+                border: 1px solid #eee;
+                border-radius: 8px;
+                position: relative;           /* Necesario para que el sticky funcione bien */
             }
             .recruiters-table { width: 100%; border-collapse: collapse; }
             .recruiters-table thead { background: #f1f3f5; }
@@ -1922,6 +1944,9 @@
                     padding: 10px !important;
                 }
         
+                
+
+
 
         </style>    
     </head>
@@ -2216,58 +2241,60 @@
                     <button class="close-btn" style="position:static;" onclick="closeTeamModal()">×</button>
                 </div>
                 
-                <div class="modern-form-box">
-                    <div class="form-grid-2">
-                        <div class="form-group">
-                            <label>Nombre del Reclutador</label>
-                            <input type="text" id="recName" placeholder="Ej. Juan Pérez">
+                <div class="modern-form-box" style="padding: 10px; margin-bottom: 10px; background: #f8f9fa; border: 1px solid #e0e0e0;">
+                    <div style="display: flex; gap: 8px; align-items: flex-end; flex-wrap: nowrap;">
+                        <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                            <label style="font-size: 10px; font-weight: bold; margin-bottom: 2px; display: block;">Nombre</label>
+                            <input type="text" id="recName" placeholder="Juan Pérez" style="height: 30px !important; font-size: 12px; padding: 0 8px;">
                         </div>
-                        <div class="form-group">
-                            <label>Código Único (Link)</label>
-                            <input type="text" id="recCode" placeholder="Ej. JUAN (Sin espacios)">
+                        <div class="form-group" style="margin-bottom: 0; width: 80px;">
+                            <label style="font-size: 10px; font-weight: bold; margin-bottom: 2px; display: block;">Código</label>
+                            <input type="text" id="recCode" placeholder="JUAN" style="height: 30px !important; font-size: 12px; padding: 0 8px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; flex: 1.5;">
+                            <label style="font-size: 10px; font-weight: bold; margin-bottom: 2px; display: block;">WhatsApp</label>
+                            <div class="phone-group" style="height: 30px; display: flex;">
+                                <select id="recPhoneCode" class="phone-select" style="min-width: 80px !important; font-size: 11px !important; padding: 0 2px;">
+                                    <option value="+52">🇲🇽 +52</option>
+                                    <option value="+54">🇦🇷 +54</option>
+                                    <option value="+591">🇧🇴 +591</option>
+                                    <option value="+55">🇧🇷 +55</option>
+                                    <option value="+56">🇨🇱 +56</option>
+                                    <option value="+57">🇨🇴 +57</option>
+                                    <option value="+506">🇨🇷 +506</option>
+                                    <option value="+53">🇨🇺 +53</option>
+                                    <option value="+593">🇪🇨 +593</option>
+                                    <option value="+503">🇸🇻 +503</option>
+                                    <option value="+34">🇪🇸 +34</option>
+                                    <option value="+1">🇺🇸 +1</option>
+                                    <option value="+502">🇬🇹 +502</option>
+                                    <option value="+504">🇭🇳 +504</option>
+                                    <option value="+505">🇳🇮 +505</option>
+                                    <option value="+507">🇵🇦 +507</option>
+                                    <option value="+595">🇵🇾 +595</option>
+                                    <option value="+51">🇵🇪 +51</option>
+                                    <option value="+1">🇩🇴 +1</option>
+                                    <option value="+598">🇺🇾 +598</option>
+                                    <option value="+58">🇻🇪 +58</option>
+                                </select>
+                                <input type="text" id="recPhone" placeholder="10 dígitos" style="height: 30px !important; font-size: 12px !important; flex: 1;" autocomplete="off">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 4px;">
+                            <button class="btn-primary" id="btnSaveRecruiter" onclick="saveRecruiter()" style="height: 30px; font-size: 11px; padding: 0 10px; white-space: nowrap;">💾 Guardar</button>
+                            <button class="tool-btn" onclick="downloadRecruiters()" style="height: 30px; background:#2e7d32; font-size: 11px; padding: 0 10px;">📥 Base</button>
                         </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>WhatsApp de Contacto</label>
-                        <div class="phone-group">
-                            <select id="recPhoneCode" class="phone-select">
-                                <option value="+52">🇲🇽 +52</option>
-                                <option value="+54">🇦🇷 +54</option>
-                                <option value="+591">🇧🇴 +591</option>
-                                <option value="+55">🇧🇷 +55</option>
-                                <option value="+56">🇨🇱 +56</option>
-                                <option value="+57">🇨🇴 +57</option>
-                                <option value="+506">🇨🇷 +506</option>
-                                <option value="+53">🇨🇺 +53</option>
-                                <option value="+593">🇪🇨 +593</option>
-                                <option value="+503">🇸🇻 +503</option>
-                                <option value="+34">🇪🇸 +34</option>
-                                <option value="+1">🇺🇸 +1</option>
-                                <option value="+502">🇬🇹 +502</option>
-                                <option value="+504">🇭🇳 +504</option>
-                                <option value="+505">🇳🇮 +505</option>
-                                <option value="+507">🇵🇦 +507</option>
-                                <option value="+595">🇵🇾 +595</option>
-                                <option value="+51">🇵🇪 +51</option>
-                                <option value="+1">🇩🇴 +1</option>
-                                <option value="+598">🇺🇾 +598</option>
-                                <option value="+58">🇻🇪 +58</option>
-                            </select>
-                            <input type="text" id="recPhone" placeholder="Número completo (ej. 521234567890)" style="flex: 1; min-width: 200px;">
-                        </div>
-                    </div>
-
-                    <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
-                            <button class="btn-primary" style="flex:1;" id="btnSaveRecruiter" onclick="saveRecruiter()">
-                                💾 Guardar
-                            </button>
-                            <button class="tool-btn" style="background:#2e7d32; flex:1; justify-content:center;" onclick="downloadRecruiters()">
-                                📥 Base
-                            </button>
-                        </div>
                 </div>
-
+                <thead>
+                    <tr>
+                        <th class="col-num">#</th>
+                        <th>Nombre</th>
+                        <th>Código</th>
+                        <th style="text-align:center;">Link</th>
+                        <th style="text-align:right;">Acciones</th>
+                    </tr>
+                </thead>
                 <h3 style="font-size:16px; margin-bottom:10px; color:#555;">📂 Directorio Activo</h3>
                 <div class="table-container-pro">
                     <div style="overflow-x: auto;">
@@ -4459,35 +4486,37 @@
                 if (!list) return;
 
                 if (!recruiters || Object.keys(recruiters).length === 0) {
-                    list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#888;">No hay reclutadores en el equipo.</td></tr>';
+                    list.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#888;">No hay reclutadores en el equipo.</td></tr>';
                     return;
                 }
 
-                list.innerHTML = Object.keys(recruiters).map(key => {
+                // Convertimos a array y mapeamos con index para la numeración
+                list.innerHTML = Object.keys(recruiters).map((key, index) => {
                     const r = recruiters[key];
                     const personalLink = `${window.location.origin}/?ref=${r.code.toLowerCase()}`;
                     
                     return `
                     <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 12px 10px;">
-                            <div style="font-weight: 700; color: #333; font-size: 14px;">${r.name}</div>
-                            <div style="font-size: 12px; color: #666;">📱 ${r.phone}</div>
+                        <td class="col-num">${index + 1}</td>
+                        <td style="padding: 8px 10px;">
+                            <div style="font-weight: 700; color: #333; font-size: 12px;">${r.name}</div>
+                            <div style="font-size: 10px; color: #666;">📱 ${r.phone}</div>
                         </td>
-                        <td style="padding: 12px 10px;">
-                            <span style="background: #e3f2fd; color: #1565c0; padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 12px;">
+                        <td style="padding: 8px 10px;">
+                            <span style="background: #e3f2fd; color: #1565c0; padding: 2px 5px; border-radius: 4px; font-weight: 700; font-size: 10px;">
                                 ${r.code}
                             </span>
                         </td>
-                        <td style="padding: 12px 10px; text-align: center;">
+                        <td style="padding: 8px 10px; text-align: center;">
                             <button onclick="copyRecruiterLink('${personalLink}')" 
                                     title="Copiar Link"
-                                    style="background: #f5f5f5; border: 1px solid #ddd; padding: 6px 10px; border-radius: 4px; cursor: pointer;">
+                                    style="background: #f5f5f5; border: 1px solid #ddd; padding: 3px 6px; border-radius: 4px; cursor: pointer;">
                                 🔗
                             </button>
                         </td>
-                        <td style="padding: 12px 10px; text-align: right;">
-                            <button onclick="editRecruiter('${key}')" title="Editar" style="border: none; background: transparent; font-size: 16px; cursor: pointer; margin-right: 8px;">✏️</button>
-                            <button onclick="deleteRecruiter('${key}')" title="Eliminar" style="border: none; background: transparent; font-size: 16px; cursor: pointer; color: #d32f2f;">🗑️</button>
+                        <td style="padding: 8px 10px; text-align: right;">
+                            <button onclick="editRecruiter('${key}')" title="Editar" style="border: none; background: transparent; cursor: pointer; margin-right: 5px;">✏️</button>
+                            <button onclick="deleteRecruiter('${key}')" title="Eliminar" style="border: none; background: transparent; cursor: pointer; color: #d32f2f;">🗑️</button>
                         </td>
                     </tr>`;
                 }).join('');
@@ -4612,7 +4641,6 @@
                     }
                 }
             };
-
             
         </script>
 
