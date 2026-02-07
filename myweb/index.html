@@ -4526,28 +4526,27 @@
                 document.getElementById('recName').value = r.name;
                 document.getElementById('recCode').value = r.code;
                 
-                const fullPhone = r.phone || ""; // Ej: 529512348671 o 549112345678
+                const fullPhone = r.phone || ""; 
                 const ladaSelect = document.getElementById('recPhoneCode');
                 const phoneInput = document.getElementById('recPhone');
 
-                // --- LÓGICA DE MEMORIA PARA LA LADA ---
-                // Recorremos las opciones del combo para ver cuál coincide con el inicio del teléfono
+                // --- MEMORIA DE LADA ---
                 let ladaEncontrada = "";
+                // Buscamos en el combo cuál país coincide con el inicio del teléfono
                 for (let option of ladaSelect.options) {
-                    const ladaLimpia = option.value.replace(/\D/g, ''); // "+52" -> "52"
+                    const ladaLimpia = option.value.replace(/\D/g, ''); 
                     if (fullPhone.startsWith(ladaLimpia) && ladaLimpia.length > 0) {
-                        // Si el número empieza con esta lada, seleccionamos esta opción
-                        ladaSelect.value = option.value;
+                        ladaSelect.value = option.value; // Cambia el combo automáticamente
                         ladaEncontrada = ladaLimpia;
                         break;
                     }
                 }
 
-                // Ponemos en el cuadrito de texto solo lo que sobra (el número sin la lada)
+                // Ponemos en el cuadro solo los números que faltan
                 if (ladaEncontrada) {
                     phoneInput.value = fullPhone.substring(ladaEncontrada.length);
                 } else {
-                    phoneInput.value = fullPhone; // Por si no hubo coincidencia
+                    phoneInput.value = fullPhone;
                 }
                 
                 editingRecruiterId = key;
