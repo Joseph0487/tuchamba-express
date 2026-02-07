@@ -2241,22 +2241,22 @@
                     <button class="close-btn" style="position:static;" onclick="closeTeamModal()">×</button>
                 </div>
                 
-                <div class="modern-form-box" style="padding: 15px; margin-bottom: 15px; background: #fdfdfd; border: 1px solid #e0e0e0;">
-                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div class="modern-form-box" style="padding: 15px; margin-bottom: 15px; background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 12px;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
                         <div style="flex: 2;">
-                            <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px;">Nombre</label>
-                            <input type="text" id="recName" placeholder="Ej. Juan Pérez" style="width: 100%; height: 35px; font-size: 13px;">
+                            <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px; color: #555;">Nombre</label>
+                            <input type="text" id="recName" placeholder="Ej. Juan Pérez" style="width: 100%; height: 38px; font-size: 13px; border-radius: 8px; border: 1px solid #ccc; padding: 0 10px;">
                         </div>
                         <div style="flex: 1;">
-                            <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px;">Código</label>
-                            <input type="text" id="recCode" placeholder="Ej. JUAN" style="width: 100%; height: 35px; font-size: 13px;">
+                            <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px; color: #555;">Código</label>
+                            <input type="text" id="recCode" placeholder="Ej. JUAN" style="width: 100%; height: 38px; font-size: 13px; border-radius: 8px; border: 1px solid #ccc; padding: 0 10px;">
                         </div>
                     </div>
 
                     <div style="margin-bottom: 15px;">
-                        <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px;">WhatsApp de Contacto</label>
-                        <div style="display: flex; gap: 5px;">
-                            <select id="recPhoneCode" style="width: 90px; height: 35px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px;">
+                        <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px; color: #555;">WhatsApp de Contacto</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="recPhoneCode" style="width: 95px; height: 38px; font-size: 12px; border: 1px solid #ccc; border-radius: 8px; background: white; padding: 0 5px;">
                                 <option value="+52">🇲🇽 +52</option>
                                 <option value="+54">🇦🇷 +54</option>
                                 <option value="+591">🇧🇴 +591</option>
@@ -2279,13 +2279,13 @@
                                 <option value="+598">🇺🇾 +598</option>
                                 <option value="+58">🇻🇪 +58</option>
                             </select>
-                            <input type="text" id="recPhone" placeholder="10 dígitos" style="flex: 1; height: 35px; font-size: 13px;" autocomplete="off">
+                            <input type="text" id="recPhone" placeholder="10 dígitos" style="flex: 1; height: 38px; font-size: 13px; border-radius: 8px; border: 1px solid #ccc; padding: 0 10px;" autocomplete="off">
                         </div>
                     </div>
 
                     <div style="display: flex; gap: 10px;">
-                        <button class="btn-primary" id="btnSaveRecruiter" onclick="saveRecruiter()" style="flex: 1; height: 40px; font-size: 13px;">💾 Guardar</button>
-                        <button class="tool-btn" onclick="downloadRecruiters()" style="flex: 1; height: 40px; background:#2e7d32; font-size: 13px; justify-content: center; color: white; border-radius: 5px;">📥 Base</button>
+                        <button class="btn-primary" id="btnSaveRecruiter" onclick="saveRecruiter()" style="flex: 1.5; height: 42px; font-size: 13px; border-radius: 8px;">💾 Guardar Reclutador</button>
+                        <button class="tool-btn" onclick="downloadRecruiters()" style="flex: 1; height: 42px; background:#2e7d32; font-size: 13px; justify-content: center; color: white; border-radius: 8px; border: none;">📥 Base</button>
                     </div>
                 </div>
                 
@@ -2299,15 +2299,15 @@
                     </tr>
                 </thead>
                 <h3 style="font-size:16px; margin-bottom:10px; color:#555;">📂 Directorio Activo</h3>
-                <div class="table-container-pro" style="max-height: 350px; overflow-y: auto; position: relative; border: 1px solid #eee;">
-                    <table class="recruiters-table" style="width: 100%; border-collapse: collapse;">
-                        <thead style="position: sticky; top: 0; z-index: 10; background: #007bff; color: white;">
+                <div class="table-container-pro" style="max-height: 350px; overflow-y: auto; position: relative; border: 1px solid #eee; border-radius: 10px;">
+                    <table class="recruiters-table" style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+                        <thead style="position: sticky; top: 0; z-index: 10; background: #007bff;">
                             <tr>
-                                <th style="padding: 10px; font-size: 12px; width: 30px;">#</th>
-                                <th style="padding: 10px; font-size: 12px; text-align: left;">Nombre</th>
-                                <th style="padding: 10px; font-size: 12px; text-align: left;">Código</th>
-                                <th style="padding: 10px; font-size: 12px; text-align: center;">Link</th>
-                                <th style="padding: 10px; font-size: 12px; text-align: right;">Acciones</th>
+                                <th style="width: 40px; color: white; padding: 12px 5px; font-size: 11px; text-align: center;">#</th>
+                                <th style="width: 45%; color: white; padding: 12px 10px; font-size: 11px; text-align: left;">Nombre</th>
+                                <th style="width: 80px; color: white; padding: 12px 10px; font-size: 11px; text-align: left;">Código</th>
+                                <th style="width: 50px; color: white; padding: 12px 5px; font-size: 11px; text-align: center;">Link</th>
+                                <th style="width: 80px; color: white; padding: 12px 10px; font-size: 11px; text-align: right;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="recruitersList">
@@ -4489,32 +4489,33 @@
                 if (!list) return;
 
                 if (!recruiters || Object.keys(recruiters).length === 0) {
-                    list.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">No hay reclutadores.</td></tr>';
+                    list.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">No hay reclutadores registrados.</td></tr>';
                     return;
                 }
 
+                // Dibujamos la tabla
                 list.innerHTML = Object.keys(recruiters).map((key, index) => {
                     const r = recruiters[key];
                     const personalLink = `${window.location.origin}/?ref=${r.code.toLowerCase()}`;
                     
                     return `
                     <tr style="border-bottom: 1px solid #eee;">
-                        <td style="text-align: center; font-size: 12px; color: #666; font-weight: bold; padding: 10px;">${index + 1}</td>
-                        <td style="padding: 10px;">
-                            <div style="font-weight: bold; color: #333; font-size: 13px;">${r.name}</div>
-                            <div style="font-size: 11px; color: #666;">📱 ${r.phone}</div>
+                        <td style="text-align: center; font-size: 11px; color: #888; font-weight: bold; padding: 10px;">${index + 1}</td>
+                        <td style="padding: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            <div style="font-weight: bold; color: #333; font-size: 12px;">${r.name}</div>
+                            <div style="font-size: 10px; color: #007bff;">📱 ${r.phone}</div>
                         </td>
                         <td style="padding: 10px;">
-                            <span style="background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px;">
+                            <span style="background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px;">
                                 ${r.code}
                             </span>
                         </td>
                         <td style="padding: 10px; text-align: center;">
-                            <button onclick="copyRecruiterLink('${personalLink}')" style="background: #eee; border: 1px solid #ccc; padding: 5px; border-radius: 4px; cursor: pointer;">🔗</button>
+                            <button onclick="copyRecruiterLink('${personalLink}')" style="background: #f5f5f5; border: 1px solid #ccc; padding: 6px; border-radius: 6px; cursor: pointer; font-size: 12px;">🔗</button>
                         </td>
-                        <td style="padding: 10px; text-align: right;">
+                        <td style="padding: 10px; text-align: right; white-space: nowrap;">
                             <button onclick="editRecruiter('${key}')" style="border: none; background: transparent; cursor: pointer; font-size: 16px;">✏️</button>
-                            <button onclick="deleteRecruiter('${key}')" style="border: none; background: transparent; cursor: pointer; font-size: 16px; color: #d32f2f; margin-left: 5px;">🗑️</button>
+                            <button onclick="deleteRecruiter('${key}')" style="border: none; background: transparent; cursor: pointer; font-size: 16px; color: #d32f2f; margin-left: 8px;">🗑️</button>
                         </td>
                     </tr>`;
                 }).join('');
