@@ -4411,7 +4411,7 @@
                         return {
                             'Nombre': r.name || 'N/A',
                             'Código': r.code || 'N/A',
-                            'Teléfono': r.phone ? r.phone.replace(/\D/g, '') : '',
+                            'Teléfono': r.phone ? r.phone.replace(/\D/g, '') : '', // Solo números
                             'Link Personal': `${window.location.origin}/?ref=${r.code.toLowerCase()}`
                         };
                     });
@@ -4495,20 +4495,28 @@
 
             window.saveRecruiter = function() {
                 const name = document.getElementById('recName').value.trim();
-                const rawPhone = document.getElementById('recPhone').value.trim();
                 const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
+                
+                // --- LÓGICA DE UNIÓN Y LIMPIEZA ---
+                const lada = document.getElementById('recPhoneCode').value; // Ej: +52
+                const numeroIngresado = document.getElementById('recPhone').value.trim();
+                
+                if (!name || !numeroIngresado || !code) return alert('⚠️ Llena todos los campos');
 
-                if (!name || !rawPhone || !code) return alert('⚠️ Llena todos los campos');
+                // Juntamos Lada + Número y quitamos cualquier cosa que no sea dígito (incluyendo el +)
+                let phoneFull = (lada + numeroIngresado).replace(/\D/g, ''); 
 
-                // Solo números para la base de datos
-                let pureNumbers = rawPhone.replace(/\D/g, ''); 
+                const recruiterData = { 
+                    name: name, 
+                    phone: phoneFull, // Se guarda como 529512348671
+                    code: code 
+                };
 
-                const recruiterData = { name, phone: pureNumbers, code };
                 const idToSave = editingRecruiterId || 'rec-' + Date.now();
 
                 set(ref(db, 'recruiters/' + idToSave), recruiterData)
                     .then(() => {
-                        window.showToast('✅ Datos guardados (sin signos)');
+                        window.showToast('✅ Reclutador guardado: ' + phoneFull);
                         resetRecruiterForm();    
                         renderRecruitersTable(); 
                     });
@@ -4517,14 +4525,18 @@
             window.editRecruiter = function(key) {
                 const r = recruiters[key];
                 if(!r) return;
+                
                 document.getElementById('recName').value = r.name;
                 document.getElementById('recCode').value = r.code;
-                // Mostramos el número limpio al editar
+                
+                // Cargamos el número tal cual (ej: 529512348671)
+                // Nota: El combo de la bandera se queda en el que esté, 
+                // pero al guardar, la lógica del paso 1 se encargará de todo.
                 document.getElementById('recPhone').value = r.phone.replace(/\D/g, ''); 
                 
                 editingRecruiterId = key;
                 const btnSave = document.getElementById('btnSaveRecruiter');
-                if(btnSave) btnSave.innerHTML = "🔄 Actualizar";
+                if(btnSave) btnSave.innerHTML = "🔄 Actualizar Reclutador";
             };
 
             window.deleteRecruiter = function(key) {
