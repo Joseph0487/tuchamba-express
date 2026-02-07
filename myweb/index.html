@@ -4411,7 +4411,7 @@
                         return {
                             'Nombre': r.name || 'N/A',
                             'Código': r.code || 'N/A',
-                            'Teléfono': r.phone ? r.phone.replace(/\D/g, '') : '', // Solo números
+                            'Teléfono': r.phone || '', // Bajamos el número tal cual está en Firebase
                             'Link Personal': `${window.location.origin}/?ref=${r.code.toLowerCase()}`
                         };
                     });
@@ -4497,18 +4497,25 @@
                 const name = document.getElementById('recName').value.trim();
                 const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
                 
-                // --- LÓGICA DE UNIÓN Y LIMPIEZA ---
-                const lada = document.getElementById('recPhoneCode').value; // Ej: +52
-                const numeroIngresado = document.getElementById('recPhone').value.trim();
+                const ladaSelect = document.getElementById('recPhoneCode').value; // Ej: +52
+                const ladaLimpia = ladaSelect.replace(/\D/g, ''); // 52
+                let numeroInput = document.getElementById('recPhone').value.trim().replace(/\D/g, ''); 
                 
-                if (!name || !numeroIngresado || !code) return alert('⚠️ Llena todos los campos');
+                if (!name || !numeroInput || !code) return alert('⚠️ Llena todos los campos');
 
-                // Juntamos Lada + Número y quitamos cualquier cosa que no sea dígito (incluyendo el +)
-                let phoneFull = (lada + numeroIngresado).replace(/\D/g, ''); 
+                // --- VALIDACIÓN ANTIDUPLICADOS ---
+                // Si el usuario escribió un número que ya empieza con la lada seleccionada,
+                // se la quitamos del input para que al unirla no se repita.
+                if (numeroInput.startsWith(ladaLimpia) && numeroInput.length > 10) {
+                    numeroInput = numeroInput.substring(ladaLimpia.length);
+                }
+
+                // Unimos la lada del combo con el número limpio
+                const phoneFull = ladaLimpia + numeroInput; 
 
                 const recruiterData = { 
                     name: name, 
-                    phone: phoneFull, // Se guarda como 529512348671
+                    phone: phoneFull, 
                     code: code 
                 };
 
@@ -4516,7 +4523,7 @@
 
                 set(ref(db, 'recruiters/' + idToSave), recruiterData)
                     .then(() => {
-                        window.showToast('✅ Reclutador guardado: ' + phoneFull);
+                        window.showToast('✅ Guardado con éxito: ' + phoneFull); // Aquí verás el número real en el cuadro negro
                         resetRecruiterForm();    
                         renderRecruitersTable(); 
                     });
@@ -4529,10 +4536,17 @@
                 document.getElementById('recName').value = r.name;
                 document.getElementById('recCode').value = r.code;
                 
-                // Cargamos el número tal cual (ej: 529512348671)
-                // Nota: El combo de la bandera se queda en el que esté, 
-                // pero al guardar, la lógica del paso 1 se encargará de todo.
-                document.getElementById('recPhone').value = r.phone.replace(/\D/g, ''); 
+                // --- LIMPIEZA PARA EL INPUT ---
+                // Tomamos el número de la base (ej: 52951...) y le quitamos la lada
+                // para que en el cuadrito solo veas los 10 dígitos.
+                const ladaActual = document.getElementById('recPhoneCode').value.replace(/\D/g, '');
+                let phoneDisplay = r.phone || '';
+                
+                if (phoneDisplay.startsWith(ladaActual)) {
+                    phoneDisplay = phoneDisplay.substring(ladaActual.length);
+                }
+                
+                document.getElementById('recPhone').value = phoneDisplay; 
                 
                 editingRecruiterId = key;
                 const btnSave = document.getElementById('btnSaveRecruiter');
