@@ -2254,7 +2254,7 @@
                                 <option value="+598">🇺🇾 +598</option>
                                 <option value="+58">🇻🇪 +58</option>
                             </select>
-                            <input type="text" id="recPhone" placeholder="Número completo (ej. 521234567890)" style="flex: 1; min-width: 200px;">
+                            <input type="text" id="recPhone" placeholder="Escribe el número aquí" style="flex:1;" autocomplete="off">
                         </div>
                     </div>
 
@@ -4497,15 +4497,20 @@
                 const name = document.getElementById('recName').value.trim();
                 const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
                 
-                // 1. Obtenemos los valores de los dos campos
-                const ladaSelect = document.getElementById('recPhoneCode').value; // Ej: +52
-                const numeroInput = document.getElementById('recPhone').value.trim();
+                // 1. Obtenemos lada y número por separado
+                const ladaCombo = document.getElementById('recPhoneCode').value.replace(/\D/g, ''); // Solo números del combo
+                let numeroCaja = document.getElementById('recPhone').value.trim().replace(/\D/g, ''); // Solo números de la caja
                 
-                if (!name || !numeroInput || !code) return alert('⚠️ Llena todos los campos');
+                if (!name || !numeroCaja || !code) return alert('⚠️ Llena todos los campos');
 
-                // 2. UNIÓN TOTAL: Pegamos lada + número y quitamos todo lo que no sea dígito
-                // Esto garantiza que se guarde como 529512348671
-                const phoneFull = (ladaSelect + numeroInput).replace(/\D/g, ''); 
+                // 2. REGLA DE ORO: Si el usuario ya escribió la lada en la caja (ej. pegó 52...), 
+                // se la quitamos para que al unirla con el combo no se duplique.
+                if (numeroCaja.startsWith(ladaCombo) && numeroCaja.length > 10) {
+                    numeroCaja = numeroCaja.substring(ladaCombo.length);
+                }
+
+                // 3. LA UNIÓN FINAL: Guardamos el churro completo
+                const phoneFull = ladaCombo + numeroCaja; 
 
                 const recruiterData = { 
                     name: name, 
@@ -4513,14 +4518,17 @@
                     code: code 
                 };
 
+                // Buscamos si estamos editando o creando nuevo
                 const idToSave = editingRecruiterId || 'rec-' + Date.now();
 
+                // 4. MANDAMOS A FIREBASE (Esto sobreescribe lo que haya)
                 set(ref(db, 'recruiters/' + idToSave), recruiterData)
                     .then(() => {
-                        window.showToast('✅ Guardado en Base de Datos: ' + phoneFull);
-                        resetRecruiterForm();    
+                        window.showToast('✅ Guardado con éxito: ' + phoneFull);
+                        resetRecruiterForm(); // Limpiamos todo el formulario
                         renderRecruitersTable(); 
-                    });
+                    })
+                    .catch(err => alert('❌ Error: ' + err.message));
             };
 
             window.editRecruiter = function(key) {
@@ -4530,13 +4538,23 @@
                 document.getElementById('recName').value = r.name;
                 document.getElementById('recCode').value = r.code;
                 
-                // Cargamos el número tal cual está guardado (ej: 529512348671)
-                // Así puedes borrar los primeros dígitos si la lada estaba mal
-                document.getElementById('recPhone').value = r.phone; 
+                // 1. Detectamos qué lada tiene el combo ahorita
+                const ladaActual = document.getElementById('recPhoneCode').value.replace(/\D/g, '');
+                let phoneDeBase = r.phone || '';
+                
+                // 2. Si el número de la base ya trae la lada, se la quitamos PARA MOSTRARLO
+                // Así en el cuadrito solo verás los 10 dígitos y podrás editarlos limpio
+                if (phoneDeBase.startsWith(ladaActual)) {
+                    phoneDeBase = phoneDeBase.substring(ladaActual.length);
+                }
+                
+                document.getElementById('recPhone').value = phoneDeBase; 
                 
                 editingRecruiterId = key;
                 const btnSave = document.getElementById('btnSaveRecruiter');
-                if(btnSave) btnSave.innerHTML = "🔄 Actualizar Reclutador";
+                if(btnSave) btnSave.innerHTML = "💾 Actualizar Reclutador";
+                
+                window.showToast("✏️ Editando: " + r.name);
             };
 
             window.deleteRecruiter = function(key) {
@@ -4550,15 +4568,13 @@
             };
 
             window.resetRecruiterForm = function() {
-            document.getElementById('recName').value = '';
-            document.getElementById('recCode').value = '';
-            document.getElementById('recPhone').value = '';
-            editingRecruiterId = null;
-            
-            // Solo reseteamos el botón de Guardar
-            const btnSave = document.getElementById('btnSaveRecruiter');
-            if(btnSave) btnSave.innerHTML = "💾 Guardar";
-        };
+                document.getElementById('recName').value = '';
+                document.getElementById('recCode').value = '';
+                document.getElementById('recPhone').value = '';
+                editingRecruiterId = null;
+                const btnSave = document.getElementById('btnSaveRecruiter');
+                if(btnSave) btnSave.innerHTML = "💾 Guardar Reclutador";
+            };
           
         // COPIAR LINK PERSONAL - VERSIÓN DEBUG (para ver por qué falla)
         window.copyRecruiterLink = function(specificLink = null) {
