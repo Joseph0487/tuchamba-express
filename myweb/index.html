@@ -4534,36 +4534,37 @@
                 }).join('');
             };
 
-            // --- GUARDADO: Limpia y concatena correctamente ---
-window.saveRecruiter = function() {
-    const name = document.getElementById('recName').value.trim();
-    const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
-    const lada = document.getElementById('recPhoneCode').value; 
-    const num = document.getElementById('recPhone').value.trim();
+            // --- GUARDADO: Limpia, previene duplicados y concatena ---
+            window.saveRecruiter = function() {
+                const name = document.getElementById('recName').value.trim();
+                const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
+                const lada = document.getElementById('recPhoneCode').value; 
+                const num = document.getElementById('recPhone').value.trim();
 
-    if (!name || !num || !code) return alert('⚠️ Llena todos los campos');
+                if (!name || !num || !code) return alert('⚠️ Llena todos los campos');
 
-    let cleanNum = num.replace(/\D/g, ''); // Solo números
-    let cleanLada = lada.replace('+', ''); // Lada sin el signo
-    
-    // Evitamos que se duplique la lada si el usuario la escribió manualmente
-    if (cleanNum.startsWith(cleanLada)) {
-        cleanNum = cleanNum.substring(cleanLada.length);
-    }
+                let cleanNum = num.replace(/\D/g, ''); // Solo números
+                let cleanLada = lada.replace('+', ''); // Lada sin el signo
+                
+                // SEGURIDAD: Si el usuario escribió la lada en el input por error, la quitamos
+                if (cleanNum.startsWith(cleanLada)) {
+                    cleanNum = cleanNum.substring(cleanLada.length);
+                }
 
-    const phoneToSave = cleanLada + cleanNum; // Resultado limpio para Firebase
+                const phoneToSave = cleanLada + cleanNum; // Resultado: 541126935040
 
-    const recruiterData = { name, phone: phoneToSave, code };
-    const idToSave = editingRecruiterId || 'rec-' + Date.now();
+                const recruiterData = { name, phone: phoneToSave, code };
+                const idToSave = editingRecruiterId || 'rec-' + Date.now();
 
-    set(ref(db, 'recruiters/' + idToSave), recruiterData)
-        .then(() => {
-            window.showToast('✅ Registro actualizado');
-            resetRecruiterForm();    
-            renderRecruitersTable(); 
-        });
-};
+                set(ref(db, 'recruiters/' + idToSave), recruiterData)
+                    .then(() => {
+                        window.showToast('✅ Registro actualizado correctamente');
+                        resetRecruiterForm();    
+                        renderRecruitersTable(); 
+                    });
+            };
 
+            // --- EDICIÓN: Identifica el país y separa los números ---
             window.editRecruiter = function(key) {
                 const r = recruiters[key];
                 if(!r) return;
@@ -4574,8 +4575,8 @@ window.saveRecruiter = function() {
                 const fullPhone = r.phone; 
                 const selectLada = document.getElementById('recPhoneCode');
                 
-                // Prefijos internacionales que manejas
-                const prefijos = ["52", "54", "591", "55", "56", "57", "506", "53", "593", "503", "34", "1", "502", "504", "505", "507", "595", "51", "598", "58"];
+                // Lista de prefijos (Asegúrate de que coincida con tu HTML)
+                const prefijos = ["591", "506", "593", "503", "502", "504", "505", "507", "595", "598", "52", "54", "55", "56", "57", "53", "34", "51", "58", "1"];
                 let encontrado = false;
 
                 for (let p of prefijos) {
@@ -4591,7 +4592,7 @@ window.saveRecruiter = function() {
                 
                 editingRecruiterId = key;
                 const btnSave = document.getElementById('btnSaveRecruiter');
-                if(btnSave) btnSave.innerHTML = "🔄 Actualizar Reclutador";
+                if(btnSave) btnSave.innerHTML = "🔄 Actualizar"; // Texto más profesional para edición
             };
 
             window.deleteRecruiter = function(key) {
