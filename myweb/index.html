@@ -1885,10 +1885,7 @@
                 }
             }
 
-        
-
-
-            /* =========================================================
+                    /* =========================================================
             CORRECCIONES RECLUTADOR MÓVIL (V22.FINAL) 📱
             (Parche Seguro: Lupa, Vistas Duplicadas y Títulos)
             ========================================================= */
@@ -1944,8 +1941,41 @@
                     padding: 10px !important;
                 }
         
-                
+            /* Contenedor con espaciado consistente */
+                .team-actions-container {
+                    display: flex;
+                    gap: 10px;
+                    margin-top: 15px;
+                }
 
+                /* Botones con look profesional "Slim" */
+                .btn-save-rec, .btn-base-rec {
+                    flex: 1;                /* Ambos miden exactamente lo mismo */
+                    height: 36px;           /* Altura elegante, no tosca */
+                    border-radius: 8px;     /* Bordes suaves */
+                    font-size: 13px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    border: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 6px;
+                    transition: all 0.2s ease;
+                }
+
+                /* Colores institucionales */
+                .btn-save-rec { background-color: #0a66c2; color: white; }
+                .btn-base-rec { background-color: #2e7d32; color: white; }
+
+                .btn-save-rec:hover, .btn-base-rec:hover {
+                    filter: brightness(1.1);
+                    transform: translateY(-1px);
+                }
+
+                .btn-save-rec:active, .btn-base-rec:active {
+                    transform: scale(0.98);
+                }
 
 
         </style>    
@@ -2283,16 +2313,16 @@
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-primary" id="btnSaveRecruiter" onclick="saveRecruiter()" style="flex: 1.5; height: 42px; font-size: 13px; border-radius: 8px;">💾 Guardar Reclutador</button>
-                        <button class="tool-btn" onclick="downloadRecruiters()" style="flex: 1; height: 42px; background:#2e7d32; font-size: 13px; justify-content: center; color: white; border-radius: 8px; border: none;">📥 Base</button>
+                    <div class="team-actions-container">
+                        <button class="btn-save-rec" id="btnSaveRecruiter" onclick="saveRecruiter()">
+                            💾 Guardar
+                        </button>
+                        <button class="btn-base-rec" onclick="downloadRecruiters()">
+                            📥 Base
+                        </button>
                     </div>
                 </div>
                 
-
-
-
-
                 <h3 style="font-size:16px; margin-bottom:10px; color:#555;">📂 Directorio Activo</h3>
                 <div class="table-container-pro" style="max-height: 350px; overflow-y: auto; position: relative; border: 1px solid #eee; border-radius: 10px;">
                     <table class="recruiters-table" style="width: 100%; border-collapse: collapse; table-layout: fixed;">
@@ -4504,29 +4534,35 @@
                 }).join('');
             };
 
-            window.saveRecruiter = function() {
-                const name = document.getElementById('recName').value.trim();
-                const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
-                const lada = document.getElementById('recPhoneCode').value; 
-                const num = document.getElementById('recPhone').value.trim();
+            // --- GUARDADO: Limpia y concatena correctamente ---
+window.saveRecruiter = function() {
+    const name = document.getElementById('recName').value.trim();
+    const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
+    const lada = document.getElementById('recPhoneCode').value; 
+    const num = document.getElementById('recPhone').value.trim();
 
-                if (!name || !num || !code) return alert('⚠️ Llena todos los campos');
+    if (!name || !num || !code) return alert('⚠️ Llena todos los campos');
 
-                // Limpieza de datos antes de subir a la nube
-                let cleanNum = num.replace(/\D/g, '');
-                let cleanLada = lada.replace('+', '');
-                const phoneToSave = cleanLada + cleanNum;
+    let cleanNum = num.replace(/\D/g, ''); // Solo números
+    let cleanLada = lada.replace('+', ''); // Lada sin el signo
+    
+    // Evitamos que se duplique la lada si el usuario la escribió manualmente
+    if (cleanNum.startsWith(cleanLada)) {
+        cleanNum = cleanNum.substring(cleanLada.length);
+    }
 
-                const recruiterData = { name, phone: phoneToSave, code };
-                const idToSave = editingRecruiterId || 'rec-' + Date.now();
+    const phoneToSave = cleanLada + cleanNum; // Resultado limpio para Firebase
 
-                set(ref(db, 'recruiters/' + idToSave), recruiterData)
-                    .then(() => {
-                        window.showToast('✅ Reclutador guardado');
-                        resetRecruiterForm();    
-                        renderRecruitersTable(); 
-                    });
-            };
+    const recruiterData = { name, phone: phoneToSave, code };
+    const idToSave = editingRecruiterId || 'rec-' + Date.now();
+
+    set(ref(db, 'recruiters/' + idToSave), recruiterData)
+        .then(() => {
+            window.showToast('✅ Registro actualizado');
+            resetRecruiterForm();    
+            renderRecruitersTable(); 
+        });
+};
 
             window.editRecruiter = function(key) {
                 const r = recruiters[key];
