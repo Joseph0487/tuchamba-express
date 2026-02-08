@@ -459,9 +459,13 @@
                 position: fixed; 
                 top: 0; left: 0; right: 0; bottom: 0; 
                 background: rgba(0,0,0,0.6); 
-                z-index: 3000 !important; /* ¡FUERZA BRUTA! Para que nada lo tape */
+                z-index: -1; /* <--- CAMBIA ESTO */
                 padding: 20px; 
                 backdrop-filter: blur(4px); 
+            }
+            .modal.active {
+                display: flex;
+                z-index: 3000 !important; /* <--- AGREGA ESTO */
             }
             .modal.active { display: flex; align-items: center; justify-content: center; }
             .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; overflow-x: hidden; padding-bottom: 0; }
