@@ -1891,72 +1891,71 @@
             ========================================================= */
             /* --- NUEVO PANEL RECLUTADOR MÓVIL V25.7 (ESTRUCTURA LIMPIA) --- */
             @media (max-width: 768px) {
-                /* 1. MANTENEMOS TU CONFIGURACIÓN DE VISTAS (Ya funciona, no la tocamos) */
-                body.recruiter-view #mobileMetricsPanel {
-                    display: block !important;
-                    background: white !important;
-                    margin: 5px 10px 10px 10px !important;
-                    border-radius: 10px !important;
-                    border: 1px solid #e0e0e0 !important;
-                    padding: 6px !important;
-                }
-
-                /* 2. PANEL DE CONTROL: REORGANIZADO */
-                body.recruiter-view #adminControls {
-                    display: block !important;
-                    background: white !important;
-                    border: 1px solid #e0e0e0 !important;
-                    border-radius: 16px !important;
-                    padding: 10px 8px !important;
-                    margin: 10px 5px !important;
-                    position: static !important;
-                }
-
-                /* 3. FILA DE 3 BOTONES: EL CORAZÓN DEL CAMBIO */
-                body.recruiter-view .admin-controls-wrapper {
-                    display: grid !important;
-                    grid-template-columns: repeat(3, 1fr) !important; 
-                    gap: 8px !important;
-                }
-
-                /* 4. ESTILO DE LOS 3 BOTONES QUE SE QUEDAN */
-                body.recruiter-view .admin-controls-wrapper button {
-                    grid-column: auto !important;
-                    width: 100% !important;
-                    height: 42px !important;
-                    font-size: 11px !important;
-                    font-weight: 700 !important;
-                    border-radius: 8px !important;
-                    display: flex !important;
-                    align-items: center; 
-                    justify-content: center;
-                    margin: 0 !important;
-                    padding: 0 4px !important;
-                }
-
-                /* 5. ELIMINACIÓN DE BOTONES SOBRANTES (Solo para Reclutador) */
-                /* Aquí es donde borramos lo que no debe ver el reclutador */
-                body.recruiter-view #adminSearchToggle,   /* Lupa */
-                body.recruiter-view #viewToggleBtn,       /* Botón Ojo (Vista) */
-                body.recruiter-view #seoSitemapBtn,       /* Botón Sitemap */
-                body.recruiter-view .metrics-card,        /* Tarjeta gris vieja */
-                body.recruiter-view .add-job-btn,         /* Botón Nueva Vacante */
-                body.recruiter-view .settings-btn,        /* Botón de Ajustes */
-                body.recruiter-view .team-btn,            /* Botón de Equipo */
-                body.recruiter-view button[onclick*="excelFile"] { /* Input de subir base */
-                    display: none !important;
-                }
-
-                /* 6. MANTENEMOS TUS TÍTULOS LEGIBLES */
-                body.recruiter-view .job-title {
-                    font-size: 16px !important;
-                    line-height: 1.3 !important;
-                    font-weight: 700 !important;
-                    margin-bottom: 5px !important;
-                    min-height: auto !important;
-                }
+            /* 1. MANTENEMOS TU PANEL DE VISTAS (No se toca porque ya te funciona) */
+            body.recruiter-view #mobileMetricsPanel {
+                display: block !important;
+                background: white !important;
+                margin: 5px 10px 10px 10px !important;
+                border-radius: 10px !important;
+                border: 1px solid #e0e0e0 !important;
+                padding: 6px !important;
             }
-            
+
+            /* 2. PANEL DE CONTROL PARA RECLUTADOR */
+            body.recruiter-view #adminControls {
+                display: block !important;
+                background: white !important;
+                border: 1px solid #e0e0e0 !important;
+                border-radius: 16px !important;
+                padding: 10px 8px !important;
+                margin: 10px 5px !important;
+            }
+
+            /* 3. FILA DE 3 COLUMNAS (Métricas, Respaldo, Plantilla) */
+            body.recruiter-view .admin-controls-wrapper {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important; 
+                gap: 8px !important;
+            }
+
+            /* 4. BLOQUEO TOTAL DE BOTONES PARA RECLUTADOR */
+            /* Aquí es donde "limpiamos" el panel del reclutador sin afectar al Admin */
+            body.recruiter-view .add-job-btn,           /* Botón "Nueva" */
+            body.recruiter-view .settings-btn,          /* Botón "Ajustes" */
+            body.recruiter-view .team-btn,              /* Botón "Equipo" */
+            body.recruiter-view #viewToggleBtn,         /* Botón "Vista" (Ojo) */
+            body.recruiter-view #seoSitemapBtn,         /* Botón "Sitemap" */
+            body.recruiter-view #adminSearchToggle,     /* Botón de la Lupa */
+            body.recruiter-view .metrics-card,           /* El cuadro gris viejo de visitas */
+            body.recruiter-view button[onclick*="excelFile"] { /* Botón de subir Excel */
+                display: none !important;
+            }
+
+            /* 5. ESTILO DE LOS 3 BOTONES QUE SE QUEDAN */
+            body.recruiter-view .admin-controls-wrapper button {
+                grid-column: auto !important;
+                width: 100% !important;
+                height: 44px !important;
+                font-size: 10px !important;
+                font-weight: 800 !important;
+                border-radius: 10px !important;
+                display: flex !important;
+                align-items: center; 
+                justify-content: center;
+                margin: 0 !important;
+                text-transform: uppercase;
+            }
+
+            /* 6. MANTENEMOS TUS TÍTULOS DE VACANTES LEGIBLES */
+            body.recruiter-view .job-title {
+                font-size: 16px !important;
+                line-height: 1.3 !important;
+                font-weight: 700 !important;
+                margin-bottom: 5px !important;
+            }
+        }
+
+
             /* Homologación visual del campo de teléfono */
                 .phone-group {
                     display: flex !important;
