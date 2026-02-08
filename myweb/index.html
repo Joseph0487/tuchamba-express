@@ -4607,15 +4607,25 @@
             };
 
             window.resetRecruiterForm = function() {
-            document.getElementById('recName').value = '';
-            document.getElementById('recCode').value = '';
-            document.getElementById('recPhone').value = '';
-            editingRecruiterId = null;
-            
-            // Solo reseteamos el botón de Guardar
-            const btnSave = document.getElementById('btnSaveRecruiter');
-            if(btnSave) btnSave.innerHTML = "💾 Guardar";
-        };
+                // 1. Limpiamos los campos de texto
+                document.getElementById('recName').value = '';
+                document.getElementById('recCode').value = '';
+                document.getElementById('recPhone').value = '';
+                
+                // 2. IMPORTANTE: Limpiamos el selector de país (poniéndolo en México por defecto)
+                const selectLada = document.getElementById('teamCountryCode');
+                if(selectLada) selectLada.value = '+52';
+                
+                // 3. Matamos la memoria del ID para que la siguiente acción sea una "Alta Nueva"
+                editingRecruiterId = null; 
+                
+                // 4. Restauramos el botón a su estado original (Azul y texto de Guardar)
+                const btnSave = document.getElementById('btnSaveRecruiter');
+                if(btnSave) {
+                    btnSave.innerHTML = "💾 Guardar Reclutador";
+                    btnSave.style.backgroundColor = "#0a66c2"; 
+                }
+};
           
         // COPIAR LINK PERSONAL - VERSIÓN DEBUG (para ver por qué falla)
         window.copyRecruiterLink = function(specificLink = null) {
