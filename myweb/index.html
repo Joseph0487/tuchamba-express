@@ -1924,10 +1924,10 @@
                     display: none !important;
                 }
 
-                /* 5. ESTILO PAREJO PARA LOS 3 QUE SE QUEDAN */
+                /* 5. ESTILO PAREJO Y ANGOSTO PARA LOS 3 QUE SE QUEDAN */
                 body.recruiter-view .admin-controls-wrapper button:not(.admin-only) {
                     width: 100% !important;
-                    height: 44px !important;
+                    height: 32px !important; /* <--- AQUÍ LOS HACEMOS MÁS ANGOSTOS */
                     font-size: 10px !important;
                     font-weight: 800 !important;
                     border-radius: 8px !important;
@@ -1935,7 +1935,9 @@
                     align-items: center; 
                     justify-content: center;
                     margin: 0 !important;
+                    padding: 0 2px !important;
                     text-transform: uppercase;
+                    line-height: 1;
                 }
 
                 /* 6. Mantenemos tus títulos de vacantes legibles */
