@@ -3174,142 +3174,176 @@
                 if(selectedMonths.length === 0) return alert("Selecciona al menos un mes");
 
                 try {
-                    // 1. CARGA PEREZOSA: Traemos la herramienta de Excel solo si vas a descargar reportes
+                    // Carga de la librería de Excel solo cuando se necesita
                     await loadExternalLibrary("https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js", "XLSX");
+                    window.showToast("📊 Generando Reporte Maestro V25.7...");
 
-                    window.showToast("📊 Generando reporte detallado...");
+                    // Función interna para nombres de mes legibles
+                    const getMonthName = (monthKey) => {
+                        const [year, month] = monthKey.split('-');
+                        const date = new Date(year, month - 1);
+                        return date.toLocaleString('es-MX', { month: 'short', year: 'numeric' }).toUpperCase();
+                    };
 
                     const dataRows = [];
-                    
-                    Object.keys(jobs).forEach(jobId => {
-                        const j = jobs[jobId];
-                        const s = jobStats[jobId] || {};
-                        
-                        let totalViews = 0;
-                        selectedMonths.forEach(m => {
-                            if(s.monthlyViews && s.monthlyViews[m]) {
-                                totalViews += s.monthlyViews[m];
+                    const recruiterRows = [];
+                    const detailRows = [];
+                    const clickEventRows = [];
+
+                    // 1. PROCESAMIENTO CONGLOMERADO (Dato en Bruto por Mes)
+                    selectedMonths.sort().forEach(m => {
+                        const monthLabel = getMonthName(m);
+
+                        // Hoja: Desempeño Vacantes
+                        Object.keys(jobs).forEach(jobId => {
+                            const j = jobs[jobId];
+                            const s = jobStats[jobId] || {};
+                            const views = (s.monthlyViews && s.monthlyViews[m]) ? s.monthlyViews[m] : 0;
+                            const clicks = Object.values(clickLogs).filter(l => 
+                                l && l.jobId === jobId && 
+                                l.timestamp && typeof l.timestamp === 'string' &&
+                                l.timestamp.substring(0,7) === m
+                            ).length;
+
+                            if(views > 0 || clicks > 0) {
+                                dataRows.push({
+                                    'MES': monthLabel,
+                                    'ID': jobId,
+                                    'Título': j.title,
+                                    'Empresa': j.company,
+                                    'Vistas': views,
+                                    'Clics WhatsApp': clicks,
+                                    'Estatus': j.status
+                                });
                             }
                         });
-                        
-                        const clicksInMonths = Object.values(clickLogs).filter(l => 
-                            l && l.jobId === jobId && 
-                            l.timestamp && typeof l.timestamp === 'string' &&
-                            selectedMonths.includes(l.timestamp.substring(0,7))
-                        ).length;
 
-                        dataRows.push({
-                            'ID': jobId,
-                            'Título': j.title,
-                            'Empresa': j.company,
-                            'Vistas (Meses selecc.)': totalViews,
-                            'Clics WhatsApp (Meses selecc.)': clicksInMonths,
-                            'Estatus': j.status
+                        // Hoja: Rendimiento Equipo
+                        const recruiterMonthMap = {};
+                        let totalMonthClicks = 0;
+                        Object.values(clickLogs).forEach(l => {
+                            if(l && l.timestamp && typeof l.timestamp === 'string' && l.timestamp.substring(0,7) === m) {
+                                const recName = l.recruiter || 'Orgánico';
+                                if(!recruiterMonthMap[recName]) recruiterMonthMap[recName] = 0;
+                                recruiterMonthMap[recName]++;
+                                totalMonthClicks++;
+                            }
                         });
-                    });
 
-                    const recruiterMap = {};
-                    let totalRecruiterClicks = 0;
-                    Object.values(clickLogs).forEach(l => {
-                        if(l && l.timestamp && typeof l.timestamp === 'string' && selectedMonths.includes(l.timestamp.substring(0,7))) {
-                            const recName = l.recruiter || 'Orgánico';
-                            if(!recruiterMap[recName]) recruiterMap[recName] = 0;
-                            recruiterMap[recName]++;
-                            totalRecruiterClicks++;
-                        }
-                    });
-
-                    let recruiterRows = Object.keys(recruiterMap).map(name => ({
-                        'Reclutador': name,
-                        'Clics Generados': recruiterMap[name],
-                        '% del Total': totalRecruiterClicks > 0 ? ((recruiterMap[name] / totalRecruiterClicks) * 100).toFixed(2) + '%' : '0%'
-                    }));
-
-                    if (recruiterRows.length === 0) recruiterRows = [{'Reclutador': 'Sin datos', 'Clics': 0}];
-
-                    const detailMap = {}; 
-
-                    // Lógica de cruce de datos para el detalle
-                    Object.keys(jobs).forEach(jobId => {
-                        const j = jobs[jobId];
-                        const s = jobStats[jobId] || {};
-                        
-                        if (s.viewsByRecruiter) {
-                            Object.keys(s.viewsByRecruiter).forEach(recCode => {
-                                let recName = 'Orgánico';
-                                if (recCode !== 'ORGANICO') {
-                                    const foundRec = Object.values(recruiters).find(r => r.code === recCode);
-                                    recName = foundRec ? foundRec.name : recCode;
-                                }
-
-                                const key = `${jobId}_${recName}`;
-                                
-                                if (!detailMap[key]) detailMap[key] = { 
-                                    jobId: jobId, 
-                                    title: j.title, 
-                                    company: j.company || 'Sin Empresa',
-                                    whatsapp: j.contact || 'Sin Num',
-                                    recruiter: recName, 
-                                    views: 0, 
-                                    clicks: 0 
-                                };
-                                
-                                detailMap[key].views = s.viewsByRecruiter[recCode];
+                        Object.keys(recruiterMonthMap).forEach(name => {
+                            recruiterRows.push({
+                                'MES': monthLabel,
+                                'Reclutador': name,
+                                'Clics Generados': recruiterMonthMap[name],
+                                '% del Mes': totalMonthClicks > 0 ? ((recruiterMonthMap[name] / totalMonthClicks) * 100).toFixed(1) + '%' : '0%'
                             });
-                        }
+                        });
+
+                        // Hoja: Detalle Rec-Vacante (Validación de WhatsApp Real)
+                        const detailMonthMap = {};
+                        Object.values(clickLogs).forEach(l => {
+                            if(l && l.jobId && l.timestamp && typeof l.timestamp === 'string' && l.timestamp.substring(0,7) === m) {
+                                const j = jobs[l.jobId];
+                                if(!j) return;
+                                const recName = l.recruiter || 'Orgánico';
+                                const key = `${m}_${l.jobId}_${recName}`;
+
+                                if (!detailMonthMap[key]) {
+                                    // VALIDACIÓN DE TELÉFONO DESTINO
+                                    let destPhone = 'Sin Número';
+                                    if (l.recruiter && l.recruiter !== 'Orgánico' && l.recruiter !== 'directo') {
+                                        const foundRec = Object.values(recruiters).find(r => r.name === l.recruiter);
+                                        destPhone = foundRec ? foundRec.phone : (j.contact || centralPhone);
+                                    } else {
+                                        destPhone = j.contact || centralPhone;
+                                    }
+
+                                    detailMonthMap[key] = {
+                                        'MES': monthLabel,
+                                        'ID Vacante': l.jobId,
+                                        'Reclutador': recName,
+                                        'Empresa': j.company,
+                                        'Vacante': j.title,
+                                        'Clics': 0,
+                                        'WhatsApp Destino': destPhone
+                                    };
+                                }
+                                detailMonthMap[key]['Clics']++;
+                            }
+                        });
+                        Object.values(detailMonthMap).forEach(row => detailRows.push(row));
                     });
 
+                    // 2. HOJA NUEVA: Log de Clics Individuales (Bitácora)
                     Object.values(clickLogs).forEach(l => {
                         if(l && l.jobId && l.timestamp && typeof l.timestamp === 'string' && selectedMonths.includes(l.timestamp.substring(0,7))) {
                             const j = jobs[l.jobId];
+                            if(!j) return;
                             const recName = l.recruiter || 'Orgánico';
-                            const key = `${l.jobId}_${recName}`;
                             
-                            if (!detailMap[key]) detailMap[key] = { 
-                                jobId: l.jobId, 
-                                title: j ? j.title : 'Vacante Borrada', 
-                                company: j ? j.company : 'N/A',
-                                whatsapp: j ? j.contact : 'N/A',
-                                recruiter: recName, 
-                                views: 0, 
-                                clicks: 0 
-                            };
-                            
-                            detailMap[key].clicks++;
+                            let destPhone = 'Sin Número';
+                            if (l.recruiter && l.recruiter !== 'Orgánico' && l.recruiter !== 'directo') {
+                                const foundRec = Object.values(recruiters).find(r => r.name === l.recruiter);
+                                destPhone = foundRec ? foundRec.phone : (j.contact || centralPhone);
+                            } else {
+                                destPhone = j.contact || centralPhone;
+                            }
+
+                            const dateObj = new Date(l.timestamp);
+                            const formattedDate = dateObj.toLocaleDateString('es-MX', {day:'2-digit', month:'2-digit', year:'numeric'}) + ' ' + 
+                                                dateObj.toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit', hour12: false});
+
+                            clickEventRows.push({
+                                'ID Vacante': l.jobId,
+                                'Reclutador': recName,
+                                'Empresa': j.company,
+                                'Vacante': j.title,
+                                'WhatsApp Destino': destPhone,
+                                'Fecha y Hora': formattedDate
+                            });
                         }
                     });
+                    
+                    // Ordenar logs: Lo más reciente arriba
+                    clickEventRows.sort((a,b) => b['Fecha y Hora'].localeCompare(a['Fecha y Hora']));
 
-                    let detailRows = Object.values(detailMap).map(d => ({
-                        'ID Vacante': d.jobId,
-                        'Reclutador': d.recruiter,
-                        'Empresa': d.company,
-                        'Vacante': d.title,
-                        'Vistas Totales (Histórico)': d.views, 
-                        'Clics (Meses selecc.)': d.clicks,
-                        'Conversion %': d.views > 0 ? ((d.clicks / d.views) * 100).toFixed(1) + '%' : '0%',
-                        'WhatsApp Destino': d.whatsapp
-                    }));
-
+                    // 3. ARMADO DEL LIBRO EXCEL
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataRows), "Desempeño Vacantes");
                     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(recruiterRows), "Rendimiento Equipo");
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(detailRows), "Detalle Rec-Vacante");
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(clickEventRows), "Log de Clics Individuales");
                     
                     const summaryRows = [
-                        { 'Métrica': 'Periodo Analizado', 'Valor': selectedMonths.join(', ') },
-                        { 'Métrica': 'Total Vistas', 'Valor': dataRows.reduce((a,b)=>a+b['Vistas (Meses selecc.)'],0) },
-                        { 'Métrica': 'Total Clics (Leads)', 'Valor': dataRows.reduce((a,b)=>a+b['Clics WhatsApp (Meses selecc.)'],0) }
+                        { 'Métrica': 'Periodo Seleccionado', 'Valor': selectedMonths.map(getMonthName).join(', ') },
+                        { 'Métrica': 'Total Clics Verdes en Periodo', 'Valor': clickEventRows.length }
                     ];
                     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryRows), "Resumen Global");
-                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(detailRows.length ? detailRows : [{'Mensaje': 'Sin datos'}]), "Detalle Rec-Vacante");
 
-                    XLSX.writeFile(wb, `Reporte_TuChamba_${selectedMonths.join('_')}.xlsx`);
-                    window.showToast("✅ Reporte generado correctamente");
+                    XLSX.writeFile(wb, `Reporte_KPIs_TuChamba_${selectedMonths.join('_')}.xlsx`);
+                    window.showToast("✅ Reporte Maestro Generado");
 
                 } catch (err) {
                     console.error(err);
-                    alert("❌ Error al procesar las métricas o cargar la herramienta.");
+                    alert("❌ Error al generar el reporte avanzado.");
                 }
             };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             let lastClickTime = 0; 
             window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
