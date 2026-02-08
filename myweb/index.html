@@ -1892,67 +1892,59 @@
             /* --- NUEVO PANEL RECLUTADOR MÓVIL V25.7 (ESTRUCTURA LIMPIA) --- */
             /* --- V25.7: LIMPIEZA TOTAL DE BOTONES Y REACTIVACIÓN DE CONTADORES --- */
             @media (max-width: 768px) {
-                /* 1. ASEGURAMOS QUE LOS CONTADORES SE VEAN SIEMPRE (Quitamos el bloqueo) */
+                /* 1. FORZAMOS QUE LA BARRA DE VISTAS APAREZCA ARRIBA */
                 #mobileMetricsPanel {
                     display: block !important;
                     visibility: visible !important;
                     background: #f8f9fa !important;
                     margin: 10px 10px 5px 10px !important;
-                    padding: 10px !important;
+                    padding: 12px !important;
                     border-radius: 12px !important;
                     border: 1px solid #ddd !important;
-                    text-align: center !important;
                 }
 
-                /* 2. PANEL DEL RECLUTADOR: SOLO 3 COLUMNAS */
+                /* 2. DISEÑO DEL PANEL DE BOTONES */
                 body.recruiter-view #adminControls {
                     display: block !important;
                     background: white !important;
-                    padding: 10px 8px !important;
+                    padding: 10px !important;
                     margin: 5px 5px 10px 5px !important;
                     border-radius: 16px !important;
                     border: 1px solid #e0e0e0 !important;
                 }
 
+                /* 3. REGLA DE ORO: SOLO 3 COLUMNAS */
                 body.recruiter-view .admin-controls-wrapper {
                     display: grid !important;
-                    grid-template-columns: repeat(3, 1fr) !important; /* FILA DE 3 PAREJOS */
+                    grid-template-columns: repeat(3, 1fr) !important;
                     gap: 8px !important;
                 }
 
-                /* 3. ELIMINAMOS TODOS LOS BOTONES QUE NO SON MÉTRICAS, RESPALDO O PLANTILLA */
-                body.recruiter-view .add-job-btn,           /* Botón Nueva Vacante */
-                body.recruiter-view .settings-btn,          /* Botón Ajustes */
-                body.recruiter-view .team-btn,              /* Botón Equipo */
-                body.recruiter-view #viewToggleBtn,         /* Botón Ojo (Vista) */
-                body.recruiter-view #seoSitemapBtn,         /* Botón Sitemap */
-                body.recruiter-view #adminSearchToggle,     /* Botón Lupa */
-                body.recruiter-view .metrics-card,           /* Tarjeta vieja de números */
-                body.recruiter-view button[onclick*="excelFile"] { /* Botón de subir base */
+                /* 4. AQUÍ ESTÁ EL TRUCO: OCULTAR TODO LO QUE NO QUEREMOS */
+                /* Desaparecemos: Lupa, Ojo, Nueva, Ajustes, Equipo, Sitemap, Excel y Metrics-Card vieja */
+                body.recruiter-view #adminSearchToggle,
+                body.recruiter-view #viewToggleBtn,
+                body.recruiter-view .add-job-btn,
+                body.recruiter-view .settings-btn,
+                body.recruiter-view .team-btn,
+                body.recruiter-view #seoSitemapBtn,
+                body.recruiter-view .metrics-card,
+                body.recruiter-view button[onclick*="excelFile"] {
                     display: none !important;
                 }
 
-                /* 4. AJUSTE DE TAMAÑO PARA LOS 3 BOTONES RESTANTES */
+                /* 5. AJUSTE DE LOS 3 BOTONES SOBREVIVIENTES */
                 body.recruiter-view .admin-controls-wrapper button {
                     grid-column: auto !important;
                     width: 100% !important;
-                    height: 46px !important; /* Altura cómoda para el dedo */
-                    font-size: 11px !important;
-                    font-weight: 700 !important;
+                    height: 48px !important;
+                    font-size: 10px !important;
+                    font-weight: 800 !important;
                     border-radius: 10px !important;
-                    margin: 0 !important;
                     display: flex !important;
                     align-items: center;
                     justify-content: center;
                     text-transform: uppercase;
-                }
-
-                /* Mantenemos tus títulos de vacantes legibles */
-                body.recruiter-view .job-title {
-                    font-size: 16px !important;
-                    line-height: 1.3 !important;
-                    font-weight: 700 !important;
-                    margin-bottom: 5px !important;
                 }
             }
 
