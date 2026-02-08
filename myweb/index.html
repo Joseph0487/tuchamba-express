@@ -3109,15 +3109,6 @@
                     console.error("Error al copiar:", err);
                 });
             }
-            
-            //function renderRecruitersTable() {
-                //const list = document.getElementById('recruitersList');
-                //if(Object.keys(recruiters).length === 0) { list.innerHTML = '<tr><td colspan="4" style="text-align:center;">No hay reclutadores</td></tr>'; return; }
-                //list.innerHTML = Object.keys(recruiters).map(key => { 
-                    //const r = recruiters[key]; 
-                    //return `<tr><td>${r.name}</td><td><b>${r.code}</b></td><td><button class="copy-btn" onclick="copyLink('${r.code}')">Copiar</button></td><td><button onclick="editRecruiter('${key}')" style="cursor:pointer; border:none; background:none;">✏️</button><button onclick="deleteRecruiter('${key}')" style="cursor:pointer; border:none; background:none;">🗑️</button></td></tr>`; 
-                //}).join('');
-            //}
 
             function populateMetricsList() {
                 const list = document.getElementById('metricsMonthList');
@@ -3330,7 +3321,7 @@
                     // --- MODIFICADO: Ahora abrimos cleanLink en lugar de link ---
                     window.open(cleanLink, '_blank'); 
                     btn.disabled = false;
-                    btn.innerHTML = '¡PIDE INFORMES Y EMPIEZA YA! 📲';
+                    btn.innerHTML = '📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC';
                 }, 500);
             };
 
@@ -4515,20 +4506,23 @@
 
             window.saveRecruiter = function() {
                 const name = document.getElementById('recName').value.trim();
-                const rawPhone = document.getElementById('recPhone').value.trim();
                 const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
+                const lada = document.getElementById('recPhoneCode').value; 
+                const num = document.getElementById('recPhone').value.trim();
 
-                if (!name || !rawPhone || !code) return alert('⚠️ Llena todos los campos');
+                if (!name || !num || !code) return alert('⚠️ Llena todos los campos');
 
-                // Solo números para la base de datos
-                let pureNumbers = rawPhone.replace(/\D/g, ''); 
+                // Limpieza de datos antes de subir a la nube
+                let cleanNum = num.replace(/\D/g, '');
+                let cleanLada = lada.replace('+', '');
+                const phoneToSave = cleanLada + cleanNum;
 
-                const recruiterData = { name, phone: pureNumbers, code };
+                const recruiterData = { name, phone: phoneToSave, code };
                 const idToSave = editingRecruiterId || 'rec-' + Date.now();
 
                 set(ref(db, 'recruiters/' + idToSave), recruiterData)
                     .then(() => {
-                        window.showToast('✅ Datos guardados (sin signos)');
+                        window.showToast('✅ Reclutador guardado');
                         resetRecruiterForm();    
                         renderRecruitersTable(); 
                     });
@@ -4537,14 +4531,31 @@
             window.editRecruiter = function(key) {
                 const r = recruiters[key];
                 if(!r) return;
+                
                 document.getElementById('recName').value = r.name;
                 document.getElementById('recCode').value = r.code;
-                // Mostramos el número limpio al editar
-                document.getElementById('recPhone').value = r.phone.replace(/\D/g, ''); 
+                
+                const fullPhone = r.phone; 
+                const selectLada = document.getElementById('recPhoneCode');
+                
+                // Prefijos internacionales que manejas
+                const prefijos = ["52", "54", "591", "55", "56", "57", "506", "53", "593", "503", "34", "1", "502", "504", "505", "507", "595", "51", "598", "58"];
+                let encontrado = false;
+
+                for (let p of prefijos) {
+                    if (fullPhone.startsWith(p)) {
+                        selectLada.value = "+" + p;
+                        document.getElementById('recPhone').value = fullPhone.substring(p.length);
+                        encontrado = true;
+                        break;
+                    }
+                }
+
+                if(!encontrado) document.getElementById('recPhone').value = fullPhone;
                 
                 editingRecruiterId = key;
                 const btnSave = document.getElementById('btnSaveRecruiter');
-                if(btnSave) btnSave.innerHTML = "🔄 Actualizar";
+                if(btnSave) btnSave.innerHTML = "🔄 Actualizar Reclutador";
             };
 
             window.deleteRecruiter = function(key) {
