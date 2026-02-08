@@ -1889,71 +1889,63 @@
             CORRECCIONES RECLUTADOR MÓVIL (V22.FINAL) 📱
             (Parche Seguro: Lupa, Vistas Duplicadas y Títulos)
             ========================================================= */
-            /* --- NUEVO PANEL RECLUTADOR MÓVIL V25.7 (ESTRUCTURA LIMPIA) --- */
+            /* --- LIMPIEZA DE BOTONES MODO RECLUTADOR V25.7 --- */
             @media (max-width: 768px) {
-            /* 1. MANTENEMOS TU PANEL DE VISTAS (No se toca porque ya te funciona) */
-            body.recruiter-view #mobileMetricsPanel {
-                display: block !important;
-                background: white !important;
-                margin: 5px 10px 10px 10px !important;
-                border-radius: 10px !important;
-                border: 1px solid #e0e0e0 !important;
-                padding: 6px !important;
-            }
+                /* 1. Mantenemos el panel de vistas exactamente como está */
+                body.recruiter-view #mobileMetricsPanel {
+                    display: block !important;
+                }
 
-            /* 2. PANEL DE CONTROL PARA RECLUTADOR */
-            body.recruiter-view #adminControls {
-                display: block !important;
-                background: white !important;
-                border: 1px solid #e0e0e0 !important;
-                border-radius: 16px !important;
-                padding: 10px 8px !important;
-                margin: 10px 5px !important;
-            }
+                /* 2. CONFIGURACIÓN DEL PANEL (Solo para Reclutador) */
+                body.recruiter-view #adminControls {
+                    display: block !important;
+                    background: white !important;
+                    border: 1px solid #e0e0e0 !important;
+                    border-radius: 16px !important;
+                    padding: 10px 8px !important;
+                    margin: 10px 5px !important;
+                    position: static !important;
+                }
 
-            /* 3. FILA DE 3 COLUMNAS (Métricas, Respaldo, Plantilla) */
-            body.recruiter-view .admin-controls-wrapper {
-                display: grid !important;
-                grid-template-columns: repeat(3, 1fr) !important; 
-                gap: 8px !important;
-            }
+                /* 3. FILA DE 3 BOTONES: Métricas, Respaldo y Plantilla */
+                body.recruiter-view .admin-controls-wrapper {
+                    display: grid !important;
+                    grid-template-columns: repeat(3, 1fr) !important; 
+                    gap: 8px !important;
+                }
 
-            /* 4. BLOQUEO TOTAL DE BOTONES PARA RECLUTADOR */
-            /* Aquí es donde "limpiamos" el panel del reclutador sin afectar al Admin */
-            body.recruiter-view .add-job-btn,           /* Botón "Nueva" */
-            body.recruiter-view .settings-btn,          /* Botón "Ajustes" */
-            body.recruiter-view .team-btn,              /* Botón "Equipo" */
-            body.recruiter-view #viewToggleBtn,         /* Botón "Vista" (Ojo) */
-            body.recruiter-view #seoSitemapBtn,         /* Botón "Sitemap" */
-            body.recruiter-view #adminSearchToggle,     /* Botón de la Lupa */
-            body.recruiter-view .metrics-card,           /* El cuadro gris viejo de visitas */
-            body.recruiter-view button[onclick*="excelFile"] { /* Botón de subir Excel */
-                display: none !important;
-            }
+                /* 4. ELIMINACIÓN DE BOTONES PROHIBIDOS PARA RECLUTADOR */
+                /* Aquí es donde matamos a los intrusos que se te colaban */
+                body.recruiter-view .admin-only,           /* Mata: Nueva, Equipo, Ajustes y Cargar */
+                body.recruiter-view #viewToggleBtn,        /* Mata: El botón de Vista (Ojo) */
+                body.recruiter-view #seoSitemapBtn,        /* Mata: El botón de Sitemap */
+                body.recruiter-view #adminSearchToggle,    /* Mata: La Lupa de búsqueda */
+                body.recruiter-view .metrics-card {        /* Mata: El cuadro gris viejo de visitas */
+                    display: none !important;
+                }
 
-            /* 5. ESTILO DE LOS 3 BOTONES QUE SE QUEDAN */
-            body.recruiter-view .admin-controls-wrapper button {
-                grid-column: auto !important;
-                width: 100% !important;
-                height: 44px !important;
-                font-size: 10px !important;
-                font-weight: 800 !important;
-                border-radius: 10px !important;
-                display: flex !important;
-                align-items: center; 
-                justify-content: center;
-                margin: 0 !important;
-                text-transform: uppercase;
-            }
+                /* 5. ESTILO PAREJO PARA LOS 3 QUE SE QUEDAN */
+                body.recruiter-view .admin-controls-wrapper button:not(.admin-only) {
+                    width: 100% !important;
+                    height: 44px !important;
+                    font-size: 10px !important;
+                    font-weight: 800 !important;
+                    border-radius: 8px !important;
+                    display: flex !important;
+                    align-items: center; 
+                    justify-content: center;
+                    margin: 0 !important;
+                    text-transform: uppercase;
+                }
 
-            /* 6. MANTENEMOS TUS TÍTULOS DE VACANTES LEGIBLES */
-            body.recruiter-view .job-title {
-                font-size: 16px !important;
-                line-height: 1.3 !important;
-                font-weight: 700 !important;
-                margin-bottom: 5px !important;
+                /* 6. Mantenemos tus títulos de vacantes legibles */
+                body.recruiter-view .job-title {
+                    font-size: 16px !important;
+                    line-height: 1.3 !important;
+                    font-weight: 700 !important;
+                    margin-bottom: 5px !important;
+                }
             }
-        }
 
 
             /* Homologación visual del campo de teléfono */
