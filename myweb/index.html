@@ -2286,7 +2286,7 @@
                     <div style="margin-bottom: 15px;">
                         <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px; color: #555;">WhatsApp de Contacto</label>
                         <div style="display: flex; gap: 8px;">
-                            <select id="recPhoneCode" style="width: 95px; height: 38px; font-size: 12px; border: 1px solid #ccc; border-radius: 8px; background: white; padding: 0 5px;">
+                            <select id="teamCountryCode" style="width: 95px; height: 38px; font-size: 12px; border: 1px solid #ccc; border-radius: 8px; background: white; padding: 0 5px;">
                                 <option value="+52">🇲🇽 +52</option>
                                 <option value="+54">🇦🇷 +54</option>
                                 <option value="+591">🇧🇴 +591</option>
@@ -4534,37 +4534,37 @@
                 }).join('');
             };
 
-            // --- GUARDADO: Limpia, previene duplicados y concatena ---
+            // --- GUARDADO DE RECLUTADOR CON MEMORIA ---
             window.saveRecruiter = function() {
                 const name = document.getElementById('recName').value.trim();
                 const code = document.getElementById('recCode').value.toUpperCase().replace(/\s/g, '');
-                const lada = document.getElementById('recPhoneCode').value; 
+                const lada = document.getElementById('teamCountryCode').value; // ID Único corregido
                 const num = document.getElementById('recPhone').value.trim();
 
                 if (!name || !num || !code) return alert('⚠️ Llena todos los campos');
 
-                let cleanNum = num.replace(/\D/g, ''); // Solo números
-                let cleanLada = lada.replace('+', ''); // Lada sin el signo
+                let cleanNum = num.replace(/\D/g, '');
+                let cleanLada = lada.replace('+', '');
                 
-                // SEGURIDAD: Si el usuario escribió la lada en el input por error, la quitamos
                 if (cleanNum.startsWith(cleanLada)) {
                     cleanNum = cleanNum.substring(cleanLada.length);
                 }
 
-                const phoneToSave = cleanLada + cleanNum; // Resultado: 541126935040
-
+                const phoneToSave = cleanLada + cleanNum;
                 const recruiterData = { name, phone: phoneToSave, code };
+                
+                // Si editingRecruiterId tiene valor, Firebase sobreescribe el mismo registro
                 const idToSave = editingRecruiterId || 'rec-' + Date.now();
 
                 set(ref(db, 'recruiters/' + idToSave), recruiterData)
                     .then(() => {
-                        window.showToast('✅ Registro actualizado correctamente');
-                        resetRecruiterForm();    
+                        window.showToast('✅ Registro guardado correctamente');
+                        resetRecruiterForm(); // Limpia el formulario y resetea el ID de edición
                         renderRecruitersTable(); 
                     });
             };
 
-            // --- EDICIÓN: Identifica el país y separa los números ---
+            // --- EDICIÓN DE RECLUTADOR CON DETECCIÓN DE PAÍS ---
             window.editRecruiter = function(key) {
                 const r = recruiters[key];
                 if(!r) return;
@@ -4573,12 +4573,13 @@
                 document.getElementById('recCode').value = r.code;
                 
                 const fullPhone = r.phone; 
-                const selectLada = document.getElementById('recPhoneCode');
+                const selectLada = document.getElementById('teamCountryCode'); // ID Único corregido
                 
-                // Lista de prefijos (Asegúrate de que coincida con tu HTML)
-                const prefijos = ["591", "506", "593", "503", "502", "504", "505", "507", "595", "598", "52", "54", "55", "56", "57", "53", "34", "51", "58", "1"];
-                let encontrado = false;
+                // Lista de prefijos para detectar el país automáticamente
+                const prefijos = ["52", "54", "591", "55", "56", "57", "506", "53", "593", "503", "34", "1", "502", "504", "505", "507", "595", "51", "598", "58"];
+                prefijos.sort((a, b) => b.length - a.length); // Ordenar para no confundir 5 con 52
 
+                let encontrado = false;
                 for (let p of prefijos) {
                     if (fullPhone.startsWith(p)) {
                         selectLada.value = "+" + p;
@@ -4590,9 +4591,9 @@
 
                 if(!encontrado) document.getElementById('recPhone').value = fullPhone;
                 
-                editingRecruiterId = key;
+                editingRecruiterId = key; // Guardamos el ID en memoria para el guardado posterior
                 const btnSave = document.getElementById('btnSaveRecruiter');
-                if(btnSave) btnSave.innerHTML = "🔄 Actualizar"; // Texto más profesional para edición
+                if(btnSave) btnSave.innerHTML = "💾 Actualizar Reclutador";
             };
 
             window.deleteRecruiter = function(key) {
