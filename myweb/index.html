@@ -4763,6 +4763,78 @@
                 }
             };
 
+            // --- DETECTIVE DE EVENTOS EXTERNOS ---
+            const EventManager = {
+                repoURL: './assets/eventos/',
+
+                async init() {
+                    const mesActual = new Date().getMonth();
+                    try {
+                        const response = await fetch(this.repoURL + 'config-eventos.json');
+                        const config = await response.json();
+                        
+                        if (config[mesActual]) {
+                            this.lanzarEfecto(config[mesActual]);
+                        }
+                    } catch (e) {
+                        console.log("Hoy no hay eventos especiales.");
+                    }
+                },
+
+                lanzarEfecto(datos) {
+                    // Crear capa invisible
+                    const capa = document.createElement('div');
+                    capa.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; overflow:hidden;';
+                    document.body.appendChild(capa);
+
+                    // Lanzar 15 elementos aleatorios
+                    for (let i = 0; i < 15; i++) {
+                        const imgIndex = Math.floor(Math.random() * datos.elementos.length);
+                        const img = document.createElement('img');
+                        img.src = this.repoURL + datos.elementos[imgIndex];
+                        img.style.cssText = `
+                            position: absolute; bottom: -100px; width: ${Math.random() * 40 + 20}px;
+                            left: ${Math.random() * 100}vw; opacity: 0.8;
+                            animation: subirFlotando ${Math.random() * 3 + 4}s linear forwards;
+                        `;
+                        capa.appendChild(img);
+                    }
+
+                    // Estilo de la animación
+                    const style = document.createElement('style');
+                    style.innerHTML = `
+                        @keyframes subirFlotando {
+                            0% { transform: translateY(0) rotate(0deg); }
+                            100% { transform: translateY(-115vh) rotate(360deg); }
+                        }
+                    `;
+                    document.head.appendChild(style);
+
+                    // Mostrar mensaje central (Opcional)
+                    this.mostrarMensaje(datos.mensaje, datos.colorPrimario);
+                },
+
+                mostrarMensaje(texto, color) {
+                    const aviso = document.createElement('div');
+                    aviso.innerHTML = texto;
+                    aviso.style.cssText = `
+                        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+                        background: ${color}; color: white; padding: 15px 25px; border-radius: 50px;
+                        font-weight: bold; z-index: 10000; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                    `;
+                    document.body.appendChild(aviso);
+                    setTimeout(() => aviso.style.transform = "translate(-50%, -50%) scale(1.2)", 500);
+                    setTimeout(() => {
+                        aviso.style.transform = "translate(-50%, -50%) scale(0)";
+                        setTimeout(() => aviso.remove(), 500);
+                    }, 4000);
+                }
+            };
+
+            // Arrancar al cargar la página
+            document.addEventListener('DOMContentLoaded', () => EventManager.init());
+
             
         </script>
 
@@ -4780,4 +4852,3 @@
 
     </body>
     </html>
-
