@@ -1,7 +1,7 @@
 {
   "1": {
     "nombre": "San Valentin",
-    "elementos": ["feb-corazon-rojo.png", "feb-corazon-rosa.png"],
+    "elementos": ["feb-corazon (1).png", "feb-corazon (2).png", "feb-corazon (3).png", "feb-corazon (4).png"],
     "colorPrimario": "#ff4d6d",
     "mensaje": "¡Feliz Día del Amor y la Amistad! ❤️"
   },
@@ -12,3 +12,4 @@
     "mensaje": "¡Cuidado con los fantasmas! 👻"
   }
 }
+
