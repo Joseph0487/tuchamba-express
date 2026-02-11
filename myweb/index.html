@@ -4793,7 +4793,7 @@
                         const img = document.createElement('img');
                         img.src = this.repoURL + datos.elementos[imgIndex];
                         img.style.cssText = `
-                            position: absolute; bottom: -100px; width: ${Math.random() * 40 + 20}px;
+                            position: absolute; bottom: -100px; width: ${Math.random() * 60 + 50}px;
                             left: ${Math.random() * 100}vw; opacity: 0.8;
                             animation: subirFlotando ${Math.random() * 3 + 4}s linear forwards;
                         `;
@@ -4816,19 +4816,29 @@
 
                 mostrarMensaje(texto, color) {
                     const aviso = document.createElement('div');
-                    aviso.innerHTML = texto;
+                    // Usamos un estilo más elegante y un emoji que resalte
+                    aviso.innerHTML = texto.replace('❤️', '<span style="color: white; filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));">🤍</span>');
+                    
                     aviso.style.cssText = `
                         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-                        background: ${color}; color: white; padding: 15px 25px; border-radius: 50px;
-                        font-weight: bold; z-index: 10000; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                        background: ${color}; 
+                        color: white; 
+                        padding: 20px 40px; 
+                        border-radius: 50px;
+                        font-weight: bold; 
+                        font-size: 1.2rem;
+                        z-index: 10000; 
+                        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                        box-shadow: 0 0 30px rgba(255, 77, 109, 0.6); /* Brillo neón */
+                        border: 3px solid rgba(255,255,255,0.3); /* Borde sutil */
+                        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
                     `;
                     document.body.appendChild(aviso);
-                    setTimeout(() => aviso.style.transform = "translate(-50%, -50%) scale(1.2)", 500);
+                    setTimeout(() => aviso.style.transform = "translate(-50%, -50%) scale(1)", 500);
                     setTimeout(() => {
                         aviso.style.transform = "translate(-50%, -50%) scale(0)";
                         setTimeout(() => aviso.remove(), 500);
-                    }, 4000);
+                    }, 4500);
                 }
             };
 
