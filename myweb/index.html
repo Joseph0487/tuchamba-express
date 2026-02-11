@@ -4768,31 +4768,23 @@
                 repoURL: './assets/eventos/',
 
                 async init() {
-                    // 1. Creamos un sello único basado en el Mes y el Día (ej: "1-11" para 11 de Feb)
-                    const fechaHoy = `${new Date().getMonth()}-${new Date().getDate()}`;
-                    
-                    // 2. EL CANDADO DE HIERRO: Si el sello de hoy ya existe, no hagas NADA
-                    if (localStorage.getItem('lastEventDate') === fechaHoy) {
-                        console.log("Evento ya mostrado hoy. No molestamos al usuario.");
-                        return;
-                    }
+                    // --- EL CANDADO ---
+                    // Si ya se mostraron los corazones en esta sesión, no hacer nada
+                    if (sessionStorage.getItem('eventShown')) return;
 
                     const mesActual = new Date().getMonth();
-                    
                     try {
                         const response = await fetch(this.repoURL + 'config-eventos.json');
-                        if (!response.ok) return;
-                        
                         const config = await response.json();
                         
                         if (config[mesActual]) {
-                            // 3. PONER EL SELLO: Antes de la animación, guardamos la fecha en localStorage
-                            localStorage.setItem('lastEventDate', fechaHoy);
-                            
                             this.lanzarEfecto(config[mesActual]);
+                            // --- MARCAR COMO MOSTRADO ---
+                            // Guardamos en la memoria de la sesión que ya salieron
+                            sessionStorage.setItem('eventShown', 'true');
                         }
                     } catch (e) {
-                        console.log("Sin eventos.");
+                        console.log("Hoy no hay eventos especiales.");
                     }
                 },
 
