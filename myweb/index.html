@@ -4768,18 +4768,25 @@
                 repoURL: './assets/eventos/',
 
                 async init() {
-                    const mesActual = new Date().getMonth();
-                    try {
-                        const response = await fetch(this.repoURL + 'config-eventos.json');
-                        const config = await response.json();
-                        
-                        if (config[mesActual]) {
-                            this.lanzarEfecto(config[mesActual]);
-                        }
-                    } catch (e) {
-                        console.log("Hoy no hay eventos especiales.");
+                // --- EL CANDADO ---
+                // Si ya se mostraron los corazones en esta sesión, no hacer nada
+                if (sessionStorage.getItem('eventShown')) return;
+
+                const mesActual = new Date().getMonth();
+                try {
+                    const response = await fetch(this.repoURL + 'config-eventos.json');
+                    const config = await response.json();
+                    
+                    if (config[mesActual]) {
+                        this.lanzarEfecto(config[mesActual]);
+                        // --- MARCAR COMO MOSTRADO ---
+                        // Guardamos en la memoria de la sesión que ya salieron
+                        sessionStorage.setItem('eventShown', 'true');
                     }
-                },
+                } catch (e) {
+                    console.log("Hoy no hay eventos especiales.");
+                }
+            },
 
                 lanzarEfecto(datos) {
                     // Crear capa invisible
