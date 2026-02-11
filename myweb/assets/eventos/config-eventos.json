@@ -1,8 +1,14 @@
 {
   "1": {
     "nombre": "San Valentin",
-    "elementos": ["corazon1.png", "corazon2.png"],
+    "elementos": ["feb-corazon-rojo.png", "feb-corazon-rosa.png"],
     "colorPrimario": "#ff4d6d",
     "mensaje": "¡Feliz Día del Amor y la Amistad! ❤️"
+  },
+  "9": {
+    "nombre": "Halloween",
+    "elementos": ["oct-calabaza.png", "oct-fantasma.png"],
+    "colorPrimario": "#ff9100",
+    "mensaje": "¡Cuidado con los fantasmas! 👻"
   }
 }
