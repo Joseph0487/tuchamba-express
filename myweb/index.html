@@ -2,7 +2,7 @@
     <html lang="es">
     <head>
     <meta charset="UTF-8">
-
+    <link rel="canonical" id="canonicalLink" href="https://tuchamba-express.vercel.app/">    
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-N2SW9MJGYG"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -440,7 +440,7 @@
             .badge-vigente { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
             .badge-closed { background: #ffebee; color: #c62828; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
             .badge-new { background: #fff3e0; color: #e65100; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; margin-left: 5px; border: 1px solid #ffcc80; }
-            .job-title { font-size: 1.2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; line-height: 1.3; }
+            .job-title { font-size: 1.2rem; font-weight: 800; color: #1a1a1a; margin: 0 0 4px 0; line-height: 1.3; display: block; }
             .company-name { font-size: 0.9rem; color: #0a66c2; font-weight: 600; display: flex; align-items: center; }
             .location { font-size: 0.9rem; color: #555; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
             .salary-text { color: #d32f2f; font-weight: 800; font-size: 1.3rem; margin-top: 5px; }
@@ -2093,7 +2093,8 @@
             <div class="container">
                 
                 <div class="header">
-                    <h1>Portal de Vacantes</h1>
+                    <h1 style="margin:0; font-size: 22px;">🚀 TuChamba Express</h1>
+                    <div style="font-size: 14px; color: #666; font-weight: 400; margin-top: 4px;">Vacantes Urgentes y Sin Experiencia</div>
                     <div class="header-buttons">
                         <button id="adminSearchToggle" class="admin-only btn-icon-small" onclick="toggleAdminSearch()" style="display:none; background:#eee; color:#333;">🔍</button>
                         
@@ -3871,7 +3872,7 @@
                             <div style="display: flex; gap: 15px; margin-bottom: 15px; margin-top: 10px;">
                                 <div class="company-logo">${j.company.charAt(0)}</div>
                                 <div>
-                                    <div class="job-title">${j.title}</div>
+                                    <h3 class="job-title" style="margin: 0 0 4px 0;">${j.title}</h3>
                                     <div class="company-name">${finalCompanyName} ${verifiedHtml}</div>
                                 </div>
                             </div>
@@ -4151,9 +4152,16 @@
 
 
             window.closeViewModal = function() { 
+                // RESTAURAR TÍTULO
                 document.title = "TuChamba Express | Vacantes Urgentes en Nuevo León, CDMX y EdoMex 2026";
+                
+                // RESTAURAR CANONICAL (ESTO ES LO NUEVO)
+                const canonical = document.getElementById('canonicalLink');
+                if(canonical) canonical.href = "https://tuchamba-express.vercel.app/";
+
                 document.getElementById('viewModal').classList.remove('active'); 
             }
+
             window.closeFormModal = function() { document.getElementById('formModal').classList.remove('active'); }
             window.closeTeamModal = function() { document.getElementById('teamModal').classList.remove('active'); }
             
@@ -4404,6 +4412,13 @@
                 const metaDesc = document.querySelector('meta[name="description"]');
                 if (metaDesc) {
                     metaDesc.setAttribute("content", `Vacante: ${j.title} ($${j.salary}) en ${j.city}. ¡Postúlate hoy mismo vía WhatsApp!`);
+                }
+
+                // --- NUEVO: CANONICAL DINÁMICO ---
+                const canonical = document.getElementById('canonicalLink');
+                if(canonical) {
+                    // Apuntamos a la versión LIMPIA (sin referido)
+                    canonical.href = `https://tuchamba-express.vercel.app/?id=${id}`;
                 }
 
                 // C. JSON-LD (Datos Estructurados para Google Jobs)
