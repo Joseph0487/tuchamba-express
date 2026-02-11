@@ -4768,9 +4768,12 @@
                 repoURL: './assets/eventos/',
 
                 async init() {
-                    // 1. Verificamos el candado inmediatamente
-                    if (sessionStorage.getItem('eventShown') === 'true') {
-                        console.log("Evento ya mostrado en esta sesión.");
+                    // 1. Creamos un sello único basado en el Mes y el Día (ej: "1-11" para 11 de Feb)
+                    const fechaHoy = `${new Date().getMonth()}-${new Date().getDate()}`;
+                    
+                    // 2. EL CANDADO DE HIERRO: Si el sello de hoy ya existe, no hagas NADA
+                    if (localStorage.getItem('lastEventDate') === fechaHoy) {
+                        console.log("Evento ya mostrado hoy. No molestamos al usuario.");
                         return;
                     }
 
@@ -4778,20 +4781,18 @@
                     
                     try {
                         const response = await fetch(this.repoURL + 'config-eventos.json');
-                        // Si la respuesta no es ok, salimos
                         if (!response.ok) return;
                         
                         const config = await response.json();
                         
                         if (config[mesActual]) {
-                            // 2. Marcamos como mostrado ANTES de lanzar el efecto
-                            // Así, si algo tarda, el candado ya está puesto
-                            sessionStorage.setItem('eventShown', 'true');
+                            // 3. PONER EL SELLO: Antes de la animación, guardamos la fecha en localStorage
+                            localStorage.setItem('lastEventDate', fechaHoy);
                             
                             this.lanzarEfecto(config[mesActual]);
                         }
                     } catch (e) {
-                        console.log("Sin eventos o error de red.");
+                        console.log("Sin eventos.");
                     }
                 },
 
