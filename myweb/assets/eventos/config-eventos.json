@@ -1,0 +1,8 @@
+{
+  "1": {
+    "nombre": "San Valentin",
+    "elementos": ["corazon1.png", "corazon2.png"],
+    "colorPrimario": "#ff4d6d",
+    "mensaje": "¡Feliz Día del Amor y la Amistad! ❤️"
+  }
+}
