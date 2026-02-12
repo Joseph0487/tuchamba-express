@@ -2385,7 +2385,7 @@
         <script type="module">
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
             import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-            import { getDatabase, ref, set, onValue, remove, runTransaction, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+            import { getDatabase, ref, set, onValue, remove, runTransaction, push, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
             const firebaseConfig = {
             apiKey: "AIzaSyB1k1lnQjQXiGYJRT9E9-KYzGSBBmrQGFI",
@@ -3524,12 +3524,17 @@
             const visitsRef = ref(db, 'siteStats/visits');
             const monthlyRef = ref(db, `siteStats/monthly/${currentMonthKey}`);
             
+            // --- ACTUALIZACIÓN DE CONTADORES GLOBALES ---
             const isMyDevice = localStorage.getItem('iamsuperadmin');
             const alreadyVisited = localStorage.getItem('visited_v2');
 
             if (!alreadyVisited && !isMyDevice) { 
-                runTransaction(visitsRef, (c) => (c || 0) + 1); 
-                runTransaction(monthlyRef, (c) => (c || 0) + 1); 
+                const today = new Date();
+                const monthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+
+                runTransaction(ref(db, 'siteStats/visits'), (c) => (c || 0) + 1); 
+                runTransaction(ref(db, `siteStats/monthly/${monthKey}`), (c) => (c || 0) + 1); 
+                
                 localStorage.setItem('visited_v2', 'true'); 
             }
             
@@ -3539,7 +3544,11 @@
                 if(document.getElementById('totalVisitsMobile')) document.getElementById('totalVisitsMobile').innerText = val;
             });
             
-            onValue(monthlyRef, (s) => { 
+            // Escuchar las visitas del mes actual
+            const today = new Date();
+            const monthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+
+            onValue(ref(db, `siteStats/monthly/${monthKey}`), (s) => { 
                 const val = s.val() || 0;
                 if(document.getElementById('monthlyVisits')) document.getElementById('monthlyVisits').innerText = val;
                 if(document.getElementById('monthlyVisitsMobile')) document.getElementById('monthlyVisitsMobile').innerText = val;
@@ -4026,19 +4035,24 @@
                 updateJobSEO(j, id);
                 const isRefMode = !!refCode;
 
-                // Creamos una "marca" para saber si ya vio esta vacante en esta pestaña
+                // --- REGISTRO DE VISTA DE VACANTE ---
                 const yaLoVio = sessionStorage.getItem(`visto_${id}`);
 
-                // Solo contamos la vista si NO es Admin Y si NO lo ha visto antes en esta sesión
                 if ((!isAdmin || isRefMode) && !yaLoVio) {
-                    runTransaction(ref(db, `jobStats/${id}/totalViews`), (c) => (c || 0) + 1);
-                    runTransaction(ref(db, `jobStats/${id}/monthlyViews/${currentMonthKey}`), (c) => (c || 0) + 1);
-                    
+                    const today = new Date();
+                    const monthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
                     const recCodeSafe = activeRecruiter ? activeRecruiter.code : 'ORGANICO';
+
+                    // Transacciones oficiales para cumplir con tus reglas de Firebase
+                    runTransaction(ref(db, `jobStats/${id}/totalViews`), (c) => (c || 0) + 1);
+                    runTransaction(ref(db, `jobStats/${id}/monthlyViews/${monthKey}`), (c) => (c || 0) + 1);
                     runTransaction(ref(db, `jobStats/${id}/viewsByRecruiter/${recCodeSafe}`), (c) => (c || 0) + 1);
 
-                    // Dejamos la marca puesta para que no vuelva a contar
                     sessionStorage.setItem(`visto_${id}`, 'true');
+                        console.log("✅ Vista registrada correctamente");
+                    } catch (e) {
+                        console.error("❌ Error al registrar vista:", e);
+                    }
                 }
                 
                 document.title = `Trabajo en ${j.city || 'México'} - ${j.title} | TuChamba`;
