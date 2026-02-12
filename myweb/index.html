@@ -4815,8 +4815,12 @@
                         const img = document.createElement('img');
                         img.src = this.repoURL + datos.elementos[imgIndex];
                         img.style.cssText = `
-                            position: absolute; bottom: -100px; width: ${Math.random() * 60 + 50}px;
-                            left: ${Math.random() * 100}vw; opacity: 0.8;
+                            position: absolute; 
+                            bottom: -150px; 
+                            width: ${Math.random() * 60 + 40}px;
+                            left: ${Math.random() * 100}%; 
+                            transform: translateX(-50%); /* Esto evita que se amontonen a la derecha */
+                            opacity: 0.8;
                             animation: subirFlotando ${Math.random() * 3 + 4}s linear forwards;
                         `;
                         capa.appendChild(img);
@@ -4837,29 +4841,38 @@
                 },
 
                 mostrarMensaje(texto, color) {
-                    const aviso = document.createElement('div');
-                    // Usamos un estilo más elegante y un emoji que resalte
-                    aviso.innerHTML = texto.replace('❤️', '<span style="color: white; filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));">🤍</span>');
+                    const contenedor = document.createElement('div');
+                    // El emoji de la frase lo quitamos del texto porque ya el fondo es un corazón
+                    const textoLimpio = texto.replace('❤️', '').replace('🤍', '');
                     
-                    aviso.style.cssText = `
-                        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+                    contenedor.innerHTML = `<span style="z-index: 10001; position: relative;">${textoLimpio}</span>`;
+                    
+                    contenedor.style.cssText = `
+                        position: fixed; top: 50%; left: 50%; 
+                        transform: translate(-50%, -50%) scale(0);
                         background: ${color}; 
                         color: white; 
-                        padding: 20px 40px; 
-                        border-radius: 50px;
-                        font-weight: bold; 
-                        font-size: 1.2rem;
+                        width: 280px;  /* Tamaño para que quepa la frase */
+                        height: 250px;
+                        display: flex; align-items: center; justify-content: center;
+                        text-align: center; font-weight: bold; font-size: 1.1rem;
+                        padding: 20px;
                         z-index: 10000; 
-                        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                        box-shadow: 0 0 30px rgba(255, 77, 109, 0.6); /* Brillo neón */
-                        border: 3px solid rgba(255,255,255,0.3); /* Borde sutil */
-                        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+                        transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                        /* ESTA ES LA MAGIA: Recorte en forma de Corazón */
+                        clip-path: path('M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z');
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                     `;
-                    document.body.appendChild(aviso);
-                    setTimeout(() => aviso.style.transform = "translate(-50%, -50%) scale(1)", 500);
+
+                    // Para que el clip-path funcione con coordenadas relativas, usamos este ajuste:
+                    contenedor.style.clipPath = "polygon(50% 15%, 80% 0%, 100% 20%, 100% 50%, 50% 100%, 0% 50%, 0% 20%, 20% 0%)";
+                    // Nota: Si el polígono se ve muy "cuadrado", podemos usar una imagen de fondo de corazón.
+                    
+                    document.body.appendChild(contenedor);
+                    setTimeout(() => contenedor.style.transform = "translate(-50%, -50%) scale(1.2)", 500);
                     setTimeout(() => {
-                        aviso.style.transform = "translate(-50%, -50%) scale(0)";
-                        setTimeout(() => aviso.remove(), 500);
+                        contenedor.style.transform = "translate(-50%, -50%) scale(0)";
+                        setTimeout(() => contenedor.remove(), 500);
                     }, 4500);
                 }
             };
