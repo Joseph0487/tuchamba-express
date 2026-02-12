@@ -4832,11 +4832,17 @@
                     const style = document.createElement('style');
                     style.innerHTML = `
                         @keyframes subirFlotando {
-                            0% { transform: translate(-50%, 0) scale(1) rotate(0deg); opacity: 0; }
+                            0% { 
+                                transform: translate(-50%, 0) scale(1) rotate(0deg); 
+                                opacity: 0; 
+                            }
                             15% { opacity: 0.8; }
                             85% { opacity: 0.8; }
-                            /* Terminamos en 0.1 de escala para evitar el giro inverso */
-                            100% { transform: translate(-50%, -115vh) scale(0.1) rotate(15deg); opacity: 0; }
+                            100% { 
+                                /* Quitamos el scale(0.1) para que no se encojan */
+                                transform: translate(-50%, -125vh) scale(1) rotate(15deg); 
+                                opacity: 0; 
+                            }
                         }
                     `;
                     document.head.appendChild(style);
