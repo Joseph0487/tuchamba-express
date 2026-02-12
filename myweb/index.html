@@ -4817,10 +4817,11 @@
                         img.style.cssText = `
                             position: absolute; 
                             bottom: -150px; 
-                            width: ${Math.random() * 50 + 30}px; /* Un pelín más chicos también ayuda */
+                            /* Ajustamos el tamaño: mínimo 60px, máximo 100px */
+                            width: ${Math.random() * 40 + 60}px; 
                             left: ${Math.random() * 100}%; 
                             transform: translateX(-50%);
-                            z-index: 6000; /* Mayor a 5000 para que pasen POR ENFRENTE del mensaje */
+                            z-index: 6000; 
                             opacity: 0.8;
                             animation: subirFlotando ${Math.random() * 3 + 4}s linear forwards;
                         `;
