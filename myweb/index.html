@@ -4830,8 +4830,10 @@
                     const style = document.createElement('style');
                     style.innerHTML = `
                         @keyframes subirFlotando {
-                            0% { transform: translateY(0) rotate(0deg); }
-                            100% { transform: translateY(-115vh) rotate(360deg); }
+                            0% { transform: translate(-50%, 0) rotate(0deg); opacity: 0; }
+                            10% { opacity: 0.8; }
+                            90% { opacity: 0.8; }
+                            100% { transform: translate(-50%, -115vh) rotate(20deg); opacity: 0; }
                         }
                     `;
                     document.head.appendChild(style);
@@ -4842,38 +4844,35 @@
 
                 mostrarMensaje(texto, color) {
                     const contenedor = document.createElement('div');
-                    // El emoji de la frase lo quitamos del texto porque ya el fondo es un corazón
                     const textoLimpio = texto.replace('❤️', '').replace('🤍', '');
                     
-                    contenedor.innerHTML = `<span style="z-index: 10001; position: relative;">${textoLimpio}</span>`;
-                    
+                    // Usamos un SVG de fondo para que la forma sea perfecta y redondeada
                     contenedor.style.cssText = `
                         position: fixed; top: 50%; left: 50%; 
                         transform: translate(-50%, -50%) scale(0);
-                        background: ${color}; 
-                        color: white; 
-                        width: 280px;  /* Tamaño para que quepa la frase */
-                        height: 250px;
+                        width: 300px; height: 280px;
                         display: flex; align-items: center; justify-content: center;
-                        text-align: center; font-weight: bold; font-size: 1.1rem;
-                        padding: 20px;
-                        z-index: 10000; 
-                        transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                        /* ESTA ES LA MAGIA: Recorte en forma de Corazón */
-                        clip-path: path('M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z');
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                        text-align: center; color: white; font-weight: bold; font-size: 1.2rem;
+                        z-index: 10000; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${encodeURIComponent(color)}' stroke='white' stroke-width='0.5'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>");
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        filter: drop-shadow(0 0 15px rgba(255,255,255,0.4)); /* Contorno clarito */
                     `;
 
-                    // Para que el clip-path funcione con coordenadas relativas, usamos este ajuste:
-                    contenedor.style.clipPath = "polygon(50% 15%, 80% 0%, 100% 20%, 100% 50%, 50% 100%, 0% 50%, 0% 20%, 20% 0%)";
-                    // Nota: Si el polígono se ve muy "cuadrado", podemos usar una imagen de fondo de corazón.
+                    contenedor.innerHTML = `<div style="padding: 40px; line-height: 1.2;">${textoLimpio}</div>`;
                     
                     document.body.appendChild(contenedor);
-                    setTimeout(() => contenedor.style.transform = "translate(-50%, -50%) scale(1.2)", 500);
+                    
+                    // Animación de entrada
+                    setTimeout(() => contenedor.style.transform = "translate(-50%, -50%) scale(1.1)", 100);
+                    
+                    // Salida limpia sin voltearse
                     setTimeout(() => {
                         contenedor.style.transform = "translate(-50%, -50%) scale(0)";
                         setTimeout(() => contenedor.remove(), 500);
-                    }, 4500);
+                    }, 4000);
                 }
             };
 
