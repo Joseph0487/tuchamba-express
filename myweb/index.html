@@ -4817,9 +4817,10 @@
                         img.style.cssText = `
                             position: absolute; 
                             bottom: -150px; 
-                            width: ${Math.random() * 60 + 40}px;
+                            width: ${Math.random() * 50 + 30}px; /* Un pelín más chicos también ayuda */
                             left: ${Math.random() * 100}%; 
-                            transform: translateX(-50%); /* Esto evita que se amontonen a la derecha */
+                            transform: translateX(-50%);
+                            z-index: 6000; /* Mayor a 5000 para que pasen POR ENFRENTE del mensaje */
                             opacity: 0.8;
                             animation: subirFlotando ${Math.random() * 3 + 4}s linear forwards;
                         `;
@@ -4846,35 +4847,29 @@
                 mostrarMensaje(texto, color) {
                     const contenedor = document.createElement('div');
                     const textoLimpio = texto.replace('❤️', '').replace('🤍', '');
-                    
-                    // 1. Calculamos un color de borde que sea el mismo pero con menos opacidad (más claro)
-                    const colorContorno = `${color}cc`; // Agregamos transparencia para aclarar sobre el fondo
+                    const colorContorno = `${color}cc`;
 
                     contenedor.style.cssText = `
                         position: fixed; top: 50%; left: 50%; 
                         transform: translate(-50%, -50%) scale(0);
-                        width: 320px; height: 300px;
+                        /* Reducimos el tamaño para que no tape todo */
+                        width: 260px; height: 240px; 
                         display: flex; align-items: center; justify-content: center;
-                        text-align: center; color: white; font-weight: bold; font-size: 1.15rem;
-                        z-index: 10000; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                        
-                        /* SVG con borde delgado (0.3) y del mismo tono aclarado */
+                        text-align: center; color: white; font-weight: bold; font-size: 1.05rem;
+                        /* Z-INDEX: Lo ponemos en 5000 (los pequeños deben tener más de 5000 para pasar por enfrente) */
+                        z-index: 5000; 
+                        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                         background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='${encodeURIComponent(color)}' stroke='${encodeURIComponent(colorContorno)}' stroke-width='0.3'><path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>");
                         background-size: contain;
                         background-repeat: no-repeat;
                         background-position: center;
+                        /* Un poco de transparencia para que se vea lo de atrás */
+                        opacity: 0.95;
                         filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
                     `;
 
-                    // 2. Ajustamos el contenedor del texto para subirlo un poco (padding-bottom fuerte)
                     contenedor.innerHTML = `
-                        <div style="
-                            padding: 20px; 
-                            padding-bottom: 60px; /* Esto empuja el texto hacia arriba */
-                            line-height: 1.3; 
-                            max-width: 80%;
-                            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-                        ">
+                        <div style="padding: 15px; padding-bottom: 50px; line-height: 1.2; max-width: 85%;">
                             ${textoLimpio}
                         </div>
                     `;
@@ -4882,14 +4877,13 @@
                     document.body.appendChild(contenedor);
                     
                     setTimeout(() => contenedor.style.transform = "translate(-50%, -50%) scale(1.1)", 100);
-
+                    
                     setTimeout(() => {
                         contenedor.style.transition = "all 0.3s linear"; 
                         contenedor.style.transform = "translate(-50%, -50%) scale(0.01)";
                         contenedor.style.opacity = "0";
-                        
                         setTimeout(() => contenedor.remove(), 350);
-                    }, 4000);
+                    }, 4500);
                 }
             };
 
