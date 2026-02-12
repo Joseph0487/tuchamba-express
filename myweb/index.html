@@ -3522,15 +3522,21 @@
             };
 
             const visitsRef = ref(db, 'siteStats/visits');
+            // Mantenemos la ruta correcta que ya tenías
             const monthlyRef = ref(db, `siteStats/monthly/${currentMonthKey}`);
             
             const isMyDevice = localStorage.getItem('iamsuperadmin');
-            const alreadyVisited = localStorage.getItem('visited_v2');
+
+            // CAMBIO CLAVE: sessionStorage se borra al cerrar la pestaña
+            const alreadyVisited = sessionStorage.getItem('visited_session'); 
 
             if (!alreadyVisited && !isMyDevice) { 
-                runTransaction(visitsRef, (c) => (c || 0) + 1); 
-                runTransaction(monthlyRef, (c) => (c || 0) + 1); 
-                localStorage.setItem('visited_v2', 'true'); 
+                // Agregamos .catch para que si falla, te avise en la consola (F12)
+                runTransaction(visitsRef, (c) => (c || 0) + 1).catch(err => console.error("Error visita total:", err)); 
+                runTransaction(monthlyRef, (c) => (c || 0) + 1).catch(err => console.error("Error visita mes:", err)); 
+                
+                // Guardamos la marca solo por esta sesión
+                sessionStorage.setItem('visited_session', 'true'); 
             }
             
             onValue(visitsRef, (s) => { 
