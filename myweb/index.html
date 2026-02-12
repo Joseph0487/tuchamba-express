@@ -4831,10 +4831,10 @@
                     style.innerHTML = `
                         @keyframes subirFlotando {
                             0% { transform: translate(-50%, 0) scale(1) rotate(0deg); opacity: 0; }
-                            10% { opacity: 0.8; }
-                            90% { opacity: 0.8; }
-                            /* Quitamos la rotación excesiva al final para evitar el efecto espejo */
-                            100% { transform: translate(-50%, -115vh) scale(1) rotate(10deg); opacity: 0; }
+                            15% { opacity: 0.8; }
+                            85% { opacity: 0.8; }
+                            /* Terminamos en 0.1 de escala para evitar el giro inverso */
+                            100% { transform: translate(-50%, -115vh) scale(0.1) rotate(15deg); opacity: 0; }
                         }
                     `;
                     document.head.appendChild(style);
@@ -4882,11 +4882,14 @@
                     document.body.appendChild(contenedor);
                     
                     setTimeout(() => contenedor.style.transform = "translate(-50%, -50%) scale(1.1)", 100);
-                    
+
                     setTimeout(() => {
-                        contenedor.style.transform = "translate(-50%, -50%) scale(0)";
-                        setTimeout(() => contenedor.remove(), 500);
-                    }, 4500);
+                        contenedor.style.transition = "all 0.3s linear"; 
+                        contenedor.style.transform = "translate(-50%, -50%) scale(0.01)";
+                        contenedor.style.opacity = "0";
+                        
+                        setTimeout(() => contenedor.remove(), 350);
+                    }, 4000);
                 }
             };
 
