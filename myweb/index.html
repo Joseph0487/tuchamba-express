@@ -4816,9 +4816,9 @@
                         img.src = this.repoURL + datos.elementos[imgIndex];
                         img.style.cssText = `
                             position: absolute; 
-                            bottom: -150px; 
-                            /* Ajustamos el tamaño: mínimo 60px, máximo 100px */
-                            width: ${Math.random() * 40 + 60}px; 
+                            bottom: -200px; /* Bajamos un poco más el inicio por ser más grandes */
+                            /* Ajustamos el tamaño: mínimo 120px, máximo 180px */
+                            width: ${Math.random() * 60 + 120}px; 
                             left: ${Math.random() * 100}%; 
                             transform: translateX(-50%);
                             z-index: 6000; 
