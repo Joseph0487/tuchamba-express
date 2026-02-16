@@ -3367,29 +3367,24 @@
                 }
             };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             let lastClickTime = 0; 
+            
+            // ==========================================
+            // 🚀 INTEGRACIÓN TUCHAMBA V3 (TALLY FILTER)
+            // ==========================================
             window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
+                // 1. Evitar doble clic rápido
                 const now = Date.now(); 
                 if (now - lastClickTime < 5000) return; 
                 lastClickTime = now;
 
-                // 1. Google Analytics
+                // 2. Feedback visual en el botón
+                if(btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '🔄 Cargando Filtro...';
+                }
+
+                // 3. Google Analytics (Mantenemos tu tracking)
                 if (typeof gtag === 'function') {
                     const job = jobs[jobId] || {};
                     gtag('event', 'contact_click', {
@@ -3400,10 +3395,7 @@
                     });
                 }
 
-                btn.disabled = true;
-                btn.innerHTML = '🔄 Abriendo...';
-
-                // 2. Registro detallado en Firebase (Logs)
+                // 4. Registro en Firebase (Logs)
                 const logRef = push(ref(db, 'clickLogs'));
                 set(logRef, {
                     jobId: jobId,
@@ -3412,18 +3404,51 @@
                     userAgent: navigator.userAgent
                 });
 
-                // 3. Incremento del contador público
+                // 5. Incremento del contador público
                 runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
 
-                // --- NUEVO: LIMPIEZA DEL ENLACE ANTES DE ABRIR ---
-                // Esto elimina espacios accidentales que rompen WhatsApp
-                const cleanLink = link.replace(/\s/g, '');
+                // --- AQUÍ EMPIEZA LA MAGIA DE TALLY ---
+                
+                // A) Recuperamos la info de la vacante
+                const job = jobs[jobId];
+                if (!job) {
+                    console.error("Vacante no encontrada:", jobId);
+                    return;
+                }
 
+                // B) Definimos a quién le llega el WhatsApp (Referido vs Orgánico)
+                let targetPhone = "";
+                let targetName = "";
+
+                if (activeRecruiter) {
+                    // Si hay referido activo, él gana
+                    targetPhone = activeRecruiter.phone;
+                    targetName = activeRecruiter.name;
+                } else {
+                    // Si es orgánico, usamos el contacto de la vacante o central
+                    targetPhone = job.contact || centralPhone || "525512345678";
+                    targetName = "Equipo TuChamba"; 
+                }
+
+                // C) Limpiamos datos para la URL
+                const cleanPhone = targetPhone ? targetPhone.replace(/\D/g, '') : '';
+                const cleanJobName = encodeURIComponent(job.title || 'Vacante');
+                const cleanRecName = encodeURIComponent(targetName || 'Reclutador');
+
+                // D) Construimos el link de Tally con tu ID real
+                const tallyID = "ODzQ98"; 
+                
+                const finalUrl = `https://tally.so/r/${tallyID}?job_id=${jobId}&job_name=${cleanJobName}&recruiter_phone=${cleanPhone}&recruiter_name=${cleanRecName}`;
+
+                // E) Abrimos Tally
                 setTimeout(() => {
-                    // --- MODIFICADO: Ahora abrimos cleanLink en lugar de link ---
-                    window.open(cleanLink, '_blank'); 
-                    btn.disabled = false;
-                    btn.innerHTML = '📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC';
+                    window.open(finalUrl, '_blank'); 
+                    
+                    // Restauramos el botón
+                    if(btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC';
+                    }
                 }, 500);
             };
 
@@ -4919,4 +4944,3 @@
 
     </body>
     </html>
-
