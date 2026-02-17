@@ -3451,9 +3451,11 @@
                 }
             };
 
+            // Variables de control global
             let currentSurveyData = { jobId: '', recName: '', waLink: '', jobTitle: '' };
             let lastClickTime = 0; 
 
+            // 1. Función para abrir el modal desde el botón morado
             window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
                 const job = jobs[jobId];
                 if (!job) return;
@@ -3462,40 +3464,50 @@
                 currentSurveyData = { 
                     jobId: jobId, 
                     recName: recruiterName, 
-                    waLink: link.replace(/\s/g, ''), // Limpiamos espacios de una vez
+                    waLink: link.replace(/\s/g, ''), // Limpieza de espacios
                     jobTitle: job.title 
                 };
 
-                // Preparamos el Modal
-                document.getElementById('surveyJobTitle').innerText = job.title;
-                document.getElementById('surveyStep1').style.display = 'block';
-                document.getElementById('surveyStep2').style.display = 'none';
-                document.getElementById('preFilterForm').reset();
+                // Preparamos el contenido del Modal
+                const surveyTitle = document.getElementById('surveyJobTitle');
+                const step1 = document.getElementById('surveyStep1');
+                const step2 = document.getElementById('surveyStep2');
+                const form = document.getElementById('preFilterForm');
+                const modal = document.getElementById('surveyModal');
+
+                if (surveyTitle) surveyTitle.innerText = job.title;
+                if (step1) step1.style.display = 'block';
+                if (step2) step2.style.display = 'none';
+                if (form) form.reset();
                 
-                // Abrimos el modal (surveyModal debe estar en tu HTML)
-                document.getElementById('surveyModal').classList.add('active');
+                // Mostramos el modal usando la clase 'active'
+                if (modal) {
+                    modal.classList.add('active');
+                    modal.style.display = 'flex'; // Forzamos visibilidad
+                }
             };
 
+            // 2. Función para procesar la encuesta y enviar a WhatsApp
             window.processSurvey = function(e) {
                 e.preventDefault();
                 const now = Date.now(); 
                 if (now - lastClickTime < 5000) return; 
                 lastClickTime = now;
                 
-                // 1. Recopilar respuestas
+                // Recopilar respuestas del formulario
                 const a = {
                     nombre: document.getElementById('qName').value,
                     edad: document.getElementById('qAge').value,
                     loc: document.getElementById('qLoc').value,
                     status: document.getElementById('qWork').value,
                     exp: document.getElementById('qExp').value,
-                    turnos: document.getElementById('qShifts').value,      
-                    entrevista: document.getElementById('qInterview').value, 
-                    estudios: document.getElementById('qEdu').value,       
-                    contacto: document.getElementById('qContact').value    
+                    turnos: document.getElementById('qShifts').value,
+                    entrevista: document.getElementById('qInterview').value,
+                    estudios: document.getElementById('qEdu').value,
+                    contacto: document.getElementById('qContact').value
                 };
 
-                // 2. Registro de Métricas y Logs
+                // Registro de Métricas en Google Analytics
                 if (typeof gtag === 'function') {
                     gtag('event', 'survey_complete', {
                         'job_title': currentSurveyData.jobTitle,
@@ -3504,6 +3516,7 @@
                     });
                 }
 
+                // Registro en Firebase Logs y Contadores
                 const logRef = push(ref(db, 'clickLogs'));
                 set(logRef, {
                     jobId: currentSurveyData.jobId,
@@ -3514,7 +3527,7 @@
 
                 runTransaction(ref(db, `jobStats/${currentSurveyData.jobId}/contactClicks`), (c) => (c || 0) + 1);
 
-                // 3. MENSAJE LIMPIO PARA WHATSAPP (Sin signos raros)
+                // Formatear mensaje limpio para WhatsApp
                 let msg = `Hola, vi la vacante *${currentSurveyData.jobTitle}*\n\n`;
                 msg += `*NUEVO REGISTRO - TUCHAMBA EXPRESS*\n`;
                 msg += `--------------------------------\n`;
@@ -3531,27 +3544,30 @@
                 msg += `--------------------------------\n`;
                 msg += `_Formulario de pre-filtro completado._`;
 
-                // 4. Abrir WhatsApp
+                // Abrir WhatsApp y mostrar éxito
                 const finalWaLink = currentSurveyData.waLink + encodeURIComponent("\n\n" + msg);
                 window.open(finalWaLink, '_blank');
 
-                // 5. Pantalla de éxito en el portal
-                const successMsg = `
-                    <div style="text-align:center;">
-                        <h3 style="color:#673ab7; margin-bottom:15px;">✅ ¡REGISTRO COMPLETADO CON ÉXITO!</h3>
-                    </div>
+                document.getElementById('successMsgBox').innerHTML = `
+                    <div style="text-align:center;"><h3 style="color:#673ab7; margin-bottom:15px;">✅ ¡REGISTRO COMPLETADO!</h3></div>
                     Hemos recibido tus datos para la vacante <b>${currentSurveyData.jobTitle}</b>.<br><br>
-                    <b>¿Qué sigue?</b><br>
-                    Nuestro sistema ya asignó tu perfil al reclutador: <b>${currentSurveyData.recName}</b>.<br><br>
-                    Él/Ella está revisando tus respuestas en este momento. Si tu perfil es compatible con la zona y requisitos, te contactará por WhatsApp en el transcurso del día desde el número oficial.<br><br>
-                    <small>⚠️ <b>Por favor, mantente atento a tu celular. No es necesario llamar.</b></small>
+                    <b>¿Qué sigue?</b> Nuestro sistema ya asignó tu perfil al reclutador: <b>${currentSurveyData.recName}</b>.<br><br>
+                    Él/Ella está revisando tus respuestas. Si tu perfil es compatible, te contactará por WhatsApp.<br><br>
+                    <small>⚠️ <b>No es necesario llamar.</b></small>
                 `;
-                
-                document.getElementById('successMsgBox').innerHTML = successMsg;
                 document.getElementById('surveyStep1').style.display = 'none';
                 document.getElementById('surveyStep2').style.display = 'block';
             };
-      
+
+            // 3. Función para cerrar el modal
+            window.closeSurveyModal = function() {
+                const modal = document.getElementById('surveyModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                    modal.style.display = 'none';
+                }
+            };
+                  
             window.closeSurveyModal = function() {
                 document.getElementById('surveyModal').classList.remove('active');
             };
@@ -5051,7 +5067,7 @@
 
     <div class="modal" id="surveyModal">
     <div class="modal-content" style="max-width: 450px; border-top: 6px solid #673ab7;">
-        <button class="close-btn" onclick="closeSurveyModal()">×</button>
+        <button class="close-btn" onclick="window.closeSurveyModal()">×</button>
         
         <div id="surveyStep1">
             <div style="text-align: center; margin-bottom: 20px;">
