@@ -2066,7 +2066,21 @@
                 gap: 15px !important;
                 margin-bottom: 10px;
             }
+            /* Alineación de etiquetas en rejilla doble */
+            #preFilterForm .form-grid-2 .form-group label {
+                min-height: 40px; /* Ajusta la altura para que los selects queden parejos */
+                display: flex;
+                align-items: flex-end;
+                margin-bottom: 8px !important;
+            }
 
+            /* Estilo para el placeholder en gris claro */
+            #preFilterForm select:invalid {
+                color: #999 !important;
+            }
+            #preFilterForm select option {
+                color: #333;
+            }
 
 
         </style>    
