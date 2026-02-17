@@ -3485,7 +3485,21 @@
             // 1. Función para abrir el modal desde el botón morado
             window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
                 const job = jobs[jobId];
-                if (!job) return;
+                if (!job) {
+                    // Firebase aún no cargó los datos — abrimos el modal igual con la info que tenemos
+                    const surveyTitle = document.getElementById('surveyJobTitle');
+                    const step1 = document.getElementById('surveyStep1');
+                    const step2 = document.getElementById('surveyStep2');
+                    const form = document.getElementById('preFilterForm');
+                    const modal = document.getElementById('surveyModal');
+                    currentSurveyData = { jobId: jobId, recName: recruiterName, waLink: link.replace(/\s/g, ''), jobTitle: 'esta vacante' };
+                    if (surveyTitle) surveyTitle.innerText = 'esta vacante';
+                    if (step1) step1.style.display = 'block';
+                    if (step2) step2.style.display = 'none';
+                    if (form) form.reset();
+                    if (modal) { modal.classList.add('active'); modal.style.display = 'flex'; }
+                    return;
+                }
 
                 // Guardamos los datos para la encuesta
                 currentSurveyData = { 
@@ -4246,29 +4260,26 @@
                     targetPhone = centralPhone.replace(/\D/g, ''); 
                 }
 
-                if (targetPhone) {
-                    let msg = `Hola, vi la vacante ${j.title} (Cód: ${id})`;
-                    if(isReferral) msg += ` (Referido por ${activeRecruiter.name})`;
-                    const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
-                    const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
-                    
-                    // CAMBIO V25.7: Sándwich Compacto (Sin espacios extra)
-                    // Dentro de openViewModal, busca donde se genera contactHtml:
-                    contactHtml = `
-                        <div class="sticky-footer" style="padding: 10px 15px 15px;"> 
-                            <p style="font-size:11px; color:#666; margin: 0 0 4px 0; font-weight:600;">
-                                👇🏻 Postulación Express 👇🏻
-                            </p>
-                            
-                            <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
-                                📲 INICIAR REGISTRO Y CONTACTAR
-                            </button>
+                // Si no hay teléfono, usamos un placeholder para que el botón siempre aparezca
+                const waLinkFinal = targetPhone 
+                    ? `https://wa.me/${targetPhone}?text=${encodeURIComponent(`Hola, vi la vacante ${j.title} (Cód: ${id})${activeRecruiter ? ` (Referido por ${activeRecruiter.name})` : ''}`)}`
+                    : '';
+                const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
+                
+                contactHtml = `
+                    <div class="sticky-footer" style="padding: 10px 15px 15px;"> 
+                        <p style="font-size:11px; color:#666; margin: 0 0 4px 0; font-weight:600;">
+                            👇🏻 Postulación Express 👇🏻
+                        </p>
+                        
+                        <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLinkFinal}')" class="whatsapp-btn-large">
+                            📲 INICIAR REGISTRO Y CONTACTAR
+                        </button>
 
-                            <p style="font-size:11px; color:#666; margin: 4px 0 0 0; font-weight:600;">
-                                👆🏻 Completa el filtro para hablar con el reclutador 👆🏻
-                            </p>
-                        </div>`;
-                }
+                        <p style="font-size:11px; color:#666; margin: 4px 0 0 0; font-weight:600;">
+                            👆🏻 Completa el filtro para hablar con el reclutador 👆🏻
+                        </p>
+                    </div>`;
 
                 let adminInfoHtml = '';
                 if (isAdmin && !isRefMode) {
