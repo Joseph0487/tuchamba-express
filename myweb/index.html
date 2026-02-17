@@ -2613,12 +2613,6 @@
                 });
             }
 
-            document.addEventListener('DOMContentLoaded', () => {
-                document.getElementById('searchInput').value = '';
-                document.getElementById('stateFilter').value = '';
-                document.getElementById('cityFilter').value = '';
-            });
-
             window.addEventListener('pageshow', function(event) {
             if (event.persisted) {
                 // Limpieza extra + recarga limpia
@@ -5101,36 +5095,58 @@
                 }
             };
 
-            // Arrancar al cargar la página
-            document.addEventListener('DOMContentLoaded', () => EventManager.init());
-            
-        </script>
-
-    <div style="text-align: center; font-size: 10px; color: #666; padding: 20px 10px; opacity: 0.7;">
-    <p>
-        <strong>TuChamba Express © 2026.</strong> Plataforma de vinculación laboral. 
-        No somos responsables de las contrataciones ni condiciones laborales (NOM-035) ofrecidas por terceros.
-    </p>
-    <p>
-        Este sitio utiliza almacenamiento local para mejorar tu experiencia. 
-        No guardamos datos personales de candidatos sin consentimiento.
-        <a href="#" onclick="alert('Aviso de Privacidad Simplificado:\n\n1. No recopilamos tu nombre ni correo.\n2. Los datos de contacto son públicos bajo responsabilidad del reclutador.\n3. Usamos cookies anónimas para contar visitas.\n\nPara ejercer derechos ARCO, contacta al admin.')" style="color: #666; text-decoration: underline;">Ver Aviso de Privacidad</a>
-    </p>
-</div>
-
-    <div class="modal" id="surveyModal">
-    <div class="modal-content" style="max-width: 450px; border-top: 6px solid #673ab7;">
-        <button class="close-btn" onclick="window.closeSurveyModal()">×</button>
-        
-        <div id="surveyStep1">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h2 style="color: #512da8; margin-bottom: 5px;">📋 Registro de Perfil</h2>
-                <p style="font-size: 13px; color: #666;">Postulación para: <strong id="surveyJobTitle" style="color: #333;"></strong></p>
-            </div>
-            
-            <form id="preFilterForm" onsubmit="processSurvey(event)">
-                <div class="form-group"><label>Nombre Completo</label><input type="text" id="qName" required placeholder="Tu nombre y apellidos"></div>
+            document.addEventListener('DOMContentLoaded', () => {
+                // 1. Limpia los filtros (lo que ya tenías)
+                const searchInput = document.getElementById('searchInput');
+                const stateFilter = document.getElementById('stateFilter');
+                const cityFilter = document.getElementById('cityFilter');
                 
+                if(searchInput) searchInput.value = '';
+                if(stateFilter) stateFilter.value = '';
+                if(cityFilter) cityFilter.value = '';
+
+                // 2. Inicializa el gestor de eventos (lo que ya tenías)
+                if (typeof EventManager !== 'undefined') {
+                    EventManager.init();
+                }
+
+                // 3. NUEVO: Lógica del botón de la encuesta (lo que faltaba)
+                const openSurveyBtn = document.getElementById('open-survey-btn');
+                const surveyModal = document.getElementById('survey-modal');
+                const closeSurveyBtn = document.getElementById('close-survey-btn');
+
+                if (openSurveyBtn && surveyModal) {
+                    openSurveyBtn.onclick = function() {
+                        surveyModal.style.display = 'block';
+                    };
+                }
+
+                if (closeSurveyBtn) {
+                    closeSurveyBtn.onclick = function() {
+                        surveyModal.style.display = 'none';
+                    };
+                }
+
+                window.onclick = function(event) {
+                    if (event.target == surveyModal) {
+                        surveyModal.style.display = 'none';
+                    }
+                };
+            });
+
+            <div class="modal" id="surveyModal">
+            <div class="modal-content" style="max-width: 450px; border-top: 6px solid #673ab7;">
+                <button class="close-btn" onclick="window.closeSurveyModal()">×</button>
+                
+                <div id="surveyStep1">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h2 style="color: #512da8; margin-bottom: 5px;">📋 Registro de Perfil</h2>
+                        <p style="font-size: 13px; color: #666;">Postulación para: <strong id="surveyJobTitle" style="color: #333;"></strong></p>
+                    </div>
+                    
+                    <form id="preFilterForm" onsubmit="processSurvey(event)">
+                        <div class="form-group"><label>Nombre Completo</label><input type="text" id="qName" required placeholder="Tu nombre y apellidos"></div>
+                        
                 <div class="form-grid-2">
                     <div class="form-group"><label>Edad</label><input type="number" id="qAge" min="18" max="70" required placeholder="Mín. 18"></div>
                     <div class="form-group"><label>Municipio / Alcaldía</label><input type="text" id="qLoc" required placeholder="¿Dónde vives?"></div>
@@ -5207,6 +5223,7 @@
         </div>
     </div>
 </div>
+
 
 
     </body>
