@@ -2014,74 +2014,6 @@
                     transform: scale(0.98);
                 }
 
-            /* --- NUEVA SECCIÓN: ENCUESTA MORADA PRO --- */
-            /* 1. Recuperamos el efecto Heartbeat para el botón morado */
-            @keyframes heartbeat { 
-                0% { transform: scale(1); } 
-                15% { transform: scale(1.05); } 
-                30% { transform: scale(1); } 
-                100% { transform: scale(1); } 
-            }
-            /* 2. Botón de la Ficha: Morado y con Latido */
-            .whatsapp-btn-large {
-                background-color: #673ab7 !important;
-                box-shadow: 0 4px 10px rgba(103, 58, 183, 0.3) !important;
-                animation: heartbeat 2.5s infinite !important; /* El latido ha vuelto */
-                border-radius: 12px !important;
-                color: white !important;
-                font-weight: 800 !important;
-                transition: all 0.2s ease;
-            }
-            /* 3. Botón dentro de la Encuesta: Verde WhatsApp */
-            #preFilterForm .whatsapp-btn-large {
-                background-color: #25D366 !important;
-                box-shadow: 0 4px 10px rgba(37, 211, 102, 0.4) !important;
-                animation: none !important; /* En la encuesta que se quede quieto */
-            }
-            /* 4. Manejo de Iconos (Para que no salgan en el morado pero sí en el verde) */
-            .whatsapp-btn-large img { display: none; }
-            #preFilterForm .whatsapp-btn-large img { 
-                display: inline-block !important; 
-                vertical-align: middle;
-            }
-            /* 5. Espaciado para que no se vea encimado */
-            #preFilterForm .form-group {
-                margin-bottom: 18px !important; /* Más aire entre preguntas */
-            }
-            #preFilterForm .form-group label {
-                color: #512da8 !important; /* Etiquetas moradas */
-                font-size: 13px !important;
-                font-weight: 700 !important;
-                margin-bottom: 6px !important;
-                display: block !important;
-            }
-            #preFilterForm .form-group input, 
-            #preFilterForm .form-group select {
-                border: 1px solid #ddd !important;
-                background: #fff !important;
-                padding: 10px !important;
-                border-radius: 8px !important;
-            }
-            #preFilterForm .form-grid-2 {
-                gap: 15px !important;
-                margin-bottom: 10px;
-            }
-            /* Alineación de etiquetas en rejilla doble */
-            #preFilterForm .form-grid-2 .form-group label {
-                min-height: 40px; /* Ajusta la altura para que los selects queden parejos */
-                display: flex;
-                align-items: flex-end;
-                margin-bottom: 8px !important;
-            }
-
-            /* Estilo para el placeholder en gris claro */
-            #preFilterForm select:invalid {
-                color: #999 !important;
-            }
-            #preFilterForm select option {
-                color: #333;
-            }
-
 
         </style>    
     </head>
@@ -2273,9 +2205,10 @@
                 </div>
 
                 <div class="footer">
-                    <p>TuChamba Express &copy; 2026. Plataforma de vinculación laboral rápida. Actuamos únicamente como canal de enlace; no somos responsables de los procesos de contratación ni de las condiciones laborales (NOM-035) ofrecidas por terceros.</p>
+                    <p>TuChamba Express &copy; 2026. Todos los derechos reservados.<br>
+                    Aviso: Algunas empresas pueden solicitar examen médico y/o antidoping.</p>
                     <div style="margin-top:10px;">
-                        <p style="font-size: 11px;">Este sitio utiliza almacenamiento local para mejorar tu experiencia. La información del pre-filtro es transmitida al reclutador y eliminada de nuestros registros temporales en 48 horas. <a class="footer-link" onclick="openPrivacyModal()">🔒 Aviso de Privacidad</a></p>
+                        <a class="footer-link" onclick="openPrivacyModal()">🔒 Aviso de Privacidad</a>
                     </div>
                     <p class="powered-by">Powered by <strong>BitX</strong></p>
                 </div>
@@ -2447,23 +2380,8 @@
             </div>
         </div>
         <div class="modal" id="settingsModal"><div class="modal-content"><button class="close-btn" onclick="closeSettingsModal()">×</button><h2>⚙️ Ajustes del Sistema</h2><div class="form-group"><label>📞 Teléfono Oficina Central (Respaldo)</label><div style="display:flex; gap:10px;"><input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1;"><button class="btn-primary" id="btnSaveCentral" onclick="saveCentralConfig()">Guardar</button></div><p style="font-size:12px; color:#666; margin-top:5px;">Este número se usa si la vacante no tiene contacto o está mal escrito.</p></div><div class="danger-section"><h3 style="color:#d32f2f; margin-bottom:10px;">⚠️ Zona de Peligro (Admin)</h3><p style="font-size:13px; color:#666; margin-bottom:10px;">Acciones irreversibles protegidas por contraseña.</p><button class="danger-btn" onclick="performSafeAction('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button><button class="danger-btn" onclick="performSafeAction('deleteJobs')">🔥 Borrar TODAS las Vacantes</button></div></div></div>
-        <div class="modal" id="privacyModal"><div class="modal-content"><button class="close-btn" onclick="closePrivacyModal()">×</button><h2>🔒 Aviso de Privacidad</h2>
-        
-        <div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto;">
-            <p style="font-size: 12px; color: #666; margin-bottom: 15px;"><strong>Última actualización: Febrero 2026</strong></p>
-            <p style="margin-bottom: 15px;">En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, <strong>TuChamba Express</strong> informa:</p>
-            
-            <p><strong>1. Responsable de los datos:</strong> TuChamba Express actúa como enlace de vinculación entre candidatos y empresas reclutadoras.</p>
-            
-            <p><strong>2. Finalidad y Almacenamiento Limitado:</strong> Los datos del formulario de pre-filtro se recopilan exclusivamente para facilitar su postulación. <strong>Su información es eliminada permanentemente de nuestra base de datos en un lapso de 48 horas</strong> tras su registro.</p>
-            
-            <p><strong>3. Uso de la información:</strong> Los datos se utilizan para contactar al candidato respecto a la vacante, agendar entrevistas y realizar filtros internos de selección.</p>
-            
-            <p><strong>4. Compartir datos:</strong> Su información será compartida únicamente con el reclutador responsable de la vacante a la que usted decida postularse voluntariamente mediante WhatsApp.</p>
-            
-            <p><strong>5. Examen Médico y Requisitos:</strong> El usuario reconoce que las empresas pueden requerir exámenes médicos o pruebas de detección de sustancias como parte de sus políticas legales de contratación.</p>
-        </div>
-        
+        <div class="modal" id="privacyModal"><div class="modal-content"><button class="close-btn" onclick="closePrivacyModal()">×</button><h2>🔒 Aviso de Privacidad</h2><div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto;"><p style="font-size: 12px; color: #666; margin-bottom: 15px;"><strong>Última actualización: Enero 2026</strong></p><p style="margin-bottom: 15px;">En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, <strong>TuChamba Express</strong> informa:</p><p style="margin-bottom:5px;"><strong>1. Responsable de los datos:</strong></p><p style="margin-bottom:15px;">TuChamba Express actúa como enlace entre candidatos y empresas reclutadoras.</p><p style="margin-bottom:5px;"><strong>2. Datos recopilados:</strong></p><p style="margin-bottom:15px;">Podemos recopilar datos de contacto (como número telefónico) con el único fin de facilitar la comunicación para procesos de reclutamiento.</p><p style="margin-bottom:5px;"><strong>3. Uso de la información:</strong></p><p style="margin-bottom:5px;">Los datos proporcionados serán utilizados exclusivamente para:</p><ul style="margin-left: 20px; margin-bottom: 15px;"><li>Contactar al candidato respecto a la vacante de interés.</li><li>Agendar entrevistas laborales.</li><li>Procesos internos de selección.</li></ul><p style="margin-bottom:5px;"><strong>4. Compartir datos:</strong></p><p style="margin-bottom:15px;">Su información de contacto será compartida únicamente con la empresa o reclutador responsable de la vacante a la que usted decida postularse voluntariamente.</p><p style="margin-bottom:5px;"><strong>5. Examen Médico:</strong></p><p style="margin-bottom:0;">Al utilizar esta plataforma, usted reconoce que algunas empresas contratantes pueden requerir, como parte de su proceso de selección y conforme a la ley, la realización de exámenes médicos y/o pruebas de detección de sustancias.</p></div></div></div>
+
         <script type="module">
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
             import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -2607,9 +2525,7 @@
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === "Escape") {
-                    // Añadimos la línea de surveyModal aquí:
-                    if(document.getElementById('surveyModal') && document.getElementById('surveyModal').classList.contains('active')) closeSurveyModal();
-                    else if(document.getElementById('viewModal').classList.contains('active')) closeViewModal();
+                    if(document.getElementById('viewModal').classList.contains('active')) closeViewModal();
                     else if(document.getElementById('formModal').classList.contains('active')) closeFormModal();
                     else if(document.getElementById('metricsModal').classList.contains('active')) closeMetricsModal();
                     else if(document.getElementById('teamModal').classList.contains('active')) closeTeamModal();
@@ -3451,125 +3367,64 @@
                 }
             };
 
-            // Variables de control global
-            let currentSurveyData = { jobId: '', recName: '', waLink: '', jobTitle: '' };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             let lastClickTime = 0; 
-
-            // 1. Función para abrir el modal desde el botón morado
             window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
-                const job = jobs[jobId];
-                if (!job) return;
-
-                // Guardamos los datos para usarlos al final de la encuesta
-                currentSurveyData = { 
-                    jobId: jobId, 
-                    recName: recruiterName, 
-                    waLink: link.replace(/\s/g, ''), // Limpieza de espacios
-                    jobTitle: job.title 
-                };
-
-                // Preparamos el contenido del Modal
-                const surveyTitle = document.getElementById('surveyJobTitle');
-                const step1 = document.getElementById('surveyStep1');
-                const step2 = document.getElementById('surveyStep2');
-                const form = document.getElementById('preFilterForm');
-                const modal = document.getElementById('surveyModal');
-
-                if (surveyTitle) surveyTitle.innerText = job.title;
-                if (step1) step1.style.display = 'block';
-                if (step2) step2.style.display = 'none';
-                if (form) form.reset();
-                
-                // Mostramos el modal usando la clase 'active'
-                if (modal) {
-                    modal.classList.add('active');
-                    modal.style.display = 'flex'; // Forzamos visibilidad
-                }
-            };
-
-            // 2. Función para procesar la encuesta y enviar a WhatsApp
-            window.processSurvey = function(e) {
-                e.preventDefault();
                 const now = Date.now(); 
                 if (now - lastClickTime < 5000) return; 
                 lastClickTime = now;
-                
-                // Recopilar respuestas del formulario
-                const a = {
-                    nombre: document.getElementById('qName').value,
-                    edad: document.getElementById('qAge').value,
-                    loc: document.getElementById('qLoc').value,
-                    status: document.getElementById('qWork').value,
-                    exp: document.getElementById('qExp').value,
-                    turnos: document.getElementById('qShifts').value,
-                    entrevista: document.getElementById('qInterview').value,
-                    estudios: document.getElementById('qEdu').value,
-                    contacto: document.getElementById('qContact').value
-                };
 
-                // Registro de Métricas en Google Analytics
+                // 1. Google Analytics
                 if (typeof gtag === 'function') {
-                    gtag('event', 'survey_complete', {
-                        'job_title': currentSurveyData.jobTitle,
-                        'job_id': currentSurveyData.jobId,
-                        'recruiter': currentSurveyData.recName
+                    const job = jobs[jobId] || {};
+                    gtag('event', 'contact_click', {
+                        'job_title': job.title || 'Desconocido',
+                        'job_id': jobId,
+                        'company': job.company || 'N/A',
+                        'recruiter': recruiterName || 'directo'
                     });
                 }
 
-                // Registro en Firebase Logs y Contadores
+                btn.disabled = true;
+                btn.innerHTML = '🔄 Abriendo...';
+
+                // 2. Registro detallado en Firebase (Logs)
                 const logRef = push(ref(db, 'clickLogs'));
                 set(logRef, {
-                    jobId: currentSurveyData.jobId,
-                    recruiter: currentSurveyData.recName || 'directo',
+                    jobId: jobId,
+                    recruiter: recruiterName || 'directo',
                     timestamp: new Date().toISOString(),
-                    surveyData: a 
+                    userAgent: navigator.userAgent
                 });
 
-                runTransaction(ref(db, `jobStats/${currentSurveyData.jobId}/contactClicks`), (c) => (c || 0) + 1);
+                // 3. Incremento del contador público
+                runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
 
-                // Formatear mensaje limpio para WhatsApp
-                let msg = `Hola, vi la vacante *${currentSurveyData.jobTitle}*\n\n`;
-                msg += `*NUEVO REGISTRO - TUCHAMBA EXPRESS*\n`;
-                msg += `--------------------------------\n`;
-                msg += `• *Cód:* ${currentSurveyData.jobId}\n\n`;
-                msg += `• *Candidato:* ${a.nombre}\n`;
-                msg += `• *Edad:* ${a.edad} años\n`;
-                msg += `• *Ubicación:* ${a.loc}\n`;
-                msg += `• *Situación:* ${a.status}\n`;
-                msg += `• *Experiencia:* ${a.exp}\n`;
-                msg += `• *Escolaridad:* ${a.estudios}\n`;
-                msg += `• *Rola Turnos:* ${a.turnos}\n`;
-                msg += `• *Entrevista:* ${a.entrevista}\n`;
-                msg += `• *Contacto:* ${a.contacto}\n`;
-                msg += `--------------------------------\n`;
-                msg += `_Formulario de pre-filtro completado._`;
+                // --- NUEVO: LIMPIEZA DEL ENLACE ANTES DE ABRIR ---
+                // Esto elimina espacios accidentales que rompen WhatsApp
+                const cleanLink = link.replace(/\s/g, '');
 
-                // Abrir WhatsApp y mostrar éxito
-                const finalWaLink = currentSurveyData.waLink + encodeURIComponent("\n\n" + msg);
-                window.open(finalWaLink, '_blank');
-
-                document.getElementById('successMsgBox').innerHTML = `
-                    <div style="text-align:center;"><h3 style="color:#673ab7; margin-bottom:15px;">✅ ¡REGISTRO COMPLETADO!</h3></div>
-                    Hemos recibido tus datos para la vacante <b>${currentSurveyData.jobTitle}</b>.<br><br>
-                    <b>¿Qué sigue?</b> Nuestro sistema ya asignó tu perfil al reclutador: <b>${currentSurveyData.recName}</b>.<br><br>
-                    Él/Ella está revisando tus respuestas. Si tu perfil es compatible, te contactará por WhatsApp.<br><br>
-                    <small>⚠️ <b>No es necesario llamar.</b></small>
-                `;
-                document.getElementById('surveyStep1').style.display = 'none';
-                document.getElementById('surveyStep2').style.display = 'block';
-            };
-
-            // 3. Función para cerrar el modal
-            window.closeSurveyModal = function() {
-                const modal = document.getElementById('surveyModal');
-                if (modal) {
-                    modal.classList.remove('active');
-                    modal.style.display = 'none';
-                }
-            };
-                  
-            window.closeSurveyModal = function() {
-                document.getElementById('surveyModal').classList.remove('active');
+                setTimeout(() => {
+                    // --- MODIFICADO: Ahora abrimos cleanLink en lugar de link ---
+                    window.open(cleanLink, '_blank'); 
+                    btn.disabled = false;
+                    btn.innerHTML = '📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC';
+                }, 500);
             };
 
             window.registerClick = function(jobId, recruiterName) {
@@ -4224,21 +4079,18 @@
                     const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                     
                     // CAMBIO V25.7: Sándwich Compacto (Sin espacios extra)
-                    // Dentro de openViewModal, busca donde se genera contactHtml:
-                    contactHtml = `
-                        <div class="sticky-footer" style="padding: 10px 15px 15px;"> 
-                            <p style="font-size:11px; color:#666; margin: 0 0 4px 0; font-weight:600;">
-                                👇🏻 Postulación Express 👇🏻
-                            </p>
-                            
-                            <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large">
-                                <span style="white-space: nowrap;">📲 INICIAR REGISTRO Y CONTACTAR</span> 
-                                </button>
-                            
-                            <p style="font-size:11px; color:#666; margin: 4px 0 0 0; font-weight:600;">
-                                👆🏻 Completa el filtro para hablar con el reclutador 👆🏻
-                            </p>
-                        </div>`;
+                    contactHtml = `<div class="sticky-footer" style="padding: 10px 15px 15px;"> <p style="font-size:11px; color:#666; margin: 0 0 4px 0; font-weight:600;">
+                                            👇🏻 Respuesta Inmediata 👇🏻
+                                        </p>
+                                        
+                                        <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <span style="white-space: nowrap;">📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC</span> 
+                                            <img src="favicon_2.png" alt="WA" style="height: 26px; width: auto;"> </button>
+                                        
+                                        <p style="font-size:11px; color:#666; margin: 4px 0 0 0; font-weight:600;">
+                                            👆🏻 ¡No pierdas tu oportunidad, postúlate ahora! 👆🏻
+                                        </p>
+                                </div>`;
                 }
 
                 let adminInfoHtml = '';
@@ -5064,97 +4916,6 @@
         <a href="#" onclick="alert('Aviso de Privacidad Simplificado:\n\n1. No recopilamos tu nombre ni correo.\n2. Los datos de contacto son públicos bajo responsabilidad del reclutador.\n3. Usamos cookies anónimas para contar visitas.\n\nPara ejercer derechos ARCO, contacta al admin.')" style="color: #666; text-decoration: underline;">Ver Aviso de Privacidad</a>
     </p>
 </div>
-
-    <div class="modal" id="surveyModal">
-    <div class="modal-content" style="max-width: 450px; border-top: 6px solid #673ab7;">
-        <button class="close-btn" onclick="window.closeSurveyModal()">×</button>
-        
-        <div id="surveyStep1">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h2 style="color: #512da8; margin-bottom: 5px;">📋 Registro de Perfil</h2>
-                <p style="font-size: 13px; color: #666;">Postulación para: <strong id="surveyJobTitle" style="color: #333;"></strong></p>
-            </div>
-            
-            <form id="preFilterForm" onsubmit="processSurvey(event)">
-                <div class="form-group"><label>Nombre Completo</label><input type="text" id="qName" required placeholder="Tu nombre y apellidos"></div>
-                
-                <div class="form-grid-2">
-                    <div class="form-group"><label>Edad</label><input type="number" id="qAge" min="18" max="70" required placeholder="Mín. 18"></div>
-                    <div class="form-group"><label>Municipio / Alcaldía</label><input type="text" id="qLoc" required placeholder="¿Dónde vives?"></div>
-                </div>
-
-                <div class="form-group">
-                    <label>Situación laboral / Disponibilidad</label>
-                    <select id="qWork" required>
-                        <option value="" disabled selected>Selecciona una opción</option>
-                        <option value="🔴 Desempleado - ¡Empezaría hoy mismo!">🔴 Desempleado - ¡Busco empezar hoy mismo!</option>
-                        <option value="🟠 Desempleado - Disponible en unos días">🟠 Desempleado - Puedo empezar en unos días</option>
-                        <option value="🟡 Empleado - Busco mejores opciones">🟡 Empleado - Busco mejores opciones (debo avisar)</option>
-                        <option value="🔵 Estoy Explorando">🔵 Estoy Explorando</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>¿Tienes experiencia en puestos similares?</label>
-                    <select id="qExp" required>
-                        <option value="" disabled selected style="color: #999;">Selecciona una Opción</option>
-                        <option value="Sí, más de 1 año">Sí, más de 1 año</option>
-                        <option value="Sí, 1 año o menos">Sí, 1 año o menos</option>
-                        <option value="Sí, 6 meses o menos">Sí, 6 meses o menos</option>
-                        <option value="No, pero aprendo rápido">No, pero aprendo rápido</option>
-                    </select>
-                </div>
-
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label>¿Puedes rolar turnos?</label>
-                        <select id="qShifts"><option value="Sí">Sí</option><option value="No">No</option></select>
-                    </div>
-                    <div class="form-group">
-                        <label>¿Puedes asistir a una entrevista en esta semana?</label>
-                        <select id="qInterview"><option value="Sí">Sí</option><option value="No">No</option></select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>¿Último grado de estudios?</label>
-                    <select id="qEdu" required>
-                        <option value="" disabled selected style="color: #999;">Selecciona una Opción</option>
-                        <option value="Primaria Terminada">Primaria Terminada</option>
-                        <option value="Secundaria Terminada">Secundaria Terminada</option>
-                        <option value="Bachillerato Terminado">Bachillerato Terminado</option>
-                        <option value="Licenciatura/Ingeniería Terminada">Licenciatura/Ingeniería Terminada</option>
-                        <option value="Carrera Técnica / TSU Terminada">Carrera Técnica / TSU Terminada</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Preferencia de contacto</label>
-                    <select id="qContact"><option value="WhatsApp">📲 Mensaje de WhatsApp</option><option value="Llamada">📞 Llamada Telefónica</option></select>
-                </div>
-
-                <p style="font-size: 10px; color: #999; margin: 15px 0; line-height: 1.2;">
-                    * Al enviar, tus datos se mandan directo al reclutador por WhatsApp para tu filtro inicial. No almacenamos info personal por más de 48h.
-                </p>
-
-                <button type="submit" class="whatsapp-btn-large">
-                    ENVIAR A WHATSAPP 
-                    <img src="favicon_2.png" alt="WA" style="height: 24px; width: auto; margin-left: 10px;"> 
-                </button>
-            </form>
-           
-        </div>
-
-        <div id="surveyStep2" style="display:none; text-align:center; padding: 20px 0;">
-            <div style="font-size: 60px; margin-bottom: 15px;">✅</div>
-            <h2 style="color: #2e7d32; margin-bottom: 20px; font-weight: 900;">¡REGISTRO COMPLETADO!</h2>
-            <div id="successMsgBox" style="text-align: left; font-size: 14px; color: #333; line-height: 1.6; background: #f3e5f5; padding: 20px; border-radius: 12px; border: 1px solid #e1bee7;">
-                </div>
-            <button onclick="closeSurveyModal()" class="btn-primary" style="margin-top: 25px; width: 100%; background: #333; height: 45px; border-radius: 10px;">Cerrar y Volver</button>
-        </div>
-    </div>
-</div>
-
 
     </body>
     </html>
