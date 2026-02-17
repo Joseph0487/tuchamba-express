@@ -3367,66 +3367,83 @@
                 }
             };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             let lastClickTime = 0; 
-            window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
+            
+            // =========================================================
+            // 🚀 INTEGRACIÓN TUCHAMBA V3.0 - MODO BUZÓN (TALLY)
+            // =========================================================
+            window.handleWhatsAppClick = function(btn, jobId, recruiterName, linkOriginal) {
+                // 1. Evitar doble clic (Anti-Rebote)
                 const now = Date.now(); 
-                if (now - lastClickTime < 5000) return; 
+                if (now - lastClickTime < 2000) return; 
                 lastClickTime = now;
 
-                // 1. Google Analytics
-                if (typeof gtag === 'function') {
-                    const job = jobs[jobId] || {};
-                    gtag('event', 'contact_click', {
-                        'job_title': job.title || 'Desconocido',
-                        'job_id': jobId,
-                        'company': job.company || 'N/A',
-                        'recruiter': recruiterName || 'directo'
-                    });
+                // 2. Feedback Visual en el Botón
+                const textoOriginal = btn.innerHTML;
+                if(btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '🔄 Abriendo formulario...';
                 }
 
-                btn.disabled = true;
-                btn.innerHTML = '🔄 Abriendo...';
+                // 3. RECUPERAR DATOS DE LA VACANTE Y RECLUTADOR
+                const job = jobs[jobId];
+                if (!job) {
+                    console.error("Vacante no encontrada:", jobId);
+                    if(btn) { btn.disabled = false; btn.innerHTML = textoOriginal; }
+                    return;
+                }
 
-                // 2. Registro detallado en Firebase (Logs)
-                const logRef = push(ref(db, 'clickLogs'));
-                set(logRef, {
-                    jobId: jobId,
-                    recruiter: recruiterName || 'directo',
-                    timestamp: new Date().toISOString(),
-                    userAgent: navigator.userAgent
-                });
+                // --- AQUÍ SE DECIDE QUIÉN ES EL DUEÑO DEL LEAD ---
+                let targetPhone = "";
+                let targetName = "";
 
-                // 3. Incremento del contador público
-                runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
+                if (activeRecruiter) {
+                    // CASO A: Es un Referido (Viene de ?ref=JUAN)
+                    targetPhone = activeRecruiter.phone;
+                    targetName = activeRecruiter.name;
+                    
+                    // Analytics opcional
+                    if(typeof registerClick === 'function') registerClick(jobId, activeRecruiter.name);
 
-                // --- NUEVO: LIMPIEZA DEL ENLACE ANTES DE ABRIR ---
-                // Esto elimina espacios accidentales que rompen WhatsApp
-                const cleanLink = link.replace(/\s/g, '');
+                } else {
+                    // CASO B: Es Orgánico (Viene de Google/Facebook)
+                    targetPhone = job.contact || centralPhone || "525512345678";
+                    
+                    // Buscamos el nombre del dueño de ese teléfono
+                    const foundRec = Object.values(recruiters).find(r => r.phone.replace(/\D/g,'') === targetPhone.replace(/\D/g,''));
+                    targetName = foundRec ? foundRec.name : (job.agency || "Equipo TuChamba");
+                    
+                    if(typeof registerClick === 'function') registerClick(jobId, "Organico");
+                }
+
+                // 4. PREPARAR DATOS PARA TALLY (Limpieza)
+                const cleanPhone = targetPhone ? targetPhone.replace(/\D/g, '') : '';
+                const cleanJobName = encodeURIComponent(job.title || 'Vacante');
+                const cleanRecName = encodeURIComponent(targetName || 'Equipo');
+                const cleanJobId = encodeURIComponent(jobId);
+
+                // 5. REGISTRAR ESTADÍSTICAS EN FIREBASE (IMPORTANTE PARA TUS GRÁFICAS)
+                // (Esto requiere el cambio de reglas JSON que vimos hace rato)
+                if (typeof runTransaction === 'function' && typeof ref === 'function' && typeof db !== 'undefined') {
+                     runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
+                }
+
+                // 6. LANZAR TALLY 🚀
+                // Tu ID de formulario es: ODzQ98
+                const tallyBase = "https://tally.so/r/ODzQ98";
+                const finalUrl = `${tallyBase}?job_id=${cleanJobId}&job_name=${cleanJobName}&recruiter_phone=${cleanPhone}&recruiter_name=${cleanRecName}`;
 
                 setTimeout(() => {
-                    // --- MODIFICADO: Ahora abrimos cleanLink en lugar de link ---
-                    window.open(cleanLink, '_blank'); 
-                    btn.disabled = false;
-                    btn.innerHTML = '📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC';
+                    window.open(finalUrl, '_blank'); 
+                    
+                    // Restauramos el botón
+                    if(btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = textoOriginal;
+                    }
                 }, 500);
             };
-
+            
             window.registerClick = function(jobId, recruiterName) {
                 runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
                 push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
