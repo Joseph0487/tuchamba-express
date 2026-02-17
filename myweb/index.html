@@ -3482,7 +3482,7 @@
             let currentSurveyData = { jobId: '', recName: '', waLink: '', jobTitle: '' };
             let lastClickTime = 0; 
 
-            // 1. Función para abrir el modal desde el botón morado
+            // 1. Función para abrir el modal desde el botón morado (ESTA FALTABA EN TU ACTUAL)
             window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
                 const job = jobs[jobId];
                 if (!job) return;
@@ -3495,7 +3495,7 @@
                     jobTitle: job.title 
                 };
 
-                // Preparamos el contenido del Modal
+                // Llenamos el contenido
                 const surveyTitle = document.getElementById('surveyJobTitle');
                 const step1 = document.getElementById('surveyStep1');
                 const step2 = document.getElementById('surveyStep2');
@@ -3507,10 +3507,10 @@
                 if (step2) step2.style.display = 'none';
                 if (form) form.reset();
                 
-                // Mostramos el modal usando la clase 'active'
+                // Mostramos el modal
                 if (modal) {
                     modal.classList.add('active');
-                    modal.style.display = 'flex'; // Forzamos visibilidad
+                    modal.style.display = 'flex'; 
                 }
             };
             
