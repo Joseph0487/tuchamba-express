@@ -5055,8 +5055,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label>¿Experiencia en puestos similares?</label>
-                    <select id="qExp">
+                    <label>¿Tienes experiencia en puestos similares?</label>
+                    <select id="qExp" required>
+                        <option value="" disabled selected style="color: #999;">Selecciona una Opción</option>
                         <option value="Sí, más de 1 año">Sí, más de 1 año</option>
                         <option value="Sí, 1 año o menos">Sí, 1 año o menos</option>
                         <option value="Sí, 6 meses o menos">Sí, 6 meses o menos</option>
@@ -5066,22 +5067,24 @@
 
                 <div class="form-grid-2">
                     <div class="form-group">
-                        <label>¿Rolas turnos?</label>
+                        <label>¿Puedes rolar turnos?</label>
                         <select id="qShifts"><option value="Sí">Sí</option><option value="No">No</option></select>
                     </div>
                     <div class="form-group">
-                        <label>¿Entrevista hoy/mañana?</label>
+                        <label>¿Puedes asistir a una entrevista en esta semana?</label>
                         <select id="qInterview"><option value="Sí">Sí</option><option value="No">No</option></select>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label>¿Último grado de estudios?</label>
-                    <select id="qEdu">
-                        <option value="Secundaria">Secundaria Terminada</option>
-                        <option value="Preparatoria">Preparatoria / Bachillerato</option>
-                        <option value="Carrera Técnica / TSU">Carrera Técnica / TSU</option>
-                        <option value="Licenciatura / Ing">Licenciatura / Ingeniería</option>
+                    <select id="qEdu" required>
+                        <option value="" disabled selected style="color: #999;">Selecciona una Opción</option>
+                        <option value="Primaria Terminada">Primaria Terminada</option>
+                        <option value="Secundaria Terminada">Secundaria Terminada</option>
+                        <option value="Bachillerato Terminado">Bachillerato Terminado</option>
+                        <option value="Licenciatura/Ingeniería Terminada">Licenciatura/Ingeniería Terminada</option>
+                        <option value="Carrera Técnica / TSU Terminada">Carrera Técnica / TSU Terminada</option>
                     </select>
                 </div>
 
@@ -5099,6 +5102,7 @@
                     <img src="favicon_2.png" alt="WA" style="height: 24px; width: auto; margin-left: 10px;"> 
                 </button>
             </form>
+           
         </div>
 
         <div id="surveyStep2" style="display:none; text-align:center; padding: 20px 0;">
