@@ -3498,14 +3498,10 @@
                 msg += `🛠️ *Experiencia:* ${a.exp}\n`;
                 msg += `🎓 *Escolaridad:* ${a.estudios}\n`;
                 msg += `🔄 *Rola Turnos:* ${a.turnos}\n`;
-                msg += `📅 *Entrevista:* ${a.entrevista}\n`;
+                msg += `📅 *Entrevista esta semana:* ${a.entrevista}\n`;
                 msg += `📲 *Contacto:* ${a.contacto}\n`;
                 msg += `--------------------------------\n`;
-                msg += `✅ *¡REGISTRO COMPLETADO CON ÉXITO!*\n\n`;
-                msg += `¿Qué sigue?\n`;
-                msg += `Nuestro sistema ya asignó tu perfil al reclutador: ${currentSurveyData.recName}.\n\n`;
-                msg += `Él/Ella está revisando tus respuestas en este momento. Si tu perfil es compatible con la zona y requisitos, te contactará por WhatsApp en el transcurso del día desde el número oficial.\n\n`;
-                msg += `⚠️ *Por favor, mantente atento a tu celular. No es necesario llamar.*`;
+                msg += `_Formulario de pre-filtro completado._`;
 
                 // 4. Abrir WhatsApp
                 const finalWaLink = currentSurveyData.waLink + encodeURIComponent("\n\n" + msg);
