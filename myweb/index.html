@@ -3484,7 +3484,6 @@
 
             // 1. Función para abrir el modal desde el botón morado
             window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
-                alert("Función activada para: " + jobId);
                 const job = jobs[jobId];
                 if (!job) return;
 
@@ -3593,17 +3592,13 @@
                 document.getElementById('surveyStep2').style.display = 'block';
             };
 
-            // 3. Función para cerrar el modal
+            // 3. Función para cerrar el modal (CORREGIDA)
             window.closeSurveyModal = function() {
                 const modal = document.getElementById('surveyModal');
                 if (modal) {
-                    modal.classList.add('active');
-                    modal.style.display = 'flex'; 
+                    modal.classList.remove('active'); // Quitamos la clase que lo muestra
+                    modal.style.display = 'none';    // Lo ocultamos por completo
                 }
-            };
-                  
-            window.closeSurveyModal = function() {
-                document.getElementById('surveyModal').classList.remove('active');
             };
 
             window.registerClick = function(jobId, recruiterName) {
