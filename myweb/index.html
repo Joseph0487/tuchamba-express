@@ -2083,14 +2083,15 @@
             }
             /* --- CSS NECESARIO PARA LA ENCUESTA --- */
             #surveyModal.modal {
-                display: none; 
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.85); /* Un poco más oscuro para que resalte el morado */
-                z-index: 9999 !important; /* Por encima de todo */
+            display: none !important; /* Oculto por defecto */
+            }
+
+            #surveyModal.modal.active {
+                display: flex !important; /* Fuerza el despliegue */
+                position: fixed !important;
+                z-index: 99999 !important; /* Por encima de los modales de admin */
+                background: rgba(0, 0, 0, 0.85) !important;
+                top: 0; left: 0; width: 100%; height: 100%;
                 align-items: center;
                 justify-content: center;
             }
