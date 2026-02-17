@@ -2086,22 +2086,32 @@
             display: none !important; /* Oculto por defecto */
             }
 
-            #surveyModal.modal.active {
-                display: flex !important; /* Fuerza el despliegue */
+            /* 1. Estado Base: Oculto y preparado */
+            #surveyModal.modal {
+                display: none !important; /* Oculto por defecto para que no estorbe */
                 position: fixed !important;
-                z-index: 99999 !important; /* Por encima de los modales de admin */
-                background: rgba(0, 0, 0, 0.85) !important;
                 top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0, 0, 0, 0.85) !important;
+                z-index: 99999 !important; /* El valor más alto para que sea el Rey */
                 align-items: center;
                 justify-content: center;
             }
-            /* Esta es la regla que el JS activa */
+
+            /* 2. Estado Activo: Cuando el JS le da el clic */
             #surveyModal.modal.active {
-                display: flex !important; 
+                display: flex !important; /* ¡Aparece! */
             }
-            /* Arreglo de espaciado para que no se vea encimado */
+
+            /* 3. Espaciado de la encuesta: Adiós a lo encimado */
             #preFilterForm .form-group {
-                margin-bottom: 15px !important;
+                margin-bottom: 18px !important; /* Más aire entre preguntas */
+            }
+
+            #preFilterForm .form-group label {
+                display: block !important;
+                margin-bottom: 6px !important;
+                font-weight: 700 !important;
+                color: #512da8 !important; /* Color morado para que combine */
             }
 
 
@@ -3488,7 +3498,7 @@
                 const job = jobs[jobId];
                 if (!job) return;
 
-                // Guardamos los datos para la encuesta
+                // 1. Guardamos datos limpios
                 currentSurveyData = { 
                     jobId: jobId, 
                     recName: recruiterName, 
@@ -3496,22 +3506,33 @@
                     jobTitle: job.title 
                 };
 
-                // Llenamos el contenido
+                // 2. Referenciamos los elementos
                 const surveyTitle = document.getElementById('surveyJobTitle');
                 const step1 = document.getElementById('surveyStep1');
                 const step2 = document.getElementById('surveyStep2');
                 const form = document.getElementById('preFilterForm');
                 const modal = document.getElementById('surveyModal');
 
+                // 3. Preparamos el contenido
                 if (surveyTitle) surveyTitle.innerText = job.title;
                 if (step1) step1.style.display = 'block';
                 if (step2) step2.style.display = 'none';
                 if (form) form.reset();
                 
-                // Mostramos el modal
+                // 4. DISPARO DE APERTURA (Con blindaje !important)
                 if (modal) {
                     modal.classList.add('active');
-                    modal.style.display = 'flex'; 
+                    // Esto le gana a cualquier regla de CSS externa:
+                    modal.style.setProperty('display', 'flex', 'important'); 
+                }
+            };
+
+            // Asegúrate de tener esta también para que no se quede trabado
+            window.closeSurveyModal = function() {
+                const modal = document.getElementById('surveyModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                    modal.style.setProperty('display', 'none', 'important');
                 }
             };
             
