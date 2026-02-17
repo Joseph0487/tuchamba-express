@@ -3516,13 +3516,15 @@
                     modal.style.display = 'flex'; // Forzamos visibilidad
                 }
             };
-
-
-
-
-
-
             
+
+
+
+
+
+
+
+
             // 2. Función para procesar la encuesta y enviar a WhatsApp
             window.processSurvey = function(e) {
                 e.preventDefault();
@@ -3595,6 +3597,16 @@
                 document.getElementById('surveyStep2').style.display = 'block';
             };
 
+
+
+
+
+
+
+
+
+
+            
             // 3. Función para cerrar el modal
             window.closeSurveyModal = function() {
                 const modal = document.getElementById('surveyModal');
@@ -5087,6 +5099,33 @@
             // Arrancar al cargar la página
             document.addEventListener('DOMContentLoaded', () => EventManager.init());
             
+            window.openSurveyModal = function(jobTitle = '') {
+                const modal = document.getElementById('surveyModal');
+                if (!modal) {
+                    console.error('Modal no encontrado');
+                    return;
+                }
+                
+                // Muestra el modal
+                modal.style.display = 'flex';
+                modal.classList.add('active');  // Si usas animaciones como en teamModal
+                
+                // Set job title (del job card o lo que sea)
+                document.getElementById('surveyJobTitle').innerText = jobTitle;
+                
+                // Reset steps (muestra step1, esconde step2)
+                document.getElementById('surveyStep1').style.display = 'block';
+                document.getElementById('surveyStep2').style.display = 'none';
+                
+                // Focus en primer input
+                setTimeout(() => {
+                    document.getElementById('qName').focus();
+                }, 100);
+                
+                console.log('Modal abierto para job:', jobTitle);
+            };
+
+
         </script>
 
     <div style="text-align: center; font-size: 10px; color: #666; padding: 20px 10px; opacity: 0.7;">
