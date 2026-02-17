@@ -3468,7 +3468,7 @@
                 if (now - lastClickTime < 5000) return; 
                 lastClickTime = now;
                 
-                // 1. Recopilar respuestas para el mensaje de WhatsApp
+                // 1. Recopilar respuestas
                 const a = {
                     nombre: document.getElementById('qName').value,
                     edad: document.getElementById('qAge').value,
@@ -3500,20 +3500,20 @@
 
                 runTransaction(ref(db, `jobStats/${currentSurveyData.jobId}/contactClicks`), (c) => (c || 0) + 1);
 
-                // 3. Construir el mensaje formateado para WhatsApp
-                let msg = `*NUEVO REGISTRO - TUCHAMBA EXPRESS*\n`;
+                // 3. MENSAJE LIMPIO PARA WHATSAPP (Sin signos raros)
+                let msg = `Hola, vi la vacante *${currentSurveyData.jobTitle}*\n\n`;
+                msg += `*NUEVO REGISTRO - TUCHAMBA EXPRESS*\n`;
                 msg += `--------------------------------\n`;
-                msg += `💼 *Vacante:* ${currentSurveyData.jobTitle}\n`;
-                msg += `🆔 *Cód:* ${currentSurveyData.jobId}\n\n`;
-                msg += `👤 *Candidato:* ${a.nombre}\n`;
-                msg += `🎂 *Edad:* ${a.edad} años\n`;
-                msg += `📍 *Ubicación:* ${a.loc}\n`;
-                msg += `🚥 *Situación:* ${a.status}\n`;
-                msg += `🛠️ *Experiencia:* ${a.exp}\n`;
-                msg += `🎓 *Escolaridad:* ${a.estudios}\n`;
-                msg += `🔄 *Rola Turnos:* ${a.turnos}\n`;
-                msg += `📅 *Entrevista esta semana:* ${a.entrevista}\n`;
-                msg += `📲 *Contacto:* ${a.contacto}\n`;
+                msg += `• *Cód:* ${currentSurveyData.jobId}\n\n`;
+                msg += `• *Candidato:* ${a.nombre}\n`;
+                msg += `• *Edad:* ${a.edad} años\n`;
+                msg += `• *Ubicación:* ${a.loc}\n`;
+                msg += `• *Situación:* ${a.status}\n`;
+                msg += `• *Experiencia:* ${a.exp}\n`;
+                msg += `• *Escolaridad:* ${a.estudios}\n`;
+                msg += `• *Rola Turnos:* ${a.turnos}\n`;
+                msg += `• *Entrevista:* ${a.entrevista}\n`;
+                msg += `• *Contacto:* ${a.contacto}\n`;
                 msg += `--------------------------------\n`;
                 msg += `_Formulario de pre-filtro completado._`;
 
@@ -3521,10 +3521,10 @@
                 const finalWaLink = currentSurveyData.waLink + encodeURIComponent("\n\n" + msg);
                 window.open(finalWaLink, '_blank');
 
-                // 5. Mostrar pantalla de éxito en el portal (Mensaje idéntico al de WhatsApp)
+                // 5. Pantalla de éxito en el portal
                 const successMsg = `
                     <div style="text-align:center;">
-                        <h3 style="color:#2e7d32; margin-bottom:15px;">✅ ¡REGISTRO COMPLETADO CON ÉXITO!</h3>
+                        <h3 style="color:#673ab7; margin-bottom:15px;">✅ ¡REGISTRO COMPLETADO CON ÉXITO!</h3>
                     </div>
                     Hemos recibido tus datos para la vacante <b>${currentSurveyData.jobTitle}</b>.<br><br>
                     <b>¿Qué sigue?</b><br>
@@ -3537,7 +3537,7 @@
                 document.getElementById('surveyStep1').style.display = 'none';
                 document.getElementById('surveyStep2').style.display = 'block';
             };
-
+      
             window.closeSurveyModal = function() {
                 document.getElementById('surveyModal').classList.remove('active');
             };
