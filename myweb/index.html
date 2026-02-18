@@ -459,13 +459,15 @@
                 position: fixed; 
                 top: 0; left: 0; right: 0; bottom: 0; 
                 background: rgba(0,0,0,0.6); 
-                z-index: -1; /* <--- CAMBIA ESTO */
+                z-index: 4000 !important; /* Lo subimos para que siempre esté al frente */
                 padding: 20px; 
                 backdrop-filter: blur(4px); 
+                align-items: center; 
+                justify-content: center;
             }
-            .modal.active {
-                display: flex;
-                z-index: 3000 !important; /* <--- AGREGA ESTO */
+
+            .modal.active { 
+                display: flex !important; 
             }
             .modal.active { display: flex; align-items: center; justify-content: center; }
             .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; overflow-x: hidden; padding-bottom: 0; }
@@ -2022,10 +2024,33 @@
                 #surveyModal .modal-content {
                     background: #ffffff;
                     border-radius: 24px;
-                    border-top: 8px solid #9575cd; /* Morado claro sólido */
+                    border-top: 8px solid #9575cd; 
                     box-shadow: 0 20px 40px rgba(103, 58, 183, 0.15);
                     padding: 30px 25px;
-                    position: relative;
+                }
+
+                #preFilterForm .form-group {
+                    margin-bottom: 20px !important; /* Espacio generoso entre preguntas */
+                    text-align: left;
+                }
+
+                #preFilterForm label {
+                    display: block !important;
+                    margin-bottom: 8px !important;
+                    color: #7e57c2 !important;
+                    font-size: 12px !important;
+                    font-weight: 800 !important;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                #preFilterForm select {
+                    cursor: pointer;
+                    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%237e57c2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+                    background-repeat: no-repeat !important;
+                    background-position: right 12px center !important;
+                    background-size: 16px !important;
+                    padding-right: 40px !important;
                 }
 
                 /* 2. Títulos y Textos */
@@ -2489,10 +2514,39 @@
                 </div>
             </div>
         </div>
-        <div class="modal" id="settingsModal"><div class="modal-content"><button class="close-btn" onclick="closeSettingsModal()">×</button><h2>⚙️ Ajustes del Sistema</h2><div class="form-group"><label>📞 Teléfono Oficina Central (Respaldo)</label><div style="display:flex; gap:10px;"><input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1;"><button class="btn-primary" id="btnSaveCentral" onclick="saveCentralConfig()">Guardar</button></div><p style="font-size:12px; color:#666; margin-top:5px;">Este número se usa si la vacante no tiene contacto o está mal escrito.</p></div><div class="danger-section"><h3 style="color:#d32f2f; margin-bottom:10px;">⚠️ Zona de Peligro (Admin)</h3><p style="font-size:13px; color:#666; margin-bottom:10px;">Acciones irreversibles protegidas por contraseña.</p><button class="danger-btn" onclick="performSafeAction('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button><button class="danger-btn" onclick="performSafeAction('deleteJobs')">🔥 Borrar TODAS las Vacantes</button></div></div></div>
-        <div class="modal-content">
-        <button class="close-btn" onclick="closePrivacyModal()">×</button>
-        <h2>🔒 Aviso de Privacidad</h2>
+        
+        <div class="modal" id="settingsModal">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closeSettingsModal()">×</button>
+                <h2>⚙️ Ajustes del Sistema</h2>
+                <div class="form-group">
+                    <label>📞 Teléfono Oficina Central (Respaldo)</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1;">
+                        <button class="btn-primary" id="btnSaveCentral" onclick="saveCentralConfig()">Guardar</button>
+                    </div>
+                    <p style="font-size:12px; color:#666; margin-top:5px;">Este número se usa si la vacante no tiene contacto o está mal escrito.</p>
+                </div>
+                <div class="danger-section">
+                    <h3 style="color:#d32f2f; margin-bottom:10px;">⚠️ Zona de Peligro (Admin)</h3>
+                    <p style="font-size:13px; color:#666; margin-bottom:10px;">Acciones irreversibles protegidas por contraseña.</p>
+                    <button class="danger-btn" onclick="performSafeAction('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button>
+                    <button class="danger-btn" onclick="performSafeAction('deleteJobs')">🔥 Borrar TODAS las Vacantes</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="privacyModal">
+            <div class="modal-content">
+                <button class="close-btn" onclick="closePrivacyModal()">×</button>
+                <h2>🔒 Aviso de Privacidad</h2>
+                <div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto;">
+                    <p style="font-size: 12px; color: #666; margin-bottom: 15px;"><strong>Última actualización: Febrero 2026</strong></p>
+                    <p style="margin-bottom: 15px;">En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, <strong>TuChamba Express</strong> informa sobre el tratamiento de su información capturada en nuestros filtros de enlace por un <strong>periodo máximo de 3 meses</strong>.</p>
+                    </div>
+            </div>
+        </div>
+
         <div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto;">
             <p style="font-size: 12px; color: #666; margin-bottom: 15px;"><strong>Última actualización: Febrero 2026</strong></p>
             
@@ -2669,7 +2723,9 @@
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === "Escape") {
-                    if(document.getElementById('viewModal').classList.contains('active')) closeViewModal();
+                    // Cerramos en orden de prioridad
+                    if(document.getElementById('surveyModal').classList.contains('active')) window.closeSurveyModal();
+                    else if(document.getElementById('viewModal').classList.contains('active')) closeViewModal();
                     else if(document.getElementById('formModal').classList.contains('active')) closeFormModal();
                     else if(document.getElementById('metricsModal').classList.contains('active')) closeMetricsModal();
                     else if(document.getElementById('teamModal').classList.contains('active')) closeTeamModal();
@@ -4222,14 +4278,15 @@
 
                     contactHtml = `
                         <div class="sticky-footer" style="padding: 10px 15px 15px;"> 
-                            <p style="font-size:11px; color:#666; margin: 0 0 4px 0; font-weight:600;">👇🏻 Respuesta Inmediata 👇🏻</p>
+                            <p style="font-size:11px; color:#666; margin: 0 0 4px 0; font-weight:600;">👇🏻 Postulación Express 👇🏻</p>
                             
-                            <button onclick="window.openSurvey('${id}', '${recNameSafe}', '${waLinkBase}', '${j.title.replace(/'/g, "\\'")}')" class="whatsapp-btn-large" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <span style="white-space: nowrap;">📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC</span> 
-                                <img src="favicon_2.png" alt="WA" style="height: 26px; width: auto;">
+                            <button onclick="window.openSurvey('${id}', '${recNameSafe}', '${waLinkBase}', '${j.title.replace(/'/g, "\\'")}')" 
+                                    class="whatsapp-btn-large" 
+                                    style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #9575cd !important; box-shadow: 0 4px 10px rgba(149, 117, 205, 0.3) !important;">
+                                <span style="white-space: nowrap;">🧾 INICIAR REGISTRO Y CONTACTAR 📲</span> 
                             </button>
                             
-                            <p style="font-size:11px; color:#666; margin: 4px 0 0 0; font-weight:600;">👆🏻 ¡No pierdas tu oportunidad, postúlate ahora! 👆🏻</p>
+                            <p style="font-size:11px; color:#666; margin: 4px 0 0 0; font-weight:600;">👆🏻 Completa el filtro para hablar con el reclutador 👆🏻</p>
                         </div>`;
                 }
 
@@ -5174,12 +5231,12 @@
                 </div>
 
                 <p style="font-size: 10px; color: #999; margin: 15px 0; line-height: 1.2;">
-                    * Al enviar, tus datos se mandan directo al reclutador por WhatsApp para tu filtro inicial. No almacenamos info personal por más de 48h.
+                    * Al enviar, tus datos se mandan directo al reclutador por WhatsApp para tu filtro inicial. Conservamos esta información en nuestros registros por un periodo máximo de 3 meses para seguimiento de tu vacante.
                 </p>
 
-                <button type="submit" id="finalWaBtn" class="whatsapp-btn-large">
+                <button type="submit" id="finalWaBtn" class="whatsapp-btn-large" style="background: #25D366 !important; height: 65px !important; font-size: 17px !important;">
                     ENVIAR A WHATSAPP 
-                    <img src="favicon_2.png" alt="WA" style="height: 24px; width: auto; margin-left: 10px;"> 
+                    <img src="favicon_2.png" alt="WA" style="height: 35px; width: auto; margin-left: 12px;"> 
                 </button>
             </form>
         </div>
