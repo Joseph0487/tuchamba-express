@@ -4371,16 +4371,6 @@
                 if(modal) modal.classList.remove('active');
             };
 
-
-
-
-
-
-
-
-
-
-
             window.processSurvey = function(e) {
                 e.preventDefault();
                 
@@ -4395,7 +4385,7 @@
                 const contactPref = document.getElementById('qContact').value;
 
                 // Usamos códigos Unicode para asegurar que WhatsApp no rompa los emojis
-                const iCheck = "\u2705"; // ✅
+                const iCheck = "\u2705"; // 👤
                 const iCake = "\uD83C\uDF82"; // 🎂
                 const iPin = "\uD83D\uDccd"; // 📍
                 const iBrief = "\uD83D\uDCBC"; // 💼
@@ -4441,19 +4431,6 @@
 
                 window.handleWhatsAppClick(btnSubmit, currentSurveyJobId, currentSurveyRecruiterName, finalLink);
             };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             window.closeViewModal = function() { 
                 // RESTAURAR TÍTULO
