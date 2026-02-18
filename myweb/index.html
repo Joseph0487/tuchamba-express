@@ -4384,34 +4384,34 @@
                 const edu = document.getElementById('qEdu').value;
                 const contactPref = document.getElementById('qContact').value;
 
-                // Usamos variables para los iconos para asegurar que se concatenen bien
-                const check = "✅";
-                const cake = "🎂";
-                const pin = "📍";
-                const brief = "💼";
-                const star = "⭐";
-                const sync = "🔄";
-                const cal = "📅";
-                const grad = "🎓";
-                const phone = "📲";
+                // Usamos códigos Unicode para asegurar que WhatsApp no rompa los emojis
+                const iCheck = "\u2705"; // 👤
+                const iCake = "\uD83C\uDF82"; // 🎂
+                const iPin = "\uD83D\uDccd"; // 📍
+                const iBrief = "\uD83D\uDCBC"; // 💼
+                const iStar = "\u2B50"; // ⭐
+                const iSync = "\uD83D\uDD04"; // 🔄
+                const iCal = "\uD83D\uDCC5"; // 📅
+                const iGrad = "\uD83C\uDF93"; // 🎓
+                const iPhone = "\uD83D\uDCF2"; // 📲
 
-                // Construimos el mensaje plano primero
-                const textMessage = `¡Hola! Me interesa la vacante. Aquí mi perfil:\n\n` +
-                    `${check} Nombre: ${name}\n` +
-                    `${cake} Edad: ${age} años\n` +
-                    `${pin} Vive en: ${loc}\n` +
-                    `${brief} Situación: ${work}\n` +
-                    `${star} Experiencia: ${exp}\n` +
-                    `${sync} Rola Turnos: ${shifts}\n` +
-                    `${cal} Entrevista: ${interview}\n` +
-                    `${grad} Estudios: ${edu}\n` +
-                    `${phone} Contacto: ${contactPref}\n\n` +
-                    `(Cód. Vacante: ${currentSurveyJobId} | Ref: ${currentSurveyRecruiterName})`;
+                const intro = "¡Hola! Me interesa la vacante. Aquí mi perfil:\n\n";
+                const body = 
+                    iCheck + " Nombre: " + name + "\n" +
+                    iCake + " Edad: " + age + " años\n" +
+                    iPin + " Vive en: " + loc + "\n" +
+                    iBrief + " Situación: " + work + "\n" +
+                    iStar + " Experiencia: " + exp + "\n" +
+                    iSync + " Rola Turnos: " + shifts + "\n" +
+                    iCal + " Entrevista: " + interview + "\n" +
+                    iGrad + " Estudios: " + edu + "\n" +
+                    iPhone + " Contacto: " + contactPref + "\n\n" +
+                    "(Cód: " + currentSurveyJobId + " | Ref: " + currentSurveyRecruiterName + ")";
 
-                // LA SOLUCIÓN: Codificamos TODO el mensaje junto antes de pegarlo al enlace
-                const finalLink = currentSurveyWaLinkBase + encodeURIComponent(textMessage);
+                const finalLink = currentSurveyWaLinkBase + encodeURIComponent(intro + body);
                 const btnSubmit = document.getElementById('finalWaBtn');
                 
+                // Pantalla de Éxito
                 const successBox = document.getElementById('successMsgBox');
                 const surveyStep1 = document.getElementById('surveyStep1');
                 
@@ -4419,13 +4419,13 @@
                     surveyStep1.style.display = 'none';
                     successBox.style.display = 'block';
                     successBox.innerHTML = `
-                        <div style="text-align:center;"><h3 style="color:#673ab7; margin-bottom:15px;">✅ ¡REGISTRO COMPLETADO!</h3></div>
-                        Hemos recibido tus datos para la vacante <b>${document.getElementById('surveyJobTitle').textContent}</b>.<br><br>
-                        <b>¿Qué sigue?</b> Nuestro sistema ya asignó tu perfil al reclutador: <b>${currentSurveyRecruiterName}</b>.<br><br>
+                        <div style="text-align:center;"><h3 style="color:#673ab7; margin-bottom:15px;">` + iCheck + ` ¡REGISTRO COMPLETADO!</h3></div>
+                        Hemos recibido tus datos para la vacante <b>` + document.getElementById('surveyJobTitle').textContent + `</b>.<br><br>
+                        <b>¿Qué sigue?</b> Nuestro sistema ya asignó tu perfil al reclutador: <b>` + currentSurveyRecruiterName + `</b>.<br><br>
                         Él/Ella está revisando tus respuestas. Si tu perfil es compatible, te contactará por WhatsApp.<br><br>
                         <small>⚠️ <b>No es necesario llamar.</b></small>
                         <br><br>
-                        <button onclick="window.closeSurveyModal()" class="btn-primary" style="width:100%; background:#673ab7;">Cerrar y Regresar</button>
+                        <button onclick="window.closeSurveyModal()" class="btn-primary" style="width:100%; background:#673ab7; border-radius:12px; height:45px;">Cerrar y Regresar</button>
                     `;
                 }
 
