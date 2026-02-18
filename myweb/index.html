@@ -2107,19 +2107,21 @@
 
                 /* 5. Botón Final "Hyper WhatsApp" */
                 #finalWaBtn {
-                    background: linear-gradient(135deg, #7e57c2 0%, #5e35b1 100%) !important;
-                    border: none !important;
-                    border-radius: 16px !important;
-                    box-shadow: 0 8px 20px rgba(94, 53, 177, 0.3) !important;
-                    font-size: 15px !important;
-                    height: 55px !important;
-                    margin-top: 20px !important;
-                    text-transform: uppercase;
-                    width: 100% !important;
+                    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%) !important;
+                    height: 70px !important; /* Más alto */
+                    font-size: 18px !important;
+                    font-weight: 850 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 15px !important; /* Más espacio entre texto e icono */
+                    animation: pulse-green 2s infinite;
                 }
 
-                #finalWaBtn:active {
-                    transform: scale(0.97);
+                #finalWaBtn img {
+                    height: 40px !important; /* Icono mucho más grande */
+                    width: auto !important;
+                    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
                 }
 
                 /* 6. Optimizaciones para Celular 📱 */
@@ -2551,10 +2553,13 @@
             <div class="modal-content">
                 <button class="close-btn" onclick="closePrivacyModal()">×</button>
                 <h2>🔒 Aviso de Privacidad</h2>
-                <div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto;">
+                <div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto; padding-right: 10px;">
                     <p style="font-size: 12px; color: #666; margin-bottom: 15px;"><strong>Última actualización: Febrero 2026</strong></p>
-                    <p>En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, <strong>TuChamba Express</strong> informa sobre el tratamiento de su información capturada en nuestros filtros de enlace por un periodo máximo de 3 meses, tras el cual será eliminada de forma definitiva.</p>
-                    <p>Los datos son utilizados exclusivamente para facilitar el contacto entre usted y el reclutador asignado vía WhatsApp.</p>
+                    <p>En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, <strong>TuChamba Express</strong> informa:</p>
+                    <p><strong>1. Responsable:</strong> Enlace entre candidatos y empresas.</p>
+                    <p><strong>2. Datos:</strong> Nombre, edad y contacto para fines de reclutamiento.</p>
+                    <p><strong>3. Tiempo:</strong> Los datos se conservan por un máximo de <strong>3 meses</strong> y luego se eliminan.</p>
+                    <p><strong>4. Exámenes:</strong> El usuario acepta que las empresas pueden requerir exámenes médicos conforme a la ley.</p>
                 </div>
             </div>
         </div>
@@ -4378,7 +4383,7 @@
             window.processSurvey = function(e) {
                 e.preventDefault();
                 
-                // Recopilación de datos
+                // Captura de datos
                 const name = document.getElementById('qName').value.trim();
                 const age = document.getElementById('qAge').value;
                 const loc = document.getElementById('qLoc').value.trim();
@@ -4389,24 +4394,24 @@
                 const edu = document.getElementById('qEdu').value;
                 const contactPref = document.getElementById('qContact').value;
 
-                // Mensaje Limpio con Emojis Universales (Punto 4)
-                // Se quitaron los símbolos que daban error por iconos estándar
-                const fullMessage = `¡Hola! Me interesa la vacante. Aquí mi perfil:\n\n` +
-                    `✅ Nombre: ${name}\n` +
-                    `🎂 Edad: ${age} años\n` +
-                    `📍 Vive en: ${loc}\n` +
-                    `💼 Situación: ${work}\n` +
-                    `⭐ Experiencia: ${exp}\n` +
-                    `🔄 Rola Turnos: ${shifts}\n` +
-                    `📅 Entrevista esta semana: ${interview}\n` +
-                    `🎓 Estudios: ${edu}\n` +
-                    `📲 Contacto preferido: ${contactPref}\n\n` +
-                    `(Cód. Vacante: ${currentSurveyJobId} | Ref: ${currentSurveyRecruiterName})`;
+                // Mensaje con formato limpio (Cambiamos los símbolos por emojis universales)
+                const intro = "¡Hola! Me interesa la vacante. Aquí mi perfil:\n\n";
+                const body = 
+                    "✅ Nombre: " + name + "\n" +
+                    "🎂 Edad: " + age + " años\n" +
+                    "📍 Vive en: " + loc + "\n" +
+                    "💼 Situación: " + work + "\n" +
+                    "⭐ Experiencia: " + exp + "\n" +
+                    "🔄 Rola Turnos: " + shifts + "\n" +
+                    "📅 Entrevista: " + interview + "\n" +
+                    "🎓 Estudios: " + edu + "\n" +
+                    "📲 Contacto: " + contactPref + "\n\n" +
+                    "(Cód: " + currentSurveyJobId + " | Ref: " + currentSurveyRecruiterName + ")";
 
-                const finalLink = currentSurveyWaLinkBase + encodeURIComponent(fullMessage);
+                const finalLink = currentSurveyWaLinkBase + encodeURIComponent(intro + body);
                 const btnSubmit = document.getElementById('finalWaBtn');
                 
-                // Cambiar visualmente al Paso 2 - Pantalla de Éxito (Punto 2)
+                // Pantalla de Éxito
                 const successBox = document.getElementById('successMsgBox');
                 const surveyStep1 = document.getElementById('surveyStep1');
                 
@@ -4420,11 +4425,11 @@
                         Él/Ella está revisando tus respuestas. Si tu perfil es compatible, te contactará por WhatsApp.<br><br>
                         <small>⚠️ <b>No es necesario llamar.</b></small>
                         <br><br>
-                        <button onclick="window.closeSurveyModal()" class="btn-primary" style="width:100%; background:#673ab7;">Cerrar y Regresar</button>
+                        <button onclick="window.closeSurveyModal()" class="btn-primary" style="width:100%; background:#673ab7; border-radius:12px; height:45px;">Cerrar y Regresar</button>
                     `;
                 }
 
-                // Se dispara handleWhatsAppClick para que cuente el clic en Firebase y abra WA
+                // Registro de clic y redirección
                 window.handleWhatsAppClick(btnSubmit, currentSurveyJobId, currentSurveyRecruiterName, finalLink);
             };
 
