@@ -11,21 +11,15 @@
 
       gtag('config', 'G-N2SW9MJGYG');
     </script>
-
-        <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.gstatic.com https://images.unsplash.com;
-        
-        script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://html2canvas.hertzen.com https://*.gstatic.com https://cdn.sheetjs.com https://*.googleapis.com https://*.firebaseio.com https://www.googletagmanager.com https://www.google-analytics.com;
-        
-        connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.gstatic.com https://www.google-analytics.com https://analytics.google.com;
-        
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-        
-        font-src 'self' https://fonts.gstatic.com data:;
-        
-        img-src 'self' data: https: blob: https://*.google-analytics.com https://images.unsplash.com https://tuchamba-express.github.io;
-        
-        worker-src 'self' blob:;">
+    
+       <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.gstatic.com https://images.unsplash.com;
+    script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://html2canvas.hertzen.com https://*.gstatic.com https://cdn.sheetjs.com https://*.googleapis.com https://*.firebaseio.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net;
+    connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.gstatic.com https://www.google-analytics.com https://analytics.google.com https://www.facebook.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src 'self' https://fonts.gstatic.com data:;
+    img-src 'self' data: https: blob: https://*.google-analytics.com https://images.unsplash.com https://tuchamba-express.github.io https://www.facebook.com;
+    worker-src 'self' blob:;">
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         
@@ -1618,7 +1612,7 @@
                 #adminSearchToggle { display: none !important; }
 
                 body.admin-mode #adminControls {
-                    border-radius: 50px !important;
+                    border-radius: 50px !important; 
                     margin: 10px auto 15px auto !important;
                     max-width: 98% !important;
                     padding: 5px 15px !important;
@@ -2156,10 +2150,26 @@
 
                 #finalWaBtn {
                     animation: pulse-purple 2s infinite;
-            }
-            
+            }      
 
-        </style>    
+        </style>        
+
+        <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '26687793254156414');
+        fbq('track', 'PageView');
+        </script>
+        <noscript><img height="1" width="1" style="display:none"
+        src="https://www.facebook.com/tr?id=26687793254156414&ev=PageView&noscript=1"
+        /></noscript>
+    
     </head>
     <body>
 
@@ -4374,6 +4384,10 @@
             window.processSurvey = function(e) {
                 e.preventDefault();
                 
+                if (typeof fbq === 'function') { 
+                    fbq('track', 'Contact'); 
+                }
+
                 const name = document.getElementById('qName').value.trim();
                 const age = document.getElementById('qAge').value;
                 const loc = document.getElementById('qLoc').value.trim();
@@ -4381,7 +4395,7 @@
                 const exp = document.getElementById('qExp').value;
                 const shifts = document.getElementById('qShifts').value;
                 const interview = document.getElementById('qInterview').value;
-                const edu = document.getElementById('qEdu').value;
+                const edu = document.getElementById('qEdu').value;  
                 const contactPref = document.getElementById('qContact').value;
 
                 // Usamos códigos Unicode para asegurar que WhatsApp no rompa los emojis
@@ -4410,7 +4424,7 @@
 
                 const finalLink = currentSurveyWaLinkBase + encodeURIComponent(intro + body);
                 const btnSubmit = document.getElementById('finalWaBtn');
-                
+
                 // Pantalla de Éxito
                 const successBox = document.getElementById('successMsgBox');
                 const surveyStep1 = document.getElementById('surveyStep1');
