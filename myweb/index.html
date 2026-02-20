@@ -4361,6 +4361,7 @@
                 
                 // 2. Resetear el botón de envío (Punto 3)
                 const btnSubmit = document.getElementById('finalWaBtn');
+
                 if(btnSubmit) {
                     btnSubmit.disabled = false;
                     btnSubmit.innerHTML = `ENVIAR A WHATSAPP <img src="favicon_2.png" alt="WA" style="height: 24px; width: auto; margin-left: 10px;">`;
@@ -4383,9 +4384,9 @@
 
             window.processSurvey = function(e) {
                 e.preventDefault();
-                
-                if (typeof fbq === 'function') { 
-                    fbq('track', 'Contact'); 
+            
+                if (typeof fbq === 'function') {
+                    fbq('track', 'Lead'); 
                 }
 
                 const name = document.getElementById('qName').value.trim();
