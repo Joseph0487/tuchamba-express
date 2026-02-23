@@ -4386,54 +4386,45 @@
 
             window.processSurvey = function(e) {
                 e.preventDefault();
-            
+
+                // --- 1. MANTENEMOS EL PÍXEL INTACTO ---
                 if (typeof fbq === 'function') {
                     fbq('track', 'Lead'); 
                 }
 
+                // --- 2. CAPTURAMOS SOLO LOS 4 CAMPOS NUEVOS ---
                 const name = document.getElementById('qName').value.trim();
                 const age = document.getElementById('qAge').value;
-                const loc = document.getElementById('qLoc').value.trim();
-                const work = document.getElementById('qWork').value;
-                const exp = document.getElementById('qExp').value;
+                const loc = document.getElementById('qLoc').value.trim(); // Nota: En tu HTML usas qLoc
                 const shifts = document.getElementById('qShifts').value;
-                const interview = document.getElementById('qInterview').value;
-                const edu = document.getElementById('qEdu').value;  
-                const contactPref = document.getElementById('qContact').value;
 
-                // Usamos códigos Unicode para asegurar que WhatsApp no rompa los emojis
+                // --- 3. EMOJIS (Mantenemos los que quedan) ---
                 const iCheck = "\u2705"; // 👤
                 const iCake = "\uD83C\uDF82"; // 🎂
                 const iPin = "\uD83D\uDccd"; // 📍
-                const iBrief = "\uD83D\uDCBC"; // 💼
-                const iStar = "\u2B50"; // ⭐
                 const iSync = "\uD83D\uDD04"; // 🔄
-                const iCal = "\uD83D\uDCC5"; // 📅
-                const iGrad = "\uD83C\uDF93"; // 🎓
-                const iPhone = "\uD83D\uDCF2"; // 📲
 
+                // --- 4. ARMAMOS EL MENSAJE (Más limpio y directo) ---
                 const intro = "¡Hola! Me interesa la vacante. Aquí mi perfil:\n\n";
                 const body = 
                     iCheck + " Nombre: " + name + "\n" +
                     iCake + " Edad: " + age + " años\n" +
                     iPin + " Vive en: " + loc + "\n" +
-                    iBrief + " Situación: " + work + "\n" +
-                    iStar + " Experiencia: " + exp + "\n" +
-                    iSync + " Rola Turnos: " + shifts + "\n" +
-                    iCal + " Entrevista: " + interview + "\n" +
-                    iGrad + " Estudios: " + edu + "\n" +
-                    iPhone + " Contacto: " + contactPref + "\n\n" +
+                    iSync + " Rola Turnos: " + shifts + "\n\n" +
                     "(Cód: " + currentSurveyJobId + " | Ref: " + currentSurveyRecruiterName + ")";
 
                 const finalLink = currentSurveyWaLinkBase + encodeURIComponent(intro + body);
                 const btnSubmit = document.getElementById('finalWaBtn');
 
-                // Pantalla de Éxito
+                // --- 5. PANTALLA DE ÉXITO (Mantenemos tu lógica de Admin/Reclutador) ---
                 const successBox = document.getElementById('successMsgBox');
-                const surveyStep1 = document.getElementById('surveyStep1');
+                const surveyStep1 = document.getElementById('preFilterForm'); // Ojo: Verifica si tu div se llama surveyStep1 o usas el ID del form
                 
-                if (successBox && surveyStep1) {
-                    surveyStep1.style.display = 'none';
+                if (successBox) {
+                    // Ocultamos el formulario (usando el ID que pusimos en el HTML anterior)
+                    const formToHide = document.getElementById('preFilterForm');
+                    if(formToHide) formToHide.style.display = 'none';
+                    
                     successBox.style.display = 'block';
                     successBox.innerHTML = `
                         <div style="text-align:center;"><h3 style="color:#673ab7; margin-bottom:15px;">` + iCheck + ` ¡REGISTRO COMPLETADO!</h3></div>
@@ -4446,6 +4437,8 @@
                     `;
                 }
 
+                // --- 6. DISPARAMOS TU FUNCIÓN DE CONTADOR Y REDIRECCIÓN ---
+                // Esto es lo que asegura que se cuente el clic en Firebase y abra WhatsApp
                 window.handleWhatsAppClick(btnSubmit, currentSurveyJobId, currentSurveyRecruiterName, finalLink);
             };
 
@@ -5219,7 +5212,7 @@
                 <h2 style="color: #512da8; margin-bottom: 5px;">📋 Registro de Perfil</h2>
                 <p style="font-size: 13px; color: #666;">Postulación para: <strong id="surveyJobTitle" style="color: #333;"></strong></p>
             </div>
-            
+                      
             <form id="preFilterForm" onsubmit="window.processSurvey(event)">
                 <div class="form-group">
                     <label>Nombre y Apellido</label>
@@ -5238,55 +5231,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Situación laboral / Disponibilidad</label>
-                    <select id="qWork" required>
+                    <label>¿Puedes rolar turnos?</label>
+                    <select id="qShifts" required>
                         <option value="" disabled selected>Selecciona una opción</option>
-                        <option value="🔴 Desempleado - ¡Empezaría hoy mismo!">🔴 Desempleado - ¡Busco empezar hoy mismo!</option>
-                        <option value="🟠 Desempleado - Disponible en unos días">🟠 Desempleado - Puedo empezar en unos días</option>
-                        <option value="🟡 Empleado - Busco mejores opciones">🟡 Empleado - Busco mejores opciones</option>
-                        <option value="🔵 Estoy Explorando">🔵 Estoy Explorando</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>¿Tienes experiencia en puestos similares?</label>
-                    <select id="qExp" required>
-                        <option value="" disabled selected style="color: #999;">Selecciona una Opción</option>
-                        <option value="Sí, más de 1 año">Sí, más de 1 año</option>
-                        <option value="Sí, 1 año o menos">Sí, 1 año o menos</option>
-                        <option value="Sí, 6 meses o menos">Sí, 6 meses o menos</option>
-                        <option value="No, pero aprendo rápido">No, pero aprendo rápido</option>
-                    </select>
-                </div>
-
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label>¿Puedes rolar turnos?</label>
-                        <select id="qShifts"><option value="Sí">Sí</option><option value="No">No</option></select>
-                    </div>
-                    <div class="form-group">
-                        <label>¿Puedes asistir a una entrevista en esta semana?</label>
-                        <select id="qInterview"><option value="Sí">Sí</option><option value="No">No</option></select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>¿Último grado de estudios?</label>
-                    <select id="qEdu" required>
-                        <option value="" disabled selected style="color: #999;">Selecciona una Opción</option>
-                        <option value="Primaria Terminada">Primaria Terminada</option>
-                        <option value="Secundaria Terminada">Secundaria Terminada</option>
-                        <option value="Bachillerato Terminado">Bachillerato Terminado</option>
-                        <option value="Licenciatura/Ingeniería Terminada">Licenciatura/Ingeniería Terminada</option>
-                        <option value="Carrera Técnica / TSU Terminada">Carrera Técnica / TSU Terminada</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Preferencia de contacto</label>
-                    <select id="qContact">
-                        <option value="WhatsApp">📲 Mensaje de WhatsApp</option>
-                        <option value="Llamada">📞 Llamada Telefónica</option>
+                        <option value="Sí">Sí, sin problema</option>
+                        <option value="No">No, busco turno fijo</option>
                     </select>
                 </div>
 
@@ -5299,6 +5248,7 @@
                     <img src="favicon_2.png" alt="WA" style="height: 35px; width: auto; margin-left: 12px;"> 
                 </button>
             </form>
+
         </div>
         <div id="successMsgBox" style="display:none; padding: 10px 5px; text-align: left;">
         </div>
