@@ -3378,29 +3378,22 @@
                 }
             };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             let lastClickTime = 0; 
             window.handleWhatsAppClick = function(btn, jobId, recruiterName, link) {
                 const now = Date.now(); 
                 if (now - lastClickTime < 5000) return; 
                 lastClickTime = now;
 
-                // 1. Google Analytics
+                // --- 1. META PIXEL (NUEVO) ---
+                // Registra el Lead en Facebook antes de que el usuario abandone el sitio
+                if (typeof fbq === 'function') {
+                    fbq('track', 'Lead', {
+                        content_name: jobId,
+                        content_category: recruiterName || 'directo'
+                    });
+                }
+
+                // 2. Google Analytics (Tu código original)
                 if (typeof gtag === 'function') {
                     const job = jobs[jobId] || {};
                     gtag('event', 'contact_click', {
@@ -3414,7 +3407,7 @@
                 btn.disabled = true;
                 btn.innerHTML = '🔄 Abriendo...';
 
-                // 2. Registro detallado en Firebase (Logs)
+                // 3. Registro detallado en Firebase (Logs)
                 const logRef = push(ref(db, 'clickLogs'));
                 set(logRef, {
                     jobId: jobId,
@@ -3423,19 +3416,17 @@
                     userAgent: navigator.userAgent
                 });
 
-                // 3. Incremento del contador público
+                // 4. Incremento del contador público
                 runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
 
-                // --- NUEVO: LIMPIEZA DEL ENLACE ANTES DE ABRIR ---
-                // Esto elimina espacios accidentales que rompen WhatsApp
+                // 5. LIMPIEZA DEL ENLACE
                 const cleanLink = link.replace(/\s/g, '');
 
                 setTimeout(() => {
-                    // --- MODIFICADO: Ahora abrimos cleanLink en lugar de link ---
                     window.open(cleanLink, '_blank'); 
                     btn.disabled = false;
                     btn.innerHTML = '📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC';
-                }, 500);
+                }, 500); // 500ms es tiempo suficiente para que el Píxel mande la señal
             };
 
             window.registerClick = function(jobId, recruiterName) {
@@ -4168,6 +4159,15 @@
             }
 
 
+
+
+
+
+
+
+
+
+            
             window.closeViewModal = function() { 
                 // RESTAURAR TÍTULO
                 document.title = "TuChamba Express | Vacantes Urgentes en Nuevo León, CDMX y EdoMex 2026";
