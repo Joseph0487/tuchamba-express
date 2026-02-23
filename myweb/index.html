@@ -4387,58 +4387,48 @@
             window.processSurvey = function(e) {
                 e.preventDefault();
 
-                // --- 1. MANTENEMOS EL PÍXEL INTACTO ---
+                // --- MANTENEMOS EL PÍXEL ---
                 if (typeof fbq === 'function') {
                     fbq('track', 'Lead'); 
                 }
 
-                // --- 2. CAPTURAMOS SOLO LOS 4 CAMPOS NUEVOS ---
+                // --- CAPTURAMOS SOLO LOS 3 CAMPOS RESTANTES ---
                 const name = document.getElementById('qName').value.trim();
                 const age = document.getElementById('qAge').value;
-                const loc = document.getElementById('qLoc').value.trim(); // Nota: En tu HTML usas qLoc
-                const shifts = document.getElementById('qShifts').value;
+                const loc = document.getElementById('qLoc').value.trim();
 
-                // --- 3. EMOJIS (Mantenemos los que quedan) ---
+                // --- EMOJIS ---
                 const iCheck = "\u2705"; // 👤
                 const iCake = "\uD83C\uDF82"; // 🎂
                 const iPin = "\uD83D\uDccd"; // 📍
-                const iSync = "\uD83D\uDD04"; // 🔄
 
-                // --- 4. ARMAMOS EL MENSAJE (Más limpio y directo) ---
+                // --- MENSAJE PARA WHATSAPP (Aún más corto) ---
                 const intro = "¡Hola! Me interesa la vacante. Aquí mi perfil:\n\n";
                 const body = 
                     iCheck + " Nombre: " + name + "\n" +
                     iCake + " Edad: " + age + " años\n" +
-                    iPin + " Vive en: " + loc + "\n" +
-                    iSync + " Rola Turnos: " + shifts + "\n\n" +
+                    iPin + " Vive en: " + loc + "\n\n" +
                     "(Cód: " + currentSurveyJobId + " | Ref: " + currentSurveyRecruiterName + ")";
 
                 const finalLink = currentSurveyWaLinkBase + encodeURIComponent(intro + body);
                 const btnSubmit = document.getElementById('finalWaBtn');
 
-                // --- 5. PANTALLA DE ÉXITO (Mantenemos tu lógica de Admin/Reclutador) ---
+                // --- PANTALLA DE ÉXITO ---
                 const successBox = document.getElementById('successMsgBox');
-                const surveyStep1 = document.getElementById('preFilterForm'); // Ojo: Verifica si tu div se llama surveyStep1 o usas el ID del form
+                const formToHide = document.getElementById('preFilterForm');
                 
                 if (successBox) {
-                    // Ocultamos el formulario (usando el ID que pusimos en el HTML anterior)
-                    const formToHide = document.getElementById('preFilterForm');
                     if(formToHide) formToHide.style.display = 'none';
-                    
                     successBox.style.display = 'block';
                     successBox.innerHTML = `
                         <div style="text-align:center;"><h3 style="color:#673ab7; margin-bottom:15px;">` + iCheck + ` ¡REGISTRO COMPLETADO!</h3></div>
                         Hemos recibido tus datos para la vacante <b>` + document.getElementById('surveyJobTitle').textContent + `</b>.<br><br>
-                        <b>¿Qué sigue?</b> Nuestro sistema ya asignó tu perfil al reclutador: <b>` + currentSurveyRecruiterName + `</b>.<br><br>
-                        Él/Ella está revisando tus respuestas. Si tu perfil es compatible, te contactará por WhatsApp.<br><br>
-                        <small>⚠️ <b>No es necesario llamar.</b></small>
-                        <br><br>
+                        <b>¿Qué sigue?</b> El reclutador <b>` + currentSurveyRecruiterName + `</b> está revisando tu perfil. Si es compatible, te contactará por WhatsApp.<br><br>
                         <button onclick="window.closeSurveyModal()" class="btn-primary" style="width:100%; background:#673ab7; border-radius:12px; height:45px;">Cerrar y Regresar</button>
                     `;
                 }
 
-                // --- 6. DISPARAMOS TU FUNCIÓN DE CONTADOR Y REDIRECCIÓN ---
-                // Esto es lo que asegura que se cuente el clic en Firebase y abra WhatsApp
+                // --- SEGUIMOS CONTANDO EL CLIC EN FIREBASE ---
                 window.handleWhatsAppClick(btnSubmit, currentSurveyJobId, currentSurveyRecruiterName, finalLink);
             };
 
@@ -5230,17 +5220,8 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>¿Puedes rolar turnos?</label>
-                    <select id="qShifts" required>
-                        <option value="" disabled selected>Selecciona una opción</option>
-                        <option value="Sí">Sí, sin problema</option>
-                        <option value="No">No, busco turno fijo</option>
-                    </select>
-                </div>
-
                 <p style="font-size: 10px; color: #999; margin: 15px 0; line-height: 1.2;">
-                    * Al enviar, tus datos se mandan directo al reclutador por WhatsApp para tu filtro inicial. Conservamos esta información en nuestros registros por un periodo máximo de 3 meses para seguimiento de tu vacante.
+                    * Al enviar, tus datos se mandan directo al reclutador por WhatsApp para tu filtro inicial. Conservamos esta información en nuestros registros por un periodo máximo de 3 meses.
                 </p>
 
                 <button type="submit" id="finalWaBtn" class="whatsapp-btn-large" style="background: #25D366 !important; height: 65px !important; font-size: 17px !important;">
