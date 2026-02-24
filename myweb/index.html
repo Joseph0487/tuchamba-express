@@ -2144,40 +2144,51 @@
                             <span class="icon">🌐</span> Generar Sitemap SEO
                         </button>
                         .btn-sitemap-seo {
-                            /* Fondo oscuro y bordes muy redondeados */
-                            background-color: #2a2d32; 
-                            color: #ffffff;
-                            border: none;
-                            border-radius: 12px; /* Esquinas curvas como en la imagen */
-                            
-                            /* Espaciado y alineación */
-                            padding: 10px 20px;
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 10px; /* Espacio entre el icono y el texto */
-                            
-                            /* Tipografía */
-                            font-family: sans-serif;
-                            font-size: 14px;
-                            font-weight: 600;
-                            text-transform: uppercase; /* Texto en mayúsculas como "CASH COLLECT" */
-                            letter-spacing: 0.5px;
-                            
-                            cursor: pointer;
-                            transition: background 0.2s ease;
-                        }
+    /* Fondo con gradiente verde como el de Slots */
+    background: linear-gradient(145deg, #53980d 0%, #2e5c04 100%);
+    color: #ffffff;
+    
+    /* Forma y Tamaño */
+    border: none;
+    border-radius: 16px; /* Bordes bien redondeados */
+    padding: 20px;
+    width: 200px;        /* Ancho fijo para que no se deforme */
+    height: 100px;       /* Altura para dar espacio al diseño */
+    
+    /* Tipografía */
+    font-family: 'Arial', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    text-align: left;    /* Texto a la izquierda como en la imagen */
+    line-height: 1.1;
+    
+    /* Interactividad */
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    
+    /* Alineación del contenido */
+    display: flex;
+    align-items: flex-start;
+}
 
-                        /* Efecto al pasar el mouse */
-                        .btn-sitemap-seo:hover {
-                            background-color: #3f434a; /* Un gris un poco más claro */
-                        }
+/* El icono grande de fondo (Las cerezas/mundo) */
+.btn-sitemap-seo::after {
+    content: "🌐";
+    position: absolute;
+    right: -10px;
+    bottom: -15px;
+    font-size: 70px;     /* Icono gigante */
+    opacity: 0.25;       /* Transparencia para que sea fondo */
+    transform: rotate(-10deg);
+}
 
-                        /* Estilo para el icono */
-                        .btn-sitemap-seo .icon {
-                            font-size: 18px;
-                            opacity: 0.8;
-                        }
-
+.btn-sitemap-seo:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.2);
+}
                         <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
                     </div>
                 </div>
