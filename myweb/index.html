@@ -2143,52 +2143,41 @@
                         <button onclick="window.downloadSitemap()" class="btn-sitemap-seo">
                             <span class="icon">🌐</span> Generar Sitemap SEO
                         </button>
+                        <style>
                         .btn-sitemap-seo {
-    /* Fondo con gradiente verde como el de Slots */
-    background: linear-gradient(145deg, #53980d 0%, #2e5c04 100%);
-    color: #ffffff;
-    
-    /* Forma y Tamaño */
-    border: none;
-    border-radius: 16px; /* Bordes bien redondeados */
-    padding: 20px;
-    width: 200px;        /* Ancho fijo para que no se deforme */
-    height: 100px;       /* Altura para dar espacio al diseño */
-    
-    /* Tipografía */
-    font-family: 'Arial', sans-serif;
-    font-weight: 800;
-    font-size: 16px;
-    text-align: left;    /* Texto a la izquierda como en la imagen */
-    line-height: 1.1;
-    
-    /* Interactividad */
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-    
-    /* Alineación del contenido */
-    display: flex;
-    align-items: flex-start;
-}
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 10px;
+                            background-color: #2e7d32; /* Un verde más elegante y profundo */
+                            color: white;
+                            padding: 12px 24px;
+                            border: none;
+                            border-radius: 8px; /* Bordes redondeados modernos */
+                            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                            font-size: 16px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                            transition: all 0.3s ease;
+                        }
 
-/* El icono grande de fondo (Las cerezas/mundo) */
-.btn-sitemap-seo::after {
-    content: "🌐";
-    position: absolute;
-    right: -10px;
-    bottom: -15px;
-    font-size: 70px;     /* Icono gigante */
-    opacity: 0.25;       /* Transparencia para que sea fondo */
-    transform: rotate(-10deg);
-}
+                        .btn-sitemap-seo:hover {
+                            background-color: #1b5e20;
+                            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+                            transform: translateY(-2px); /* Efecto de levitación */
+                        }
 
-.btn-sitemap-seo:hover {
-    transform: translateY(-3px);
-    filter: brightness(1.2);
-}
+                        .btn-sitemap-seo:active {
+                            transform: translateY(0);
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                        }
+
+                        .btn-sitemap-seo .icon {
+                            font-size: 1.2em;
+                        }
+                        </style>
+
+
                         <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
                     </div>
                 </div>
