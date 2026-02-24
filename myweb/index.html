@@ -2143,6 +2143,41 @@
                         <button onclick="window.downloadSitemap()" class="btn-sitemap-seo">
                             <span class="icon">🌐</span> Generar Sitemap SEO
                         </button>
+                        .btn-sitemap-seo {
+                            /* Fondo oscuro y bordes muy redondeados */
+                            background-color: #2a2d32; 
+                            color: #ffffff;
+                            border: none;
+                            border-radius: 12px; /* Esquinas curvas como en la imagen */
+                            
+                            /* Espaciado y alineación */
+                            padding: 10px 20px;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 10px; /* Espacio entre el icono y el texto */
+                            
+                            /* Tipografía */
+                            font-family: sans-serif;
+                            font-size: 14px;
+                            font-weight: 600;
+                            text-transform: uppercase; /* Texto en mayúsculas como "CASH COLLECT" */
+                            letter-spacing: 0.5px;
+                            
+                            cursor: pointer;
+                            transition: background 0.2s ease;
+                        }
+
+                        /* Efecto al pasar el mouse */
+                        .btn-sitemap-seo:hover {
+                            background-color: #3f434a; /* Un gris un poco más claro */
+                        }
+
+                        /* Estilo para el icono */
+                        .btn-sitemap-seo .icon {
+                            font-size: 18px;
+                            opacity: 0.8;
+                        }
+
                         <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
                     </div>
                 </div>
