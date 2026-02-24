@@ -2140,9 +2140,44 @@
                         <button class="tool-btn settings-btn admin-only" onclick="openSettingsModal()">⚙️ Ajustes</button>
                         <button class="tool-btn admin-only" onclick="document.getElementById('excelFile').click()">📤 Cargar</button>
                         <button class="tool-btn" onclick="downloadTemplate()">📋 Plantilla</button>
-                        <button onclick="window.downloadSitemap()" class="btn-secondary" style="background:#4caf50;">
-                            🌐 Generar Sitemap SEO
-                        </button>   
+                        <button onclick="window.downloadSitemap()" class="btn-sitemap-seo">
+                            <span class="icon">🌐</span> Generar Sitemap SEO
+                        </button>
+                        <style>
+                        .btn-sitemap-seo {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 10px;
+                            background-color: #2e7d32; /* Un verde más elegante y profundo */
+                            color: white;
+                            padding: 12px 24px;
+                            border: none;
+                            border-radius: 8px; /* Bordes redondeados modernos */
+                            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                            font-size: 16px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                            transition: all 0.3s ease;
+                        }
+
+                        .btn-sitemap-seo:hover {
+                            background-color: #1b5e20;
+                            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+                            transform: translateY(-2px); /* Efecto de levitación */
+                        }
+
+                        .btn-sitemap-seo:active {
+                            transform: translateY(0);
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                        }
+
+                        .btn-sitemap-seo .icon {
+                            font-size: 1.2em;
+                        }
+                        </style>
+
+
                         <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
                     </div>
                 </div>
