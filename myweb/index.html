@@ -2140,7 +2140,9 @@
                         <button class="tool-btn settings-btn admin-only" onclick="openSettingsModal()">⚙️ Ajustes</button>
                         <button class="tool-btn admin-only" onclick="document.getElementById('excelFile').click()">📤 Cargar</button>
                         <button class="tool-btn" onclick="downloadTemplate()">📋 Plantilla</button>
-                        <button id="seoSitemapBtn" class="tool-btn" onclick="window.downloadSitemap()" style="background-color: #FF9800; color: white;">🗺️ Sitemap SEO</button>
+                        <button onclick="window.downloadSitemap()" class="btn-secondary" style="background:#4caf50;">
+                            🌐 Generar Sitemap SEO
+                        </button>   
                         <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
                     </div>
                 </div>
@@ -3384,22 +3386,16 @@
                 if (now - lastClickTime < 5000) return; 
                 lastClickTime = now;
 
-                // --- 1. META PIXEL (NUEVO) ---
-                // Registra el Lead en Facebook antes de que el usuario abandone el sitio
+                // --- RASTREO META PIXEL ---
                 if (typeof fbq === 'function') {
-                    fbq('track', 'Lead', {
-                        content_name: jobId,
-                        content_category: recruiterName || 'directo'
-                    });
+                    fbq('track', 'Lead', { content_name: jobId, content_category: recruiterName });
                 }
 
-                // 2. Google Analytics (Tu código original)
                 if (typeof gtag === 'function') {
                     const job = jobs[jobId] || {};
                     gtag('event', 'contact_click', {
                         'job_title': job.title || 'Desconocido',
                         'job_id': jobId,
-                        'company': job.company || 'N/A',
                         'recruiter': recruiterName || 'directo'
                     });
                 }
@@ -3407,7 +3403,6 @@
                 btn.disabled = true;
                 btn.innerHTML = '🔄 Abriendo...';
 
-                // 3. Registro detallado en Firebase (Logs)
                 const logRef = push(ref(db, 'clickLogs'));
                 set(logRef, {
                     jobId: jobId,
@@ -3416,17 +3411,14 @@
                     userAgent: navigator.userAgent
                 });
 
-                // 4. Incremento del contador público
                 runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
 
-                // 5. LIMPIEZA DEL ENLACE
                 const cleanLink = link.replace(/\s/g, '');
-
                 setTimeout(() => {
                     window.open(cleanLink, '_blank'); 
                     btn.disabled = false;
                     btn.innerHTML = '📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC';
-                }, 500); // 500ms es tiempo suficiente para que el Píxel mande la señal
+                }, 500);
             };
 
             window.registerClick = function(jobId, recruiterName) {
@@ -4490,47 +4482,59 @@
                 document.head.appendChild(script);
             }
             
-        // --- HERRAMIENTA ADMIN: GENERADOR DE SITEMAP (V26.9 - CORREGIDO) ---
-        window.downloadSitemap = function() {
-            let xmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n';
-            xmlContent += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+            // --- HERRAMIENTA ADMIN: GENERADOR DE SITEMAP SEO (V27 - FILTRADO) ---
+            window.downloadSitemap = function() {
+                let xmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n';
+                xmlContent += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-            // URL Principal
-            xmlContent += '  <url><loc>https://tuchamba-express.vercel.app/</loc><priority>1.0</priority></url>\n';
+                // 1. URL Principal (Home)
+                xmlContent += '  <url>\n    <loc>https://tuchamba-express.vercel.app/</loc>\n    <priority>1.0</priority>\n  </url>\n';
 
-            Object.keys(jobs).forEach(id => {
-                const j = jobs[id];
-                // Solo incluir vacantes activas
-                if (j.status !== 'No Vigente') {
-                    let isoDate = new Date().toISOString().split('T')[0]; // Fecha de hoy por defecto
-            
-                // Convertir DD/MM/YYYY a YYYY-MM-DD
-                if (j.fecha && j.fecha.includes('/')) {
-                const [d, m, y] = j.fecha.split('/');
-                isoDate = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+                // 2. Generar URLs de vacantes VIGENTES
+                Object.keys(jobs).forEach(id => {
+                    const j = jobs[id];
+                    
+                    // FILTRO CRÍTICO: Solo incluimos las que NO están marcadas como "No Vigente"
+                    if (j.status !== 'No Vigente') {
+                        let isoDate = new Date().toISOString().split('T')[0]; // Fecha de hoy por defecto
+
+                        // Conversión de fecha DD/MM/YYYY a formato XML (YYYY-MM-DD)
+                        if (j.fecha && j.fecha.includes('/')) {
+                            const parts = j.fecha.split('/');
+                            if (parts.length === 3) {
+                                const [d, m, y] = parts;
+                                isoDate = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+                            }
+                        }
+
+                        // Escapamos el carácter '&' para que el XML sea válido
+                        const urlLimpia = `https://tuchamba-express.vercel.app/?id=${id}`.replace(/&/g, '&amp;');
+                        
+                        xmlContent += '  <url>\n';
+                        xmlContent += `    <loc>${urlLimpia}</loc>\n`;
+                        xmlContent += `    <lastmod>${isoDate}</lastmod>\n`;
+                        xmlContent += '    <changefreq>weekly</changefreq>\n';
+                        xmlContent += '    <priority>0.8</priority>\n';
+                        xmlContent += '  </url>\n';
+                    }
+                });
+
+                xmlContent += '</urlset>';
+
+                // Creación y descarga del archivo
+                const blob = new Blob([xmlContent], { type: 'application/xml' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'sitemap.xml';
+                link.click();
+                
+                if(typeof window.showToast === 'function') {
+                    window.showToast("✅ Sitemap SEO generado (Solo vigentes)");
+                } else {
+                    console.log("Sitemap generado y descargado.");
                 }
-
-                // Escapar caracteres especiales en la URL
-                const urlLimpia = `https://tuchamba-express.vercel.app/?id=${id}`.replace(/&/g, '&amp;');
-            
-                xmlContent += '  <url>\n';
-                xmlContent += `    <loc>${urlLimpia}</loc>\n`;
-                xmlContent += `    <lastmod>${isoDate}</lastmod>\n`;
-                xmlContent += '    <changefreq>weekly</changefreq>\n';
-                xmlContent += '    <priority>0.8</priority>\n';
-                xmlContent += '  </url>\n';
-            }
-            });
-
-            xmlContent += '</urlset>';
-            const blob = new Blob([xmlContent], { type: 'application/xml' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'sitemap.xml';
-            link.click();
-            console.log("Sitemap generado con fechas reales y descargado.");
-        };   
-
+            };
+        
             /* =========================================================
             BLOQUE DE RECUPERACIÓN TOTAL (V22.FIX) 🚑
             (Incluye: Descargas, Equipo, Directorio y Accesos)
