@@ -1668,9 +1668,9 @@
                     targetPhone = centralPhone.replace(/\D/g, ''); 
                 }
 
-                if (targetPhone) {
-                    let msg = `Hola, vi la vacante ${j.title} (Cód: ${id})`;
-                    if(isReferral) msg += ` (Referido por ${activeRecruiter.name})`;
+               if (targetPhone) {
+                    let msg = `Hola, vi la vacante de ${j.title} (Cód: ${id})\n\nEstos son mis datos:\n• Nombre: \n• Edad: \n• Municipio/Alcaldía: `;
+                    if(isReferral) msg += `\n(Referido por ${activeRecruiter.name})`;
                     const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                     const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
                     
