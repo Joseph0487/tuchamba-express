@@ -1,0 +1,1943 @@
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            
+        body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                padding: 15px;
+                padding-top: 10px;
+                min-height: 100vh;
+                background-color: #f0f2f5; 
+                overflow-anchor: none;  /* <--- ESTA ES LA LÍNEA MÁGICA */
+            }
+            body {
+        transition: all 0.3s ease; /* Suaviza cambios de estilo */
+    }
+    body.loading {
+        opacity: 0; /* Esconde temporalmente durante carga */
+    }
+
+            /* Fondo Global Fijo */
+            #globalBackground {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -10;
+                background-image: 
+                    linear-gradient(to bottom, rgba(10, 30, 60, 0.75), rgba(10, 30, 60, 0.85)),
+                    url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-1.2.1&auto=format&fit=crop&w=1080&q=60&auto=format');
+                background-size: cover;
+                background-position: center;
+            }
+
+            #toast {
+                visibility: hidden; min-width: 250px; margin-left: -125px; background-color: #333; color: #fff;
+                text-align: center; border-radius: 50px; padding: 16px; position: fixed; z-index: 2147483647 !important;
+                left: 50%; bottom: 30px; font-size: 15px; font-weight: 500; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+                opacity: 0; transition: opacity 0.5s, bottom 0.5s;
+            }
+            #toast.show { visibility: visible !important; opacity: 1 !important; bottom: 50px !important; }
+
+            .footer { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #ccc; font-size: 12px; line-height: 1.6; }
+            
+            .footer-link { color: #fff; text-decoration: underline; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+            
+            .powered-by { margin-top: 20px; color: rgba(255,255,255,0.4); font-size: 10px; font-family: monospace; letter-spacing: 1.5px; text-transform: uppercase; }
+            .powered-by strong { color: rgba(255,255,255,0.7); font-weight: 900; }
+
+            @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+            .skeleton { background: #f6f7f8; background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%); background-repeat: no-repeat; background-size: 1000px 100%; display: inline-block; position: relative; animation: shimmer 2s infinite linear forwards; border-radius: 4px; }
+            .skeleton-card { background: white; border-radius: 16px; padding: 25px; height: 200px; display: flex; flex-direction: column; gap: 15px; }
+            .sk-title { width: 70%; height: 24px; } .sk-text { width: 90%; height: 16px; } .sk-tag { width: 30%; height: 20px; border-radius: 20px; }
+
+            .welcome-container { max-width: 480px; margin: 60px auto; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2); border-top: 5px solid #ffc107; padding: 40px 25px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); text-align: center; }
+            .welcome-title { font-size: 28px; color: #ffffff; margin-bottom: 10px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
+            .welcome-subtitle { color: #f0f0f0; margin-bottom: 30px; font-size: 16px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.5); line-height: 1.5; }
+            .btn-big-guest { background: #0a66c2; color: white; border: none; padding: 16px; width: 100%; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.2s, background 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+            .btn-big-guest:hover { background: #004182; transform: translateY(-2px); }
+            .admin-toggle-link { display: block; margin-top: 30px; color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: underline; cursor: pointer; }
+            /* --- CORRECCIÓN LOGIN MODERNO (V18.1) --- */
+            .admin-login-form { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); text-align: left; animation: fadeIn 0.5s; }
+            .admin-login-form label { display: block; color: white; margin-bottom: 8px; font-weight: bold; font-size: 14px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+            .admin-login-form input { 
+                width: 100%; 
+                padding: 12px 15px; 
+                margin-bottom: 15px; 
+                border-radius: 10px; 
+                border: none; 
+                font-size: 16px; 
+                background: rgba(255,255,255,0.95) !important; 
+                color: #333; 
+                outline: none;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            }
+            .admin-login-form input:focus { transform: scale(1.02); transition: 0.2s; }
+
+            /* =========================================================
+            BLOQUE 1 FINAL-FINAL: BARRA FLACA Y OJO CENTRADO
+            ========================================================= */
+
+            /* 1. El Contenedor */
+            .password-wrapper {
+                position: relative; 
+                width: 100%;
+                margin-bottom: 15px;
+            }
+
+            /* 2. El Input: BAJAMOS LA ALTURA A 44px (Igual que el de arriba) */
+            .password-wrapper input {
+                width: 100% !important;
+                height: 44px !important; /* <--- AQUÍ ESTABA EL DETALLE (Antes 50px) */
+                
+                padding: 0 50px 0 15px !important; 
+                margin: 0 !important;
+                box-sizing: border-box !important;
+                line-height: normal !important;
+            }
+
+            /* 3. El Área del Icono: SE MANTIENE EL CENTRADO QUE SÍ SIRVIÓ */
+            .password-toggle-icon {
+                position: absolute;
+                right: 5px;
+                
+                /* Truco de centrado automático */
+                top: 0;
+                bottom: 0;
+                margin: auto;
+                
+                width: 44px; /* Ajustamos el área al mismo alto que el input */
+                height: 44px; 
+                
+                display: flex;
+                align-items: center; 
+                justify-content: center;
+                
+                cursor: pointer;
+                z-index: 20;
+            }
+
+            /* 4. La Imagen */
+            .password-toggle-icon img {
+                width: 22px !important; 
+                height: 22px !important;
+                display: block;
+                object-fit: contain;
+                opacity: 0.6;
+                transition: opacity 0.2s;
+            }
+            
+            .password-toggle-icon:hover img { opacity: 1; }
+
+            /* 2. El Contenedor del Icono (El que centra) */
+            .password-toggle-icon {
+                position: absolute;
+                right: 10px; /* Pegado a la derecha */
+                
+                /* --- LA FORMULA DEL CENTRADO PERFECTO --- */
+                top: 50%;    
+                transform: translateY(-50%); 
+                /* --------------------------------------- */
+                
+                width: 40px; /* Área grande para dar clic fácil */
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                z-index: 20;
+            }
+
+            /* 3. La Imagen (PNG) */
+            .password-toggle-icon img {
+                width: 22px !important; /* Tamaño del ojito */
+                height: 22px !important;
+                object-fit: contain;
+                display: block;
+                opacity: 0.7; /* Un poco transparente para que se vea elegante */
+            }
+            
+            /* Cuando pasas el mouse, se oscurece */
+            .password-toggle-icon:hover img {
+                opacity: 1;
+            }
+
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+            .container { max-width: 1250px; margin: 0 auto; }
+
+            .header { 
+                background: white; 
+                padding: 12px 15px; 
+                border-radius: 12px; 
+                margin-bottom: 15px; 
+                display: flex; justify-content: space-between; align-items: center; 
+                flex-wrap: wrap; gap: 10px; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                z-index: 1100; 
+            }
+            
+            /* Sticky solo para Admin en el Header */
+            body.admin-mode .header { position: sticky; top: 0; }
+
+            .header h1 { font-size: 20px; color: #333; font-weight: 800; margin: 0; line-height: 1.2; }
+            .header-buttons { display: flex; gap: 8px; align-items: center; }
+
+            #recruiterBanner { background: #e3f2fd !important; color: #0d47a1 !important; padding: 10px 15px; border-radius: 8px; margin-top: 30px; margin-bottom: 10px; font-size: 13px; display: flex !important; align-items: center; justify-content: center; gap: 10px; border: 1px solid #bbdefb; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
+            #recruiterBanner:hover { background: #bbdefb !important; }
+
+            /* --- V18.2 MEJORA DE DISEÑO DE BÚSQUEDA (Estilo App Moderna) --- */
+            #userStickyTools {
+                position: sticky;
+                top: 10px; 
+                z-index: 990; 
+                margin-bottom: 15px;
+                
+                /* Nuevo Look Flotante */
+                background: white;
+                border-radius: 16px;
+                padding: 10px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1); /* Sombra suave */
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+            
+            /* --- FIX V18.2: Descongelar búsqueda en modo Admin/Reclutador --- */
+            body.admin-mode #userStickyTools {
+                position: static !important; /* Deja de ser sticky */
+                margin-top: 10px;
+                box-shadow: none; /* Se integra más plano en modo trabajo */
+                background: rgba(255,255,255,0.9);
+            }
+
+            .search-container { width: 100%; position: relative; margin-bottom: 8px; }
+            
+            /* Input más moderno */
+            .search-input {
+                width: 100%;
+                padding: 12px 40px 12px 15px;
+                border-radius: 10px;
+                border: 1px solid #eee;
+                font-size: 15px;
+                outline: none;
+                background: #f9f9f9; /* Gris muy tenue */
+                transition: all 0.2s;
+            }
+            .search-input:focus { border-color: #0a66c2; background: #fff; box-shadow: 0 0 0 2px rgba(10,102,194,0.1); }
+            
+            .search-clear-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: #ddd; color: #666; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+
+            .filter-container { 
+                display: flex; gap: 8px; align-items: center; 
+                padding: 0; /* Quitamos padding extra */
+                background: transparent; 
+                box-shadow: none; /* Quitamos sombra vieja */
+            }
+            
+            .filter-icon-box { display: flex; align-items: center; justify-content: center; background: #f0f2f5; padding: 0; border-radius: 10px; border: 1px solid #eee; height: 42px; width: 42px; flex-shrink: 0; }
+            .filter-select { 
+                flex: 1; min-width: 0; padding: 0 12px; 
+                border: 1px solid #eee; border-radius: 10px; 
+                font-size: 14px; background: #f9f9f9; outline: none; height: 42px; 
+                cursor: pointer;
+            }
+            .filter-select:focus { background: white; border-color: #0a66c2; }
+
+            #mobileFilterToggle { display: none; } 
+
+            .btn-primary, .admin-btn { background: #0a66c2; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; font-size: 14px; }
+            .add-job-btn { background: #10a37f; padding: 12px 24px; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+            
+            .tool-btn { background: #2c3e50; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+            .metrics-btn { background: #7b1fa2; } .team-btn { background: #e65100; } .settings-btn { background: #607d8b; }
+            .danger-section { background: #ffebee; padding: 15px; border-radius: 8px; border: 1px solid #ef9a9a; margin-top: 25px; }
+            .danger-btn { background: #d32f2f; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+
+            .pagination-container { display: flex; justify-content: center; align-items: center; gap: 5px; margin-top: 30px; margin-bottom: 40px; flex-wrap: wrap; }
+            .page-btn { background: white; border: 1px solid #ddd; color: #0a66c2; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+            .page-btn:hover { background: #f0f2f5; border-color: #0a66c2; }
+            .page-btn.active { background: #0a66c2; color: white; border-color: #0a66c2; }
+            .page-btn:disabled { background: #f9f9f9; color: #ccc; cursor: not-allowed; border-color: #eee; }
+            .page-info { width: 100%; text-align: center; font-size: 13px; color: #666; margin-top: 10px; }
+
+            .sticky-footer { 
+                position: sticky; 
+                bottom: 0; 
+                background: white; 
+                /* AJUSTE: Padding más controlado */
+                padding: 10px 15px 15px; 
+                /* AJUSTE: Margen negativo solo lateral para pegar a los bordes */
+                margin: 15px -20px -20px; 
+                border-top: 1px solid #eee; 
+                text-align: center; 
+                box-shadow: 0 -4px 10px rgba(0,0,0,0.05); 
+                z-index: 100; 
+            }
+            @keyframes heartbeat { 0% { transform: scale(1); } 15% { transform: scale(1.05); } 30% { transform: scale(1); } 100% { transform: scale(1); } }
+            
+            /* BOTÓN WHATSAPP SLIM FIT (V25.8) - Estilizado para PC y Celular */
+            .whatsapp-btn-large { 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                width: 100%; 
+                background-color: #25D366; 
+                color: white; 
+                text-decoration: none; 
+                
+                /* ESTILO BASE (PC): Más delgado y elegante */
+                padding: 10px 15px;      /* Reduje el relleno vertical */
+                font-size: 16px;         /* Letra legible pero no gigante */
+                border-radius: 12px;     
+                letter-spacing: 0.5px; 
+                font-weight: 800;      
+                box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); 
+                border: none; 
+                cursor: pointer; 
+                animation: heartbeat 2.5s infinite; 
+                white-space: nowrap; 
+                overflow: hidden; 
+                text-overflow: ellipsis; 
+            }
+
+            /* --- AJUSTE MÓVIL (Para que no se vea gordo en el cel) --- */
+            @media (max-width: 768px) {
+                .whatsapp-btn-large {
+                    /* En celular mantenemos la letra casi igual pero ajustamos espacios */
+                    font-size: 15px !important; 
+                    
+                    /* Padding lateral mínimo para que quepa el texto largo */
+                    padding: 12px 5px !important; 
+                    
+                    /* Juntamos un pelín las letras para asegurar que quepa "EMPIEZA YA" */
+                    letter-spacing: -0.3px !important; 
+                }
+            }
+            
+            .whatsapp-btn-large:active { transform: scale(0.98); animation: none; }
+            .whatsapp-btn-large:disabled { background-color: #9ccc65; cursor: not-allowed; transform: none; opacity: 0.7; animation: none; }
+
+            .share-btn { background: #25D366; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
+            
+            #adminControls {
+                z-index: 1001;
+                background: rgba(240, 242, 245, 0.95);
+                backdrop-filter: blur(5px);
+                padding-top: 10px; padding-bottom: 10px; margin-top: 0 !important; margin-bottom: 0px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            }
+            /* CORRECCIÓN: Botones Admin Sticky (Te siguen al bajar) */
+            body.admin-mode #adminControls { 
+                position: sticky; 
+                top: 60px; /* Ajuste para quedar debajo de la barra blanca */
+                z-index: 900; /* Menor que el header (1100) pero visible */
+            }
+
+            .admin-controls-wrapper { display: flex; gap: 10px; margin-bottom: 0px; flex-wrap: wrap; }
+            .metrics-card { background: white; color: #333; padding: 10px 20px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; font-size: 14px; }
+            .metric-val { color: #0a66c2; font-weight: 800; margin-left: 4px; margin-right: 12px; }
+            .admin-mode-indicator { background: #ffe0b2; color: #e65100; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid #ffcc80; }
+
+            .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px; margin-top: 10px; }
+            .job-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden; }
+            .job-card:hover { transform: translateY(-4px); }
+            .badge-featured { position: absolute; top: 15px; right: 40px; background: linear-gradient(135deg, #6200ea 0%, #3700b3 100%); color: white; padding: 5px 12px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; box-shadow: 0 4px 8px rgba(98, 0, 234, 0.3); z-index: 4; display: flex; align-items: center; gap: 5px; border: none; letter-spacing: 0.5px; }
+            .verified-badge { display: inline-flex; align-items: center; justify-content: center; background-color: #1da1f2; color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; margin-left: 6px; vertical-align: middle; }
+            .card-header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; margin-right: 35px; }
+            /* =========================================================
+            CORRECCIÓN FINAL: FECHA SUAVE Y LEGIBLE (V22.10) ☁️
+            (Equilibrio: Se lee bien, pero no roba atención)
+            ========================================================= */
+            .card-header-date { 
+                /* 1. Estructura */
+                display: inline-flex !important;
+                align-items: center !important;
+                padding: 3px 8px !important;
+                border-radius: 4px !important;
+                margin-bottom: 10px !important;
+                gap: 5px !important;
+
+                /* 2. Colores Suaves (El ajuste que pediste) */
+                background-color: #f5f5f5 !important; /* Gris clarito elegante */
+                color: #444 !important;               /* Gris oscuro legible (no negro) */
+                border: 1px solid #e0e0e0 !important; /* Borde muy sutil */
+                
+                /* 3. Texto */
+                font-size: 0.75rem !important; 
+                font-weight: 600 !important;          /* Seminegrita (no tan gruesa) */
+            }
+            .badge-vigente { background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; }
+            .badge-closed { background: #ffebee; color: #c62828; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
+            .badge-new { background: #fff3e0; color: #e65100; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; margin-left: 5px; border: 1px solid #ffcc80; }
+            .job-title { font-size: 1.2rem; font-weight: 800; color: #1a1a1a; margin: 0 0 4px 0; line-height: 1.3; display: block; }
+            .company-name { font-size: 0.9rem; color: #0a66c2; font-weight: 600; display: flex; align-items: center; }
+            .location { font-size: 0.9rem; color: #555; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+            .salary-text { color: #d32f2f; font-weight: 800; font-size: 1.3rem; margin-top: 5px; }
+            .company-logo { width: 48px; height: 48px; background: linear-gradient(135deg, #0a66c2 0%, #004182 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; flex-shrink: 0; }
+            .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
+            .tag { background: #f3f2ef; color: #444; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+            .more-btn { position: absolute; top: 15px; right: 15px; background: transparent; border: none; font-size: 24px; color: #333; cursor: pointer; width: 30px; height: 30px; z-index: 5; font-weight: 900; }
+            .admin-actions { display: none; position: absolute; top: 45px; right: 15px; background: white; border: 1px solid #eee; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 20; }
+            .admin-actions.active { display: block; }
+            .admin-action { padding: 10px 20px; width: 100%; text-align: left; border: none; background: none; cursor: pointer; }
+            .admin-action:hover { background: #f9f9f9; }
+
+            /* CORRECCIÓN: Modal siempre hasta el frente (Nivel 3000) */
+            .modal { 
+                display: none; 
+                position: fixed; 
+                top: 0; left: 0; right: 0; bottom: 0; 
+                background: rgba(0,0,0,0.6); 
+                z-index: -1; /* <--- CAMBIA ESTO */
+                padding: 20px; 
+                backdrop-filter: blur(4px); 
+            }
+            .modal.active {
+                display: flex;
+                z-index: 3000 !important; /* <--- AGREGA ESTO */
+            }
+            .modal.active { display: flex; align-items: center; justify-content: center; }
+            .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; overflow-x: hidden; padding-bottom: 0; }
+            .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
+            .job-details { display: grid; gap: 15px; margin-bottom: 25px; margin-top: 15px; }
+            .detail-item { font-size: 15px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 10px; line-height: 1.4; word-break: break-word; }
+            .modal-share-btn { background: #455a64; color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; white-space: nowrap; }
+            .view-count-badge { background: #e3f2fd; color: #0277bd; font-size: 12px; padding: 6px 14px; border-radius: 50px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; border: 1px solid #bbdefb; }
+            .agency-badge { background: #fff3e0; color: #ef6c00; font-size: 12px; padding: 6px 14px; border-radius: 50px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; border: 1px solid #ffe0b2; }
+            .section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 12px; margin-top: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 5px; display: block; }
+            .item-list li { background: #f9f9f9; padding: 10px 14px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; font-size: 15px; }
+            .recruiters-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            .recruiters-table th, .recruiters-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+            .recruiters-table th {
+                background-color: #007bff;
+                color: white;
+                padding: 12px 10px;
+                text-align: left;
+                font-size: 13px;
+                /* --- AQUÍ ESTÁ EL TRUCO --- */
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 20; /* Para que los nombres no se encimen al bajar */
+                box-shadow: 0 2px 2px rgba(0,0,0,0.1); /* Sombrita para que se vea la separación */
+            }
+            .col-num {
+                width: 40px;
+                text-align: center;
+                font-weight: bold;
+                background: #f1f3f5 !important;
+                color: #666 !important;
+            }
+            .recruiters-table tr:hover { background-color: #f9f9f9; }
+            .job-counter { color: white; font-weight: 700; text-shadow: 0 1px 3px rgba(0,0,0,0.8); margin-bottom: 15px; margin-top: 10px; display: block; font-size: 16px; }
+
+            /* =========================================================
+            BLOQUE 2 FINAL V16: LA PURGA (SIN TRANSFORM + ULTRA FUERTE) 🛡️
+            ========================================================= */
+
+            /* 1. Contador "Slim" Transparente */
+            .detailed-counter {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 5px !important;
+                margin-top: 10px !important;
+                margin-bottom: 10px !important;
+                display: flex; flex-wrap: wrap; gap: 15px; align-items: center;
+                font-size: 13px; color: white !important; font-weight: 700;
+                text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            }
+            
+            .counter-tag { display: inline-flex; align-items: center; gap: 5px; }
+            .tag-total { color: #fff; } 
+            .tag-active { color: #69f0ae; }
+            .tag-inactive { color: #ff8a80; }
+
+            /* 2. CONTENEDOR (LIMPIO DE ERRORES) */
+            .job-table-container {
+                width: 100%; 
+                overflow-x: auto !important; /* Scroll obligatorio */
+                background: white;
+                border-radius: 12px; 
+                box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                margin-bottom: 50px; 
+                border: 1px solid #e0e0e0;
+                -webkit-overflow-scrolling: touch; 
+                
+                /* --- LA CURA: PROHIBIDO USAR TRANSFORM AQUÍ --- */
+                transform: none !important; 
+                position: static !important; /* Dejamos que fluya natural */
+            }
+
+            .management-table {
+                width: 100%; 
+                border-collapse: separate !important; /* VITAL para sticky */
+                border-spacing: 0;
+                min-width: 900px; 
+            }
+
+            /* --- 3. ENCABEZADOS (BARRA AZUL) --- */
+            /* Usamos selectores fuertes (body ...) para ganar prioridad */
+            body .management-table th {
+                background: #0a66c2; 
+                color: white; 
+                padding: 10px 8px; 
+                text-align: left; font-size: 13px; font-weight: 700; 
+                text-transform: uppercase; white-space: nowrap;
+                
+                /* Sticky Vertical (Arriba) */
+                position: sticky; 
+                top: 0; 
+                z-index: 20; 
+                border-bottom: none; 
+            }
+
+            /* --- 4. LA ESQUINA MAESTRA (#) - DOBLE ANCLAJE --- */
+            /* Specificity Hack: body.recruiter-view gana a todo lo demás */
+            body .management-table th:first-child,
+            body.recruiter-view .management-table th:first-child {
+                position: -webkit-sticky !important;
+                position: sticky !important;
+                left: 0 !important;
+                top: 0 !important;
+                z-index: 100 !important; /* SIEMPRE ARRIBA DE TODO */
+                
+                background-color: #0a66c2 !important; 
+                width: 35px !important; 
+                min-width: 35px !important;
+                text-align: center !important;
+                padding: 10px 0 !important;
+                
+                /* La sombra interna gris (indestructible) */
+                box-shadow: inset -1px 0 0 rgba(255,255,255,0.3) !important;
+                border-top-left-radius: 11px;
+            }
+            
+            .management-table th:last-child { border-top-right-radius: 11px; }
+
+            /* --- 5. CELDAS DEL CUERPO --- */
+            .management-table td {
+                padding: 8px 8px; 
+                border-bottom: 1px solid #f0f0f0; 
+                color: #333; font-size: 13px; vertical-align: middle;
+                white-space: nowrap; 
+                background-color: white; 
+            }
+
+            /* --- 6. COLUMNA LATERAL (1, 2, 3...) - ANCLAJE IZQUIERDO --- */
+            body .management-table td:first-child,
+            body.recruiter-view .management-table td:first-child {
+                position: -webkit-sticky !important;
+                position: sticky !important;
+                left: 0 !important;
+                z-index: 50 !important; /* Encima de las celdas normales */
+                
+                font-weight: bold;
+                color: #0a66c2;
+                width: 35px !important;
+                min-width: 35px !important;
+                text-align: center !important;
+                padding: 8px 0 !important;
+                
+                /* Sombra interna GRIS para la división */
+                box-shadow: inset -2px 0 0 #e0e0e0 !important;
+                
+                background-color: white !important; /* Fondo sólido */
+            }
+
+            /* Texto Grande */
+            .management-table td:nth-child(3), 
+            .management-table td:nth-child(4) { 
+                font-size: 15px !important; font-weight: 600; 
+            }
+            .management-table td:last-child { text-align: right; width: 1%; }
+            .actions-flex { display: flex; justify-content: flex-end; align-items: center; gap: 5px; }
+
+            /* --- COLORES CEBRA (Sincronizados a la fuerza) --- */
+            .management-table tr:nth-child(even) td { background-color: #f8f9fa; }
+            .management-table tr:nth-child(even) td:first-child { background-color: #f8f9fa !important; }
+
+            .management-table tr:hover td { background-color: #e3f2fd; }
+            .management-table tr:hover td:first-child { background-color: #e3f2fd !important; }
+
+            /* Botones Acción */
+            .action-icon-btn {
+                background: white; border: 1px solid #ddd; cursor: pointer;
+                font-size: 15px; width: 28px; height: 28px; border-radius: 6px;
+                display: inline-flex; align-items: center; justify-content: center;
+                transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            }
+            .action-icon-btn:hover { transform: translateY(-2px); border-color: #0a66c2; background: #f0f7ff; }
+
+            /* 7. Select del Filtro */
+            .header-select {
+                background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+                color: white; padding: 2px 4px; border-radius: 4px;
+                font-size: 11px; font-weight: bold; width: 100%; max-width: 180px;
+                outline: none; cursor: pointer;
+            }
+            .header-select option { color: #333; background: white; }
+
+            /* 8. AJUSTE PC */
+            @media (min-width: 1024px) {
+                .job-table-container { overflow-x: visible; }
+                .management-table { min-width: 100%; width: 100%; table-layout: auto; }
+                .management-table td { white-space: normal; word-wrap: break-word; max-width: 250px; }
+                .management-table td:nth-child(6), .management-table td:last-child { white-space: nowrap; width: 1%; }
+                .header-select { max-width: 100%; }
+            }
+
+            
+            
+            #flyerTemplate { width: 1080px; min-height: 1080px; height: auto; position: fixed; top: 0; left: -9999px; z-index: -1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: 'Arial Black', 'Arial', sans-serif; text-align: center; padding: 80px 60px; box-sizing: border-box; background: #0a192d; }
+            .flyer-badge-top { background-color: #FF9800; color: white; font-size: 55px; padding: 15px 80px; border-radius: 10px; text-transform: uppercase; letter-spacing: 4px; font-weight: 900; margin-bottom: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 4px solid #FFF; transform: skew(-10deg); z-index: 2; position: relative; }
+            .flyer-title { font-size: 90px; font-weight: 900; line-height: 1.1; margin-bottom: 20px; text-shadow: 0 5px 20px rgba(0,0,0,0.9); max-width: 95%; text-transform: uppercase; color: #FFFFFF; z-index: 2; position: relative; }
+            .flyer-company { font-size: 35px; color: #BBDEFB; font-family: 'Segoe UI', sans-serif; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; z-index: 2; position: relative; }
+            .flyer-salary { font-size: 100px; color: #C6FF00; font-weight: 900; margin-bottom: 50px; text-shadow: 0 5px 20px rgba(0,0,0,0.9); z-index: 2; position: relative; }
+            .flyer-benefits-container { background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 30px; padding: 40px; width: 90%; margin-bottom: 60px; backdrop-filter: blur(10px); z-index: 2; position: relative; }
+            .flyer-benefits-title { font-size: 40px; color: #FFD740; margin-bottom: 30px; text-transform: uppercase; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 15px; display: inline-block; }
+            .flyer-benefits-list { list-style: none; padding: 0; margin: 0; font-size: 55px; font-family: 'Segoe UI', sans-serif; font-weight: 600; color: white; text-align: left; display: inline-block; }
+            .flyer-benefits-list li { margin-bottom: 15px; }
+            .flyer-cta-box { background: white; color: #D50000; padding: 40px 60px; border-radius: 20px; font-size: 42px; font-weight: 900; box-shadow: 0 15px 50px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; gap: 20px; border-bottom: 15px solid #b71c1c; width: 100%; text-transform: uppercase; z-index: 2; position: relative; }
+            #flyerQr { margin-left: 20px; border: 2px solid #ddd; padding: 5px; border-radius: 10px; background: white; }
+            #flyerQr img { display: block; }
+            /* --- ESTILOS MODERNOS PARA MODALES (V18.3) --- */
+            .modal-header-pro {
+                display: flex; justify-content: space-between; align-items: center;
+                border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;
+            }
+            .modal-header-pro h2 { margin: 0; font-size: 1.4rem; color: #1a1a1a; display: flex; align-items: center; gap: 10px; }
+            
+            .modern-form-box {
+                background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 20px; margin-bottom: 20px;
+            }
+            
+            /* Grid para ahorrar espacio (2 columnas) */
+            .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+            
+            /* Tabla Pro */
+            .table-container-pro {
+                max-height: 380px !important; /* Altura máxima antes de que aparezca el scroll */
+                overflow-y: auto !important;  /* Activa el scroll vertical */
+                border: 1px solid #eee;
+                border-radius: 8px;
+                position: relative;           /* Necesario para que el sticky funcione bien */
+            }
+            .recruiters-table { width: 100%; border-collapse: collapse; }
+            .recruiters-table thead { background: #f1f3f5; }
+            .recruiters-table th { color: #495057; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; padding: 12px 15px; letter-spacing: 0.5px; }
+            .recruiters-table td { padding: 12px 15px; border-bottom: 1px solid #f1f3f5; color: #333; font-size: 0.9rem; vertical-align: middle; }
+            .recruiters-table tr:hover { background: #fffde7; }
+            @media (max-width: 768px) {
+        .recruiters-table th {
+            font-size: 0.75rem; /* Letra más chica para encabezados (era 0.8rem) */
+            padding: 8px 10px; /* Reduce padding para ahorrar espacio */
+        }
+        .recruiters-table td {
+            font-size: 0.85rem; /* Letra principal más chica (era 0.9rem) */
+            padding: 8px 10px; /* Reduce padding */
+        }
+        .recruiters-table td:first-child {
+            text-align: justify; /* Justifica los nombres para que se distribuyan mejor */
+            word-break: break-word; /* Rompe palabras largas si es necesario */
+        }
+        .recruiters-table td:nth-child(2) {
+            font-size: 0.75rem; /* Código más chico */
+        }
+        .table-container-pro {
+            overflow-x: auto; /* Permite scroll horizontal si aún no cabe */
+        }
+    }
+
+            /* Botones de acción pequeños */
+            .btn-icon-small { border: none; background: transparent; cursor: pointer; font-size: 16px; padding: 5px; border-radius: 4px; transition: background 0.2s; }
+            .btn-icon-small:hover { background: #eee; }
+            .copy-badge { background: #e3f2fd; color: #1565c0; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; border: none; }
+            .copy-badge:hover { background: #bbdefb; }
+
+            /* Zona de Peligro Bonita */
+            .danger-zone-pro {
+                background: #fff5f5; border: 1px solid #ffc9c9; border-radius: 12px; padding: 20px;
+                position: relative; overflow: hidden; margin-top: 10px;
+            }
+            @media (max-width: 768px) {
+            .danger-zone-pro .danger-btn {
+            margin-top: 15px; /* Separa más los botones en celular */
+            padding: 12px; /* Un poquito más alto para que se vea mejor */
+            }
+            .danger-zone-pro {
+            padding: 15px; /* Reduce padding general para que quepa mejor */
+            }
+            }
+            .danger-zone-pro::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #ff6b6b; }
+            .danger-title { color: #c92a2a; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 1rem; }
+            
+            @media (max-width: 600px) { .form-grid-2 { grid-template-columns: 1fr; } }
+            /* --- ESTILOS V18.6 (Separación Total: App vs Login) --- */
+
+            /* GRUPO 1: DENTRO DE LA APP (Compactos y Modernos) */
+            /* Excluimos explícitamente el #adminForm para que no lo toque */
+            :not(#adminForm) > .form-group input, 
+            :not(#adminForm) > .form-group textarea, 
+            :not(#adminForm) > .form-group select { 
+                width: 100% !important; 
+                padding: 8px 12px !important; /* Compactos */
+                background-color: #f0f2f5 !important; /* Gris App */
+                border: 1px solid transparent !important; 
+                border-radius: 8px !important;
+                font-size: 14px !important; 
+                color: #1c1e21 !important;
+                font-weight: 500 !important;
+                transition: all 0.2s ease !important;
+                box-shadow: none !important;
+                min-height: 38px !important;
+            }
+            
+            /* Efecto Focus App */
+            :not(#adminForm) > .form-group input:focus, 
+            :not(#adminForm) > .form-group select:focus {
+                background-color: #ffffff !important;
+                border: 1px solid #0a66c2 !important;
+                box-shadow: 0 2px 6px rgba(10, 102, 194, 0.15) !important;
+            }
+
+            /* Etiquetas App (Gris oscuro) */
+            :not(#adminForm) > .form-group label {
+                display: block !important;
+                margin-bottom: 4px !important;
+                color: #444 !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                text-transform: uppercase !important;
+            }
+
+            /* GRUPO 2: LOGIN (Rescatando el estilo original) */
+            #adminForm .form-group input {
+                background-color: #ffffff !important; /* BLANCO PURO */
+                color: #000000 !important; /* Texto NEGRO */
+                border: none !important;
+                padding: 12px 15px !important; /* Grandes y cómodos */
+                border-radius: 10px !important;
+                font-size: 16px !important;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+                margin-bottom: 15px !important;
+            }
+
+            /* Etiquetas del Login (BLANCAS para que se vean en el fondo oscuro) */
+            #adminForm .form-group label {
+                color: #ffffff !important; 
+                font-size: 14px !important;
+                font-weight: bold !important;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.8) !important;
+                margin-bottom: 8px !important;
+                text-transform: none !important; /* Normal, no mayúsculas */
+            }
+
+            /* Ajustes técnicos globales */
+            .phone-group input { border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+            .phone-select { border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; background-color: #e4e6eb !important; border-right: 1px solid #ccc !important; padding: 5px !important; }
+
+            /* Efecto al dar clic (Se ilumina) */
+            .form-group input:focus, 
+            .form-group textarea:focus, 
+            .form-group select:focus { 
+                background-color: #ffffff !important;
+                border: 1px solid #0a66c2 !important; /* Borde azul al escribir */
+                box-shadow: 0 4px 15px rgba(10, 102, 194, 0.15) !important;
+                outline: none !important;
+            }
+
+            /* Etiquetas (Títulos de los campos) */
+            .form-group label {
+                display: block !important;
+                margin-bottom: 8px !important;
+                margin-left: 5px !important;
+                font-weight: 700 !important;
+                color: #444 !important;
+                font-size: 12px !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.5px !important;
+            }
+            
+            /* Ajuste especial para el grupo de teléfono (que no se rompa) */
+            .phone-group input {
+                border-top-left-radius: 0 !important;
+                border-bottom-left-radius: 0 !important;
+            }
+            .phone-select {
+                border-top-right-radius: 0 !important;
+                border-bottom-right-radius: 0 !important;
+                background-color: #e4e6eb !important;
+                border-right: 1px solid #ccc !important;
+            }
+            /* --- ESTILO BARRA DE BÚSQUEDA DE ALTO CONTRASTE (V18.7) --- */
+            
+            /* 1. La barra contenedora (Fondo Gris) */
+            #userStickyTools, body.admin-mode #userStickyTools {
+                background-color: #e4e6eb !important; /* Gris sólido para el fondo */
+                border: 1px solid rgba(0,0,0,0.05) !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important; /* Sombra suave para que flote */
+            }
+
+            /* 2. Los campos de búsqueda y filtros (Blancos Brillantes) */
+            .search-input, 
+            .filter-select, 
+            .filter-icon-box {
+                background-color: #ffffff !important; /* BLANCO PURO */
+                border: 1px solid transparent !important; /* Sin bordes grises */
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important; /* Pequeña sombra 3D */
+                color: #333 !important;
+            }
+
+            /* 3. Efecto al hacer clic en ellos (Resplandor Azul) */
+            .search-input:focus, 
+            .filter-select:focus {
+                background-color: #ffffff !important;
+                box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.2) !important; /* Anillo azul suave */
+                border-color: #0a66c2 !important;
+            }
+
+            /* Ajuste para el icono del embudo */
+            .filter-icon-box svg {
+                stroke: #555 !important;
+            }
+            /* --- FICHAS COMPACTAS (Optimización de Espacio V18.8) --- */
+            
+            /* 1. Reducir el "aire" general de la tarjeta */
+            .job-card {
+                padding: 14px !important; /* Antes era 20px */
+                border-radius: 12px !important;
+            }
+
+            /* 2. Pegar más los elementos internos */
+            .card-header-top { margin-bottom: 4px !important; } /* Menos espacio arriba */
+            .card-header-date { margin-bottom: 8px !important; font-size: 0.7rem !important; }
+            
+            /* El bloque del Logo y Título */
+            .job-card > div[style*="display: flex"] {
+                margin-top: 5px !important; /* Pegarlo a la fecha */
+                margin-bottom: 8px !important; /* Pegarlo a la ubicación */
+                gap: 10px !important; /* Acercar logo al texto */
+            }
+            
+            /* Ajustar márgenes de textos clave */
+            .job-title { margin-bottom: 0px !important; line-height: 1.2 !important; }
+            .company-name { margin-bottom: 2px !important; }
+            .location { margin-top: 4px !important; }
+            .salary-text { margin-top: 4px !important; }
+
+            /* Las etiquetas de abajo (Tags) */
+            .tags { margin-top: 10px !important; gap: 5px !important; }
+            .tag { padding: 3px 8px !important; font-size: 11px !important; }
+
+            /* Hacer los botones de "Destacado" y "Vigente" más delgados */
+            .badge-featured, .badge-vigente, .badge-closed, .badge-new {
+                padding: 3px 8px !important;
+                top: 12px !important; /* Subirlos un poquito */
+            }
+            .more-btn { top: 10px !important; right: 10px !important; } /* Ajustar botón de menú */
+            /* --- CORRECCIÓN FINAL LADAS (V18.9) --- */
+            .phone-group {
+                display: flex !important; /* Obliga a ponerse en fila */
+                align-items: stretch !important;
+                width: 100% !important;
+                gap: 0 !important; /* Pegaditos */
+            }
+            
+            .phone-select {
+                width: auto !important; /* Que solo ocupe lo necesario */
+                flex: 0 0 auto !important; /* No permitir que se estire */
+                min-width: 100px !important; /* Ancho fijo ideal para "🇲🇽 +52" */
+                padding: 8px 5px !important;
+                text-align: center !important;
+                border-right: 1px solid #ccc !important;
+                background-color: #e4e6eb !important;
+                border-top-right-radius: 0 !important;
+                border-bottom-right-radius: 0 !important;
+                cursor: pointer !important;
+            }
+
+            .phone-group input {
+                flex: 1 !important; /* El input toma TODO el espacio sobrante */
+                border-top-left-radius: 0 !important;
+                border-bottom-left-radius: 0 !important;
+                border-left: none !important;
+            }
+            /* --- CORRECCIÓN FINAL MAESTRA LADAS (V18.11) --- */
+            
+            /* 1. Forzamos al contenedor a ser flexible horizontalmente */
+            .form-group .phone-group {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                width: 100% !important;
+            }
+
+            /* 2. AL SELECTOR DE PAÍS: Lo obligamos a ser pequeño */
+            .form-group .phone-group select.phone-select {
+                width: 110px !important; /* Ancho fijo pequeño */
+                min-width: 110px !important;
+                max-width: 110px !important;
+                flex: 0 0 110px !important; /* No te estires ni te encojas */
+                
+                border-top-right-radius: 0 !important;
+                border-bottom-right-radius: 0 !important;
+                border-right: 1px solid #ccc !important;
+                margin: 0 !important;
+            }
+
+            /* 3. AL CAMPO DE NÚMERO: Le decimos que ocupe TODO el resto */
+            .form-group .phone-group input {
+                width: auto !important; 
+                flex-grow: 1 !important; /* Crece para llenar el hueco */
+                min-width: 0 !important;
+                
+                border-top-left-radius: 0 !important;
+                border-bottom-left-radius: 0 !important;
+                margin: 0 !important;
+            }
+
+        /* --- CORRECCIÓN FINAL V32: PANEL RECLUTADOR LIMPIO (2x2) --- */
+            @media (max-width: 768px) {
+
+                /* 1. ENCABEZADO (Limpio en una línea) */
+                .header {
+                    display: flex !important; flex-wrap: nowrap !important; align-items: center !important;
+                    padding: 8px 10px !important; gap: 5px !important; height: 50px !important;
+                }
+                .header h1 { font-size: 15px !important; margin: 0 !important; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+                .header-buttons { flex-shrink: 0; gap: 5px !important; }
+                .header-buttons button, .header-buttons span { padding: 4px 8px !important; font-size: 11px !important; height: 30px !important; }
+                #viewToggleBtn { display: none !important; }
+
+                /* 2. PANEL CONTENEDOR (Redondo y Flotante) */
+                body.recruiter-view #adminControls {
+                    position: static !important;
+                    padding: 10px !important;
+                    background: #f4f6f8 !important;
+                    border-radius: 16px !important; /* <--- ESQUINAS REDONDAS */
+                    margin: 10px !important; 
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
+                }
+                
+                body.recruiter-view .admin-controls-wrapper {
+                    display: grid !important;
+                    grid-template-columns: 1fr 1fr !important; /* 2 Columnas exactas */
+                    gap: 10px !important;
+                    margin: 0 !important;
+                }
+
+                /* 3. ¡REGLA DE ORO! OCULTAR TODO LO DE ADMIN */
+                /* Esto borra Cargar, Nueva, Equipo y Ajustes de un jalón */
+                body.recruiter-view .admin-only, 
+                body.recruiter-view input[type="file"] { 
+                    display: none !important; 
+                }
+
+                /* 4. ESTILOS Y ORDEN DE LOS 4 SOBREVIVIENTES */
+                
+                /* Posición 1: Tarjeta Vistas */
+                body.recruiter-view .metrics-card {
+                    order: 1 !important;
+                    width: 100% !important; height: 45px !important;
+                    font-size: 12px !important; padding: 0 !important; margin: 0 !important;
+                    background: white !important; border: 1px solid #ddd !important;
+                    border-left: 5px solid #0a66c2 !important;
+                    border-radius: 10px !important;
+                    display: flex !important; align-items: center !important; justify-content: center !important;
+                }
+                body.recruiter-view .metrics-card span { display: inline !important; }
+
+                /* Posición 2: Botón Métricas (Morado) */
+                body.recruiter-view .metrics-btn {
+                    order: 2 !important;
+                    width: 100% !important; height: 45px !important;
+                    background: #7b1fa2 !important; color: white !important;
+                    font-size: 13px !important; border-radius: 10px !important;
+                    padding: 0 !important; margin: 0 !important;
+                    display: flex !important; align-items: center !important; justify-content: center !important;
+                }
+
+                /* Posición 3: Botón Respaldo (Centrado) */
+                body.recruiter-view button[onclick*="exportToExcel"] {
+                    order: 3 !important;
+                    height: 45px !important; width: 100% !important; 
+                    font-size: 13px !important; padding: 0 !important;
+                    border-radius: 10px !important;
+                    display: flex !important; align-items: center !important; justify-content: center !important;
+                }
+
+                /* Posición 4: Botón Plantilla (Centrado) */
+                body.recruiter-view button[onclick*="downloadTemplate"] {
+                    order: 4 !important;
+                    height: 45px !important; width: 100% !important;
+                    font-size: 13px !important; padding: 0 !important;
+                    border-radius: 10px !important;
+                    display: flex !important; align-items: center !important; justify-content: center !important;
+                }
+
+                /* 5. TABLA STICKY */
+                body.recruiter-view .management-table th {
+                    position: sticky !important; top: 0 !important; z-index: 1000 !important;
+                    padding: 10px 5px !important;
+                }
+                .job-table-container { margin-top: 5px !important; border: none !important; }
+            }
+
+            /* =========================================================
+            BLOQUE FINAL: PC RECLUTADOR (ULTRA SLIM V3)
+            ========================================================= */
+            @media (min-width: 769px) {
+                
+                /* 1. EL PANEL (Barra fina y flotante) */
+                body.recruiter-view #adminControls {
+                    position: static !important;
+                    margin: 10px auto 15px auto !important; /* Margen muy pegadito */
+                    width: 85% !important; 
+                    max-width: 950px;
+                    
+                    background: #ffffff !important;
+                    border: 1px solid #e0e0e0 !important;
+                    border-radius: 50px !important; /* <--- ESTILO PÍLDORA (Más redondo) */
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
+                    
+                    /* AQUÍ ESTÁ LA MAGIA DE LA ALTURA */
+                    padding: 5px 20px !important; 
+                    z-index: 100 !important;
+                    min-height: 45px !important; /* Altura mínima controlada */
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                }
+
+                /* 2. OCULTAR LO QUE SOBRA */
+                body.recruiter-view .admin-only,
+                body.recruiter-view .settings-btn,
+                body.recruiter-view .team-btn,
+                body.recruiter-view .add-job-btn,
+                body.recruiter-view button[onclick*="excelFile"],
+                body.recruiter-view #viewToggleBtn { 
+                    display: none !important;
+                }
+
+                /* 3. ALINEACIÓN INTERNA */
+                body.recruiter-view .admin-controls-wrapper {
+                    display: flex !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    gap: 12px !important; /* Menos espacio entre botones */
+                    flex-wrap: nowrap !important;
+                    margin: 0 !important;
+                    width: 100% !important;
+                }
+
+                /* 4. BOTONES ULTRA SLIM (Altura 32px) */
+                
+                /* Tarjeta de Vistas */
+                body.recruiter-view .metrics-card {
+                    background: #f8f9fa !important;
+                    border: 1px solid #ddd !important;
+                    border-left: 3px solid #0a66c2 !important; /* Borde más fino */
+                    height: 32px !important; /* <--- ALTURA BAJA */
+                    border-radius: 20px !important; /* Píldora */
+                    padding: 0 15px !important;
+                    box-shadow: none !important;
+                    font-size: 12px !important; /* Letra ajustada */
+                }
+
+                /* Botones de Acción */
+                body.recruiter-view button {
+                    height: 32px !important; /* <--- ALTURA BAJA */
+                    padding: 0 18px !important;
+                    border-radius: 20px !important; /* Píldora */
+                    font-size: 12px !important;
+                    display: flex !important; 
+                    align-items: center !important; 
+                    justify-content: center !important;
+                    transition: transform 0.2s !important;
+                    margin: 0 !important;
+                }
+                body.recruiter-view button:hover {
+                    transform: translateY(-1px);
+                }
+                
+                /* Colores */
+                body.recruiter-view .metrics-btn { background: #7b1fa2 !important; }
+                body.recruiter-view button[onclick*="exportToExcel"] { background: #2c3e50 !important; }
+                body.recruiter-view button[onclick*="downloadTemplate"] { background: #455a64 !important; }
+                body.recruiter-view #seoSitemapBtn {
+                    display: none !important;
+                }
+            }
+
+            /* =========================================================
+            BLOQUE EXTRA: HEADER SLIM PARA PC (A DIETA)
+            ========================================================= */
+            @media (min-width: 769px) {
+                
+                /* 1. La Barra del Encabezado */
+                .header {
+                    padding: 5px 20px !important;  /* Relleno mínimo */
+                    min-height: 50px !important;   /* Altura fija compacta */
+                    height: 50px !important;
+                    
+                    display: flex !important;
+                    align-items: center !important;
+                    
+                    /* Redondeado suave */
+                    border-radius: 16px !important; 
+                    margin-bottom: 20px !important;
+                }
+
+                /* 2. El Título (Un poco más chico para que quepa) */
+                .header h1 {
+                    font-size: 18px !important; 
+                }
+
+                /* 3. Los Botones (Compartir, Salir, Indicador) */
+                .header-buttons {
+                    gap: 10px !important;
+                }
+
+                .header-buttons button, 
+                .header-buttons span {
+                    height: 32px !important;       /* Altura 32px (Igual que los de abajo) */
+                    font-size: 12px !important;    /* Letra compacta */
+                    padding: 0 15px !important;    /* Menos ancho */
+                    border-radius: 20px !important; /* Estilo Píldora */
+                    
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                }
+                
+            /* Ajuste específico para el indicador de modo (CENTRADO PERFECTO) */
+                .admin-mode-indicator {
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important; /* <--- La clave del centrado horizontal */
+                    text-align: center !important;
+                    
+                    height: 32px !important;
+                    padding: 0 15px !important; /* Solo relleno lateral, nada arriba/abajo */
+                    line-height: 1 !important;  /* Mata el espaciado de línea extra */
+                    
+                    /* Aseguramos que no herede márgenes raros */
+                    margin-top: 0 !important;
+                    margin-bottom: 0 !important;
+                }
+            }
+
+
+            
+            /* =========================================================
+            CORRECCIÓN URGENTE: CANDADO BOTÓN VISTA (SOLO ADMIN)
+            ========================================================= */
+            
+            /* 1. Por defecto: OCULTO PARA TODOS (Invitados y Reclutadores) */
+            #viewToggleBtn {
+                display: none !important;
+            }
+
+            /* 2. La única excepción: SUPER ADMIN (body tiene .admin-mode pero NO .recruiter-view) */
+            body.admin-mode:not(.recruiter-view) #viewToggleBtn {
+                display: flex !important; /* Solo aquí aparece */
+            }
+
+            /* --- BLOQUE 1: MEJORAS VISUALES V20.2 --- */
+
+            /* =========================================================
+            BOTÓN COMPARTIR: ESTILO "ORANGE CREAM" (V20.3) 🍊
+            (Fondo Pastel + Borde Oscuro Intenso)
+            ========================================================= */
+            #mainShareBtn {
+                /* 1. Fondo Naranja Pastel (Suave y limpio) */
+                background: #ffe0b2 !important; 
+                
+                /* 2. Texto y Borde: Naranja Quemado (Tirándole a Negro/Ladrillo) */
+                color: #bf360c !important; 
+                border: 1px solid #bf360c !important; 
+                
+                /* 3. Tipografía Gruesa para que se lea perfecto sobre el pastel */
+                font-weight: 800 !important; 
+                font-size: 13px !important;
+                letter-spacing: 0.5px !important;
+                
+                /* 4. Forma Píldora */
+                border-radius: 50px !important;
+                padding: 0 20px !important;
+                height: 34px !important;
+                
+                /* 5. Sin sombras raras (Flat Design) */
+                box-shadow: none !important;
+                text-shadow: none !important;
+                
+                /* 6. Alineación */
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                margin: 0 !important;
+                cursor: pointer !important;
+                transition: all 0.2s ease !important;
+            }
+
+            /* Efecto Hover: Se invierten los colores o se oscurece un poco */
+            #mainShareBtn:hover {
+                background: #ffcc80 !important; /* Un poco más intenso al pasar el mouse */
+                transform: translateY(-1px) !important;
+            }
+
+            /* Efecto sutil al pasar el mouse (se pone negro total) */
+            #mainShareBtn:hover {
+                background: #000000 !important;
+                transform: scale(1.02) !important;
+            }
+
+            /* Ajuste Móvil */
+            @media (max-width: 768px) {
+                #mainShareBtn {
+                    height: 32px !important;
+                    font-size: 12px !important;
+                    padding: 0 16px !important;
+                }
+            }
+
+            /* Efecto al pasar el mouse */
+            #mainShareBtn:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6) !important;
+                filter: brightness(1.1);
+            }
+
+            /* Efecto al dar clic */
+            #mainShareBtn:active {
+                transform: scale(0.95) !important;
+            }
+
+            /* AJUSTE PARA MÓVIL (Para que no robe mucho espacio) */
+            @media (max-width: 768px) {
+                #mainShareBtn {
+                    height: 32px !important;
+                    padding: 0 15px !important;
+                    font-size: 12px !important;
+                }
+            }
+
+            /* Efecto al pasar el mouse (se ilumina un poco) */
+            body .header-buttons .share-btn:hover {
+                background: #00e676 !important; 
+                transform: translateY(-1px) !important;
+            }
+
+            /* TAREA 11: Homologar Encabezados de Tabla (PC y Celular iguales) */
+            .management-table th {
+                font-size: 13px !important; /* Tamaño estándar para todos */
+                vertical-align: middle !important;
+                padding: 10px 5px !important;
+                text-transform: uppercase !important;
+            }
+            
+            /* Ajuste específico para que en celular no se hagan microscópicas */
+            @media (max-width: 768px) {
+                .management-table th {
+                    font-size: 12px !important; /* Mínimo legible */
+                    white-space: nowrap !important;
+                }
+            }
+
+            /* =================================================================
+            CORRECCIÓN FINAL MÓVIL: HOMOLOGACIÓN TOTAL (V20.3) 📏
+            (Incluye: Compartir, Salir y el Rebelde "Copiar Link")
+            ================================================================= */
+           @media (max-width: 768px) {
+                /* 1. CONTENEDOR: Forzamos que todo quepa en una línea sin saltar */
+                .header-buttons {
+                    display: flex !important;
+                    flex-wrap: nowrap !important;   
+                    align-items: center !important; 
+                    gap: 6px !important;            
+                    width: auto !important;
+                }
+
+                /* 2. BOTONES SECUNDARIOS (Compartir, Copiar Link, etc.) */
+                .header-buttons button:not([onclick="logout()"]), 
+                .header-buttons a,
+                #mainShareBtn,
+                .copy-link-btn {
+                    height: 32px !important;
+                    padding: 0 10px !important;
+                    font-size: 11px !important;
+                    white-space: nowrap !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    flex-shrink: 1 !important; /* Se encogen si es necesario */
+                    margin: 0 !important;
+                }
+
+                /* 3. EL BOTÓN DE SALIR (PROTAGONISTA) */
+                .header-buttons button[onclick="logout()"] {
+                    height: 32px !important;
+                    padding: 0 18px !important; /* Más ancho para que sea fácil de picar */
+                    font-size: 13px !important; /* Letra más grande que el resto */
+                    font-weight: 900 !important; /* Letra bien gruesa */
+                    background-color: #333 !important; /* Negro sólido */
+                    color: white !important;
+                    border-radius: 50px !important;
+                    flex-grow: 2 !important; /* Toma el espacio extra disponible */
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    white-space: nowrap !important;
+                    margin: 0 !important;
+                }
+
+                /* 4. Ajustes de color específicos que ya tenías */
+                .copy-link-btn {
+                    background-color: #e3f2fd !important;
+                }
+
+                #mainShareBtn {
+                    border-width: 1px !important;
+                }
+            }
+
+            /* =========================================================
+            CORRECCIÓN: ALINEACIÓN VERTICAL PERFECTA (V20.4) 📐
+            (Esto centra el botón de "Copiar Link" con los demás)
+            ========================================================= */
+            
+            /* 1. El contenedor invisible ahora se comporta bien */
+            #modeIndicator {
+                display: flex !important;       /* Lo volvemos flexible */
+                align-items: center !important; /* Lo centramos verticalmente */
+                height: 100% !important;        /* Que ocupe la misma altura */
+                margin: 0 !important;           /* Sin márgenes raros */
+            }
+
+            /* 2. Aseguramos que el botón azul no flote raro */
+            #modeIndicator .copy-link-btn {
+                margin: 0 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                vertical-align: middle !important;
+            }
+
+            /* =========================================================
+            TAREA 11: HOMOLOGACIÓN BARRA AZUL (V22.5) 📏
+            (Misma letra, tamaño y fuente en PC y Celular)
+            ========================================================= */
+            .management-table th {
+                font-size: 13px !important;      /* Tamaño estándar fijo para todos */
+                font-weight: 800 !important;     /* Negrita fuerte */
+                text-transform: uppercase !important; 
+                letter-spacing: 0.5px !important; 
+                vertical-align: middle !important;
+                padding: 12px 8px !important;
+                
+                /* Aseguramos que los bordes redondeados se respeten si existen */
+                border-bottom: none !important;
+            }
+
+            /* REGLA DE ORO: En celular NO permitimos que se haga chiquita */
+            @media (max-width: 768px) {
+                .management-table th {
+                    font-size: 13px !important; /* Forzamos el mismo tamaño que en PC */
+                    padding: 10px 5px !important;
+                }
+            }
+
+            /* =========================================================
+            TAREA 14: CORRECCIÓN DE COLUMNA FIJA "#" (MODO RECLUTADOR) 🧱
+            (Hacemos que el # sea el rey y nadie pase por encima de él)
+            ========================================================= */
+            
+            /* 1. Elevamos el nivel de la primera columna (#) */
+            body.recruiter-view .management-table th:first-child,
+            body.recruiter-view .management-table td:first-child {
+                position: sticky !important;
+                left: 0 !important;
+                z-index: 50 !important; /* ¡NIVEL DIOS! (Muy alto) */
+                
+                /* Le ponemos fondo sólido para que no se trasluzca lo que pasa por abajo */
+                background-color: #f8f9fa !important; 
+                border-right: 2px solid #e0e0e0 !important; /* Borde fuerte para separar */
+            }
+
+            /* 2. Aseguramos que el encabezado del # tenga el color correcto */
+            body.recruiter-view .management-table th:first-child {
+                background-color: #2c3e50 !important; /* El gris oscuro del header */
+                color: white !important;
+                z-index: 60 !important; /* El encabezado debe ser aún más alto que las celdas */
+            }
+
+            /* 3. Los demás encabezados deben estar ABAJO del # */
+            body.recruiter-view .management-table th:not(:first-child) {
+                z-index: 10 !important; /* Nivel bajo */
+            }
+
+            /* =========================================================
+            RESTAURACIÓN PC: BOTÓN "COPIAR LINK" PREMIUM 💎
+            (Solo aplica en pantallas grandes, no toca el cel)
+            ========================================================= */
+            @media (min-width: 769px) {
+                .copy-link-btn {
+                    background-color: #e3f2fd !important; /* Azulito Original */
+                    color: #0d47a1 !important;            /* Letra Azul Fuerte */
+                    border: 1px solid #90caf9 !important; 
+                    
+                    height: 36px !important;        /* Altura Cómoda PC */
+                    padding: 0 20px !important;     /* Más aire a los lados */
+                    border-radius: 50px !important; /* Óvalo perfecto */
+                    font-size: 13px !important;     /* Letra tamaño normal */
+                    font-weight: 700 !important;
+                    
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+                    margin: 0 !important;
+                    cursor: pointer !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    gap: 6px !important; /* Espacio entre icono y texto */
+                }
+
+                /* Efecto Hover PC */
+                .copy-link-btn:hover {
+                    background-color: #bbdefb !important;
+                    transform: translateY(-1px) !important;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+                }
+            }
+
+            /* =========================================================
+            RETOQUES FINALES NOCTURNOS (V20.5) 🌙
+            (Más contraste en tabla y fichas para mejor lectura)
+            ========================================================= */
+
+            /* 1. EFECTO CEBRA MÁS MARCADO (TABLA) */
+            /* Cambiamos el gris pálido por un "Gris Azulado" más notorio */
+            .management-table tr:nth-child(even) td {
+                background-color: #eceff1 !important; 
+            }
+            
+            /* ¡OJO! Esto obliga a la columna fija (#) a oscurecerse también */
+            body .management-table tr:nth-child(even) td:first-child,
+            body.recruiter-view .management-table tr:nth-child(even) td:first-child {
+                background-color: #eceff1 !important;
+            }
+
+            /* 2. RECUADROS EN MODAL DE VACANTE (Zona, Sueldo, etc.) */
+            /* Antes era #f8f9fa (casi blanco), ahora es #eef0f2 (Gris sólido) */
+            .job-details {
+                background-color: #eef0f2 !important; 
+                border: 1px solid #e0e0e0 !important; /* Un bordecito fino ayuda */
+            }
+
+            /* 3. LISTAS DE REQUISITOS Y BENEFICIOS */
+            /* También las oscurecemos para que resalten */
+            .item-list li {
+                background-color: #eef0f2 !important;
+                border: 1px solid #e0e0e0 !important;
+                color: #222 !important; /* Letra un poco más negra */
+            }
+            
+            /* =========================================================
+            CORRECCIÓN: EFECTO HOVER EN TABLA (V20.6) 🖱️
+            (Para que se ilumine al pasar el mouse, aunque tenga fondo oscuro)
+            ========================================================= */
+            
+            /* Cuando el mouse pasa por CUALQUIER fila de la tabla */
+            .management-table tr:hover td {
+                background-color: #fff9c4 !important; /* Un amarillo pálido bonito para resaltar */
+                color: #000 !important; /* Letras negras para contraste total */
+                cursor: pointer;
+            }
+
+            /* Corrección específica para que la columna "#" también se ilumine */
+            body.recruiter-view .management-table tr:hover td:first-child {
+                background-color: #fff9c4 !important;
+                border-right: 2px solid #fbc02d !important; /* Borde dorado al resaltar */
+            }
+
+            /* =========================================================
+            ESTILO FINAL: BOTÓN "CYAN FRESH" (V21.0) 🧼
+            (Color Turquesa Vibrante + Fix Anti-Pegajoso Móvil)
+            ========================================================= */
+
+            /* 1. ESTADO BASE (El color bonito de tu imagen) */
+            #mainShareBtn {
+                background-color: #00E5FF !important; /* Turquesa Brillante */
+                /* Un degradado sutil para que se vea 3D como la imagen */
+                background: linear-gradient(180deg, #26c6da 0%, #00bcd4 100%) !important;
+                
+                color: white !important;
+                border: none !important;
+                border-radius: 50px !important; /* Redondito */
+                
+                /* Tamaño PC */
+                padding: 0 20px !important;
+                height: 34px !important;
+                font-weight: 800 !important;
+                font-size: 13px !important;
+                text-shadow: 0 1px 1px rgba(0,0,0,0.2) !important; /* Sombra letra */
+                
+                /* Sombra suave del botón */
+                box-shadow: 0 4px 6px rgba(0, 188, 212, 0.3) !important;
+                
+                /* Alineación */
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                margin: 0 !important;
+                cursor: pointer !important;
+                transition: transform 0.1s, background 0.2s !important;
+                outline: none !important; /* Quita el cuadro azul de selección */
+            }
+
+            /* 2. TRUCO MÓVIL: Si se queda "seleccionado" (:focus), NO CAMBIA */
+            /* Esto evita que se quede oscuro cuando quitas el dedo */
+            #mainShareBtn:hover,
+            #mainShareBtn:focus {
+                background: linear-gradient(180deg, #26c6da 0%, #00bcd4 100%) !important;
+                transform: none !important;
+                box-shadow: 0 4px 6px rgba(0, 188, 212, 0.3) !important;
+            }
+
+            /* 3. EL CLIC (Solo mientras presionas el dedo) */
+            #mainShareBtn:active {
+                background: #0097a7 !important; /* Turquesa Oscuro Sólido */
+                box-shadow: none !important;    /* Quitamos sombra para que se hunda */
+                transform: scale(0.96) !important; /* Efecto rebote */
+            }
+
+            /* 4. HOVER SOLO EN PC (Donde hay mouse real) */
+            @media (hover: hover) {
+                #mainShareBtn:hover {
+                    /* Se pone un poquito más brillante */
+                    background: linear-gradient(180deg, #4dd0e1 0%, #26c6da 100%) !important;
+                    transform: translateY(-2px) !important;
+                    box-shadow: 0 6px 12px rgba(0, 188, 212, 0.4) !important;
+                }
+                #mainShareBtn:active {
+                    background: #00838f !important;
+                    transform: scale(0.95) !important;
+                    box-shadow: none !important;
+                }
+            }
+
+            /* 5. REGLA DE ORO MÓVIL (Alineación perfecta) */
+            @media (max-width: 768px) {
+                #mainShareBtn {
+                    height: 30px !important;        /* Misma altura que los otros */
+                    font-size: 11px !important;
+                    padding: 0 15px !important;
+                    box-shadow: 0 2px 4px rgba(0, 188, 212, 0.3) !important;
+                }
+            }
+
+            /* =========================================================
+            VISTA ADMIN V22.4 (FINAL PULIDO) ✨
+            (Correcciones: Sin Lupa PC, Fondo Blanco Móvil, Búsqueda Limpia)
+            ========================================================= */
+
+            /* --- 1. ESTILO PC (TODO EN UNA LÍNEA) --- */
+            @media (min-width: 769px) {
+                
+                /* OCULTAR LA LUPA EN PC (Corrección 1) */
+                #adminSearchToggle { display: none !important; }
+
+                body.admin-mode #adminControls {
+                    border-radius: 50px !important;
+                    margin: 10px auto 15px auto !important;
+                    max-width: 98% !important;
+                    padding: 5px 15px !important;
+                    border: 1px solid #e0e0e0 !important;
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
+                    display: flex;
+                    justify-content: center;
+                    background: white !important; /* Aseguramos fondo blanco en PC */
+                }
+
+                body.admin-mode .admin-controls-wrapper {
+                    display: flex !important;
+                    flex-wrap: nowrap !important;
+                    align-items: center !important;
+                    gap: 5px !important;
+                    width: 100%;
+                    justify-content: center;
+                }
+
+                /* Botones compactos */
+                body.admin-mode .tool-btn, 
+                body.admin-mode .add-job-btn {
+                    padding: 8px 12px !important;
+                    font-size: 13px !important;
+                    white-space: nowrap !important;
+                    height: 38px !important;
+                    display: flex; align-items: center; justify-content: center;
+                }
+
+                /* Métricas PC (Le quitamos el "body.admin-mode" para que aplique a TODOS) */
+                .metrics-card.desktop-only {
+                    display: flex !important;
+                    flex-direction: row !important;
+                    gap: 15px !important;
+                    padding: 5px 15px !important;
+                    background: #f8f9fa !important;
+                    border: 1px solid #ddd !important;
+                    border-radius: 50px !important;
+                    height: 38px !important;
+                    align-items: center;
+                    
+                    /* AGREGAMOS ESTAS 2 LÍNEAS PARA EL TAMAÑO */
+                    font-size: 15px !important; 
+                    font-weight: 800 !important;
+                }
+                #mobileMetricsPanel { display: none !important; }
+            }
+
+            /* --- 2. ESTILO MÓVIL (ESTRATEGIA 2-3-3 CON FONDO) --- */
+            @media (max-width: 768px) {
+                
+                /* --- CORRECCIÓN PANEL BÚSQUEDA (LIMPIEZA) --- */
+                /* Ocultar barra por defecto */
+                body.admin-mode #userStickyTools { display: none; }
+                
+                /* Cuando se activa con la Lupa: */
+                body.admin-mode #userStickyTools.active { 
+                    display: block !important; 
+                    animation: fadeIn 0.3s;
+                    margin-top: 10px !important;
+                    margin-bottom: 10px !important;
+                }
+
+                /* OCULTAR BOTÓN "FILTROS DE BÚSQUEDA" EN ADMIN (Corrección 2) */
+                body.admin-mode #mobileFilterToggle { display: none !important; }
+
+                /* FORZAR QUE LOS FILTROS SE VEAN SIEMPRE (Ya que quitamos el botón) */
+                body.admin-mode #filterContainer {
+                    display: flex !important;
+                    height: auto !important;
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                    margin-top: 8px !important; /* Espacio con el input */
+                }
+                
+                /* Mostrar Lupa en Header */
+                body.admin-mode #adminSearchToggle { display: inline-flex !important; font-size: 16px !important; width: 32px !important; height: 32px !important; align-items: center; justify-content: center; border-radius: 50%; border: none; }
+
+                /* PANEL DE MÉTRICAS (La tira delgada) */
+                body.admin-mode #mobileMetricsPanel {
+                    display: block !important;
+                    background: white;
+                    margin: 5px 10px 0 10px;
+                    border-radius: 10px;
+                    border: 1px solid #e0e0e0;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+                    padding: 6px;
+                    text-align: center;
+                }
+                .metrics-strip {
+                    display: flex; justify-content: center; align-items: center; gap: 15px;
+                    font-size: 13px; color: #333;
+                }
+                .metrics-strip b { color: #0a66c2; font-weight: 900; font-size: 14px; }
+                
+                .metrics-card.desktop-only { display: none !important; }
+
+                /* --- CORRECCIÓN 3: CONTENEDOR BLANCO DE VUELTA --- */
+                body.admin-mode #adminControls {
+                    background: white !important; /* ¡Fondo Blanco Regresa! ⬜ */
+                    border: 1px solid #e0e0e0 !important; /* Bordecito sutil */
+                    border-radius: 16px !important; /* Esquinas redondeadas */
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important; /* Sombrita */
+                    
+                    padding: 10px 8px !important; /* Relleno interno */
+                    margin: 10px 5px !important; /* Margen externo */
+                    position: static !important;
+                }
+
+                /* EL GRID 2-3-3 */
+                body.admin-mode .admin-controls-wrapper {
+                    display: grid !important;
+                    grid-template-columns: repeat(6, 1fr) !important; 
+                    gap: 8px !important; /* Un poco más de aire ahora que hay fondo */
+                }
+
+                /* Estilo Base Botones Móvil */
+                body.admin-mode button {
+                    margin: 0 !important;
+                    padding: 0 5px !important;
+                    height: 40px !important;
+                    font-size: 11px !important;
+                    border-radius: 8px !important;
+                    display: flex !important;
+                    align-items: center; justify-content: center; gap: 4px;
+                }
+
+                /* POSICIONES - 3 botones en primera fila (Vista + Sitemap + Nueva) */
+                #viewToggleBtn      { order: 1; grid-column: span 2 !important; background: #004d40 !important; }
+                #seoSitemapBtn      { order: 2; grid-column: span 2 !important; background: #FF9800 !important; color: white !important; }
+                .add-job-btn        { order: 3; grid-column: span 2 !important; }
+
+                button[onclick*="exportToExcel"] { grid-column: span 2 !important; }
+                .metrics-btn                     { grid-column: span 2 !important; }
+                .team-btn                        { grid-column: span 2 !important; }
+                .settings-btn                    { grid-column: span 2 !important; }
+                button[onclick*="excelFile"]     { grid-column: span 2 !important; }
+                button[onclick*="downloadTemplate"] { grid-column: span 2 !important; }
+            }
+
+            /* =========================================================
+            CORRECCIONES POST-PRODUCCIÓN (V22.1) 🚑
+            (Arreglo de Reclutador Móvil y Lupa Fantasma)
+            ========================================================= */
+
+            /* 1. MATAR LA LUPA EN MODO USUARIO/INVITADO 🕵️‍♂️🚫 */
+            /* Aseguramos que la lupa SOLO se vea si tienes la clase .admin-mode */
+            #adminSearchToggle { display: none !important; }
+            
+            /* Solo si eres Admin Y estás en celular, aparece la lupa */
+            @media (max-width: 768px) {
+                body.admin-mode #adminSearchToggle {
+                    display: inline-flex !important;
+                }
+            }
+
+            /* 2. REPARACIÓN MODO RECLUTADOR MÓVIL (GRID 2x2) 📱 */
+            @media (max-width: 768px) {
+                /* Forzamos al contenedor a usar 2 columnas simples */
+                body.recruiter-view .admin-controls-wrapper {
+                    grid-template-columns: 1fr 1fr !important; /* 2 Columnas iguales */
+                    gap: 10px !important;
+                    display: grid !important;
+                }
+
+                /* Reseteamos los botones para que no se estiren raro (quitamos el span 3 o span 2 del admin) */
+                body.recruiter-view .admin-controls-wrapper button {
+                    grid-column: auto !important; /* Que ocupen solo 1 espacio */
+                    width: 100% !important;
+                    margin: 0 !important;
+                }
+                
+                /* Ajuste específico para el botón "Vista" en Reclutador */
+                body.recruiter-view #viewToggleBtn {
+                    grid-column: auto !important; /* Le quitamos el "span 3" del admin */
+                }
+            }
+
+            /* 3. HOMOLOGACIÓN TÍTULOS TABLA (RECLUTADOR MÓVIL) 📏 */
+            /* Forzamos que en el celular del reclutador se vea igual que en PC */
+            @media (max-width: 768px) {
+                body.recruiter-view .management-table th {
+                    font-size: 13px !important;      /* Tamaño grande legible */
+                    font-weight: 800 !important;     /* Negrita fuerte */
+                    text-transform: uppercase !important;
+                    padding: 10px 5px !important;
+                    letter-spacing: 0.5px !important;
+                }
+            }
+
+            /* =========================================================
+            CORRECCIÓN FINAL: MATAR BOTÓN MÓVIL EN PC (V22.2) ☠️
+            (Ese botón "Filtros de Búsqueda" NO debe existir en escritorio)
+            ========================================================= */
+            @media (min-width: 769px) {
+                #mobileFilterToggle { 
+                    display: none !important; /* ¡Adiós para siempre en PC! */
+                }
+            }
+
+            /* =========================================================
+            CORRECCIÓN FINAL: SIN BUSCADOR EN RECLUTADOR (V22.3) 🚫
+            (El reclutador no necesita buscar, solo gestionar)
+            ========================================================= */
+            body.recruiter-view #userStickyTools {
+                display: none !important;
+            }
+
+            /* =========================================================
+            CORRECCIÓN FINAL: IGUALAR TAMAÑOS PC (V22.5) 👔
+            (Le ponemos el traje 'Grande' al Reclutador para que se vea igual al Admin)
+            ========================================================= */
+            @media (min-width: 769px) {
+                /* Apuntamos a AMBOS modos explícitamente para ganar la prioridad */
+                body.admin-mode .metrics-card.desktop-only,
+                body.recruiter-view .metrics-card.desktop-only {
+                    /* 1. TAMAÑO FÍSICO (Crecemos de 32px a 38px) */
+                    height: 38px !important;      
+                    padding: 5px 20px !important; 
+                    border-radius: 50px !important;
+                    
+                    /* 2. TAMAÑO DE LETRA (Crecemos de 12px a 15px) */
+                    font-size: 12px !important;   
+                    font-weight: 800 !important;
+
+                    /* 3. ESTÉTICA */
+                    display: flex !important;
+                    flex-direction: row !important;
+                    align-items: center !important;
+                    gap: 15px !important;
+                    background: #f8f9fa !important;
+                    border: 1px solid #ddd !important;
+                    width: auto !important; /* Que no se estire a lo ancho */
+                }
+                
+                /* Un toquecito extra al número para que resalte */
+                .metrics-card.desktop-only .m-number {
+                    font-size: 13px !important;
+                }
+            }
+    
+
+            /* =========================================================
+            CORRECCIONES MODO RECLUTADOR - MÓVIL (PARCHE SEGURO) 📱
+            ========================================================= */
+            @media (max-width: 768px) {
+                
+                /* 1. OCULTAR LUPA (FILTROS) DEL PRIMER PANEL */
+                /* Solo en modo reclutador */
+                body.recruiter-view #adminSearchToggle,
+                body.recruiter-mode #adminSearchToggle {
+                    display: none !important;
+                }
+
+                /* 2. ELIMINAR EL PANEL DE "VISTAS" DUPLICADO (Tira suelta) */
+                /* Quitamos la tira gris y dejamos solo el botón de "Métricas" */
+                body.recruiter-view #mobileMetricsPanel,
+                body.recruiter-mode #mobileMetricsPanel {
+                    display: none !important;
+                }
+
+                /* 3. HOMOLOGAR TÍTULOS DE VACANTES (Para que se vean parejos) */
+                body.recruiter-view .job-title,
+                body.recruiter-mode .job-title {
+                    font-size: 16px !important;    /* Tamaño estándar */
+                    font-weight: 700 !important;   /* Negrita */
+                    line-height: 1.3 !important;   /* Espaciado limpio */
+                    margin-bottom: 5px !important;
+                    min-height: auto !important;   /* Evita espacios raros */
+                }
+            }
+
+                    /* =========================================================
+            CORRECCIONES RECLUTADOR MÓVIL (V22.FINAL) 📱
+            (Parche Seguro: Lupa, Vistas Duplicadas y Títulos)
+            ========================================================= */
+            /* --- LIMPIEZA DE BOTONES MODO RECLUTADOR V25.7 --- */
+            @media (max-width: 768px) {
+                /* 1. Mantenemos el panel de vistas exactamente como está */
+                body.recruiter-view #mobileMetricsPanel {
+                    display: block !important;
+                }
+
+                /* 2. CONFIGURACIÓN DEL PANEL (Solo para Reclutador) */
+                body.recruiter-view #adminControls {
+                    display: block !important;
+                    background: white !important;
+                    border: 1px solid #e0e0e0 !important;
+                    border-radius: 16px !important;
+                    padding: 10px 8px !important;
+                    margin: 10px 5px !important;
+                    position: static !important;
+                }
+
+                /* 3. FILA DE 3 BOTONES: Métricas, Respaldo y Plantilla */
+                body.recruiter-view .admin-controls-wrapper {
+                    display: grid !important;
+                    grid-template-columns: repeat(3, 1fr) !important; 
+                    gap: 8px !important;
+                }
+
+                /* 4. ELIMINACIÓN DE BOTONES PROHIBIDOS PARA RECLUTADOR */
+                /* Aquí es donde matamos a los intrusos que se te colaban */
+                body.recruiter-view .admin-only,           /* Mata: Nueva, Equipo, Ajustes y Cargar */
+                body.recruiter-view #viewToggleBtn,        /* Mata: El botón de Vista (Ojo) */
+                body.recruiter-view #seoSitemapBtn,        /* Mata: El botón de Sitemap */
+                body.recruiter-view #adminSearchToggle,    /* Mata: La Lupa de búsqueda */
+                body.recruiter-view .metrics-card {        /* Mata: El cuadro gris viejo de visitas */
+                    display: none !important;
+                }
+
+                /* 5. ESTILO PAREJO Y ANGOSTO PARA LOS 3 QUE SE QUEDAN */
+                body.recruiter-view .admin-controls-wrapper button:not(.admin-only) {
+                    width: 100% !important;
+                    height: 32px !important; /* <--- AQUÍ LOS HACEMOS MÁS ANGOSTOS */
+                    font-size: 10px !important;
+                    font-weight: 800 !important;
+                    border-radius: 8px !important;
+                    display: flex !important;
+                    align-items: center; 
+                    justify-content: center;
+                    margin: 0 !important;
+                    padding: 0 2px !important;
+                    text-transform: uppercase;
+                    line-height: 1;
+                }
+
+                /* 6. Mantenemos tus títulos de vacantes legibles */
+                body.recruiter-view .job-title {
+                    font-size: 16px !important;
+                    line-height: 1.3 !important;
+                    font-weight: 700 !important;
+                    margin-bottom: 5px !important;
+                }
+            }
+
+
+            /* Homologación visual del campo de teléfono */
+                .phone-group {
+                    display: flex !important;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    background: white;
+                }
+
+                .phone-select {
+                    border: none !important;
+                    background: #f0f2f5 !important;
+                    padding: 10px !important;
+                    font-weight: bold;
+                    border-right: 1px solid #ddd !important;
+                    width: 100px !important;
+                }
+
+                .phone-group input {
+                    border: none !important;
+                    flex: 1;
+                    padding: 10px !important;
+                }
+        
+            /* Contenedor con espaciado consistente */
+                .team-actions-container {
+                    display: flex;
+                    gap: 10px;
+                    margin-top: 15px;
+                }
+
+                /* Botones con look profesional "Slim" */
+                .btn-save-rec, .btn-base-rec {
+                    flex: 1;                /* Ambos miden exactamente lo mismo */
+                    height: 36px;           /* Altura elegante, no tosca */
+                    border-radius: 8px;     /* Bordes suaves */
+                    font-size: 13px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    border: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 6px;
+                    transition: all 0.2s ease;
+                }
+
+                /* Colores institucionales */
+                .btn-save-rec { background-color: #0a66c2; color: white; }
+                .btn-base-rec { background-color: #2e7d32; color: white; }
+
+                .btn-save-rec:hover, .btn-base-rec:hover {
+                    filter: brightness(1.1);
+                    transform: translateY(-1px);
+                }
+
+                .btn-save-rec:active, .btn-base-rec:active {
+                    transform: scale(0.98);
+                }
+
+
