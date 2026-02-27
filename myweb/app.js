@@ -444,6 +444,37 @@
                 }
             }
             function setAdminMode(enableAdmin) {
+    
+                // Inyectar el template del flyer solo si es Admin o Reclutador
+                if (enableAdmin && !document.getElementById('flyerTemplate')) {
+                    const flyerHtml = `
+                    <div id="flyerTemplate">
+                        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1080&q=60') center center / cover no-repeat; opacity: 0.1; z-index: 0;"></div>
+                        <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; background: rgba(10, 25, 45, 0.05); z-index: 1;"></div>
+                        <div class="flyer-badge-top">¡SE SOLICITA!</div>
+                        <div class="flyer-company">RECONOCIDA EMPRESA BUSCA:</div>
+                        <div id="flyerTitle" class="flyer-title">PUESTO VACANTE</div>
+                        <div id="flyerSalary" class="flyer-salary" style="margin-bottom: 5px;">$0,000</div>
+                        <div id="flyerLocation" style="font-size: 50px; color: #FFFFFF !important; font-family: sans-serif; font-weight: 800; margin-top: 5px; margin-bottom: 40px; text-transform: uppercase; text-shadow: 0 4px 10px rgba(0,0,0,1); z-index: 10; position: relative; display: block;">
+                            📍 UBICACIÓN PENDIENTE
+                        </div>
+                        <div class="flyer-benefits-container">
+                            <div class="flyer-benefits-title">OFRECEMOS:</div>
+                            <ul id="flyerBenefitsList" class="flyer-benefits-list">
+                                <li>✅ Prestaciones de Ley</li>
+                            </ul>
+                        </div>
+                        <div class="flyer-cta-box">
+                            🔗 DALE CLIC AL LINK DE LA PUBLICACIÓN PARA CONOCER DETALLES Y AGENDAR ENTREVISTA
+                            <div id="flyerQr"></div>
+                        </div>
+                    </div>`;
+                    document.body.insertAdjacentHTML('afterbegin', flyerHtml);
+                }
+
+                // --- el resto de la función sigue igual desde aquí ---
+                document.getElementById('loginScreen').style.display = 'none';
+
                 document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block';
                 
                 const isRefMode = !!refCode;
