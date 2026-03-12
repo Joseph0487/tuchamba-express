@@ -241,13 +241,30 @@
                 }
             }
 
+            // Normalizador de texto (sin acentos, minúsculas)
+            function normalizeRec(str) {
+                return (str || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+            }
+
+            // Obtener logs filtrados por reclutador activo
+            function getMyLogs() {
+                const allLogs = Object.values(clickLogs).filter(l => l && l.timestamp);
+                if (!isRecruiterMode || !activeRecruiter) return allLogs;
+                const myName = normalizeRec(activeRecruiter.name);
+                const myCode = normalizeRec(activeRecruiter.code || '');
+                return allLogs.filter(l => {
+                    const logRec = normalizeRec(l.recruiter || '');
+                    return logRec === myName || logRec === myCode;
+                });
+            }
+
             // --- PANEL DE MÉTRICAS PARA RECLUTADOR ---
             function renderRecruiterMetrics() {
                 const modal = document.querySelector('#metricsModal .modal-content');
                 if (!modal) return;
 
-                // Obtener meses disponibles en sus logs
-                const myLogs = Object.values(clickLogs).filter(l => l && l.timestamp);
+                // Obtener meses disponibles en sus logs (filtrados al momento de renderizar)
+                const myLogs = getMyLogs();
                 const months = [...new Set(myLogs.map(l => l.timestamp.substring(0,7)))].sort().reverse();
                 if (months.length === 0) months.push(currentMonthKey);
 
@@ -280,9 +297,7 @@
 
             window.updateRecruiterMetrics = function() {
                 const month = document.getElementById('recruiterMonthFilter')?.value || currentMonthKey;
-                const myLogs = Object.values(clickLogs).filter(l =>
-                    l && l.timestamp && l.timestamp.substring(0,7) === month
-                );
+                const myLogs = getMyLogs().filter(l => l.timestamp.substring(0,7) === month);
 
                 const totalClics = myLogs.length;
 
@@ -351,12 +366,17 @@
             }
             
             // --- PANEL DE MÉTRICAS PRO: Orgánico vs Reclutadores ---
-            function renderTrafficChart() {
+            function renderTrafficChart(filterMonth) {
                 const container = document.getElementById('trafficChartContainer');
                 if (!container) return;
 
-                // Contar clics por fuente
-                const logs = Object.values(clickLogs).filter(l => l && l.timestamp);
+                // Obtener todos los meses disponibles para el selector
+                const allLogs = Object.values(clickLogs).filter(l => l && l.timestamp);
+                const availableMonths = [...new Set(allLogs.map(l => l.timestamp.substring(0,7)))].sort().reverse();
+                const activeMonth = filterMonth || availableMonths[0] || currentMonthKey;
+
+                // Filtrar por mes seleccionado (si no hay filtro, muestra todos)
+                const logs = activeMonth && filterMonth ? allLogs.filter(l => l.timestamp.substring(0,7) === activeMonth) : allLogs;
                 
                 let organico = 0, reclutadores = 0, googleOrg = 0, facebook = 0, directo = 0, otro = 0;
 
@@ -381,7 +401,16 @@
 
                 container.innerHTML = `
                     <div style="margin: 16px 0; padding: 14px; background: #f8f9fa; border-radius: 12px; border: 1px solid #e0e0e0;">
-                        <h3 style="margin: 0 0 12px; font-size: 15px; color: #333;">📊 Tráfico Total: ${total} clics</h3>
+                        <!-- Selector de mes para admin -->
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+                            <label style="font-size:13px; font-weight:600; color:#333;">📅 Mes:</label>
+                            <select id="adminMonthFilter" onchange="renderTrafficChart(this.value)" style="padding:6px 12px; border-radius:8px; border:1px solid #ddd; font-size:13px;">
+                                <option value="">Todos los meses</option>
+                                ${availableMonths.map(m => `<option value="${m}" ${m === activeMonth ? 'selected' : ''}>${m}</option>`).join('')}
+                            </select>
+                            <span style="font-size:12px; color:#888;">${availableMonths.length} mes(es) con actividad</span>
+                        </div>
+                        <h3 style="margin: 0 0 12px; font-size: 15px; color: #333;">📊 Tráfico${activeMonth ? ' — ' + activeMonth : ' Total'}: ${total} clics</h3>
                         
                         <!-- Barra comparativa -->
                         <div style="display:flex; height: 28px; border-radius: 8px; overflow: hidden; margin-bottom: 8px;">
@@ -954,24 +983,7 @@
 
                 // 2. Las estadísticas las cargamos por separado para que no estorben al renderizado
                 onValue(ref(db, 'jobStats'), (s) => { jobStats = s.val() || {}; });
-                onValue(ref(db, 'clickLogs'), (s) => {
-                    const allLogs = s.val() || {};
-                    // FILTRO DE PRIVACIDAD: Reclutadores solo ven SUS propios logs
-                    if (isRecruiterMode && activeRecruiter) {
-                        const normalize = str => (str || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
-                        const myName = normalize(activeRecruiter.name);
-                        const myCode = normalize(activeRecruiter.code || '');
-                        clickLogs = Object.fromEntries(
-                            Object.entries(allLogs).filter(([k, v]) => {
-                                if (!v) return false;
-                                const logRec = normalize(v.recruiter || '');
-                                return logRec === myName || logRec === myCode;
-                            })
-                        );
-                    } else {
-                        clickLogs = allLogs;
-                    }
-                });
+                onValue(ref(db, 'clickLogs'), (s) => { clickLogs = s.val() || {}; });
                 onValue(ref(db, 'settings/centralPhone'), (s) => { 
                 centralPhone = s.val() || '';
                 updateBanner();
@@ -984,23 +996,7 @@
                 // Esto corre "por detrás" mientras el usuario ya está viendo vacantes
                 setTimeout(() => {
                     onValue(ref(db, 'jobStats'), (s) => { jobStats = s.val() || {}; });
-                    onValue(ref(db, 'clickLogs'), (s) => {
-                        const allLogs = s.val() || {};
-                        if (isRecruiterMode && activeRecruiter) {
-                            const normalize = str => (str || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
-                            const myName = normalize(activeRecruiter.name);
-                            const myCode = normalize(activeRecruiter.code || '');
-                            clickLogs = Object.fromEntries(
-                                Object.entries(allLogs).filter(([k, v]) => {
-                                    if (!v) return false;
-                                    const logRec = normalize(v.recruiter || '');
-                                    return logRec === myName || logRec === myCode;
-                                })
-                            );
-                        } else {
-                            clickLogs = allLogs;
-                        }
-                    });
+                    onValue(ref(db, 'clickLogs'), (s) => { clickLogs = s.val() || {}; });
                     
                     onValue(ref(db, 'settings/centralPhone'), (s) => { 
                         centralPhone = s.val() || '';
