@@ -35,11 +35,18 @@
             const app = initializeApp(firebaseConfig)
             const auth = getAuth(app);
             const db = getDatabase(app);
-            // Seguridad: App Check para blindar la base de datos
-            const appCheck = initializeAppCheck(app, {
-            provider: new ReCaptchaEnterpriseProvider('6LfZB4csAAAAAMKI99IZpkh7rWkJrYkAhI28cA0z'),
-            isTokenAutoRefreshEnabled: true 
-            });
+
+            // --- ACTIVACIÓN DE APP CHECK (MODO SEGURO) ---
+            let appCheck;
+            try {
+                appCheck = initializeAppCheck(app, {
+                    provider: new ReCaptchaEnterpriseProvider('6LfZB4csAAAAAMKI99IZpkh7rWkJrYkAhI28cA0z'),
+                    isTokenAutoRefreshEnabled: true 
+                });
+                console.log("🛡️ App Check configurado");
+            } catch (err) {
+                console.warn("⚠️ App Check no inició, pero permitiendo carga de datos:", err);
+            }
 
             let isAdmin = false;
             let recruitersLoaded = false; // <--- NUEVA BANDERA DE CONTROL
