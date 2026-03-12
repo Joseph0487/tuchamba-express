@@ -84,6 +84,28 @@
             }
             // 3. El código "maestro" de la sesión es lo que está en memoria
             let refCode = localStorage.getItem('recruiterCode');
+            // --- FASE 2: DETECCIÓN DE ORIGEN DE TRÁFICO ---
+            function detectTrafficSource() {
+                const ref = document.referrer;
+                const params = new URLSearchParams(window.location.search);
+                // 1. Si viene con parámetros UTM de Google Ads o campañas
+                if (params.get('utm_source')) return params.get('utm_source').toLowerCase();
+                // 2. Si el referrer es Google (búsqueda orgánica)
+                if (ref.includes('google.com')) return 'google_organico';
+                // 3. Redes sociales
+                if (ref.includes('facebook.com') || ref.includes('fb.com')) return 'facebook';
+                if (ref.includes('instagram.com')) return 'instagram';
+                if (ref.includes('tiktok.com')) return 'tiktok';
+                if (ref.includes('twitter.com') || ref.includes('t.co')) return 'twitter';
+                if (ref.includes('linkedin.com')) return 'linkedin';
+                // 4. WhatsApp (no deja referrer - llega como directo)
+                if (ref === '' && params.has('ref')) return 'whatsapp_referido';
+                // 5. Directo / sin fuente identificada
+                if (ref === '') return 'directo';
+                return 'otro';
+            }
+            const trafficSource = detectTrafficSource();
+
             function actualizarBotonLogin() {
                     const botonAdmin = document.querySelector('.admin-toggle-link');
                     if (!botonAdmin) return;
@@ -211,14 +233,111 @@
 
             window.openMetricsModal = function() {
                 document.getElementById('metricsModal').classList.add('active');
-                populateMetricsList(); 
+                populateMetricsList();
+                renderTrafficChart();
+            }
+            
+            // --- PANEL DE MÉTRICAS PRO: Orgánico vs Reclutadores ---
+            function renderTrafficChart() {
+                const container = document.getElementById('trafficChartContainer');
+                if (!container) return;
+
+                // Contar clics por fuente
+                const logs = Object.values(clickLogs).filter(l => l && l.timestamp);
+                
+                let organico = 0, reclutadores = 0, googleOrg = 0, facebook = 0, directo = 0, otro = 0;
+
+                logs.forEach(l => {
+                    const isRec = l.recruiter && l.recruiter !== 'Orgánico' && l.recruiter !== 'directo';
+                    if (isRec) {
+                        reclutadores++;
+                    } else {
+                        organico++;
+                        // Desglose por fuente
+                        const src = l.source || 'directo';
+                        if (src === 'google_organico') googleOrg++;
+                        else if (src === 'facebook') facebook++;
+                        else if (src === 'directo' || src === 'whatsapp_referido') directo++;
+                        else otro++;
+                    }
+                });
+
+                const total = organico + reclutadores || 1;
+                const pOrgPct = Math.round((organico / total) * 100);
+                const pRecPct = 100 - pOrgPct;
+
+                container.innerHTML = `
+                    <div style="margin: 16px 0; padding: 14px; background: #f8f9fa; border-radius: 12px; border: 1px solid #e0e0e0;">
+                        <h3 style="margin: 0 0 12px; font-size: 15px; color: #333;">📊 Tráfico Total: ${total} clics</h3>
+                        
+                        <!-- Barra comparativa -->
+                        <div style="display:flex; height: 28px; border-radius: 8px; overflow: hidden; margin-bottom: 8px;">
+                            <div style="width: ${pOrgPct}%; background: #4CAF50; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:700; transition: width 0.5s ease;">
+                                ${pOrgPct > 10 ? pOrgPct + '%' : ''}
+                            </div>
+                            <div style="width: ${pRecPct}%; background: #2196F3; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:700; transition: width 0.5s ease;">
+                                ${pRecPct > 10 ? pRecPct + '%' : ''}
+                            </div>
+                        </div>
+                        
+                        <!-- Leyenda -->
+                        <div style="display:flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px;">
+                            <span style="display:flex; align-items:center; gap:5px; font-size:13px;">
+                                <span style="width:12px; height:12px; background:#4CAF50; border-radius:3px; display:inline-block;"></span>
+                                🌿 Orgánico: <b>${organico}</b>
+                            </span>
+                            <span style="display:flex; align-items:center; gap:5px; font-size:13px;">
+                                <span style="width:12px; height:12px; background:#2196F3; border-radius:3px; display:inline-block;"></span>
+                                👥 Reclutadores: <b>${reclutadores}</b>
+                            </span>
+                        </div>
+                        
+                        <!-- Desglose orgánico -->
+                        ${organico > 0 ? `
+                        <div style="font-size: 12px; color: #666; border-top: 1px solid #e0e0e0; padding-top: 10px;">
+                            <b>Desglose orgánico:</b>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
+                                ${googleOrg > 0 ? `<span>🔍 Google: <b>${googleOrg}</b></span>` : ''}
+                                ${facebook > 0 ? `<span>📘 Facebook: <b>${facebook}</b></span>` : ''}
+                                ${directo > 0 ? `<span>🔗 Directo/WhatsApp: <b>${directo}</b></span>` : ''}
+                                ${otro > 0 ? `<span>🌐 Otro: <b>${otro}</b></span>` : ''}
+                                ${googleOrg === 0 && facebook === 0 && directo === 0 && otro === 0 ? '<span style="color:#aaa;">Sin datos de fuente aún (se registran en clics nuevos)</span>' : ''}
+                            </div>
+                        </div>` : ''}
+                    </div>
+                `;
             }
             window.closeMetricsModal = function() { document.getElementById('metricsModal').classList.remove('active'); }
 
             window.closeTeamModal = function() { document.getElementById('teamModal').classList.remove('active'); }
 
-            window.openSettingsModal = function() { document.getElementById('settingsModal').classList.add('active'); if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone; }
+            window.openSettingsModal = function() {
+                document.getElementById('settingsModal').classList.add('active');
+                if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone;
+                // Cargar config GitHub guardada
+                onValue(ref(db, 'settings/githubRepo'), s => {
+                    const el = document.getElementById('settingsGithubRepo');
+                    if(el && s.val()) el.value = s.val();
+                }, { onlyOnce: true });
+                onValue(ref(db, 'settings/githubToken'), s => {
+                    const el = document.getElementById('settingsGithubToken');
+                    if(el && s.val()) el.placeholder = '🔒 Token guardado (escribe para cambiar)';
+                }, { onlyOnce: true });
+            }
             window.closeSettingsModal = function() { document.getElementById('settingsModal').classList.remove('active'); }
+
+            window.saveGithubConfig = function() {
+                const repo = document.getElementById('settingsGithubRepo')?.value.trim();
+                const token = document.getElementById('settingsGithubToken')?.value.trim();
+                if (!repo) return window.showToast("⚠️ Escribe el repo (usuario/nombre-repo)");
+                const updates = [];
+                updates.push(set(ref(db, 'settings/githubRepo'), repo));
+                if (token) updates.push(set(ref(db, 'settings/githubToken'), token));
+                Promise.all(updates).then(() => {
+                    window.showToast("✅ Configuración GitHub guardada");
+                    if(token) document.getElementById('settingsGithubToken').value = '';
+                });
+            }
 
             window.openPrivacyModal = function() { document.getElementById('privacyModal').classList.add('active'); }
             window.closePrivacyModal = function() { document.getElementById('privacyModal').classList.remove('active'); }
@@ -1071,7 +1190,8 @@
                     jobId: jobId,
                     recruiter: recruiterName || 'directo',
                     timestamp: new Date().toISOString(),
-                    userAgent: navigator.userAgent
+                    userAgent: navigator.userAgent,
+                    source: trafficSource
                 });
 
                 runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
@@ -1086,7 +1206,7 @@
 
             window.registerClick = function(jobId, recruiterName) {
                 runTransaction(ref(db, `jobStats/${jobId}/contactClicks`), (c) => (c || 0) + 1);
-                push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString() });
+                push(ref(db, 'clickLogs'), { jobId, recruiter: recruiterName || 'Orgánico', timestamp: new Date().toISOString(), date_readable: new Date().toLocaleString(), source: trafficSource });
             }
 
             // FUNCIÓN FLYER (Depurada para gastar menos datos)
@@ -2145,8 +2265,61 @@
                 document.head.appendChild(script);
             }
             
-            // --- HERRAMIENTA ADMIN: GENERADOR DE SITEMAP SEO (V27 - FILTRADO) ---
-            window.downloadSitemap = function() {
+            // --- HERRAMIENTA ADMIN: GENERADOR DE SITEMAP SEO (V27 - FILTRADO + AUTO GITHUB) ---
+            
+            // Sube el sitemap.xml al repositorio de GitHub automáticamente
+            async function pushSitemapToGitHub(xmlContent) {
+                // Lee token y repo desde Firebase settings (el admin los configura en ⚙️ Ajustes)
+                const tokenSnap = await new Promise(res => {
+                    const r = ref(db, 'settings/githubToken');
+                    onValue(r, snap => res(snap), { onlyOnce: true });
+                });
+                const repoSnap = await new Promise(res => {
+                    const r = ref(db, 'settings/githubRepo');
+                    onValue(r, snap => res(snap), { onlyOnce: true });
+                });
+
+                const token = tokenSnap.val();
+                const repo = repoSnap.val(); // formato: "usuario/nombre-repo"
+
+                if (!token || !repo) {
+                    window.showToast("⚠️ Configura GitHub Token y Repo en ⚙️ Ajustes primero");
+                    return false;
+                }
+
+                // Obtener SHA del archivo actual (necesario para sobreescribir)
+                let sha = null;
+                try {
+                    const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/sitemap.xml`, {
+                        headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
+                    });
+                    if (getRes.ok) {
+                        const data = await getRes.json();
+                        sha = data.sha;
+                    }
+                } catch(e) { /* archivo no existe aún, sha queda null */ }
+
+                // Subir (crear o actualizar)
+                const body = {
+                    message: `🤖 Sitemap actualizado automáticamente - ${new Date().toLocaleString('es-MX')}`,
+                    content: btoa(unescape(encodeURIComponent(xmlContent))),
+                    ...(sha ? { sha } : {})
+                };
+
+                const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/sitemap.xml`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                return putRes.ok;
+            }
+
+            window.downloadSitemap = async function() {
                 let xmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n';
                 xmlContent += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
@@ -2184,17 +2357,25 @@
 
                 xmlContent += '</urlset>';
 
-                // Creación y descarga del archivo
+                // 1. Descarga local del archivo
                 const blob = new Blob([xmlContent], { type: 'application/xml' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = 'sitemap.xml';
                 link.click();
                 
-                if(typeof window.showToast === 'function') {
-                    window.showToast("✅ Sitemap SEO generado (Solo vigentes)");
-                } else {
-                    console.log("Sitemap generado y descargado.");
+                window.showToast("✅ Sitemap generado. Subiendo a GitHub...");
+                
+                // 2. Subida automática a GitHub
+                try {
+                    const success = await pushSitemapToGitHub(xmlContent);
+                    if (success) {
+                        window.showToast("🚀 Sitemap subido a GitHub exitosamente");
+                    } else {
+                        window.showToast("⚠️ Sitemap descargado, pero falló la subida a GitHub");
+                    }
+                } catch(e) {
+                    window.showToast("⚠️ Sitemap descargado. Error GitHub: " + e.message);
                 }
             };
         
@@ -2580,3 +2761,4 @@
 
             // Arrancar al cargar la página
             document.addEventListener('DOMContentLoaded', () => EventManager.init());
+            
