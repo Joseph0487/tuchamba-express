@@ -31,14 +31,12 @@
 
             const app = initializeApp(firebaseConfig);
                 // --- ACTIVACIÓN DE APP CHECK (EL PASO FINAL) ---
-                //import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
-
-                //self.FIREBASE_APPCHECK_DEBUG_TOKEN = true; // Solo para pruebas, luego se quita
-
-                //const appCheck = initializeAppCheck(app, {
-                //provider: new ReCaptchaEnterpriseProvider('6Lcz-GIsAAAAAAvam_PuQivvnhP69qMIJ5-NhcjL'), // <--- Aquí pondrás tu llave de Google
-                //isTokenAutoRefreshEnabled: true
-                //});
+                import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
+                // Seguridad: App Check para blindar la base de datos
+                const appCheck = initializeAppCheck(app, {
+                provider: new ReCaptchaEnterpriseProvider('6LfZB4csAAAAAMKI99IZpkh7rWkJrYkAhI28cA0z'),
+                isTokenAutoRefreshEnabled: true 
+                });
             const auth = getAuth(app);
             const db = getDatabase(app);
 
