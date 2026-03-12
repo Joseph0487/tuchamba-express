@@ -1,4 +1,4 @@
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
             import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
             import { getDatabase, ref, set, onValue, remove, runTransaction, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
             import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
@@ -33,6 +33,9 @@
             const app = initializeApp(firebaseConfig);
 
             // --- ACTIVACIÓN DE APP CHECK (MODO SEGURO) ---
+            // NOTA: Si el sitio no carga vacantes, verifica en Firebase Console → App Check
+            // que el dominio tuchamba-express.vercel.app esté en la lista de dominios permitidos
+            // y que el enforcement esté activado SOLO después de registrar el dominio.
             let appCheck;
             try {
                 appCheck = initializeAppCheck(app, {
@@ -40,7 +43,7 @@
                     isTokenAutoRefreshEnabled: true
                 });
             } catch (err) {
-                console.warn("⚠️ App Check no pudo iniciar:", err);
+                console.warn("⚠️ App Check no pudo iniciar (datos aún accesibles si enforcement está desactivado):", err);
             }
             const auth = getAuth(app);
             const db = getDatabase(app);
@@ -613,16 +616,29 @@
         // FUNCIÓN CARGA DE DATOS (OPTIMIZADA V23.1 + FIX SCROLL) ⚡
         function loadData() {
             // 1. PRIORIDAD TOTAL: Cargar Vacantes primero
+            // Timeout de seguridad: si en 8s no llegan datos, ocultamos skeleton y mostramos error
+            const skeletonTimeout = setTimeout(() => {
+                const skel = document.getElementById('skeletonLoader');
+                if (skel && skel.style.display !== 'none') {
+                    skel.style.display = 'none';
+                    const grid = document.getElementById('jobGrid');
+                    if (grid) {
+                        grid.style.display = 'grid';
+                        grid.innerHTML = '<p style="text-align:center;color:#888;padding:40px;grid-column:1/-1">⚠️ No se pudieron cargar las vacantes. Verifica tu conexión e intenta de nuevo.</p>';
+                    }
+                    console.warn("⏱️ Timeout: Firebase no respondió. Posible bloqueo de App Check o red.");
+                }
+            }, 8000);
+
             onValue(ref(db, 'jobs'), (s) => { 
+                clearTimeout(skeletonTimeout);
                 jobs = s.val() || {}; 
                 
                 // Matamos el esqueleto de carga DE INMEDIATO
                 const skel = document.getElementById('skeletonLoader');
                 if(skel) skel.style.display = 'none'; 
                 
-                // 👇👇👇 AQUÍ VA LA MAGIA (Línea Nueva) 👇👇👇
                 window.scrollTo(0, 0);
-                // 👆👆👆 ESTO HACE QUE EL CELULAR SUBA AL INICIO
 
                 if (isRecruiterMode) {
                     toggleViewMode('table');
@@ -636,7 +652,18 @@
                 else renderJobsTable();
                 
                 checkUrlForJob(); // Revisar si hay ?id=...
-                }, { onlyOnce: false }); // Mantenemos la escucha activa
+                }, (error) => {
+                    // ERROR HANDLER: captura errores de permisos o App Check
+                    clearTimeout(skeletonTimeout);
+                    const skel = document.getElementById('skeletonLoader');
+                    if(skel) skel.style.display = 'none';
+                    const grid = document.getElementById('jobGrid');
+                    if (grid) {
+                        grid.style.display = 'grid';
+                        grid.innerHTML = '<p style="text-align:center;color:#888;padding:40px;grid-column:1/-1">⚠️ Error al cargar vacantes. Intenta recargar la página.</p>';
+                    }
+                    console.error("🔥 Firebase onValue error:", error.code, error.message);
+                }); // onValue con manejo de error
 
                 // 2. Las estadísticas las cargamos por separado para que no estorben al renderizado
                 onValue(ref(db, 'jobStats'), (s) => { jobStats = s.val() || {}; });
