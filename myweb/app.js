@@ -1,6 +1,6 @@
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
             import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-            import { getDatabase, ref, set, onValue, remove, runTransaction, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+            import { getDatabase, ref, set, get, onValue, remove, runTransaction, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
             import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
 
             const firebaseConfig = {
@@ -233,7 +233,13 @@
             window.openMetricsModal = function() {
                 document.getElementById('metricsModal').classList.add('active');
                 if (isRecruiterMode && activeRecruiter) {
-                    renderRecruiterMetrics();
+                    // Leer clickLogs FRESCO de Firebase para asegurar datos actualizados
+                    const modal = document.querySelector('#metricsModal .modal-content');
+                    if (modal) modal.innerHTML = '<p style="text-align:center;padding:40px;color:#888;">Cargando tus métricas...</p>';
+                    get(ref(db, 'clickLogs')).then(snap => {
+                        clickLogs = snap.val() || {};
+                        renderRecruiterMetrics();
+                    }).catch(() => renderRecruiterMetrics());
                 } else {
                     setupMetricsTabs();
                     populateMetricsList();
@@ -373,10 +379,12 @@
                 // Obtener todos los meses disponibles para el selector
                 const allLogs = Object.values(clickLogs).filter(l => l && l.timestamp);
                 const availableMonths = [...new Set(allLogs.map(l => l.timestamp.substring(0,7)))].sort().reverse();
-                const activeMonth = filterMonth || availableMonths[0] || currentMonthKey;
+                
+                // Si no se pasa mes, usar el más reciente por defecto
+                const activeMonth = filterMonth !== undefined ? filterMonth : (availableMonths[0] || currentMonthKey);
 
-                // Filtrar por mes seleccionado (si no hay filtro, muestra todos)
-                const logs = activeMonth && filterMonth ? allLogs.filter(l => l.timestamp.substring(0,7) === activeMonth) : allLogs;
+                // Filtrar: si activeMonth tiene valor, filtra; si es vacío ('') muestra todo
+                const logs = activeMonth ? allLogs.filter(l => l.timestamp.substring(0,7) === activeMonth) : allLogs;
                 
                 let organico = 0, reclutadores = 0, googleOrg = 0, facebook = 0, directo = 0, otro = 0;
 
