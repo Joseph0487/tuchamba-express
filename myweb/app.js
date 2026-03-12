@@ -958,9 +958,15 @@
                     const allLogs = s.val() || {};
                     // FILTRO DE PRIVACIDAD: Reclutadores solo ven SUS propios logs
                     if (isRecruiterMode && activeRecruiter) {
-                        const myName = activeRecruiter.name;
+                        const normalize = str => (str || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+                        const myName = normalize(activeRecruiter.name);
+                        const myCode = normalize(activeRecruiter.code || '');
                         clickLogs = Object.fromEntries(
-                            Object.entries(allLogs).filter(([k, v]) => v && v.recruiter === myName)
+                            Object.entries(allLogs).filter(([k, v]) => {
+                                if (!v) return false;
+                                const logRec = normalize(v.recruiter || '');
+                                return logRec === myName || logRec === myCode;
+                            })
                         );
                     } else {
                         clickLogs = allLogs;
@@ -981,9 +987,15 @@
                     onValue(ref(db, 'clickLogs'), (s) => {
                         const allLogs = s.val() || {};
                         if (isRecruiterMode && activeRecruiter) {
-                            const myName = activeRecruiter.name;
+                            const normalize = str => (str || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+                            const myName = normalize(activeRecruiter.name);
+                            const myCode = normalize(activeRecruiter.code || '');
                             clickLogs = Object.fromEntries(
-                                Object.entries(allLogs).filter(([k, v]) => v && v.recruiter === myName)
+                                Object.entries(allLogs).filter(([k, v]) => {
+                                    if (!v) return false;
+                                    const logRec = normalize(v.recruiter || '');
+                                    return logRec === myName || logRec === myCode;
+                                })
                             );
                         } else {
                             clickLogs = allLogs;
