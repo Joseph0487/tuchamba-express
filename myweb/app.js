@@ -376,25 +376,54 @@
                 const container = document.getElementById('trafficChartContainer');
                 if (!container) return;
 
-                // Obtener todos los meses disponibles para el selector
                 const allLogs = Object.values(clickLogs).filter(l => l && l.timestamp);
                 const availableMonths = [...new Set(allLogs.map(l => l.timestamp.substring(0,7)))].sort().reverse();
-                
-                // Si no se pasa mes, usar el más reciente por defecto
-                const activeMonth = filterMonth !== undefined ? filterMonth : (availableMonths[0] || currentMonthKey);
 
-                // Filtrar: si activeMonth tiene valor, filtra; si es vacío ('') muestra todo
+                // Crear selector solo si no existe todavía
+                if (!document.getElementById('adminMonthFilter')) {
+                    const selectorHtml = `
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+                            <label style="font-size:13px; font-weight:600; color:#333;">📅 Mes:</label>
+                            <select id="adminMonthFilter" onchange="renderTrafficChartData()" style="padding:6px 12px; border-radius:8px; border:1px solid #ddd; font-size:13px;">
+                                <option value="">Todos los meses</option>
+                                ${availableMonths.map(m => `<option value="${m}">${m}</option>`).join('')}
+                            </select>
+                            <span style="font-size:12px; color:#888;">${availableMonths.length} mes(es) con actividad</span>
+                        </div>
+                        <div id="trafficChartData"></div>
+                    `;
+                    container.innerHTML = selectorHtml;
+                    // Seleccionar el mes más reciente por defecto
+                    const sel = document.getElementById('adminMonthFilter');
+                    if (sel && availableMonths.length > 0) sel.value = availableMonths[0];
+                }
+
+                // Aplicar filterMonth si se pasó explícitamente
+                if (filterMonth !== undefined) {
+                    const sel = document.getElementById('adminMonthFilter');
+                    if (sel) sel.value = filterMonth;
+                }
+
+                renderTrafficChartData();
+            }
+
+            window.renderTrafficChartData = function() {
+                const dataDiv = document.getElementById('trafficChartData');
+                if (!dataDiv) return;
+
+                const sel = document.getElementById('adminMonthFilter');
+                const activeMonth = sel ? sel.value : '';
+
+                const allLogs = Object.values(clickLogs).filter(l => l && l.timestamp);
                 const logs = activeMonth ? allLogs.filter(l => l.timestamp.substring(0,7) === activeMonth) : allLogs;
-                
-                let organico = 0, reclutadores = 0, googleOrg = 0, facebook = 0, directo = 0, otro = 0;
 
+                let organico = 0, reclutadores = 0, googleOrg = 0, facebook = 0, directo = 0, otro = 0;
                 logs.forEach(l => {
                     const isRec = l.recruiter && l.recruiter !== 'Orgánico' && l.recruiter !== 'directo';
                     if (isRec) {
                         reclutadores++;
                     } else {
                         organico++;
-                        // Desglose por fuente
                         const src = l.source || 'directo';
                         if (src === 'google_organico') googleOrg++;
                         else if (src === 'facebook') facebook++;
@@ -407,30 +436,17 @@
                 const pOrgPct = Math.round((organico / total) * 100);
                 const pRecPct = 100 - pOrgPct;
 
-                container.innerHTML = `
-                    <div style="margin: 16px 0; padding: 14px; background: #f8f9fa; border-radius: 12px; border: 1px solid #e0e0e0;">
-                        <!-- Selector de mes para admin -->
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
-                            <label style="font-size:13px; font-weight:600; color:#333;">📅 Mes:</label>
-                            <select id="adminMonthFilter" onchange="renderTrafficChart(this.value)" style="padding:6px 12px; border-radius:8px; border:1px solid #ddd; font-size:13px;">
-                                <option value="">Todos los meses</option>
-                                ${availableMonths.map(m => `<option value="${m}" ${m === activeMonth ? 'selected' : ''}>${m}</option>`).join('')}
-                            </select>
-                            <span style="font-size:12px; color:#888;">${availableMonths.length} mes(es) con actividad</span>
-                        </div>
-                        <h3 style="margin: 0 0 12px; font-size: 15px; color: #333;">📊 Tráfico${activeMonth ? ' — ' + activeMonth : ' Total'}: ${total} clics</h3>
-                        
-                        <!-- Barra comparativa -->
+                dataDiv.innerHTML = `
+                    <div style="padding: 14px; background: #f8f9fa; border-radius: 12px; border: 1px solid #e0e0e0;">
+                        <h3 style="margin: 0 0 12px; font-size: 15px; color: #333;">📊 Tráfico${activeMonth ? ' — ' + activeMonth : ' Total'}: ${organico + reclutadores} clics</h3>
                         <div style="display:flex; height: 28px; border-radius: 8px; overflow: hidden; margin-bottom: 8px;">
-                            <div style="width: ${pOrgPct}%; background: #4CAF50; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:700; transition: width 0.5s ease;">
+                            <div style="width: ${pOrgPct}%; background: #4CAF50; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:700;">
                                 ${pOrgPct > 10 ? pOrgPct + '%' : ''}
                             </div>
-                            <div style="width: ${pRecPct}%; background: #2196F3; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:700; transition: width 0.5s ease;">
+                            <div style="width: ${pRecPct}%; background: #2196F3; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:700;">
                                 ${pRecPct > 10 ? pRecPct + '%' : ''}
                             </div>
                         </div>
-                        
-                        <!-- Leyenda -->
                         <div style="display:flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px;">
                             <span style="display:flex; align-items:center; gap:5px; font-size:13px;">
                                 <span style="width:12px; height:12px; background:#4CAF50; border-radius:3px; display:inline-block;"></span>
@@ -441,8 +457,6 @@
                                 👥 Reclutadores: <b>${reclutadores}</b>
                             </span>
                         </div>
-                        
-                        <!-- Desglose orgánico -->
                         ${organico > 0 ? `
                         <div style="font-size: 12px; color: #666; border-top: 1px solid #e0e0e0; padding-top: 10px;">
                             <b>Desglose orgánico:</b>
@@ -451,13 +465,18 @@
                                 ${facebook > 0 ? `<span>📘 Facebook: <b>${facebook}</b></span>` : ''}
                                 ${directo > 0 ? `<span>🔗 Directo/WhatsApp: <b>${directo}</b></span>` : ''}
                                 ${otro > 0 ? `<span>🌐 Otro: <b>${otro}</b></span>` : ''}
-                                ${googleOrg === 0 && facebook === 0 && directo === 0 && otro === 0 ? '<span style="color:#aaa;">Sin datos de fuente aún (se registran en clics nuevos)</span>' : ''}
+                                ${googleOrg === 0 && facebook === 0 && directo === 0 && otro === 0 ? '<span style="color:#aaa;">Sin datos de fuente aún</span>' : ''}
                             </div>
                         </div>` : ''}
                     </div>
                 `;
             }
-            window.closeMetricsModal = function() { document.getElementById('metricsModal').classList.remove('active'); }
+            window.closeMetricsModal = function() {
+                document.getElementById('metricsModal').classList.remove('active');
+                // Limpiar el selector para que se reconstruya con datos frescos la próxima vez
+                const container = document.getElementById('trafficChartContainer');
+                if (container) container.innerHTML = '';
+            }
 
             // Ocultar pestaña GA4 en modo reclutador
             function setupMetricsTabs() {
