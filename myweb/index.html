@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
     <html lang="es">
     <head>
     <meta charset="UTF-8">
@@ -14,12 +14,11 @@
 
         <meta http-equiv="Content-Security-Policy" content="
         default-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.gstatic.com https://images.unsplash.com;
-        script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://html2canvas.hertzen.com https://*.gstatic.com https://cdn.sheetjs.com https://*.googleapis.com https://*.firebaseio.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://www.google.com https://www.gstatic.com;
-        connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.gstatic.com https://www.google-analytics.com https://analytics.google.com https://www.facebook.com https://www.google.com https://recaptchaenterprise.googleapis.com https://firebaseappcheck.googleapis.com;
+        script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://html2canvas.hertzen.com https://*.gstatic.com https://cdn.sheetjs.com https://*.googleapis.com https://*.firebaseio.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net;
+        connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.gstatic.com https://www.google-analytics.com https://analytics.google.com https://www.facebook.com;
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
         font-src 'self' https://fonts.gstatic.com;
         img-src 'self' data: https://*.gstatic.com https://www.google-analytics.com https://www.facebook.com https://images.unsplash.com;
-        frame-src https://www.google.com;
         ">
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -330,7 +329,7 @@
             </div>
         </div>
 
-        <div class="modal" id="metricsModal"><div class="modal-content"><button class="close-btn" onclick="closeMetricsModal()">×</button><h2>📊 Exportar Métricas</h2><p style="margin-bottom:10px; color:#666;">Selecciona los meses que deseas incluir en el reporte:</p><div id="metricsMonthList" style="margin: 15px 0; max-height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px; background:#f9f9f9;"><p style="text-align:center; color:#999;">Cargando historial...</p></div><button class="btn-primary" style="width:100%" onclick="downloadSelectedMetrics()">📥 Descargar Excel Consolidado</button></div></div>
+        <div class="modal" id="metricsModal"><div class="modal-content"><button class="close-btn" onclick="closeMetricsModal()">×</button><h2>📊 Métricas Pro</h2><div id="trafficChartContainer"></div><p style="margin-bottom:10px; color:#666;">Selecciona los meses para el reporte Excel:</p><div id="metricsMonthList" style="margin: 15px 0; max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px; background:#f9f9f9;"><p style="text-align:center; color:#999;">Cargando historial...</p></div><button class="btn-primary" style="width:100%" onclick="downloadSelectedMetrics()">📥 Descargar Excel Consolidado</button></div></div>
         <div class="modal" id="teamModal">
             <div class="modal-content">
                 <div class="modal-header-pro">
@@ -408,7 +407,18 @@
                 </div>
             </div>
         </div>
-        <div class="modal" id="settingsModal"><div class="modal-content"><button class="close-btn" onclick="closeSettingsModal()">×</button><h2>⚙️ Ajustes del Sistema</h2><div class="form-group"><label>📞 Teléfono Oficina Central (Respaldo)</label><div style="display:flex; gap:10px;"><input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1;"><button class="btn-primary" id="btnSaveCentral" onclick="saveCentralConfig()">Guardar</button></div><p style="font-size:12px; color:#666; margin-top:5px;">Este número se usa si la vacante no tiene contacto o está mal escrito.</p></div><div class="danger-section"><h3 style="color:#d32f2f; margin-bottom:10px;">⚠️ Zona de Peligro (Admin)</h3><p style="font-size:13px; color:#666; margin-bottom:10px;">Acciones irreversibles protegidas por contraseña.</p><button class="danger-btn" onclick="performSafeAction('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button><button class="danger-btn" onclick="performSafeAction('deleteJobs')">🔥 Borrar TODAS las Vacantes</button></div></div></div>
+        <div class="modal" id="settingsModal"><div class="modal-content"><button class="close-btn" onclick="closeSettingsModal()">×</button><h2>⚙️ Ajustes del Sistema</h2><div class="form-group"><label>📞 Teléfono Oficina Central (Respaldo)</label><div style="display:flex; gap:10px;"><input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1;"><button class="btn-primary" id="btnSaveCentral" onclick="saveCentralConfig()">Guardar</button></div><p style="font-size:12px; color:#666; margin-top:5px;">Este número se usa si la vacante no tiene contacto o está mal escrito.</p></div><div class="form-group" style="margin-top:16px; padding-top:14px; border-top:1px solid #eee;">
+    <label>🔗 GitHub — Automatización Sitemap</label>
+    <div style="display:flex; gap:10px; margin-top:6px;">
+        <input type="text" id="settingsGithubRepo" placeholder="usuario/nombre-repo" style="flex:1;" title="Ej: mariajose/tuchamba-express">
+        <button class="btn-primary" onclick="saveGithubConfig()">Guardar</button>
+    </div>
+    <div style="margin-top:8px;">
+        <input type="password" id="settingsGithubToken" placeholder="GitHub Token (ghp_...)" style="width:100%; box-sizing:border-box;">
+    </div>
+    <p style="font-size:12px; color:#666; margin-top:5px;">El token necesita permiso <b>repo</b>. Se guarda cifrado en Firebase, solo tú puedes leerlo.</p>
+</div>
+<div class="danger-section"><h3 style="color:#d32f2f; margin-bottom:10px;">⚠️ Zona de Peligro (Admin)</h3><p style="font-size:13px; color:#666; margin-bottom:10px;">Acciones irreversibles protegidas por contraseña.</p><button class="danger-btn" onclick="performSafeAction('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button><button class="danger-btn" onclick="performSafeAction('deleteJobs')">🔥 Borrar TODAS las Vacantes</button></div></div></div>
         <div class="modal" id="privacyModal"><div class="modal-content"><button class="close-btn" onclick="closePrivacyModal()">×</button><h2>🔒 Aviso de Privacidad</h2><div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto;"><p style="font-size: 12px; color: #666; margin-bottom: 15px;"><strong>Última actualización: Enero 2026</strong></p><p style="margin-bottom: 15px;">En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, <strong>TuChamba Express</strong> informa:</p><p style="margin-bottom:5px;"><strong>1. Responsable de los datos:</strong></p><p style="margin-bottom:15px;">TuChamba Express actúa como enlace entre candidatos y empresas reclutadoras.</p><p style="margin-bottom:5px;"><strong>2. Datos recopilados:</strong></p><p style="margin-bottom:15px;">Podemos recopilar datos de contacto (como número telefónico) con el único fin de facilitar la comunicación para procesos de reclutamiento.</p><p style="margin-bottom:5px;"><strong>3. Uso de la información:</strong></p><p style="margin-bottom:5px;">Los datos proporcionados serán utilizados exclusivamente para:</p><ul style="margin-left: 20px; margin-bottom: 15px;"><li>Contactar al candidato respecto a la vacante de interés.</li><li>Agendar entrevistas laborales.</li><li>Procesos internos de selección.</li></ul><p style="margin-bottom:5px;"><strong>4. Compartir datos:</strong></p><p style="margin-bottom:15px;">Su información de contacto será compartida únicamente con la empresa o reclutador responsable de la vacante a la que usted decida postularse voluntariamente.</p><p style="margin-bottom:5px;"><strong>5. Examen Médico:</strong></p><p style="margin-bottom:0;">Al utilizar esta plataforma, usted reconoce que algunas empresas contratantes pueden requerir, como parte de su proceso de selección y conforme a la ley, la realización de exámenes médicos y/o pruebas de detección de sustancias.</p></div></div></div>
 
         <script type="module" src="app.js"></script>
