@@ -2290,7 +2290,7 @@
                 // Obtener SHA del archivo actual (necesario para sobreescribir)
                 let sha = null;
                 try {
-                    const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/sitemap.xml`, {
+                    const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/myweb/sitemap.xml`, {
                         headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
                     });
                     if (getRes.ok) {
@@ -2306,7 +2306,7 @@
                     ...(sha ? { sha } : {})
                 };
 
-                const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/sitemap.xml`, {
+                const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/myweb/sitemap.xml`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `token ${token}`,
