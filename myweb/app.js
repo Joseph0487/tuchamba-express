@@ -30,15 +30,16 @@
                 });
             }
 
-            // Seguridad: App Check para blindar la base de datos
-                const appCheck = initializeAppCheck(app, {
-                provider: new ReCaptchaEnterpriseProvider('6LfZB4csAAAAAMKI99IZpkh7rWkJrYkAhI28cA0z'),
-                isTokenAutoRefreshEnabled: true 
-                });
+            
 
             const app = initializeApp(firebaseConfig)
             const auth = getAuth(app);
             const db = getDatabase(app);
+            // Seguridad: App Check para blindar la base de datos
+            const appCheck = initializeAppCheck(app, {
+            provider: new ReCaptchaEnterpriseProvider('6LfZB4csAAAAAMKI99IZpkh7rWkJrYkAhI28cA0z'),
+            isTokenAutoRefreshEnabled: true 
+            });
 
             let isAdmin = false;
             let recruitersLoaded = false; // <--- NUEVA BANDERA DE CONTROL
