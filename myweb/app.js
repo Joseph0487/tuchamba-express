@@ -1,7 +1,6 @@
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
             import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
             import { getDatabase, ref, set, onValue, remove, runTransaction, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-            import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
 
             const firebaseConfig = {
             apiKey: "AIzaSyB1k1lnQjQXiGYJRT9E9-KYzGSBBmrQGFI",
@@ -30,23 +29,16 @@
                 });
             }
 
-            
-
-            const app = initializeApp(firebaseConfig)
+            const app = initializeApp(firebaseConfig);
+                // --- ACTIVACIÓN DE APP CHECK (EL PASO FINAL) ---
+                import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
+                // Seguridad: App Check para blindar la base de datos
+                const appCheck = initializeAppCheck(app, {
+                provider: new ReCaptchaEnterpriseProvider('6LfZB4csAAAAAMKI99IZpkh7rWkJrYkAhI28cA0z'),
+                isTokenAutoRefreshEnabled: true 
+                });
             const auth = getAuth(app);
             const db = getDatabase(app);
-
-            // --- ACTIVACIÓN DE APP CHECK (MODO SEGURO) ---
-            let appCheck;
-            try {
-                appCheck = initializeAppCheck(app, {
-                    provider: new ReCaptchaEnterpriseProvider('6LfZB4csAAAAAMKI99IZpkh7rWkJrYkAhI28cA0z'),
-                    isTokenAutoRefreshEnabled: true 
-                });
-                console.log("🛡️ App Check configurado");
-            } catch (err) {
-                console.warn("⚠️ App Check no inició, pero permitiendo carga de datos:", err);
-            }
 
             let isAdmin = false;
             let recruitersLoaded = false; // <--- NUEVA BANDERA DE CONTROL
