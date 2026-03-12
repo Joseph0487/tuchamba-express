@@ -308,6 +308,41 @@
             }
             window.closeMetricsModal = function() { document.getElementById('metricsModal').classList.remove('active'); }
 
+            window.switchMetricsTab = function(tab) {
+                const firebase = document.getElementById('panelFirebase');
+                const ga4 = document.getElementById('panelGA4');
+                const btnF = document.getElementById('tabFirebase');
+                const btnG = document.getElementById('tabGA4');
+
+                if (tab === 'firebase') {
+                    firebase.style.display = 'block';
+                    ga4.style.display = 'none';
+                    btnF.style.background = '#1a73e8'; btnF.style.color = 'white';
+                    btnG.style.background = '#eee'; btnG.style.color = '#555';
+                } else {
+                    firebase.style.display = 'none';
+                    ga4.style.display = 'block';
+                    btnF.style.background = '#eee'; btnF.style.color = '#555';
+                    btnG.style.background = '#1a73e8'; btnG.style.color = 'white';
+                    loadLookerStudio();
+                }
+            }
+
+            function loadLookerStudio() {
+                const container = document.getElementById('lookerContainer');
+                if (!container) return;
+                // Si ya cargó el iframe no lo volvemos a crear
+                if (container.querySelector('iframe')) return;
+
+                onValue(ref(db, 'settings/lookerUrl'), (s) => {
+                    const url = s.val();
+                    if (url) {
+                        container.innerHTML = `<iframe src="${url}" width="100%" height="480" style="border:none; border-radius:10px;" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>`;
+                    }
+                    // Si no hay URL, el placeholder ya se ve en el HTML
+                }, { onlyOnce: true });
+            }
+
             window.closeTeamModal = function() { document.getElementById('teamModal').classList.remove('active'); }
 
             window.openSettingsModal = function() {
@@ -322,8 +357,22 @@
                     const el = document.getElementById('settingsGithubToken');
                     if(el && s.val()) el.placeholder = '🔒 Token guardado (escribe para cambiar)';
                 }, { onlyOnce: true });
+                onValue(ref(db, 'settings/lookerUrl'), s => {
+                    const el = document.getElementById('settingsLookerUrl');
+                    if(el && s.val()) el.placeholder = '🔒 URL guardada (escribe para cambiar)';
+                }, { onlyOnce: true });
             }
             window.closeSettingsModal = function() { document.getElementById('settingsModal').classList.remove('active'); }
+
+            window.saveLookerUrl = function() {
+                const url = document.getElementById('settingsLookerUrl')?.value.trim();
+                if (!url) return window.showToast("⚠️ Pega el link de Looker Studio");
+                set(ref(db, 'settings/lookerUrl'), url).then(() => {
+                    window.showToast("✅ Dashboard de Looker Studio guardado");
+                    document.getElementById('settingsLookerUrl').value = '';
+                    document.getElementById('settingsLookerUrl').placeholder = '🔒 URL guardada (escribe para cambiar)';
+                });
+            }
 
             window.saveGithubConfig = function() {
                 const repo = document.getElementById('settingsGithubRepo')?.value.trim();
@@ -1165,18 +1214,35 @@
                 if (now - lastClickTime < 5000) return; 
                 lastClickTime = now;
 
-                // --- RASTREO META PIXEL ---
-                if (typeof fbq === 'function') {
-                    fbq('track', 'Lead', { content_name: jobId, content_category: recruiterName });
-                }
-
                 if (typeof gtag === 'function') {
                     const job = jobs[jobId] || {};
+                    
+                    // Evento base: todos los clics de WhatsApp
                     gtag('event', 'contact_click', {
                         'job_title': job.title || 'Desconocido',
                         'job_id': jobId,
-                        'recruiter': recruiterName || 'directo'
+                        'recruiter': recruiterName || 'directo',
+                        'traffic_source': trafficSource
                     });
+
+                    // Evento específico para clics desde Google orgánico
+                    if (trafficSource === 'google_organico') {
+                        gtag('event', 'whatsapp_click_organico', {
+                            'job_title': job.title || 'Desconocido',
+                            'job_id': jobId,
+                            'job_company': job.company || 'Desconocida',
+                            'job_city': job.city || 'Desconocida'
+                        });
+                    }
+
+                    // Evento específico para clics desde Facebook/redes sociales
+                    if (['facebook', 'instagram', 'tiktok'].includes(trafficSource)) {
+                        gtag('event', 'whatsapp_click_social', {
+                            'job_title': job.title || 'Desconocido',
+                            'job_id': jobId,
+                            'red_social': trafficSource
+                        });
+                    }
                 }
 
                 btn.disabled = true;
