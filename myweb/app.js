@@ -22,7 +22,6 @@
                     const script = document.createElement('script');
                     script.src = url;
                     script.onload = () => {
-                        console.log(`✅ ${libraryName} cargada con éxito`);
                         resolve(true);
                     };
                     script.onerror = () => reject(new Error(`Error al cargar ${libraryName}`));
@@ -697,11 +696,9 @@
 
             // 1. FUNCIÓN GLOBAL: Carga reclutadores INDEPENDIENTEMENTE del login
             function initRecruitersData() {
-                console.log("Iniciando carga de reclutadores...");
                 onValue(ref(db, 'recruiters'), (s) => { 
                     recruiters = s.val() || {}; 
                     recruitersLoaded = true; // ¡SEMÁFORO EN VERDE!
-                    console.log("✅ Reclutadores cargados");
 
                     // AUTO-LOGIN: Si recargaste el celular, aquí te recuperamos
                     // IMPORTANTE: Esto corre AUTOMÁTICAMENTE al abrir la página
@@ -1252,7 +1249,8 @@
                         benefitsList.innerHTML = '<li>✅ Prestaciones de Ley</li><li>✅ Contratación Inmediata</li>';
                     }
 
-                    // 4. QR (Usa la librería qrcodejs que ya tienes cargada)
+                    // 4. QR (Cargamos la librería solo cuando se necesita)
+                    await loadExternalLibrary("https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js", "QRCode");
                     const qrContainer = document.getElementById('flyerQr');
                     qrContainer.innerHTML = ''; 
 
@@ -2609,8 +2607,6 @@
 
                 if (!refCode) {
                     window.showToast("⚠️ No se encontró código de reclutador en ninguna fuente");
-                    console.log("DEBUG copyRecruiterLink - Fuentes chequeadas:", debugInfo);
-                    console.log("URL actual:", window.location.href);
                     return;
                 }
 
@@ -2621,8 +2617,6 @@
             navigator.clipboard.writeText(linkToCopy)
                 .then(() => {
                     window.showToast("✅ Link copiado: " + linkToCopy);
-                    console.log("DEBUG - Link COPIADO exitosamente:", linkToCopy);
-                    console.log("Fuentes chequeadas:", debugInfo);
                 })
                 .catch(err => {
                     console.error("Error al copiar:", err);
@@ -2664,7 +2658,6 @@
                             sessionStorage.setItem('eventShown', 'true');
                         }
                     } catch (e) {
-                        console.log("Hoy no hay eventos especiales.");
                     }
                 },
 
