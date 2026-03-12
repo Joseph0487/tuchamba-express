@@ -232,8 +232,122 @@
 
             window.openMetricsModal = function() {
                 document.getElementById('metricsModal').classList.add('active');
-                populateMetricsList();
-                renderTrafficChart();
+                if (isRecruiterMode && activeRecruiter) {
+                    renderRecruiterMetrics();
+                } else {
+                    setupMetricsTabs();
+                    populateMetricsList();
+                    renderTrafficChart();
+                }
+            }
+
+            // --- PANEL DE MÉTRICAS PARA RECLUTADOR ---
+            function renderRecruiterMetrics() {
+                const modal = document.querySelector('#metricsModal .modal-content');
+                if (!modal) return;
+
+                // Obtener meses disponibles en sus logs
+                const myLogs = Object.values(clickLogs).filter(l => l && l.timestamp);
+                const months = [...new Set(myLogs.map(l => l.timestamp.substring(0,7)))].sort().reverse();
+                if (months.length === 0) months.push(currentMonthKey);
+
+                const selectedMonth = months[0]; // Por defecto el mes más reciente
+
+                modal.innerHTML = `
+                    <button class="close-btn" onclick="closeMetricsModal()">×</button>
+                    <h2>📊 Mis Métricas</h2>
+                    <p style="color:#666; font-size:13px; margin-bottom:12px;">
+                        Hola <b>${activeRecruiter.name}</b> — aquí están tus resultados:
+                    </p>
+
+                    <!-- Selector de mes -->
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+                        <label style="font-size:13px; font-weight:600; color:#333;">📅 Mes:</label>
+                        <select id="recruiterMonthFilter" onchange="updateRecruiterMetrics()" style="padding:6px 12px; border-radius:8px; border:1px solid #ddd; font-size:13px;">
+                            ${months.map(m => `<option value="${m}" ${m === selectedMonth ? 'selected' : ''}>${m}</option>`).join('')}
+                        </select>
+                    </div>
+
+                    <!-- Tarjetas resumen -->
+                    <div id="recruiterSummaryCards" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;"></div>
+
+                    <!-- Tabla de vacantes -->
+                    <div id="recruiterVacantesTable"></div>
+                `;
+
+                updateRecruiterMetrics();
+            }
+
+            window.updateRecruiterMetrics = function() {
+                const month = document.getElementById('recruiterMonthFilter')?.value || currentMonthKey;
+                const myLogs = Object.values(clickLogs).filter(l =>
+                    l && l.timestamp && l.timestamp.substring(0,7) === month
+                );
+
+                const totalClics = myLogs.length;
+
+                // Agrupar por vacante
+                const byJob = {};
+                myLogs.forEach(l => {
+                    if (!l.jobId) return;
+                    if (!byJob[l.jobId]) byJob[l.jobId] = 0;
+                    byJob[l.jobId]++;
+                });
+
+                // Top vacante
+                let topJob = '—';
+                let topCount = 0;
+                Object.entries(byJob).forEach(([id, count]) => {
+                    if (count > topCount) {
+                        topCount = count;
+                        topJob = jobs[id] ? jobs[id].title : id;
+                    }
+                });
+
+                // Renderizar tarjetas
+                const cards = document.getElementById('recruiterSummaryCards');
+                if (cards) {
+                    cards.innerHTML = `
+                        <div style="flex:1; min-width:120px; background:#e8f5e9; border-radius:10px; padding:14px; text-align:center;">
+                            <div style="font-size:28px; font-weight:800; color:#2e7d32;">${totalClics}</div>
+                            <div style="font-size:12px; color:#555; margin-top:4px;">Clics este mes</div>
+                        </div>
+                        <div style="flex:2; min-width:180px; background:#e3f2fd; border-radius:10px; padding:14px; text-align:center;">
+                            <div style="font-size:13px; font-weight:700; color:#1565c0;">🏆 Vacante más solicitada</div>
+                            <div style="font-size:13px; color:#333; margin-top:6px;">${topJob}</div>
+                            <div style="font-size:11px; color:#888;">${topCount > 0 ? topCount + ' clics' : 'Sin datos'}</div>
+                        </div>
+                    `;
+                }
+
+                // Renderizar tabla por vacante
+                const table = document.getElementById('recruiterVacantesTable');
+                if (table) {
+                    const rows = Object.entries(byJob)
+                        .sort(([,a],[,b]) => b - a)
+                        .map(([id, count]) => {
+                            const j = jobs[id] || {};
+                            return `<tr>
+                                <td style="padding:8px; border-bottom:1px solid #eee;">${j.title || id}</td>
+                                <td style="padding:8px; border-bottom:1px solid #eee; color:#666;">${j.company || '—'}</td>
+                                <td style="padding:8px; border-bottom:1px solid #eee; text-align:center; font-weight:700; color:#1a73e8;">${count}</td>
+                            </tr>`;
+                        }).join('');
+
+                    table.innerHTML = rows.length > 0 ? `
+                        <p style="font-size:13px; font-weight:600; color:#333; margin-bottom:8px;">📋 Clics por vacante:</p>
+                        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                            <thead>
+                                <tr style="background:#f5f5f5;">
+                                    <th style="padding:8px; text-align:left;">Vacante</th>
+                                    <th style="padding:8px; text-align:left;">Empresa</th>
+                                    <th style="padding:8px; text-align:center;">Clics</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    ` : '<p style="text-align:center; color:#aaa; padding:20px;">Sin actividad en este mes.</p>';
+                }
             }
             
             // --- PANEL DE MÉTRICAS PRO: Orgánico vs Reclutadores ---
@@ -307,6 +421,14 @@
                 `;
             }
             window.closeMetricsModal = function() { document.getElementById('metricsModal').classList.remove('active'); }
+
+            // Ocultar pestaña GA4 en modo reclutador
+            function setupMetricsTabs() {
+                const tabGA4 = document.getElementById('tabGA4');
+                if (tabGA4) {
+                    tabGA4.style.display = (isRecruiterMode) ? 'none' : 'inline-block';
+                }
+            }
 
             window.switchMetricsTab = function(tab) {
                 const firebase = document.getElementById('panelFirebase');
