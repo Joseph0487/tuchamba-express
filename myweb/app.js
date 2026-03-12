@@ -832,7 +832,18 @@
 
                 // 2. Las estadísticas las cargamos por separado para que no estorben al renderizado
                 onValue(ref(db, 'jobStats'), (s) => { jobStats = s.val() || {}; });
-                onValue(ref(db, 'clickLogs'), (s) => { clickLogs = s.val() || {}; });
+                onValue(ref(db, 'clickLogs'), (s) => {
+                    const allLogs = s.val() || {};
+                    // FILTRO DE PRIVACIDAD: Reclutadores solo ven SUS propios logs
+                    if (isRecruiterMode && activeRecruiter) {
+                        const myName = activeRecruiter.name;
+                        clickLogs = Object.fromEntries(
+                            Object.entries(allLogs).filter(([k, v]) => v && v.recruiter === myName)
+                        );
+                    } else {
+                        clickLogs = allLogs;
+                    }
+                });
                 onValue(ref(db, 'settings/centralPhone'), (s) => { 
                 centralPhone = s.val() || '';
                 updateBanner();
@@ -845,7 +856,17 @@
                 // Esto corre "por detrás" mientras el usuario ya está viendo vacantes
                 setTimeout(() => {
                     onValue(ref(db, 'jobStats'), (s) => { jobStats = s.val() || {}; });
-                    onValue(ref(db, 'clickLogs'), (s) => { clickLogs = s.val() || {}; });
+                    onValue(ref(db, 'clickLogs'), (s) => {
+                        const allLogs = s.val() || {};
+                        if (isRecruiterMode && activeRecruiter) {
+                            const myName = activeRecruiter.name;
+                            clickLogs = Object.fromEntries(
+                                Object.entries(allLogs).filter(([k, v]) => v && v.recruiter === myName)
+                            );
+                        } else {
+                            clickLogs = allLogs;
+                        }
+                    });
                     
                     onValue(ref(db, 'settings/centralPhone'), (s) => { 
                         centralPhone = s.val() || '';
