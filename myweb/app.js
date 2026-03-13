@@ -1842,7 +1842,7 @@
 
                     let matchSearch = true;
                     if(searchText) {
-                        const fullText = normalizeText(`${j.title} ${j.company} ${j.description}`);
+                        const fullText = normalizeText(`${j.title} ${j.company} ${j.description} ${j.city} ${j.state} ${j.zone} ${j.salary} ${j.schedule} ${j.agency}`);
                         matchSearch = fullText.includes(searchText);
                     }
 
@@ -2012,7 +2012,7 @@
                     if (!isAdmin && j.status === 'No Vigente') return false;
                     
                     if (!searchText) return true;
-                    const fullText = normalizeText(`${j.title} ${j.company} ${j.tags} ${j.description}`);
+                    const fullText = normalizeText(`${j.title} ${j.company} ${j.description} ${j.city} ${j.state} ${j.zone} ${j.salary} ${j.schedule} ${j.agency}`);
                     return fullText.includes(searchText);
                 });
 
