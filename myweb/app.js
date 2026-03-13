@@ -624,6 +624,7 @@
             function deleteAllJobs() {
                 remove(ref(db, 'jobs')).then(() => {
                     window.showToast("🔥 Todas las vacantes eliminadas");
+                    autoSyncSitemap(); // Actualiza sitemap en GitHub automáticamente
                 });
             }
 
@@ -1611,10 +1612,17 @@
                 set(ref(db, 'jobs/' + id), jobData).then(() => {
                     window.showToast("✅ Vacante guardada");
                     window.closeFormModal();
+                    autoSyncSitemap(); // Actualiza sitemap en GitHub automáticamente
                 });
             }
 
-            window.deleteJob = function(id) { if(confirm('¿Borrar vacante?')) remove(ref(db, 'jobs/' + id)); }
+            window.deleteJob = function(id) { 
+                if(confirm('¿Borrar vacante?')) {
+                    remove(ref(db, 'jobs/' + id)).then(() => {
+                        autoSyncSitemap(); // Actualiza sitemap en GitHub automáticamente
+                    });
+                }
+            }
 
             function normalizeText(text) { return text ? text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : ""; }
 
@@ -2423,6 +2431,7 @@
                             });
 
                             window.showToast(`✅ ${count} vacantes cargadas con éxito`);
+                            autoSyncSitemap(); // Actualiza sitemap en GitHub automáticamente
                         } catch(err) { 
                             console.error(err);
                             alert('❌ Error al procesar los datos del archivo.'); 
@@ -2561,22 +2570,15 @@
                 return putRes.ok;
             }
 
-            window.downloadSitemap = async function() {
+            // Genera el XML del sitemap con las vacantes vigentes actuales
+            function generateSitemapXML() {
                 let xmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n';
                 xmlContent += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
-
-                // 1. URL Principal (Home)
                 xmlContent += '  <url>\n    <loc>https://tuchamba-express.vercel.app/</loc>\n    <priority>1.0</priority>\n  </url>\n';
-
-                // 2. Generar URLs de vacantes VIGENTES
                 Object.keys(jobs).forEach(id => {
                     const j = jobs[id];
-                    
-                    // FILTRO CRÍTICO: Solo incluimos las que NO están marcadas como "No Vigente"
                     if (j.status !== 'No Vigente') {
-                        let isoDate = new Date().toISOString().split('T')[0]; // Fecha de hoy por defecto
-
-                        // Conversión de fecha DD/MM/YYYY a formato XML (YYYY-MM-DD)
+                        let isoDate = new Date().toISOString().split('T')[0];
                         if (j.fecha && j.fecha.includes('/')) {
                             const parts = j.fecha.split('/');
                             if (parts.length === 3) {
@@ -2584,10 +2586,7 @@
                                 isoDate = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
                             }
                         }
-
-                        // Escapamos el carácter '&' para que el XML sea válido
                         const urlLimpia = `https://tuchamba-express.vercel.app/?id=${id}`.replace(/&/g, '&amp;');
-                        
                         xmlContent += '  <url>\n';
                         xmlContent += `    <loc>${urlLimpia}</loc>\n`;
                         xmlContent += `    <lastmod>${isoDate}</lastmod>\n`;
@@ -2596,8 +2595,23 @@
                         xmlContent += '  </url>\n';
                     }
                 });
-
                 xmlContent += '</urlset>';
+                return xmlContent;
+            }
+
+            // Sube el sitemap a GitHub silenciosamente (sin descarga local)
+            async function autoSyncSitemap() {
+                try {
+                    const xml = generateSitemapXML();
+                    const success = await pushSitemapToGitHub(xml);
+                    if (success) window.showToast('🗺️ Sitemap actualizado en Google');
+                } catch(e) {
+                    // Falla silenciosa — no interrumpir el flujo del admin
+                }
+            }
+
+            window.downloadSitemap = async function() {
+                const xmlContent = generateSitemapXML();
 
                 // 1. Descarga local del archivo
                 const blob = new Blob([xmlContent], { type: 'application/xml' });
