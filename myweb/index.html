@@ -1,462 +1,1661 @@
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-    <meta charset="UTF-8">
-    <link rel="canonical" id="canonicalLink" href="https://tuchamba-express.vercel.app/">    
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-N2SW9MJGYG"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0f0720">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>DibujaConmigo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0f0720;--pink:#FF5FA3;--purple:#9333EA;--blue:#3B82F6;
+  --cyan:#06B6D4;--green:#10B981;--yellow:#F59E0B;--orange:#F97316;--red:#EF4444;
+  --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;width:100%;overflow:hidden;font-family:'Nunito',sans-serif;
+  background:var(--bg);color:#fff;user-select:none;touch-action:manipulation}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;
+  opacity:0;pointer-events:none;transition:opacity .22s ease;z-index:1}
+.screen.active{opacity:1;pointer-events:all;z-index:10}
 
-      gtag('config', 'G-N2SW9MJGYG');
-    </script>
+/* ── SPLASH ── */
+#s-splash{align-items:center;justify-content:center;gap:14px;
+  background:radial-gradient(ellipse at 40% 40%,#3b0e6e,#0f0720 65%)}
+.spl-icon{font-size:72px;animation:spl-pop .6s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes spl-pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+.spl-title{font-family:'Fredoka One',cursive;font-size:42px;text-align:center;
+  background:linear-gradient(135deg,#FF5FA3 0%,#9333EA 50%,#3B82F6 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 4px 20px rgba(147,51,234,.5));
+  animation:spl-pop .6s .15s cubic-bezier(.34,1.56,.64,1) both}
+.spl-sub{color:rgba(255,255,255,.35);font-size:12px;font-weight:800;
+  letter-spacing:3px;text-transform:uppercase;
+  animation:spl-pop .4s .35s ease both}
+.spl-loader{width:48px;height:4px;border-radius:2px;background:rgba(255,255,255,.1);
+  overflow:hidden;margin-top:8px;animation:spl-pop .4s .4s ease both}
+.spl-loader-bar{height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));
+  animation:spl-bar 1.2s .5s ease forwards}
+@keyframes spl-bar{from{width:0}to{width:100%}}
 
-        <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.gstatic.com https://images.unsplash.com;
-        script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://html2canvas.hertzen.com https://*.gstatic.com https://cdn.sheetjs.com https://*.googleapis.com https://*.firebaseio.com https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com;
-        connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.gstatic.com https://www.google-analytics.com https://analytics.google.com https://www.google.com https://recaptchaenterprise.googleapis.com https://firebaseappcheck.googleapis.com https://api.github.com;
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
-        font-src 'self' https://fonts.gstatic.com;
-        img-src 'self' data: https://*.gstatic.com https://www.google-analytics.com https://images.unsplash.com;
-        frame-src https://www.google.com https://lookerstudio.google.com;
-        ">
+/* ── HOME ── */
+#s-home{
+  background:radial-gradient(ellipse at 20% 10%,rgba(147,51,234,.35) 0%,transparent 55%),
+             radial-gradient(ellipse at 80% 90%,rgba(59,130,246,.2) 0%,transparent 55%),
+             var(--bg)}
+.home-header{padding:calc(var(--st) + 24px) 24px 10px;text-align:center}
+.home-logo{font-family:'Fredoka One',cursive;font-size:32px;
+  background:linear-gradient(135deg,#FF5FA3,#9333EA,#3B82F6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.home-sub{color:rgba(255,255,255,.35);font-size:11px;font-weight:800;
+  letter-spacing:2.5px;text-transform:uppercase;margin-top:2px}
+.home-modes{flex:1;display:flex;flex-direction:column;gap:14px;
+  padding:12px 20px calc(var(--sb) + 20px);justify-content:center}
+.mode-card{border-radius:28px;cursor:pointer;transition:transform .18s;
+  position:relative;overflow:hidden;flex:1;max-height:200px;
+  border:1.5px solid rgba(255,255,255,.1)}
+.mode-card:active{transform:scale(.97)}
+.mc-inner{position:absolute;inset:0;display:flex;align-items:center;padding:24px 24px;gap:18px}
+.mc-calcar{background:linear-gradient(135deg,#0f2460 0%,#1e0d5e 50%,#2a1070 100%);
+  box-shadow:0 16px 48px rgba(59,130,246,.22)}
+.mc-colorear{background:linear-gradient(135deg,#3d0f00 0%,#5c1800 40%,#7a2800 100%);
+  box-shadow:0 16px 48px rgba(249,115,22,.22)}
+.mc-badge{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.1);
+  color:rgba(255,255,255,.55);font-size:10px;font-weight:800;letter-spacing:1.5px;
+  text-transform:uppercase;padding:4px 10px;border-radius:20px}
+.mc-art{font-size:68px;flex-shrink:0;filter:drop-shadow(0 6px 20px rgba(0,0,0,.5));
+  animation:flt 3s ease-in-out infinite}
+.mc-calcar .mc-art{animation-delay:-1.2s}
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.mc-title{font-family:'Fredoka One',cursive;font-size:26px;line-height:1;color:#fff}
+.mc-desc{font-size:13px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.45;font-weight:600}
+.mc-age{display:inline-flex;align-items:center;gap:5px;margin-top:10px;
+  background:rgba(255,255,255,.1);padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:800;color:rgba(255,255,255,.6)}
 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        
-        <title>Empleos Urgentes en CDMX, Nuevo León y EdoMex 2026 | TuChamba Express - Sin Experiencia, Contratación Inmediata</title>
-        
-        <link rel="icon" href="favicon.png" type="image/png">
+/* ── HEADER ── */
+.app-header{display:flex;align-items:center;gap:10px;
+  padding:calc(var(--st) + 13px) 14px 13px;flex-shrink:0;z-index:100;position:relative}
+.ah-calcar{background:rgba(9,18,56,.88);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(59,130,246,.18)}
+.ah-color{background:#fff3e0;border-bottom:2px solid #ffd0a0}
+.ah-dark{background:rgba(0,0,0,.55);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.08)}
+.btn-back{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.1);color:#fff;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:background .12s;font-family:inherit}
+.btn-back:active{background:rgba(255,255,255,.25)}
+.btn-back.dark-theme{border-color:rgba(124,45,0,.2);background:rgba(124,45,0,.1);color:#7c2d00}
+.hdr-title{font-family:'Fredoka One',cursive;font-size:20px;flex:1}
+.hdr-title.dark-theme{color:#7c2d00}
+.hdr-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.55);font-size:10px;font-weight:800;padding:4px 10px;
+  border-radius:20px;letter-spacing:.5px;white-space:nowrap}
 
-        <meta name="description" content="Encuentra vacantes urgentes en CDMX, Nuevo León, EdoMex y más. Empleos sin experiencia, contratación inmediata por WhatsApp. ¡Postúlate hoy mismo!">
+/* ── SOURCE ── */
+#s-source{background:radial-gradient(ellipse at 50% 0%,rgba(147,51,234,.25) 0%,transparent 55%),var(--bg)}
+.src-list{flex:1;display:flex;flex-direction:column;
+  padding:14px 18px calc(var(--sb) + 18px);gap:12px;justify-content:center}
+.src-card{border-radius:22px;padding:20px 18px;cursor:pointer;
+  display:flex;align-items:center;gap:16px;transition:transform .14s;
+  border:1.5px solid rgba(255,255,255,.1)}
+.src-card:active{transform:scale(.97)}
+.sc-pre{background:linear-gradient(135deg,rgba(147,51,234,.28),rgba(59,130,246,.18))}
+.sc-cam{background:linear-gradient(135deg,rgba(249,115,22,.28),rgba(239,68,68,.18))}
+.sc-gal{background:linear-gradient(135deg,rgba(16,185,129,.28),rgba(6,182,212,.18))}
+.src-ico{font-size:44px;flex-shrink:0}
+.src-title{font-family:'Fredoka One',cursive;font-size:21px;color:#fff}
+.src-desc{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px;font-weight:600;line-height:1.4}
 
-        <meta name="keywords" content="bolsa de trabajo nuevo leon, vacantes cdmx, empleos estado de mexico, trabajo queretaro, vacantes jalisco, chamba tamaulipas, empleos hidalgo, contratación inmediata, trabajo sin experiencia, tuchamba express">
+/* ── GALLERY ── */
+#s-gallery{background:var(--bg)}
+.gal-grid{flex:1;overflow-y:auto;padding:12px;display:grid;
+  grid-template-columns:repeat(2,1fr);gap:11px;align-content:start;
+  -webkit-overflow-scrolling:touch}
+.gal-grid::-webkit-scrollbar{display:none}
+.gal-item{border-radius:18px;overflow:hidden;cursor:pointer;position:relative;
+  background:#fff;aspect-ratio:1;transition:transform .14s;
+  box-shadow:0 4px 16px rgba(0,0,0,.35);border:2px solid rgba(255,255,255,.06)}
+.gal-item:active{transform:scale(.95)}
+.gal-item img{width:100%;height:100%;object-fit:contain;padding:8px;display:block}
+.gal-lbl{position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.65));
+  color:#fff;font-size:13px;font-weight:800;text-align:center;padding:18px 8px 8px}
 
-         <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "EmploymentAgency",
-      "name": "TuChamba Express",
-      "url": "https://tuchamba-express.vercel.app/",
-      "logo": "https://tuchamba-express.vercel.app/favicon.png",
-      "description": "Plataforma de vinculación laboral rápida en México. Vacantes operativas y administrativas con contratación inmediata.",
-      "areaServed": [
-        { "@type": "AdministrativeArea", "name": "Nuevo León" },
-        { "@type": "AdministrativeArea", "name": "Estado de México" },
-        { "@type": "City", "name": "Ciudad de México" },
-        { "@type": "AdministrativeArea", "name": "Querétaro" },
-        { "@type": "AdministrativeArea", "name": "Jalisco" },
-        { "@type": "AdministrativeArea", "name": "Tamaulipas" },
-        { "@type": "AdministrativeArea", "name": "Hidalgo" }
-      ],
-      "sameAs": [
-        "https://www.facebook.com/tuchambaexpress" 
-      ]
+/* ── AR ── */
+#s-ar{background:#000}
+#ar-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#ar-img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  object-fit:contain;pointer-events:none;transition:opacity .08s}
+.ar-tip{position:absolute;top:calc(var(--st) + 66px);left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.55);color:rgba(255,255,255,.8);font-size:12px;font-weight:800;
+  padding:6px 16px;border-radius:20px;pointer-events:none;white-space:nowrap;
+  backdrop-filter:blur(8px);z-index:30}
+.ar-ctrls{position:absolute;bottom:0;left:0;right:0;z-index:30;
+  padding:14px 18px calc(var(--sb) + 14px);
+  background:linear-gradient(transparent,rgba(0,0,0,.88));display:flex;flex-direction:column;gap:12px}
+.ctrl-row{display:flex;align-items:center;gap:10px}
+.ctrl-lbl{color:rgba(255,255,255,.75);font-size:12px;font-weight:800;min-width:74px;white-space:nowrap}
+input[type=range]{flex:1;-webkit-appearance:none;height:5px;border-radius:3px;
+  background:rgba(255,255,255,.2);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;
+  border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.4);cursor:pointer}
+.ar-btns{display:flex;gap:10px}
+.ar-btn{flex:1;padding:14px;border:none;border-radius:16px;font-family:'Fredoka One',cursive;
+  font-size:16px;cursor:pointer;transition:transform .12s;display:flex;align-items:center;
+  justify-content:center;gap:6px;color:#fff}
+.ar-btn:active{transform:scale(.95)}
+.ar-flip{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.2)}
+.ar-snap{background:linear-gradient(135deg,#2563EB,#7C3AED);box-shadow:0 4px 16px rgba(37,99,235,.4)}
+
+/* ── COLOREAR ── */
+#s-color{background:#FFFBF5}
+.col-wrap{flex:1;position:relative;overflow:hidden;background:#fff;cursor:crosshair}
+#ref-canvas{position:absolute;inset:0;width:100%;height:100%}
+#paint-canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.col-bar{background:#fff;border-top:2px solid #ffd0a0;
+  padding:8px 12px calc(var(--sb) + 8px);display:flex;flex-direction:column;gap:9px;flex-shrink:0}
+.tool-row{display:flex;gap:7px;align-items:center}
+.t-chip{display:flex;align-items:center;gap:5px;padding:9px 16px;border-radius:24px;
+  border:2px solid #E5E7EB;background:#fff;font-family:'Fredoka One',cursive;
+  font-size:15px;color:#374151;cursor:pointer;transition:all .14s;white-space:nowrap}
+.t-chip:active{transform:scale(.95)}
+.t-chip.on{background:var(--orange);border-color:var(--orange);color:#fff;
+  box-shadow:0 4px 12px rgba(249,115,22,.35)}
+.t-ico{font-size:17px}
+.sz-wrap{display:flex;gap:5px;margin-left:auto;align-items:center}
+.sz-b{width:36px;height:36px;border-radius:50%;border:2px solid #E5E7EB;background:#fff;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .14s}
+.sz-b:active{transform:scale(.9)}
+.sz-b.on{background:var(--orange);border-color:var(--orange)}
+.sz-dot{border-radius:50%;background:#374151;pointer-events:none}
+.sz-b.on .sz-dot{background:#fff}
+.pal-row{display:flex;gap:6px;align-items:center;overflow-x:auto;padding-bottom:2px}
+.pal-row::-webkit-scrollbar{display:none}
+.c-btn{width:38px;height:38px;border-radius:50%;border:3px solid transparent;
+  cursor:pointer;flex-shrink:0;transition:all .14s;outline:none;position:relative}
+.c-btn::after{content:'';position:absolute;inset:-5px;border-radius:50%;
+  border:3px solid transparent;transition:border-color .14s;pointer-events:none}
+.c-btn.on::after{border-color:#1F2937}
+.c-btn:active{transform:scale(1.1)}
+.act-row{display:flex;gap:7px;align-items:center}
+.a-btn{padding:9px 16px;border-radius:20px;border:none;font-family:'Fredoka One',cursive;
+  font-size:15px;cursor:pointer;transition:all .14s;display:flex;align-items:center;gap:4px}
+.a-btn:active{transform:scale(.95)}
+.a-undo{background:#F3F4F6;color:#374151}
+.a-clear{background:#FEE2E2;color:#991B1B}
+.a-save{background:linear-gradient(135deg,var(--orange),var(--red));color:#fff;
+  margin-left:auto;box-shadow:0 4px 12px rgba(249,115,22,.3)}
+
+
+/* ── MIS IMÁGENES guardadas ── */
+.gal-section{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin-top:4px}
+.gal-section-title{font-family:'Fredoka One',cursive;font-size:14px;
+  color:rgba(255,255,255,.5);letter-spacing:.5px;white-space:nowrap}
+.gal-section-line{flex:1;height:1px;background:rgba(255,255,255,.1)}
+.gal-item-saved{position:relative}
+.gal-del{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;
+  background:rgba(239,68,68,.85);border:none;color:#fff;font-size:13px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.4);z-index:5;backdrop-filter:blur(4px)}
+.gal-del:active{transform:scale(.9)}
+.gal-empty{grid-column:1/-1;text-align:center;padding:20px;
+  color:rgba(255,255,255,.25);font-size:13px;font-weight:700}
+
+
+/* ══ COLOREAR — layout completo ══ */
+#s-color {
+  background: #f0f9ff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Header */
+.ch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: calc(var(--st) + 10px) 10px 10px;
+  background: linear-gradient(135deg, #FFFDE7, #FFF8E1);
+  border-bottom: 2.5px solid #FFD54F;
+  flex-shrink: 0;
+  z-index: 20;
+}
+.ch-btn {
+  width: 42px; height: 42px;
+  border-radius: 50%; border: none;
+  background: #fff;
+  cursor: pointer; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  transition: transform .12s; flex-shrink: 0;
+}
+.ch-btn:active { transform: scale(.88); }
+.ch-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 17px; color: #7c2d00;
+  flex: 1; text-align: center;
+}
+.ch-prog { background: linear-gradient(135deg,#7C3AED,#9333EA) !important; color:#fff !important; }
+.ch-save { background: linear-gradient(135deg,#F97316,#EF4444) !important; color:#fff !important; }
+
+/* Cuerpo principal: paleta + área de dibujo */
+.cb {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  min-width: 0;
+}
+@media (orientation: landscape) {
+  .cb { flex-direction: row; }
+}
+
+/* Área de canvas + carrusel */
+.ca {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Canvas wrapper */
+.cw {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  min-height: 0;
+  min-width: 0;
+}
+#ref-canvas, #paint-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+}
+#paint-canvas { touch-action: none; cursor: crosshair; }
+
+/* Carrusel de imágenes */
+.cc {
+  display: flex;
+  gap: 8px;
+  padding: 7px 10px;
+  background: #dbeafe;
+  overflow-x: auto;
+  flex-shrink: 0;
+  align-items: center;
+  border-top: 1.5px solid #bfdbfe;
+  height: 66px;
+}
+.cc::-webkit-scrollbar { display: none; }
+.cc-item {
+  height: 50px; width: 50px; min-width: 50px;
+  border-radius: 12px;
+  border: 3px solid transparent;
+  background: #fff;
+  cursor: pointer; overflow: hidden;
+  transition: all .15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  flex-shrink: 0;
+}
+.cc-item.on {
+  border-color: #F97316;
+  transform: scale(1.12);
+  box-shadow: 0 4px 14px rgba(249,115,22,.4);
+}
+.cc-item:active { transform: scale(.92); }
+.cc-item img { width:100%; height:100%; object-fit:contain; padding:4px; display:block; }
+.cc-add {
+  height: 50px; width: 50px; min-width: 50px;
+  border-radius: 12px;
+  border: 3px dashed rgba(0,0,0,.18);
+  background: rgba(255,255,255,.8);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+  transition: all .15s;
+}
+.cc-add:active { transform: scale(.9); }
+
+/* Panel de paleta — portrait: franja horizontal abajo */
+.cp {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  background: #BFDBFE;
+  border-top: 2px solid #93C5FD;
+  padding: 8px 8px;
+  gap: 8px;
+  align-items: center;
+  overflow: visible;  /* para que outline de swatches no se recorte */
+}
+
+/* landscape: columna a la izquierda */
+@media (orientation: landscape) {
+  .cp {
+    flex-direction: column;
+    width: 62px;
+    border-top: none;
+    border-right: 2px solid #93C5FD;
+    padding: 8px 4px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    height: auto;
+  }
+}
+.cp::-webkit-scrollbar { display: none; }
+
+/* Grupo de herramientas */
+.cp-tools {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  flex-shrink: 0;
+  align-items: center;
+}
+@media (orientation: landscape) {
+  .cp-tools { flex-direction: column; }
+}
+
+/* Botones de herramienta */
+.cp-t {
+  width: 38px; height: 38px;
+  border-radius: 50%; border: 2.5px solid transparent;
+  background: #fff; cursor: pointer; font-size: 17px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .14s; flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,.12);
+}
+.cp-t:active { transform: scale(.88); }
+.cp-t.on { background: #F97316; border-color: #EA580C; }
+
+/* Separador entre herramientas y tamaños */
+.cp-sep {
+  width: 1.5px; height: 28px; background: rgba(0,0,0,.15);
+  flex-shrink: 0;
+}
+@media (orientation: landscape) {
+  .cp-sep { width: 28px; height: 1.5px; }
+}
+
+/* Botones de tamaño */
+.cp-sz {
+  width: 32px; height: 32px;
+  border-radius: 50%; border: 2px solid rgba(0,0,0,.15);
+  background: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .14s; flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+}
+.cp-sz:active { transform: scale(.88); }
+.cp-sz.on { background: #F97316; border-color: #EA580C; }
+.cp-sz-dot { border-radius: 50%; background: #374151; pointer-events: none; }
+.cp-sz.on .cp-sz-dot { background: #fff; }
+
+/* Separador 2 */
+.cp-sep2 { width:1.5px; height:28px; background:rgba(0,0,0,.15); flex-shrink:0; }
+@media(orientation:landscape){ .cp-sep2{ width:28px; height:1.5px; } }
+
+/* Colores — desplazable */
+.cp-colors {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: visible;  /* para que el outline no se recorte */
+  align-items: center;
+  padding: 6px 6px;
+  min-width: 0;
+}
+@media (orientation: landscape) {
+  .cp-colors {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    flex: 1;
+    width: 100%;
+    align-items: center;
+    padding: 6px 4px;   /* espacio para outline */
+    min-width: unset;
+  }
+}
+.cp-colors::-webkit-scrollbar { display: none; }
+
+/* Swatches de color */
+.c-sw {
+  width: 30px; height: 30px; min-width: 30px; min-height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer; flex-shrink: 0;
+  transition: all .15s;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  outline: 3px solid transparent;
+  outline-offset: 2px;
+}
+.c-sw:active { transform: scale(1.1); }
+.c-sw.on {
+  outline-color: #1F2937;
+  box-shadow: 0 2px 10px rgba(0,0,0,.3);
+}
+
+/* ── AR: imagen libre y arrastrable ── */
+#ar-img {
+  position: absolute;
+  pointer-events: none;
+  max-width: none; max-height: none;
+  transition: opacity .08s;
+  transform-origin: center center;
+  will-change: left, top;
+}
+#ar-drag-layer {
+  position: absolute; inset: 0;
+  z-index: 20; cursor: grab;
+  touch-action: none;
+}
+#ar-drag-layer:active { cursor: grabbing; }
+
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:calc(var(--sb) + 28px);left:50%;
+  transform:translateX(-50%) translateY(16px);background:rgba(0,0,0,.85);
+  color:#fff;padding:11px 22px;border-radius:28px;font-size:14px;font-weight:800;
+  z-index:9999;pointer-events:none;opacity:0;transition:all .28s;white-space:nowrap;
+  backdrop-filter:blur(14px)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="s-splash" class="screen active">
+  <div class="spl-icon">🎨</div>
+  <div class="spl-title">DibujaConmigo</div>
+  <div class="spl-sub">Tu app creativa</div>
+  <div class="spl-loader"><div class="spl-loader-bar"></div></div>
+</div>
+
+<!-- HOME -->
+<div id="s-home" class="screen">
+  <div class="home-header">
+    <div class="home-logo">🎨 DibujaConmigo</div>
+    <div class="home-sub">Elige tu modo de juego</div>
+  </div>
+  <div class="home-modes">
+    <div class="mode-card mc-calcar" onclick="openMode('calcar')">
+      <div class="mc-inner">
+        <div class="mc-art">📷</div>
+        <div>
+          <div class="mc-title">Modo Calcar</div>
+          <div class="mc-desc">Pon el celular sobre el papel y calca la imagen con la cámara</div>
+          <div class="mc-age">✏️ Para aprender a dibujar</div>
+        </div>
+      </div>
+      <div class="mc-badge">AR Drawing</div>
+    </div>
+    <div class="mode-card mc-colorear" onclick="openMode('colorear')">
+      <div class="mc-inner">
+        <div class="mc-art">🖍️</div>
+        <div>
+          <div class="mc-title">Modo Colorear</div>
+          <div class="mc-desc">Colorea dibujos en la pantalla con pinceles y el balde de pintura</div>
+          <div class="mc-age">🌈 Para colorear y pintar</div>
+        </div>
+      </div>
+      <div class="mc-badge">Coloring Book</div>
+    </div>
+  </div>
+</div>
+
+<!-- SOURCE SELECT -->
+<div id="s-source" class="screen">
+  <div class="app-header ah-dark">
+    <button class="btn-back" onclick="nav('s-home')">←</button>
+    <div class="hdr-title" id="src-title">¿Qué imagen usar?</div>
+  </div>
+  <div class="src-list">
+    <div class="src-card sc-pre" onclick="nav('s-gallery')">
+      <div class="src-ico">🎨</div>
+      <div><div class="src-title">Dibujos incluidos</div>
+        <div class="src-desc">Elige entre los dibujos ya listos para colorear o calcar</div></div>
+    </div>
+    <div class="src-card sc-cam" onclick="openCamera()">
+      <div class="src-ico">📷</div>
+      <div><div class="src-title">Tomar una foto</div>
+        <div class="src-desc">Abre la cámara ahora mismo para fotografiar algo</div></div>
+    </div>
+    <div class="src-card sc-gal" onclick="openGallery()">
+      <div class="src-ico">🗃️</div>
+      <div><div class="src-title">Elegir de mi galería</div>
+        <div class="src-desc">Busca una foto que ya tienes guardada en el teléfono</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY -->
+<div id="s-gallery" class="screen">
+  <div class="app-header ah-dark">
+    <button class="btn-back" onclick="nav('s-source')">←</button>
+    <div class="hdr-title" id="gal-title">Elige un dibujo</div>
+  </div>
+  <div class="gal-grid" id="gal-grid"></div>
+</div>
+
+<!-- AR CALCAR -->
+<div id="s-ar" class="screen">
+  <div class="app-header ah-calcar" style="position:absolute;top:0;left:0;right:0;z-index:40">
+    <button class="btn-back" onclick="stopAR()">←</button>
+    <div class="hdr-title">📷 Modo Calcar</div>
+    <div class="hdr-pill">AR Drawing</div>
+  </div>
+  <video id="ar-video" autoplay playsinline muted></video>
+  <img id="ar-img" src="" alt="">
+  <div id="ar-drag-layer"></div>
+  <div class="ar-tip">Apunta al papel y calca el dibujo ✏️</div>
+  <div class="ar-ctrls">
+    <div class="ctrl-row">
+      <span class="ctrl-lbl">🌫️ Opacidad</span>
+      <input type="range" id="ar-op" min="5" max="90" value="40" oninput="arUpdate()">
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-lbl">🔍 Tamaño</span>
+      <input type="range" id="ar-sz" min="25" max="250" value="65" oninput="arUpdate()">
+    </div>
+    <div class="ar-btns">
+      <button class="ar-btn ar-flip" onclick="flipCam()">🔄 Voltear</button>
+      <button class="ar-btn ar-snap" onclick="arSnap()">📸 Capturar</button>
+    </div>
+  </div>
+</div>
+
+<!-- COLOREAR -->
+<div id="s-color" class="screen">
+  <!-- Header compacto -->
+  <div class="ch">
+    <button class="ch-btn" onclick="stopColor()" title="Inicio">🏠</button>
+    <button class="ch-btn" onclick="undo()" title="Deshacer">↩️</button>
+    <button class="ch-btn" onclick="clearPaint()" title="Limpiar">🗑️</button>
+    <div class="ch-title">🖍️ Colorear</div>
+    <button class="ch-btn ch-prog" onclick="saveProgress()" title="Guardar avance">🔖</button>
+    <button class="ch-btn ch-save" onclick="savePaint()" title="Exportar imagen">📥</button>
+  </div>
+  <!-- Body: paleta + canvas -->
+  <div class="cb">
+    <!-- Panel de paleta (izquierda en landscape, abajo en portrait) -->
+    <div class="cp">
+      <div class="cp-tools" id="cp-tools"></div>
+      <div class="cp-colors" id="cp-colors"></div>
+    </div>
+    <!-- Área de canvas + carrusel -->
+    <div class="ca">
+      <div class="cw">
+        <canvas id="ref-canvas"></canvas>
+        <canvas id="paint-canvas"></canvas>
+      </div>
+      <!-- Carrusel de imágenes -->
+      <div class="cc" id="cc"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<input type="file" id="fi-gal" accept="image/*" style="display:none" onchange="loadFile(event)">
+<input type="file" id="fi-cam" accept="image/*" capture="environment" style="display:none" onchange="loadFile(event)">
+
+<script>
+// ══════════════════════════════════════════
+// IMÁGENES — COLOREAR (4 años)
+// ══════════════════════════════════════════
+const IMGS_COLOR = [
+  { name:'🐬 Delfín', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+    <ellipse cx="150" cy="155" rx="75" ry="105" fill="white" stroke="#222" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M150 60 Q160 90 155 130 Q150 145 145 130 Q140 90 150 60Z" fill="white" stroke="#222" stroke-width="3"/>
+    <ellipse cx="150" cy="165" rx="42" ry="70" fill="white" stroke="#aaa" stroke-width="2"/>
+    <path d="M75 180 Q50 160 30 190 Q55 185 75 200 Z" fill="white" stroke="#222" stroke-width="3.5"/>
+    <path d="M225 180 Q250 160 270 190 Q245 185 225 200 Z" fill="white" stroke="#222" stroke-width="3.5"/>
+    <path d="M115 255 Q110 275 100 285 Q130 275 150 260 Q170 275 200 285 Q190 275 185 255" fill="white" stroke="#222" stroke-width="3.5"/>
+    <circle cx="128" cy="120" r="12" fill="white" stroke="#222" stroke-width="3"/>
+    <circle cx="130" cy="118" r="5" fill="#222"/>
+    <circle cx="172" cy="120" r="12" fill="white" stroke="#222" stroke-width="3"/>
+    <circle cx="174" cy="118" r="5" fill="#222"/>
+    <path d="M135 145 Q150 155 165 145" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+    <path d="M143 135 L148 138" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M157 135 L152 138" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+  </svg>`},
+  { name:'🐱 Gatito', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+    <ellipse cx="150" cy="210" rx="80" ry="65" fill="white" stroke="#222" stroke-width="4"/>
+    <circle cx="150" cy="120" r="72" fill="white" stroke="#222" stroke-width="4"/>
+    <polygon points="80,70 55,25 110,55" fill="white" stroke="#222" stroke-width="4" stroke-linejoin="round"/>
+    <polygon points="220,70 245,25 190,55" fill="white" stroke="#222" stroke-width="4" stroke-linejoin="round"/>
+    <polygon points="83,66 60,32 106,58" fill="white" stroke="#ffb3c1" stroke-width="2"/>
+    <polygon points="217,66 240,32 194,58" fill="white" stroke="#ffb3c1" stroke-width="2"/>
+    <circle cx="122" cy="113" r="15" fill="white" stroke="#222" stroke-width="3"/>
+    <circle cx="124" cy="112" r="6" fill="#222"/>
+    <circle cx="178" cy="113" r="15" fill="white" stroke="#222" stroke-width="3"/>
+    <circle cx="180" cy="112" r="6" fill="#222"/>
+    <ellipse cx="150" cy="140" rx="8" ry="7" fill="white" stroke="#222" stroke-width="2.5"/>
+    <path d="M143 148 Q150 155 157 148" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+    <line x1="90" y1="130" x2="55" y2="122" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="90" y1="140" x2="52" y2="140" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="90" y1="150" x2="55" y2="158" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="210" y1="130" x2="245" y2="122" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="210" y1="140" x2="248" y2="140" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="210" y1="150" x2="245" y2="158" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M220 230 Q255 220 265 190 Q248 210 228 215" fill="white" stroke="#222" stroke-width="3.5"/>
+  </svg>`},
+  { name:'🐶 Perrito', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+    <ellipse cx="150" cy="205" rx="78" ry="62" fill="white" stroke="#222" stroke-width="4"/>
+    <circle cx="150" cy="120" r="70" fill="white" stroke="#222" stroke-width="4"/>
+    <ellipse cx="93" cy="72" rx="28" ry="42" fill="white" stroke="#222" stroke-width="4" transform="rotate(-18 93 72)"/>
+    <ellipse cx="207" cy="72" rx="28" ry="42" fill="white" stroke="#222" stroke-width="4" transform="rotate(18 207 72)"/>
+    <circle cx="126" cy="112" r="14" fill="white" stroke="#222" stroke-width="3"/>
+    <circle cx="128" cy="111" r="6" fill="#222"/>
+    <circle cx="174" cy="112" r="14" fill="white" stroke="#222" stroke-width="3"/>
+    <circle cx="176" cy="111" r="6" fill="#222"/>
+    <ellipse cx="150" cy="145" rx="22" ry="16" fill="white" stroke="#222" stroke-width="3"/>
+    <ellipse cx="150" cy="150" rx="14" ry="10" fill="white" stroke="#222" stroke-width="2"/>
+    <circle cx="150" cy="133" r="6" fill="white" stroke="#222" stroke-width="2.5"/>
+    <line x1="128" y1="130" x2="128" y2="137" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+    <line x1="172" y1="130" x2="172" y2="137" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+    <path d="M225 240 Q260 228 268 200 Q248 222 228 225" fill="white" stroke="#222" stroke-width="3.5"/>
+  </svg>`},
+  { name:'🦕 Dinosaurio', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+    <ellipse cx="130" cy="195" rx="85" ry="62" fill="white" stroke="#222" stroke-width="4"/>
+    <circle cx="215" cy="105" r="58" fill="white" stroke="#222" stroke-width="4"/>
+    <path d="M170 90 Q185 50 210 42 Q200 65 185 80" fill="white" stroke="#222" stroke-width="3.5"/>
+    <path d="M177 82 Q192 42 217 35 Q207 60 192 74" fill="white" stroke="#222" stroke-width="3"/>
+    <path d="M162 120 Q162 148 130 158" fill="none" stroke="#222" stroke-width="3.5"/>
+    <path d="M70 135 L55 105 L82 122 Z" fill="white" stroke="#222" stroke-width="3"/>
+    <path d="M82 122 L65 92 L92 110 Z" fill="white" stroke="#222" stroke-width="3"/>
+    <line x1="78" y1="255" x2="70" y2="280" stroke="#222" stroke-width="5" stroke-linecap="round"/>
+    <line x1="108" y1="260" x2="103" y2="280" stroke="#222" stroke-width="5" stroke-linecap="round"/>
+    <line x1="152" y1="260" x2="152" y2="280" stroke="#222" stroke-width="5" stroke-linecap="round"/>
+    <line x1="178" y1="256" x2="183" y2="278" stroke="#222" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="230" cy="92" r="8" fill="#222"/>
+    <circle cx="233" cy="89" r="2" fill="white"/>
+    <path d="M200 120 Q210 128 220 120" fill="none" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+  </svg>`},
+  { name:'🐸 Ranita', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+    <ellipse cx="150" cy="175" rx="100" ry="90" fill="white" stroke="#222" stroke-width="4"/>
+    <circle cx="110" cy="90" r="32" fill="white" stroke="#222" stroke-width="4"/>
+    <circle cx="190" cy="90" r="32" fill="white" stroke="#222" stroke-width="4"/>
+    <circle cx="110" cy="92" r="20" fill="white" stroke="#555" stroke-width="2"/>
+    <circle cx="112" cy="90" r="9" fill="#222"/>
+    <circle cx="190" cy="92" r="20" fill="white" stroke="#555" stroke-width="2"/>
+    <circle cx="192" cy="90" r="9" fill="#222"/>
+    <ellipse cx="150" cy="195" rx="30" ry="20" fill="white" stroke="#222" stroke-width="3"/>
+    <path d="M125 200 Q150 215 175 200" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="88" cy="180" rx="18" ry="12" fill="white" stroke="#222" stroke-width="2.5"/>
+    <ellipse cx="212" cy="180" rx="18" ry="12" fill="white" stroke="#222" stroke-width="2.5"/>
+    <path d="M50 235 Q38 255 50 270 Q65 245 90 240" fill="white" stroke="#222" stroke-width="3.5"/>
+    <path d="M250 235 Q262 255 250 270 Q235 245 210 240" fill="white" stroke="#222" stroke-width="3.5"/>
+    <path d="M135 160 L120 150" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M165 160 L180 150" stroke="#222" stroke-width="2.5" stroke-linecap="round"/>
+  </svg>`},
+  { name:'⭐ Estrella', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+    <polygon points="150,28 175,105 255,105 192,155 215,232 150,185 85,232 108,155 45,105 125,105" fill="white" stroke="#222" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="150" cy="148" r="32" fill="white" stroke="#222" stroke-width="3.5"/>
+    <circle cx="136" cy="140" r="9" fill="white" stroke="#222" stroke-width="2.5"/>
+    <circle cx="138" cy="139" r="4" fill="#222"/>
+    <circle cx="164" cy="140" r="9" fill="white" stroke="#222" stroke-width="2.5"/>
+    <circle cx="166" cy="139" r="4" fill="#222"/>
+    <path d="M136 163 Q150 174 164 163" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+    <path d="M136 156 Q140 152 140 158" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+    <path d="M164 156 Q160 152 160 158" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+  </svg>`},
+  { name:'🌸 Flor', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+    <line x1="150" y1="195" x2="150" y2="280" stroke="#222" stroke-width="5" stroke-linecap="round"/>
+    <path d="M150 238 Q175 225 188 235" fill="none" stroke="#222" stroke-width="3.5" stroke-linecap="round"/>
+    <ellipse cx="150" cy="108" rx="22" ry="38" fill="white" stroke="#222" stroke-width="3.5"/>
+    <ellipse cx="150" cy="108" rx="22" ry="38" fill="white" stroke="#222" stroke-width="3.5" transform="rotate(60 150 148)"/>
+    <ellipse cx="150" cy="108" rx="22" ry="38" fill="white" stroke="#222" stroke-width="3.5" transform="rotate(120 150 148)"/>
+    <ellipse cx="150" cy="108" rx="22" ry="38" fill="white" stroke="#222" stroke-width="3.5" transform="rotate(180 150 148)"/>
+    <ellipse cx="150" cy="108" rx="22" ry="38" fill="white" stroke="#222" stroke-width="3.5" transform="rotate(240 150 148)"/>
+    <ellipse cx="150" cy="108" rx="22" ry="38" fill="white" stroke="#222" stroke-width="3.5" transform="rotate(300 150 148)"/>
+    <circle cx="150" cy="148" r="34" fill="white" stroke="#222" stroke-width="4"/>
+    <circle cx="138" cy="142" r="9" fill="white" stroke="#222" stroke-width="2.5"/>
+    <circle cx="140" cy="141" r="4" fill="#222"/>
+    <circle cx="162" cy="142" r="9" fill="white" stroke="#222" stroke-width="2.5"/>
+    <circle cx="164" cy="141" r="4" fill="#222"/>
+    <path d="M138 160 Q150 170 162 160" fill="none" stroke="#222" stroke-width="3" stroke-linecap="round"/>
+  </svg>`},
+  { name:'🚗 Autito', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+    <rect x="30" y="165" width="240" height="75" rx="22" fill="white" stroke="#222" stroke-width="4"/>
+    <path d="M65 165 Q80 108 120 100 L180 100 Q220 108 235 165Z" fill="white" stroke="#222" stroke-width="4"/>
+    <rect x="80" y="110" width="56" height="50" rx="6" fill="white" stroke="#222" stroke-width="3"/>
+    <rect x="164" y="110" width="56" height="50" rx="6" fill="white" stroke="#222" stroke-width="3"/>
+    <circle cx="85" cy="240" r="30" fill="white" stroke="#222" stroke-width="4"/>
+    <circle cx="85" cy="240" r="16" fill="white" stroke="#555" stroke-width="2.5"/>
+    <circle cx="215" cy="240" r="30" fill="white" stroke="#222" stroke-width="4"/>
+    <circle cx="215" cy="240" r="16" fill="white" stroke="#555" stroke-width="2.5"/>
+    <circle cx="255" cy="178" r="10" fill="white" stroke="#222" stroke-width="3"/>
+    <circle cx="45" cy="190" r="8" fill="white" stroke="#222" stroke-width="2.5"/>
+    <line x1="30" y1="205" x2="270" y2="205" stroke="#aaa" stroke-width="2"/>
+  </svg>`},
+];
+
+// ══════════════════════════════════════════
+// IMÁGENES — CALCAR (9 años)
+// ══════════════════════════════════════════
+const IMGS_CALCAR = [
+  { name:'🎌 Chica Anime', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 360">
+    <ellipse cx="150" cy="235" rx="85" ry="105" fill="none" stroke="#222" stroke-width="3"/>
+    <circle cx="150" cy="128" r="68" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M85 95 Q82 40 128 28 Q150 20 165 22 Q198 28 215 60 Q218 85 212 105" fill="none" stroke="#222" stroke-width="3.5"/>
+    <path d="M82 92 Q78 62 90 48 Q72 60 78 82" fill="none" stroke="#333" stroke-width="2.5"/>
+    <path d="M218 105 Q228 75 218 50 Q230 68 228 95" fill="none" stroke="#333" stroke-width="2.5"/>
+    <path d="M82 78 Q70 45 92 30" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M218 78 Q230 45 208 30" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="82" cy="78" r="22" fill="none" stroke="#222" stroke-width="3"/>
+    <circle cx="218" cy="78" r="22" fill="none" stroke="#222" stroke-width="3"/>
+    <ellipse cx="82" cy="78" rx="16" ry="18" fill="none" stroke="#555" stroke-width="2"/>
+    <ellipse cx="218" cy="78" rx="16" ry="18" fill="none" stroke="#555" stroke-width="2"/>
+    <circle cx="122" cy="125" r="20" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="178" cy="125" r="20" fill="none" stroke="#222" stroke-width="2.5"/>
+    <ellipse cx="122" cy="127" rx="13" ry="14" fill="none" stroke="#555" stroke-width="2"/>
+    <ellipse cx="178" cy="127" rx="13" ry="14" fill="none" stroke="#555" stroke-width="2"/>
+    <circle cx="124" cy="126" r="6" fill="#222"/>
+    <circle cx="180" cy="126" r="6" fill="#222"/>
+    <path d="M110 108 Q122 103 134 108" fill="none" stroke="#222" stroke-width="2"/>
+    <path d="M166 108 Q178 103 190 108" fill="none" stroke="#222" stroke-width="2"/>
+    <path d="M143 145 L150 150 L157 145" fill="none" stroke="#222" stroke-width="2"/>
+    <path d="M138 162 Q150 170 162 162" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M107 158 Q108 175 115 185 Q132 200 150 200 Q168 200 185 185 Q192 175 193 158" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M115 200 Q115 230 105 250 L105 340" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M185 200 Q185 230 195 250 L195 340" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M105 250 Q150 268 195 250" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M95 270 Q90 290 86 310" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M205 270 Q210 290 214 310" fill="none" stroke="#222" stroke-width="2.5"/>
+    <rect x="120" y="258" width="12" height="15" rx="3" fill="none" stroke="#333" stroke-width="1.5"/>
+    <rect x="145" y="255" width="12" height="15" rx="3" fill="none" stroke="#333" stroke-width="1.5"/>
+    <rect x="170" y="258" width="12" height="15" rx="3" fill="none" stroke="#333" stroke-width="1.5"/>
+    <circle cx="52" cy="48" r="10" fill="none" stroke="#555" stroke-width="1.5"/>
+    <path d="M45 35 L38 22" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="250" cy="62" r="8" fill="none" stroke="#555" stroke-width="1.5"/>
+    <path d="M256 50 L262 40" stroke="#555" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M38 80 L25 78 L32 72" fill="none" stroke="#555" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M262 95 L275 92 L268 87" fill="none" stroke="#555" stroke-width="1.5" stroke-linejoin="round"/>
+  </svg>`},
+  { name:'🦄 Unicornio', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 320">
+    <ellipse cx="150" cy="220" rx="105" ry="75" fill="none" stroke="#222" stroke-width="3"/>
+    <circle cx="225" cy="130" r="62" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M225 68 L218 20 L232 62" fill="none" stroke="#222" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M188 100 Q170 72 158 58 Q175 72 192 92" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M175 110 Q148 110 145 128" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M210 68 Q195 55 188 45 Q195 60 210 68" fill="none" stroke="#444" stroke-width="2"/>
+    <path d="M222 65 Q215 48 212 38 Q218 52 225 64" fill="none" stroke="#444" stroke-width="2"/>
+    <circle cx="212" cy="125" r="12" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="213" cy="124" r="5" fill="#222"/>
+    <path d="M200 112 Q212 106 224 112" fill="none" stroke="#222" stroke-width="2"/>
+    <path d="M204 142 Q212 148 220 142" fill="none" stroke="#222" stroke-width="2.5"/>
+    <line x1="68" y1="292" x2="58" y2="318" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <line x1="102" y1="296" x2="96" y2="318" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <line x1="198" y1="296" x2="204" y2="318" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <line x1="232" y1="292" x2="242" y2="318" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <path d="M150 230 Q130 220 118 208 Q108 196 110 182 Q122 172 138 178 Q145 185 150 195 Q155 185 162 178 Q178 172 190 182 Q192 196 182 208 Q170 220 150 230Z" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M42 218 Q22 198 20 172 Q38 190 50 200 Q48 185 52 168" fill="none" stroke="#222" stroke-width="2.5"/>
+  </svg>`},
+  { name:'🐉 Dragón Kawaii', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 320">
+    <ellipse cx="150" cy="200" rx="95" ry="80" fill="none" stroke="#222" stroke-width="3"/>
+    <circle cx="150" cy="115" r="68" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M92 75 L70 32 L115 62 Z" fill="none" stroke="#222" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M208 75 L230 32 L185 62 Z" fill="none" stroke="#222" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="125" cy="110" r="18" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="175" cy="110" r="18" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="127" cy="109" r="8" fill="#222"/>
+    <circle cx="177" cy="109" r="8" fill="#222"/>
+    <path d="M115 95 Q125 88 135 95" fill="none" stroke="#222" stroke-width="2"/>
+    <path d="M165 95 Q175 88 185 95" fill="none" stroke="#222" stroke-width="2"/>
+    <path d="M140 140 Q150 148 160 140" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M132 155 Q140 165 150 165 Q160 165 168 155" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M58 155 Q20 108 38 58 Q52 110 58 140" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M242 155 Q280 108 262 58 Q248 110 242 140" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M38 58 Q50 40 70 48" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M262 58 Q250 40 230 48" fill="none" stroke="#222" stroke-width="2.5"/>
+    <line x1="88" y1="278" x2="80" y2="310" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <line x1="120" y1="282" x2="116" y2="310" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <line x1="180" y1="282" x2="184" y2="310" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <line x1="212" y1="278" x2="220" y2="310" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <path d="M215 270 Q248 265 268 245 Q258 262 248 272" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M268 245 Q278 230 272 215" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M148 195 Q142 205 148 212" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round"/>
+    <path d="M152 195 Q158 205 152 212" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round"/>
+  </svg>`},
+  { name:'🧜 Sirena', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 360">
+    <circle cx="150" cy="115" r="65" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M90 170 Q88 200 88 240 Q88 280 110 310 Q130 340 150 348 Q170 340 190 310 Q212 280 212 240 Q212 200 210 170Z" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M110 312 Q90 308 68 322 Q88 332 110 330" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M190 312 Q210 308 232 322 Q212 332 190 330" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M125 170 Q150 185 175 170" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M102 230 Q150 242 198 230" fill="none" stroke="#555" stroke-width="2"/>
+    <path d="M100 260 Q150 272 200 260" fill="none" stroke="#555" stroke-width="2"/>
+    <path d="M105 290 Q150 302 195 290" fill="none" stroke="#555" stroke-width="2"/>
+    <circle cx="128" cy="110" r="18" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="172" cy="110" r="18" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="130" cy="109" r="7" fill="#222"/>
+    <circle cx="174" cy="109" r="7" fill="#222"/>
+    <path d="M138 135 Q150 143 162 135" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M85 85 Q75 50 105 38 Q128 28 150 28 Q172 28 195 38 Q225 50 215 85" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M85 82 Q60 75 52 88" fill="none" stroke="#333" stroke-width="2"/>
+    <path d="M215 82 Q240 75 248 88" fill="none" stroke="#333" stroke-width="2"/>
+    <path d="M90 173 Q72 165 60 175 Q70 182 88 180" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M210 173 Q228 165 240 175 Q230 182 212 180" fill="none" stroke="#222" stroke-width="2.5"/>
+  </svg>`},
+  { name:'🦊 Zorro Kawaii', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 320">
+    <ellipse cx="150" cy="215" rx="85" ry="78" fill="none" stroke="#222" stroke-width="3"/>
+    <circle cx="150" cy="128" r="72" fill="none" stroke="#222" stroke-width="3"/>
+    <polygon points="90,78 55,18 112,62" fill="none" stroke="#222" stroke-width="3.5" stroke-linejoin="round"/>
+    <polygon points="210,78 245,18 188,62" fill="none" stroke="#222" stroke-width="3.5" stroke-linejoin="round"/>
+    <polygon points="93,74 65,28 110,60" fill="none" stroke="#aaa" stroke-width="2"/>
+    <polygon points="207,74 235,28 190,60" fill="none" stroke="#aaa" stroke-width="2"/>
+    <path d="M78 140 Q65 155 68 172" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M222 140 Q235 155 232 172" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="120" cy="120" r="18" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="180" cy="120" r="18" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="122" cy="119" r="8" fill="#222"/>
+    <circle cx="182" cy="119" r="8" fill="#222"/>
+    <ellipse cx="150" cy="148" rx="18" ry="14" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M108 148 Q122 150 132 148" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+    <path d="M168 148 Q178 150 192 148" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+    <path d="M138 164 Q150 172 162 164" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M225 272 Q258 265 272 242 Q260 255 248 262" fill="none" stroke="#222" stroke-width="3.5"/>
+    <path d="M272 242 Q282 222 272 205 Q265 220 264 238" fill="none" stroke="#222" stroke-width="3"/>
+    <line x1="78" y1="290" x2="70" y2="316" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <line x1="110" y1="294" x2="106" y2="316" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <line x1="190" y1="294" x2="194" y2="316" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <line x1="222" y1="290" x2="230" y2="316" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+  </svg>`},
+  { name:'🐰 Conejita Anime', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 340">
+    <ellipse cx="150" cy="225" rx="88" ry="95" fill="none" stroke="#222" stroke-width="3"/>
+    <circle cx="150" cy="125" r="68" fill="none" stroke="#222" stroke-width="3"/>
+    <ellipse cx="102" cy="58" rx="20" ry="50" fill="none" stroke="#222" stroke-width="3" transform="rotate(-12 102 58)"/>
+    <ellipse cx="198" cy="58" rx="20" ry="50" fill="none" stroke="#222" stroke-width="3" transform="rotate(12 198 58)"/>
+    <ellipse cx="100" cy="58" rx="10" ry="34" fill="none" stroke="#ccc" stroke-width="1.5" transform="rotate(-12 102 58)"/>
+    <ellipse cx="200" cy="58" rx="10" ry="34" fill="none" stroke="#ccc" stroke-width="1.5" transform="rotate(12 198 58)"/>
+    <circle cx="125" cy="120" r="17" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="175" cy="120" r="17" fill="none" stroke="#222" stroke-width="2.5"/>
+    <ellipse cx="125" cy="121" rx="11" ry="12" fill="none" stroke="#555" stroke-width="1.5"/>
+    <ellipse cx="175" cy="121" rx="11" ry="12" fill="none" stroke="#555" stroke-width="1.5"/>
+    <circle cx="127" cy="120" r="5" fill="#222"/>
+    <circle cx="177" cy="120" r="5" fill="#222"/>
+    <path d="M112 104 Q125 98 138 104" fill="none" stroke="#222" stroke-width="1.8"/>
+    <path d="M162 104 Q175 98 188 104" fill="none" stroke="#222" stroke-width="1.8"/>
+    <circle cx="150" cy="143" r="7" fill="none" stroke="#222" stroke-width="2"/>
+    <path d="M143 152 Q150 160 157 152" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M110 165 Q112 180 120 190 Q134 205 150 208 Q166 205 180 190 Q188 180 190 165" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M120 210 Q115 240 108 270" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M180 210 Q185 240 192 270" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M108 270 Q150 285 192 270" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M100 240 Q85 235 75 248" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M200 240 Q215 235 225 248" fill="none" stroke="#222" stroke-width="2.5"/>
+  </svg>`},
+  { name:'🌙 Bruja Kawaii', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 340">
+    <path d="M90 82 L148 8 L210 82 Q200 72 180 78 Q165 70 150 72 Q135 70 120 78 Q100 72 90 82Z" fill="none" stroke="#222" stroke-width="3.5" stroke-linejoin="round"/>
+    <line x1="150" y1="8" x2="150" y2="20" stroke="#222" stroke-width="2.5"/>
+    <circle cx="150" cy="138" r="65" fill="none" stroke="#222" stroke-width="3"/>
+    <circle cx="128" cy="132" r="16" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="172" cy="132" r="16" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="130" cy="131" r="7" fill="#222"/>
+    <circle cx="174" cy="131" r="7" fill="#222"/>
+    <path d="M116 115 Q128 109 140 115" fill="none" stroke="#222" stroke-width="2"/>
+    <path d="M160 115 Q172 109 184 115" fill="none" stroke="#222" stroke-width="2"/>
+    <path d="M140 155 Q150 163 160 155" fill="none" stroke="#222" stroke-width="2.5"/>
+    <ellipse cx="150" cy="240" rx="88" ry="85" fill="none" stroke="#222" stroke-width="3"/>
+    <path d="M108 196 Q105 220 105 250" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M192 196 Q195 220 195 250" fill="none" stroke="#222" stroke-width="2.5"/>
+    <path d="M75 240 Q55 248 45 268" stroke="#222" stroke-width="2.5" fill="none"/>
+    <path d="M45 268 Q55 258 70 255" stroke="#222" stroke-width="2.5" fill="none"/>
+    <path d="M225 240 Q245 248 255 268" stroke="#222" stroke-width="2.5" fill="none"/>
+    <path d="M255 268 Q245 258 230 255" stroke="#222" stroke-width="2.5" fill="none"/>
+    <line x1="95" y1="315" x2="88" y2="336" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <line x1="125" y1="320" x2="122" y2="336" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <line x1="175" y1="320" x2="178" y2="336" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <line x1="205" y1="315" x2="212" y2="336" stroke="#222" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="38" cy="55" r="6" fill="none" stroke="#aaa" stroke-width="1.5"/>
+    <path d="M42 48 L48 40" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="262" cy="70" r="8" fill="none" stroke="#aaa" stroke-width="1.5"/>
+    <path d="M256 63 L250 55" stroke="#aaa" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M44 170 L30 162 L35 175 L22 178 L36 183" fill="none" stroke="#aaa" stroke-width="1.8" stroke-linejoin="round"/>
+  </svg>`},
+  { name:'🐼 Panda Kawaii', svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 320">
+    <ellipse cx="150" cy="210" rx="105" ry="88" fill="none" stroke="#222" stroke-width="3.5"/>
+    <circle cx="150" cy="118" r="78" fill="none" stroke="#222" stroke-width="3.5"/>
+    <ellipse cx="100" cy="95" rx="30" ry="28" fill="none" stroke="#222" stroke-width="3"/>
+    <ellipse cx="200" cy="95" rx="30" ry="28" fill="none" stroke="#222" stroke-width="3"/>
+    <ellipse cx="100" cy="95" rx="22" ry="20" fill="none" stroke="#555" stroke-width="2"/>
+    <ellipse cx="200" cy="95" rx="22" ry="20" fill="none" stroke="#555" stroke-width="2"/>
+    <circle cx="105" cy="112" r="16" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="195" cy="112" r="16" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="107" cy="111" r="7" fill="#222"/>
+    <circle cx="197" cy="111" r="7" fill="#222"/>
+    <circle cx="150" cy="140" r="20" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="142" cy="132" r="5" fill="#222"/>
+    <circle cx="158" cy="132" r="5" fill="#222"/>
+    <path d="M140 150 Q150 158 160 150" fill="none" stroke="#222" stroke-width="2.5"/>
+    <line x1="128" y1="140" x2="105" y2="136" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+    <line x1="125" y1="148" x2="100" y2="148" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+    <line x1="172" y1="140" x2="195" y2="136" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+    <line x1="175" y1="148" x2="200" y2="148" stroke="#222" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="60" cy="218" rx="42" ry="28" fill="none" stroke="#222" stroke-width="3" transform="rotate(-30 60 218)"/>
+    <ellipse cx="240" cy="218" rx="42" ry="28" fill="none" stroke="#222" stroke-width="3" transform="rotate(30 240 218)"/>
+    <line x1="100" y1="295" x2="92" y2="316" stroke="#222" stroke-width="5" stroke-linecap="round"/>
+    <line x1="135" y1="298" x2="130" y2="316" stroke="#222" stroke-width="5" stroke-linecap="round"/>
+    <line x1="165" y1="298" x2="170" y2="316" stroke="#222" stroke-width="5" stroke-linecap="round"/>
+    <line x1="200" y1="295" x2="208" y2="316" stroke="#222" stroke-width="5" stroke-linecap="round"/>
+  </svg>`},
+];
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let MODE = null; // 'calcar' | 'colorear'
+let IMG_SRC = null;
+let arStream = null, arFace = 'environment';
+let arPos = {x: 50, y: 50}; // % desde top-left
+let tool = 'fill', brushSize = 3, paintColor = '#E53935';
+let history = [], histIdx = -1;
+let pCtx = null, rCtx = null;
+let painting = false, lx = 0, ly = 0;
+let strokeSnap = null, strokePoints = [];
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function nav(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function openMode(m) {
+  MODE = m;
+  if (m === 'colorear') {
+    // Colorear va directo con carrusel incorporado
+    startColor();
+  } else {
+    document.getElementById('src-title').textContent = '📷 Elige imagen para calcar';
+    nav('s-source');
+  }
+}
+
+// ══════════════════════════════════════════
+// GALLERY — soporta manifest.json externo
+// ══════════════════════════════════════════
+
+// Cambia esta URL al URL base de tus imágenes en GitHub
+// Ejemplo: 'https://raw.githubusercontent.com/TU_USUARIO/dibuja-imagenes/main/imagenes'
+const IMG_BASE_URL = './imagenes';
+
+function svgUrl(svg) {
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+async function fetchManifest() {
+  try {
+    const res = await fetch('./manifest.json');
+    if (!res.ok) throw new Error('no manifest');
+    return await res.json();
+  } catch { return null; }
+}
+
+function addGalItem(grid, src, name, savedId) {
+  const div = document.createElement('div');
+  div.className = 'gal-item' + (savedId ? ' gal-item-saved' : '');
+  const imgEl = document.createElement('img');
+  imgEl.src = src; imgEl.alt = name;
+  imgEl.onerror = () => { imgEl.style.display='none'; };
+  const lbl = document.createElement('div');
+  lbl.className = 'gal-lbl'; lbl.textContent = name;
+  div.appendChild(imgEl); div.appendChild(lbl);
+  div.onclick = () => startWithImg(src);
+  if (savedId) {
+    const del = document.createElement('button');
+    del.className = 'gal-del'; del.textContent = '✕';
+    del.title = 'Borrar imagen';
+    del.onclick = async e => {
+      e.stopPropagation();
+      await dbDeleteImage(savedId);
+      div.remove();
+      toast('🗑️ Imagen borrada');
+    };
+    div.appendChild(del);
+  }
+  grid.appendChild(div);
+}
+
+function addSectionHeader(grid, title) {
+  const sec = document.createElement('div');
+  sec.className = 'gal-section';
+  sec.innerHTML = `<div class="gal-section-line"></div><div class="gal-section-title">${title}</div><div class="gal-section-line"></div>`;
+  grid.appendChild(sec);
+}
+
+async function renderGallery(imgs, fromManifest) {
+  document.getElementById('gal-title').textContent =
+    MODE === 'calcar' ? '🎌 Imágenes para Calcar' : '🎨 Imágenes para Colorear';
+  const grid = document.getElementById('gal-grid');
+  grid.innerHTML = '';
+
+  // ── Mis imágenes guardadas ──
+  let saved = [];
+  try { saved = await dbGetImages(MODE); } catch {}
+  if (saved.length > 0) {
+    addSectionHeader(grid, '📂 Mis imágenes');
+    saved.sort((a,b) => b.ts - a.ts).forEach(im => {
+      addGalItem(grid, im.dataUrl, im.name, im.id);
+    });
+    addSectionHeader(grid, '🎨 Dibujos incluidos');
+  }
+
+  // ── Presets / manifest ──
+  imgs.forEach(im => {
+    const src = fromManifest ? (IMG_BASE_URL + '/' + im.file) : svgUrl(im.svg);
+    addGalItem(grid, src, im.name, null);
+  });
+}
+
+async function buildGallery() {
+  const manifest = await fetchManifest();
+  if (manifest) {
+    const imgs = MODE === 'calcar' ? manifest.calcar : manifest.colorear;
+    await renderGallery(imgs, true);
+  } else {
+    const imgs = MODE === 'calcar' ? IMGS_CALCAR : IMGS_COLOR;
+    await renderGallery(imgs, false);
+  }
+}
+
+function nav_gallery() { buildGallery(); nav('s-gallery'); }
+
+// ══════════════════════════════════════════
+// INDEXEDDB — imágenes locales + progreso
+// ══════════════════════════════════════════
+const DB_NAME = 'DibujaConmigo', DB_VER = 2;
+let db = null;
+
+function initDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('images')) {
+        const s = d.createObjectStore('images', { keyPath:'id', autoIncrement:true });
+        s.createIndex('mode','mode',{unique:false});
+      }
+      if (!d.objectStoreNames.contains('progress')) {
+        d.createObjectStore('progress', { keyPath:'key' });
+      }
+    };
+    req.onsuccess = e => { db = e.target.result; res(db); };
+    req.onerror = () => rej();
+  });
+}
+
+function dbSaveImage(mode, name, dataUrl) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction('images','readwrite');
+    tx.objectStore('images').add({ mode, name, dataUrl, ts: Date.now() });
+    tx.oncomplete = res; tx.onerror = rej;
+  });
+}
+
+function dbGetImages(mode) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction('images','readonly');
+    const idx = tx.objectStore('images').index('mode');
+    const req = idx.getAll(mode);
+    req.onsuccess = () => res(req.result || []);
+    req.onerror = rej;
+  });
+}
+
+function dbDeleteImage(id) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction('images','readwrite');
+    tx.objectStore('images').delete(id);
+    tx.oncomplete = res; tx.onerror = rej;
+  });
+}
+
+function dbSaveProgress(key, dataUrl) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction('progress','readwrite');
+    tx.objectStore('progress').put({ key, dataUrl, ts: Date.now() });
+    tx.oncomplete = res; tx.onerror = rej;
+  });
+}
+
+function dbGetProgress(key) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction('progress','readonly');
+    const req = tx.objectStore('progress').get(key);
+    req.onsuccess = () => res(req.result ? req.result.dataUrl : null);
+    req.onerror = rej;
+  });
+}
+
+function dbDeleteProgress(key) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction('progress','readwrite');
+    tx.objectStore('progress').delete(key);
+    tx.oncomplete = res; tx.onerror = rej;
+  });
+}
+
+// ── PROGRESS KEY based on image src hash ──
+function progressKey(src) {
+  let h = 0;
+  for (let i = 0; i < Math.min(src.length, 200); i++)
+    h = ((h << 5) - h) + src.charCodeAt(i) | 0;
+  return 'prog_' + Math.abs(h);
+}
+
+// ══════════════════════════════════════════
+// FILE INPUT
+// ══════════════════════════════════════════
+function openCamera() { document.getElementById('fi-cam').click(); }
+function openGallery() { document.getElementById('fi-gal').click(); }
+async function loadFile(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = async ev => {
+    const dataUrl = ev.target.result;
+    const name = '📷 ' + (f.name.replace(/\.[^.]+$/,'').slice(0,20) || 'Mi imagen');
+    try {
+      await dbSaveImage(MODE, name, dataUrl);
+      toast('🖼️ ¡Imagen guardada!');
+    } catch {}
+    if (MODE === 'colorear') {
+      IMG_SRC = dataUrl;
+      await buildCarousel(); // reconstruye carrusel con nueva imagen
+    } else {
+      startWithImg(dataUrl);
     }
-    </script>
-        <meta property="og:title" content="¿Buscas chamba urgente? Vacantes en Nuevo León, CDMX y EdoMex 🚀">
-        <meta property="og:description" content="Sin correos ni registros. Clic y directo al WhatsApp del reclutador. ¡Entra ya!">
-        <meta property="og:image" content="https://tuchamba-express.vercel.app/banner_1.png">
-        <meta property="og:url" content="https://tuchamba-express.vercel.app/">
-        <meta property="og:type" content="website">
+  };
+  r.readAsDataURL(f);
+  e.target.value = '';
+}
 
-        
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-        <meta http-equiv="Pragma" content="no-cache">
-        <meta http-equiv="Expires" content="0">
+function startWithImg(src) {
+  IMG_SRC = src;
+  if (MODE === 'calcar') startAR();
+  else startColor();
+}
 
-        <link rel="stylesheet" href="styles.css">
+// ══════════════════════════════════════════
+// AR MODE
+// ══════════════════════════════════════════
+async function startAR() {
+  nav('s-ar');
+  arPos = {x: 50, y: 50}; // centrado al inicio
+  document.getElementById('ar-img').src = IMG_SRC;
+  arUpdate();
+  setupARDrag();
+  try {
+    if (arStream) arStream.getTracks().forEach(t => t.stop());
+    arStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: arFace, width:{ideal:1920}, height:{ideal:1080} }, audio:false
+    });
+    const v = document.getElementById('ar-video');
+    v.srcObject = arStream;
+    v.style.transform = arFace === 'user' ? 'scaleX(-1)' : 'none';
+  } catch { toast('⚠️ Activa el permiso de cámara'); }
+}
 
-    </head>
-    <body>
+function arUpdate() {
+  const op = document.getElementById('ar-op').value / 100;
+  const sz = document.getElementById('ar-sz').value;
+  const img = document.getElementById('ar-img');
+  img.style.opacity = op;
+  img.style.width = sz + 'vw';
+  img.style.height = 'auto';
+  img.style.maxWidth = 'none';
+  img.style.maxHeight = 'none';
+  // Posición libre (draggable)
+  img.style.left = arPos.x + 'vw';
+  img.style.top  = arPos.y + 'vh';
+  img.style.transform = 'translate(-50%, -50%)';
+}
 
-        <div id="globalBackground"></div>
+function setupARDrag() {
+  const layer = document.getElementById('ar-drag-layer');
+  let dragging = false, startX, startY, startPX, startPY;
 
-        <div id="loginScreen" class="welcome-container">
-            <div style="font-size: 50px; margin-bottom: 10px;">🚀</div>
-            <h1 class="welcome-title">TuChamba Express</h1>
-            <p class="welcome-subtitle">
-                Tu nueva chamba a un mensaje de distancia.<br>
-                Sin registros complicados.
-            </p>
-            <button class="btn-big-guest" onclick="enterAsGuest()">🔍 Ver Vacantes Disponibles</button>
-            <div class="admin-toggle-link" onclick="toggleAdminLogin()">¿Eres Reclutador? Ingresa aquí</div>
-            <form id="adminForm" class="admin-login-form" onsubmit="event.preventDefault(); login();">
-                <div class="form-group">
-                    <label style="color:white;">Usuario / Correo</label>
-                    <input type="text" id="adminEmail" placeholder="Usuario o Correo" autocomplete="username" enterkeyhint="next" style="background:rgba(255,255,255,0.9);">
-                </div>
-                    <div class="form-group">
-                    <label style="color:white;">Contraseña</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="adminPassword" placeholder="******" autocomplete="current-password" enterkeyhint="go" style="background:rgba(255,255,255,0.9);">
-                        
-                        <span class="password-toggle-icon" onclick="togglePasswordVisibility()">
-                            <img id="ojoIcono" src="ver.png" alt="Ver Password">
-                        </span>
+  function onStart(cx, cy) {
+    dragging = true;
+    startX = cx; startY = cy;
+    startPX = arPos.x; startPY = arPos.y;
+  }
+  function onMove(cx, cy) {
+    if (!dragging) return;
+    const dx = (cx - startX) / window.innerWidth  * 100;
+    const dy = (cy - startY) / window.innerHeight * 100;
+    arPos.x = startPX + dx;
+    arPos.y = startPY + dy;
+    const img = document.getElementById('ar-img');
+    img.style.left = arPos.x + 'vw';
+    img.style.top  = arPos.y + 'vh';
+  }
+  function onEnd() { dragging = false; }
 
-                    </div>
-                </div>
-                <button type="submit" id="btnLogin" class="btn-primary" style="width: 100%;">Entrar al Panel</button>
-            </form>
-        </div>
+  layer.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const t = e.touches[0];
+    onStart(t.clientX, t.clientY);
+  }, {passive:false});
+  layer.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const t = e.touches[0];
+    onMove(t.clientX, t.clientY);
+  }, {passive:false});
+  layer.addEventListener('touchend', () => onEnd());
+  layer.addEventListener('mousedown', e => onStart(e.clientX, e.clientY));
+  window.addEventListener('mousemove', e => { if(dragging) onMove(e.clientX, e.clientY); });
+  window.addEventListener('mouseup', () => onEnd());
+}
 
-        <div id="mainApp" style="display: none;">
-            <div class="container">
-                
-                <div class="header">
-                    <h1 style="margin:0; font-size: 22px;">🚀 TuChamba Express</h1>
-                    <div style="font-size: 14px; color: #666; font-weight: 400; margin-top: 4px;">Vacantes Urgentes, Sin y Con Experiencia</div>
-                    <div class="header-buttons">
-                        <button id="adminSearchToggle" class="admin-only btn-icon-small" onclick="toggleAdminSearch()" style="display:none; background:#eee; color:#333;">🔍</button>
-                        
-                        <button id="mainShareBtn" class="share-btn" onclick="shareApp()">📤 Compartir</button>
-                        <span id="modeIndicator"></span>
-                        <button class="admin-btn" style="background: #333;" onclick="logout()">Salir</button>
-                    </div>
-                </div>
+function flipCam() {
+  arFace = arFace === 'environment' ? 'user' : 'environment';
+  startAR();
+}
 
-                <div id="mobileMetricsPanel" style="display:none;">
-                    <div class="metrics-strip">
-                        <span>🌎 Total: <b id="totalVisitsMobile">...</b></span>
-                        <span style="opacity:0.3">|</span>
-                        <span>📅 Mes: <b id="monthlyVisitsMobile">...</b></span>
-                    </div>
-                </div>
+function stopAR() {
+  if (arStream) { arStream.getTracks().forEach(t => t.stop()); arStream = null; }
+  nav('s-source');
+}
 
-                <div id="adminControls" style="display: none;">
-                    <div class="admin-controls-wrapper">
-                        
-                        <button id="viewToggleBtn" class="tool-btn" style="background:#00796b;" onclick="toggleViewMode()">👁️ Vista</button>
-                        <button class="add-job-btn admin-only" onclick="openJobForm()">➕ Nueva</button>
-                        
-                        <div class="metrics-card desktop-only">
-                            <div class="metric-row">🌎 <span class="m-label">Total:</span> <span id="totalVisits" class="m-number">...</span></div>
-                            <div class="metric-row">📅 <span class="m-label">Mes:</span> <span id="monthlyVisits" class="m-number">...</span></div>
-                        </div>
+function arSnap() {
+  const v = document.getElementById('ar-video');
+  const img = document.getElementById('ar-img');
+  const W = v.videoWidth || 640, H = v.videoHeight || 480;
+  const tmp = document.createElement('canvas'); tmp.width = W; tmp.height = H;
+  const c = tmp.getContext('2d');
+  if (arFace === 'user') { c.translate(W, 0); c.scale(-1, 1); }
+  c.drawImage(v, 0, 0);
+  if (arFace === 'user') c.setTransform(1,0,0,1,0,0);
+  const iw = W * (document.getElementById('ar-sz').value / 100);
+  const ih = iw * (img.naturalHeight / img.naturalWidth);
+  const ix = (W - iw) / 2, iy = (H - ih) / 2;
+  c.globalAlpha = document.getElementById('ar-op').value / 100;
+  const si = new Image(); si.src = IMG_SRC;
+  si.onload = () => {
+    c.drawImage(si, ix, iy, iw, ih);
+    const a = document.createElement('a');
+    a.download = 'calcar_' + Date.now() + '.png';
+    a.href = tmp.toDataURL('image/png');
+    a.click();
+    toast('✅ ¡Captura guardada!');
+  };
+}
 
-                        <button class="tool-btn" onclick="exportToExcel()">📦 Respaldo</button> 
-                        <button class="tool-btn metrics-btn" onclick="openMetricsModal()">📊 Métricas</button>
-                        <button class="tool-btn team-btn admin-only" onclick="openTeamModal()">👥 Equipo</button>
-                        <button class="tool-btn settings-btn admin-only" onclick="openSettingsModal()">⚙️ Ajustes</button>
-                        <button class="tool-btn admin-only" onclick="document.getElementById('excelFile').click()">📤 Cargar</button>
-                        <button class="tool-btn" onclick="downloadTemplate()">📋 Plantilla</button>
-                        <button id="seoSitemapBtn" class="tool-btn" onclick="window.downloadSitemap()" style="background-color: #FF9800; color: white;">🌐 Sitemap SEO</button>
-                        <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importFromExcel(event)">
-                    </div>
-                </div>
+// ══════════════════════════════════════════
+// COLOREAR MODE
+// ══════════════════════════════════════════
+const PALETTE = [
+  '#E53935','#E91E63','#9C27B0','#3F51B5','#2196F3','#03A9F4',
+  '#00BCD4','#009688','#4CAF50','#8BC34A','#CDDC39','#FFEB3B',
+  '#FFC107','#FF9800','#FF5722','#795548','#607D8B','#000000',
+  '#FFFFFF','#9E9E9E'
+];
 
-                <div id="userStickyTools">
-                    <button id="mobileFilterToggle" onclick="toggleMobileFilters()">
-                        🔍 Filtros de Búsqueda <span>▼</span>
-                    </button>
+function buildPalette() {
+  // ── Herramientas + tamaños ──
+  const toolsEl = document.getElementById('cp-tools');
+  toolsEl.innerHTML = '';
+  [{id:'fill',ico:'🪣',lbl:'Balde'},{id:'brush',ico:'🖌️',lbl:'Pincel'},{id:'eraser',ico:'⬜',lbl:'Borrar'}].forEach(t => {
+    const b = document.createElement('div');
+    b.className = 'cp-t' + (tool === t.id ? ' on' : '');
+    b.id = 'tc-' + t.id; b.textContent = t.ico; b.title = t.lbl;
+    b.onclick = () => setTool(t.id);
+    toolsEl.appendChild(b);
+  });
+  [{s:3,id:'sz-s',w:6},{s:10,id:'sz-m',w:11},{s:22,id:'sz-l',w:18}].forEach(sz => {
+    const b = document.createElement('div');
+    b.className = 'cp-sz' + (brushSize === sz.s ? ' on' : '');
+    b.id = sz.id; b.title = 'Tamaño';
+    b.onclick = () => setSize(sz.s, sz.id);
+    const dot = document.createElement('div');
+    dot.className = 'cp-sz-dot';
+    dot.style.cssText = `width:${sz.w}px;height:${sz.w}px`;
+    b.appendChild(dot); toolsEl.appendChild(b);
+  });
 
-                    <div class="search-container">
-                        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar vacante, empresa, palabras clave..." onkeyup="filterJobs()" autocomplete="off">
-                        <button id="clearSearchBtn" class="search-clear-btn" onclick="clearSearch()">✕</button>
-                    </div>
+  // ── Colores ──
+  const colsEl = document.getElementById('cp-colors');
+  colsEl.innerHTML = '';
+  PALETTE.forEach(c => {
+    const b = document.createElement('div');
+    b.className = 'c-sw' + (c === paintColor ? ' on' : '');
+    b.style.background = c;
+    if (c === '#FFFFFF') b.style.boxShadow = '0 0 0 2px #D1D5DB inset';
+    b.onclick = () => {
+      document.querySelectorAll('.c-sw').forEach(x => x.classList.remove('on'));
+      b.classList.add('on'); paintColor = c;
+      if (tool === 'eraser') setTool('brush');
+    };
+    colsEl.appendChild(b);
+  });
+  const picker = document.createElement('input');
+  picker.type = 'color'; picker.title = 'Color personalizado';
+  picker.style.cssText = 'width:30px;height:30px;min-width:30px;border-radius:50%;border:2px solid #D1D5DB;cursor:pointer;padding:2px;flex-shrink:0;background:none;';
+  picker.oninput = e => {
+    paintColor = e.target.value;
+    document.querySelectorAll('.c-sw').forEach(x => x.classList.remove('on'));
+    if (tool === 'eraser') setTool('brush');
+  };
+  colsEl.appendChild(picker);
+}
 
-                    <div class="filter-container" id="filterContainer">
-                        <div class="filter-icon-box">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-                        </div>
-                        <select id="stateFilter" class="filter-select" onchange="handleStateChange()" autocomplete="off">
-                            <option value="">📍 Estado</option>
-                        </select>
-                        <select id="cityFilter" class="filter-select" onchange="filterJobs()" autocomplete="off">
-                            <option value="">🏙️ Municipio</option>
-                        </select>
-                    </div>
-                </div>
+async function startColor() {
+  nav('s-color');
+  buildPalette();
+  setTool('fill');
+  await buildCarousel(); // construye carrusel y carga primera imagen
+}
 
-    <div id="universalCounter" class="detailed-counter" style="display:none;">
-                    <span class="counter-tag tag-total" id="countTotal">Total: 0</span>
-                    <span class="counter-tag tag-active" id="countActive">🟢 0 Vigentes</span>
-                    <span class="counter-tag tag-inactive" id="countInactive">🔴 0 No Vigentes</span>
-                </div>
-                
-                <div id="tableHint" style="font-size: 12px; color: #999; text-align: right; margin-bottom: 5px; display: none;">
-                    Desliza la tabla ➡️
-                </div>
+async function buildCarousel() {
+  const cc = document.getElementById('cc');
+  cc.innerHTML = '';
 
-                <div id="skeletonLoader" class="job-grid">
-                    <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-text"></div><div class="skeleton sk-text"></div><div class="skeleton sk-tag"></div></div>
-                    <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-text"></div><div class="skeleton sk-text"></div><div class="skeleton sk-tag"></div></div>
-                </div>
+  // Imágenes guardadas del usuario
+  let saved = [];
+  try { saved = await dbGetImages('colorear'); } catch {}
 
-                <div class="job-grid" id="jobGrid" style="display: none;"></div>
+  // Presets del manifest o integrados
+  const manifest = await fetchManifest();
+  let presets = [];
+  if (manifest && manifest.colorear) {
+    presets = manifest.colorear.map(im => ({name:im.name, src:IMG_BASE_URL+'/'+im.file}));
+  } else {
+    presets = IMGS_COLOR.map(im => ({name:im.name, src:svgUrl(im.svg)}));
+  }
 
-                <div class="job-table-container" id="jobTableContainer" style="display: none;">
-                    <table class="management-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 40px;">#</th>
-                                
-                                <th>
-                                    <select id="headerCompanyFilter" class="header-select" onchange="renderJobsTable()">
-                                        <option value="">🏢 EMPRESAS</option>
-                                        </select>
-                                </th>
+  const all = [
+    ...saved.sort((a,b)=>b.ts-a.ts).map(im=>({name:im.name,src:im.dataUrl,savedId:im.id})),
+    ...presets
+  ];
 
-                                <th onclick="window.handleSort('title')" style="cursor:pointer;">💼 Vacante ↕️</th>
-                                <th onclick="window.handleSort('location')" style="cursor:pointer;">📍 Ubicación ↕️</th>
-                                <th onclick="window.handleSort('salary')" style="cursor:pointer;">💰 Salario ↕️</th>
-                                <th onclick="window.handleSort('status')" style="cursor:pointer; text-align:center;">Estado ↕️</th>
-                                <th style="text-align:right;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="jobTableBody">
-                            </tbody>
-                    </table>
-                </div>
-                
-                <div id="paginationContainer" class="pagination-container" style="display:none;"></div>
-                
-                <div id="recruiterBanner" onclick="contactCentralOffice()">
-                    👤 Asistido por: <span id="recruiterNameDisplay">Oficina Central</span> (Clic para contacto)
-                </div>
+  all.forEach(im => {
+    const div = document.createElement('div');
+    div.className = 'cc-item' + (im.src === IMG_SRC ? ' on' : '');
+    div.title = im.name;
+    const img = document.createElement('img');
+    img.src = im.src; img.alt = im.name;
+    div.appendChild(img);
+    div.onclick = async () => {
+      if (IMG_SRC && IMG_SRC !== im.src && pCtx) {
+        try {
+          const pc = document.getElementById('paint-canvas');
+          if (pc) await dbSaveProgress(progressKey(IMG_SRC), pc.toDataURL());
+        } catch {}
+      }
+      document.querySelectorAll('.cc-item').forEach(x => x.classList.remove('on'));
+      div.classList.add('on');
+      IMG_SRC = im.src;
+      initColorCanvas();
+    };
+    cc.appendChild(div);
+  });
 
-                <div class="footer">
-                    <p>TuChamba Express &copy; 2026. Todos los derechos reservados.<br>
-                    Aviso: Algunas empresas pueden solicitar examen médico y/o antidoping.</p>
-                    <div style="margin-top:10px;">
-                        <a class="footer-link" onclick="openPrivacyModal()">🔒 Aviso de Privacidad</a>
-                    </div>
-                    <p class="powered-by">Powered by <strong>BitX</strong></p>
-                </div>
+  // Botón "+" para agregar imagen
+  const addBtn = document.createElement('div');
+  addBtn.className = 'cc-add';
+  addBtn.textContent = '➕';
+  addBtn.title = 'Agregar mi imagen';
+  addBtn.onclick = () => document.getElementById('fi-gal').click();
+  cc.appendChild(addBtn);
 
-                <div id="emptyState" class="welcome-container" style="display: none; padding: 30px; margin-top: 20px;">
-                    <h3>No hay vacantes publicadas 😢</h3><p>Intenta más tarde o ajusta los filtros.</p>
-                </div>
-            </div>
-        </div>
+  // Auto-seleccionar primera imagen si no hay ninguna
+  if (!IMG_SRC && all.length > 0) {
+    IMG_SRC = all[0].src;
+    cc.children[0].classList.add('on');
+  }
+  setTimeout(() => { if (IMG_SRC) initColorCanvas(); }, 80);
+}
 
-        <div id="toast"></div>
+function initColorCanvas() {
+  const wrap = document.querySelector('.cw');
+  const rc = document.getElementById('ref-canvas');
+  const pc = document.getElementById('paint-canvas');
+  const W = wrap.offsetWidth, H = wrap.offsetHeight;
+  rc.width = pc.width = W; rc.height = pc.height = H;
+  rCtx = rc.getContext('2d');
+  pCtx = pc.getContext('2d');
+  const img = new Image();
+  img.onload = async () => {
+    rCtx.clearRect(0,0,W,H);
+    rCtx.fillStyle = '#ffffff';
+    rCtx.fillRect(0,0,W,H);
+    const r = Math.min(W / img.width, H / img.height);
+    const dw = img.width * r, dh = img.height * r;
+    const dx = (W - dw) / 2, dy = (H - dh) / 2;
+    rCtx.drawImage(img, dx, dy, dw, dh);
+    history = []; histIdx = -1;
+    // Restaurar progreso guardado
+    try {
+      const pKey = progressKey(IMG_SRC);
+      const saved = await dbGetProgress(pKey);
+      if (saved) {
+        const pImg = new Image();
+        pImg.onload = () => {
+          pCtx.clearRect(0,0,W,H);
+          pCtx.drawImage(pImg,0,0);
+          saveHist();
+          toast('🔖 Avance restaurado');
+        };
+        pImg.src = saved;
+      } else {
+        saveHist();
+      }
+    } catch { saveHist(); }
+    setupPaintEvents(pc);
+  };
+  img.src = IMG_SRC;
+}
 
-        <div class="modal" id="viewModal"><div class="modal-content"><button class="close-btn" onclick="closeViewModal()">×</button><div id="viewModalBody"></div></div></div>
+function stopColor() { IMG_SRC = null; nav('s-home'); }
 
-        <div class="modal" id="formModal">
-            <div class="modal-content">
-                <button class="close-btn" onclick="closeFormModal()">×</button>
-                <h2 id="formTitle">Gestionar Vacante</h2>
-                <form id="jobForm" onsubmit="saveJob(event)">
-                    <div class="form-group"><label>Estatus</label><select id="jobStatus"><option value="Vigente">Vigente (Verde)</option><option value="No Vigente">No Vigente (Rojo)</option></select></div>
-                    
-                    <div class="form-group" style="background: #fff8e1; padding: 10px; border-radius: 8px; border: 1px dashed #ffd54f;">
-                        <label style="color: #ff8f00;">⭐ ¿Impulsar Vacante? (Destacada)</label>
-                        <select id="jobIsFeatured">
-                            <option value="false">NO (Normal)</option>
-                            <option value="true">SÍ (Destacar)</option>
-                        </select>
-                    </div>
+function setupPaintEvents(canvas) {
+  canvas.ontouchstart = e => { e.preventDefault(); const t = e.touches[0]; handleDown(getXY(t,canvas)); };
+  canvas.ontouchmove = e => { e.preventDefault(); const t = e.touches[0]; handleMove(getXY(t,canvas)); };
+  canvas.ontouchend = e => { e.preventDefault(); handleUp(); };
+  canvas.onmousedown = e => handleDown(getXY(e,canvas));
+  canvas.onmousemove = e => handleMove(getXY(e,canvas));
+  canvas.onmouseup = handleUp;
+  canvas.onmouseleave = handleUp;
+}
 
-                    <div class="form-group"><label>¿Mostrar nombre de empresa al público?</label><select id="jobShowCompany"><option value="true">SÍ (Visible para todos)</option><option value="false">NO (Confidencial / Solo Admin)</option></select></div>
-                    
-                    <div class="form-group" style="background: #fff3e0; padding: 10px; border-radius: 8px; border: 1px dashed #ef6c00;">
-                        <label style="color: #e65100;">🏢 Tipo de Servicio o Agencia (Interno)</label>
-                        <input type="text" id="jobAgency" placeholder="Ej. Agencia Norte - Solo visible para Reclutador">
-                    </div>
-                    <div class="form-group"><label>Título *</label><input type="text" id="jobTitle" required></div>
-                    <div class="form-group"><label>Empresa (Nombre Real) *</label><input type="text" id="jobCompany" required placeholder="Escribe el nombre real aquí"></div>
-                    
-                    <div class="form-group">
-                        <label>Ubicación Detallada *</label>
-                        <div class="location-grid">
-                            <input type="text" id="jobState" placeholder="Estado (Ej. CDMX)" required>
-                            <input type="text" id="jobCity" placeholder="Municipio (Ej. Coyoacán)" required>
-                            <input type="text" id="jobZone" placeholder="Colonia/Zona (Ej. Centro)">
-                        </div>
-                    </div>
+function getXY(e, canvas) {
+  const r = canvas.getBoundingClientRect();
+  return { x: (e.clientX - r.left) * (canvas.width / r.width),
+           y: (e.clientY - r.top)  * (canvas.height / r.height) };
+}
 
-                    <div class="form-group"><label>Fecha de Publicación</label><input type="date" id="jobDate"></div>
-                    
-                    <div class="form-group"><label>Salario</label><input type="text" id="jobSalary" placeholder="$8,500/mes"></div>
-                    <div class="form-group"><label>Descripción *</label><textarea id="jobDescription" required></textarea></div>
-                    <div class="form-group"><label>Jornada / Horario</label><input type="text" id="jobSchedule" placeholder="Ej. Lunes a Viernes 9 a 6"></div>
-                    
-                    <div class="form-group"><label>Etiquetas</label><input type="text" id="jobTags" placeholder="#Ventas, #Seguros"></div>
-                    <div class="form-group"><label>Requisitos</label><div class="list-input"><input type="text" id="reqInput"><button type="button" class="tool-btn" style="background:#0a66c2" onclick="addItem('req')">+</button></div><ul class="item-list" id="reqList"></ul></div>
-                    <div class="form-group"><label>Beneficios</label><div class="list-input"><input type="text" id="benInput"><button type="button" class="tool-btn" style="background:#0a66c2" onclick="addItem('ben')">+</button></div><ul class="item-list" id="benList"></ul></div>
-                    
-                    <div class="form-group">
-                        <label>WhatsApp Contacto (Número Real)</label>
-                        <div class="phone-group">
-                            <select id="recPhoneCode" class="phone-select">
-                                <option value="+52">🇲🇽 +52</option>
-                                <option value="+54">🇦🇷 +54</option>
-                                <option value="+591">🇧🇴 +591</option>
-                                <option value="+55">🇧🇷 +55</option>
-                                <option value="+56">🇨🇱 +56</option>
-                                <option value="+57">🇨🇴 +57</option>
-                                <option value="+506">🇨🇷 +506</option>
-                                <option value="+53">🇨🇺 +53</option>
-                                <option value="+593">🇪🇨 +593</option>
-                                <option value="+503">🇸🇻 +503</option>
-                                <option value="+34">🇪🇸 +34</option>
-                                <option value="+1">🇺🇸 +1</option>
-                                <option value="+502">🇬🇹 +502</option>
-                                <option value="+504">🇭🇳 +504</option>
-                                <option value="+505">🇳🇮 +505</option>
-                                <option value="+507">🇵🇦 +507</option>
-                                <option value="+595">🇵🇾 +595</option>
-                                <option value="+51">🇵🇪 +51</option>
-                                <option value="+1">🇩🇴 +1</option>
-                                <option value="+598">🇺🇾 +598</option>
-                                <option value="+58">🇻🇪 +58</option>
-                            </select>
-                            <input type="text" id="jobContact" placeholder="10 dígitos (Ej. 5512345678)" style="flex:1;">
-                        </div>
-                    </div>
+function handleDown(pos) {
+  if (tool === 'fill') { doFill(Math.round(pos.x), Math.round(pos.y)); return; }
+  painting = true; lx = pos.x; ly = pos.y;
+  strokePoints = [{x:pos.x, y:pos.y}];
+  if (tool !== 'eraser') {
+    // Guardamos snapshot para redibujar el trazo limpio
+    const pc = document.getElementById('paint-canvas');
+    strokeSnap = pCtx.getImageData(0, 0, pc.width, pc.height);
+  }
+}
 
-                    <div class="form-actions"><button type="button" class="tool-btn" style="background:#666; width:100%" onclick="closeFormModal()">Cancelar</button><button type="submit" class="btn-primary" style="width:100%">Guardar</button></div>
-                </form>
-            </div>
-        </div>
+function handleMove(pos) {
+  if (!painting) return;
+  if (tool === 'eraser') {
+    // Borrador: directo
+    pCtx.globalCompositeOperation = 'destination-out';
+    pCtx.strokeStyle = 'rgba(0,0,0,1)';
+    pCtx.lineWidth = brushSize * 5;
+    pCtx.lineCap = pCtx.lineJoin = 'round';
+    pCtx.beginPath(); pCtx.moveTo(lx, ly);
+    pCtx.lineTo(pos.x, pos.y); pCtx.stroke();
+    lx = pos.x; ly = pos.y;
+    return;
+  }
+  // Pincel: restaura snapshot y redibuja todo el trazo
+  // Esto elimina el "rayón" al pintar sobre el mismo color
+  strokePoints.push({x:pos.x, y:pos.y});
+  if (strokeSnap) pCtx.putImageData(strokeSnap, 0, 0);
+  pCtx.globalCompositeOperation = 'source-over';
+  pCtx.strokeStyle = paintColor;
+  pCtx.lineWidth = brushSize;
+  pCtx.lineCap = pCtx.lineJoin = 'round';
+  pCtx.beginPath();
+  pCtx.moveTo(strokePoints[0].x, strokePoints[0].y);
+  for (let i = 1; i < strokePoints.length; i++)
+    pCtx.lineTo(strokePoints[i].x, strokePoints[i].y);
+  pCtx.stroke();
+  lx = pos.x; ly = pos.y;
+}
 
-        <div class="modal" id="metricsModal"><div class="modal-content" style="max-width:820px; width:95%;">
-<button class="close-btn" onclick="closeMetricsModal()">×</button>
-<h2>📊 Métricas Pro</h2>
+function handleUp() {
+  if (!painting) return;
+  painting = false;
+  strokeSnap = null; strokePoints = [];
+  pCtx.globalCompositeOperation = 'source-over';
+  saveHist();
+}
 
-<!-- TABS -->
-<div style="display:flex; gap:8px; margin-bottom:16px; border-bottom:2px solid #eee; padding-bottom:8px;">
-    <button id="tabFirebase" onclick="switchMetricsTab('firebase')" style="padding:7px 16px; border:none; border-radius:8px 8px 0 0; background:#1a73e8; color:white; font-weight:700; cursor:pointer;">🔥 Portal (Firebase)</button>
-    <button id="tabGA4" onclick="switchMetricsTab('ga4')" style="padding:7px 16px; border:none; border-radius:8px 8px 0 0; background:#eee; color:#555; font-weight:600; cursor:pointer;">📈 Google Analytics</button>
-</div>
+// ── FLOOD FILL ──
+function hexToRgb(h) {
+  const v = parseInt(h.replace('#',''), 16);
+  return [(v>>16)&255, (v>>8)&255, v&255];
+}
 
-<!-- TAB FIREBASE -->
-<div id="panelFirebase">
-    <div id="trafficChartContainer"></div>
-    <p style="margin-bottom:10px; color:#666;">Selecciona los meses para el reporte Excel:</p>
-    <div id="metricsMonthList" style="margin: 15px 0; max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px; background:#f9f9f9;"><p style="text-align:center; color:#999;">Cargando historial...</p></div>
-    <button class="btn-primary" style="width:100%" onclick="downloadSelectedMetrics()">📥 Descargar Excel Consolidado</button>
-</div>
+function doFill(sx, sy) {
+  const rc = document.getElementById('ref-canvas');
+  const pc = document.getElementById('paint-canvas');
+  const W = pc.width, H = pc.height;
+  // Composite: ref (outline) + paint layers
+  const tmp = document.createElement('canvas'); tmp.width = W; tmp.height = H;
+  const tc = tmp.getContext('2d');
+  tc.drawImage(rc, 0, 0);
+  tc.drawImage(pc, 0, 0);
+  const merged = tc.getImageData(0, 0, W, H).data;
+  const paintData = pCtx.getImageData(0, 0, W, H);
+  const pd = paintData.data;
+  const idx = (y,x) => (y*W+x)*4;
+  const si = idx(sy,sx);
+  const sr = merged[si], sg = merged[si+1], sb = merged[si+2];
+  // Don't fill dark outline pixels
+  if (sr < 80 && sg < 80 && sb < 80) return;
+  const [fr,fg,fb] = hexToRgb(paintColor);
+  // Already same color
+  if (Math.abs(sr-fr)<8 && Math.abs(sg-fg)<8 && Math.abs(sb-fb)<8) return;
+  const TOL = 38;
+  function match(i) {
+    const r=merged[i],g=merged[i+1],b=merged[i+2];
+    if (r<80&&g<80&&b<80) return false;
+    return Math.abs(r-sr)<=TOL&&Math.abs(g-sg)<=TOL&&Math.abs(b-sb)<=TOL;
+  }
+  const vis = new Uint8Array(W*H);
+  const stack = [[sx,sy]];
+  vis[sy*W+sx] = 1;
+  while (stack.length) {
+    const [x,y] = stack.pop();
+    let l=x; while(l>0 && match(idx(y,l-1))) l--;
+    let r2=x; while(r2<W-1 && match(idx(y,r2+1))) r2++;
+    for (let i=l;i<=r2;i++) {
+      const di=idx(y,i);
+      pd[di]=fr; pd[di+1]=fg; pd[di+2]=fb; pd[di+3]=255;
+      if(y>0&&!vis[(y-1)*W+i]&&match(idx(y-1,i))){ vis[(y-1)*W+i]=1; stack.push([i,y-1]); }
+      if(y<H-1&&!vis[(y+1)*W+i]&&match(idx(y+1,i))){ vis[(y+1)*W+i]=1; stack.push([i,y+1]); }
+    }
+  }
+  pCtx.putImageData(paintData, 0, 0);
+  saveHist();
+}
 
-<!-- TAB GOOGLE ANALYTICS (Looker Studio) -->
-<div id="panelGA4" style="display:none;">
-    <p style="font-size:13px; color:#666; margin-bottom:10px;">Dashboard en tiempo real desde Google Analytics. <a href="https://lookerstudio.google.com" target="_blank" style="color:#1a73e8;">Editar en Looker Studio ↗</a></p>
-    <div id="lookerContainer" style="background:#f5f5f5; border-radius:10px; overflow:hidden; min-height:480px; display:flex; align-items:center; justify-content:center;">
-        <div id="lookerPlaceholder" style="text-align:center; padding:30px; color:#888;">
-            <div style="font-size:40px; margin-bottom:12px;">📈</div>
-            <p style="font-weight:700; color:#333; margin-bottom:6px;">Conecta tu Looker Studio</p>
-            <p style="font-size:13px; margin-bottom:16px;">Configura el link de tu dashboard en ⚙️ Ajustes para verlo aquí.</p>
-            <a href="https://lookerstudio.google.com/reporting/create" target="_blank" style="background:#1a73e8; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-size:13px; font-weight:600;">🚀 Crear mi Dashboard</a>
-        </div>
-    </div>
-</div>
+// ── HISTORY ──
+function saveHist() {
+  const pc = document.getElementById('paint-canvas');
+  if (!pc) return;
+  histIdx++;
+  history = history.slice(0, histIdx);
+  history.push(pc.toDataURL());
+  if (history.length > 25) { history.shift(); histIdx--; }
+}
 
-</div></div>
-        <div class="modal" id="teamModal">
-            <div class="modal-content">
-                <div class="modal-header-pro">
-                    <h2>👥 Gestión de Equipo</h2>
-                    <button class="close-btn" style="position:static;" onclick="closeTeamModal()">×</button>
-                </div>
-                
-                <div class="modern-form-box" style="padding: 15px; margin-bottom: 15px; background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 12px;">
-                    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-                        <div style="flex: 2;">
-                            <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px; color: #555;">Nombre</label>
-                            <input type="text" id="recName" placeholder="Ej. Juan Pérez" style="width: 100%; height: 38px; font-size: 13px; border-radius: 8px; border: 1px solid #ccc; padding: 0 10px;">
-                        </div>
-                        <div style="flex: 1;">
-                            <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px; color: #555;">Código</label>
-                            <input type="text" id="recCode" placeholder="Ej. JUAN" style="width: 100%; height: 38px; font-size: 13px; border-radius: 8px; border: 1px solid #ccc; padding: 0 10px;">
-                        </div>
-                    </div>
+function undo() {
+  if (histIdx <= 0) { toast('Nada que deshacer'); return; }
+  histIdx--;
+  const pc = document.getElementById('paint-canvas');
+  const img = new Image();
+  img.onload = () => { pCtx.clearRect(0,0,pc.width,pc.height); pCtx.drawImage(img,0,0); };
+  img.src = history[histIdx];
+}
 
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px; color: #555;">WhatsApp de Contacto</label>
-                        <div style="display: flex; gap: 8px;">
-                            <select id="teamCountryCode" style="width: 95px; height: 38px; font-size: 12px; border: 1px solid #ccc; border-radius: 8px; background: white; padding: 0 5px;">
-                                <option value="+52">🇲🇽 +52</option>
-                                <option value="+54">🇦🇷 +54</option>
-                                <option value="+591">🇧🇴 +591</option>
-                                <option value="+55">🇧🇷 +55</option>
-                                <option value="+56">🇨🇱 +56</option>
-                                <option value="+57">🇨🇴 +57</option>
-                                <option value="+506">🇨🇷 +506</option>
-                                <option value="+53">🇨🇺 +53</option>
-                                <option value="+593">🇪🇨 +593</option>
-                                <option value="+503">🇸🇻 +503</option>
-                                <option value="+34">🇪🇸 +34</option>
-                                <option value="+1">🇺🇸 +1</option>
-                                <option value="+502">🇬🇹 +502</option>
-                                <option value="+504">🇭🇳 +504</option>
-                                <option value="+505">🇳🇮 +505</option>
-                                <option value="+507">🇵🇦 +507</option>
-                                <option value="+595">🇵🇾 +595</option>
-                                <option value="+51">🇵🇪 +51</option>
-                                <option value="+1">🇩🇴 +1</option>
-                                <option value="+598">🇺🇾 +598</option>
-                                <option value="+58">🇻🇪 +58</option>
-                            </select>
-                            <input type="text" id="recPhone" placeholder="10 dígitos" style="flex: 1; height: 38px; font-size: 13px; border-radius: 8px; border: 1px solid #ccc; padding: 0 10px;" autocomplete="off">
-                        </div>
-                    </div>
+async function clearPaint() {
+  const pc = document.getElementById('paint-canvas');
+  pCtx.clearRect(0,0,pc.width,pc.height);
+  history = []; histIdx = -1; saveHist();
+  try { await dbDeleteProgress(progressKey(IMG_SRC)); } catch {}
+}
 
-                    <div class="team-actions-container">
-                        <button class="btn-save-rec" id="btnSaveRecruiter" onclick="saveRecruiter()">
-                            💾 Guardar
-                        </button>
-                        <button class="btn-base-rec" onclick="downloadRecruiters()">
-                            📥 Base
-                        </button>
-                    </div>
-                </div>
-                
-                <h3 style="font-size:16px; margin-bottom:10px; color:#555;">📂 Directorio Activo</h3>
-                <div class="table-container-pro" style="max-height: 350px; overflow-y: auto; position: relative; border: 1px solid #eee; border-radius: 10px;">
-                    <table class="recruiters-table" style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-                        <thead style="position: sticky; top: 0; z-index: 10; background: #007bff; color: white;">
-                            <tr>
-                                <th style="width: 40px; color: white; padding: 12px 5px; font-size: 11px; text-align: center;">#</th>
-                                <th style="width: 45%; color: white; padding: 12px 10px; font-size: 11px; text-align: left;">Nombre</th>
-                                <th style="width: 80px; color: white; padding: 12px 10px; font-size: 11px; text-align: left;">Código</th>
-                                <th style="width: 50px; color: white; padding: 12px 5px; font-size: 11px; text-align: center;">Link</th>
-                                <th style="width: 80px; color: white; padding: 12px 10px; font-size: 11px; text-align: right;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recruitersList">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="modal" id="settingsModal"><div class="modal-content"><button class="close-btn" onclick="closeSettingsModal()">×</button><h2>⚙️ Ajustes del Sistema</h2><div class="form-group"><label>📞 Teléfono Oficina Central (Respaldo)</label><div style="display:flex; gap:10px;"><input type="text" id="settingsPhoneInput" placeholder="Ej. 5512345678" style="flex:1;"><button class="btn-primary" id="btnSaveCentral" onclick="saveCentralConfig()">Guardar</button></div><p style="font-size:12px; color:#666; margin-top:5px;">Este número se usa si la vacante no tiene contacto o está mal escrito.</p></div><div class="form-group" style="margin-top:16px; padding-top:14px; border-top:1px solid #eee;">
-    <label>📈 Looker Studio — Dashboard de Analytics</label>
-    <div style="display:flex; gap:10px; margin-top:6px;">
-        <input type="text" id="settingsLookerUrl" placeholder="https://lookerstudio.google.com/embed/reporting/..." style="flex:1;">
-        <button class="btn-primary" onclick="saveLookerUrl()">Guardar</button>
-    </div>
-    <p style="font-size:12px; color:#666; margin-top:5px;">Pega aquí el link de <b>inserción</b> de tu reporte de Looker Studio.</p>
-</div>
-<div class="form-group" style="margin-top:16px; padding-top:14px; border-top:1px solid #eee;">
-    <label>🔗 GitHub — Automatización Sitemap</label>
-    <div style="display:flex; gap:10px; margin-top:6px;">
-        <input type="text" id="settingsGithubRepo" placeholder="usuario/nombre-repo" style="flex:1;" title="Ej: mariajose/tuchamba-express">
-        <button class="btn-primary" onclick="saveGithubConfig()">Guardar</button>
-    </div>
-    <div style="margin-top:8px;">
-        <input type="password" id="settingsGithubToken" placeholder="GitHub Token (ghp_...)" style="width:100%; box-sizing:border-box;">
-    </div>
-    <p style="font-size:12px; color:#666; margin-top:5px;">El token necesita permiso <b>repo</b>. Se guarda cifrado en Firebase, solo tú puedes leerlo.</p>
-</div>
-<div class="danger-section"><h3 style="color:#d32f2f; margin-bottom:10px;">⚠️ Zona de Peligro (Admin)</h3><p style="font-size:13px; color:#666; margin-bottom:10px;">Acciones irreversibles protegidas por contraseña.</p><button class="danger-btn" onclick="performSafeAction('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button><button class="danger-btn" onclick="performSafeAction('deleteJobs')">🔥 Borrar TODAS las Vacantes</button></div></div></div>
-        <div class="modal" id="privacyModal"><div class="modal-content"><button class="close-btn" onclick="closePrivacyModal()">×</button><h2>🔒 Aviso de Privacidad</h2><div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto;"><p style="font-size: 12px; color: #666; margin-bottom: 15px;"><strong>Última actualización: Enero 2026</strong></p><p style="margin-bottom: 15px;">En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, <strong>TuChamba Express</strong> informa:</p><p style="margin-bottom:5px;"><strong>1. Responsable de los datos:</strong></p><p style="margin-bottom:15px;">TuChamba Express actúa como enlace entre candidatos y empresas reclutadoras.</p><p style="margin-bottom:5px;"><strong>2. Datos recopilados:</strong></p><p style="margin-bottom:15px;">Podemos recopilar datos de contacto (como número telefónico) con el único fin de facilitar la comunicación para procesos de reclutamiento.</p><p style="margin-bottom:5px;"><strong>3. Uso de la información:</strong></p><p style="margin-bottom:5px;">Los datos proporcionados serán utilizados exclusivamente para:</p><ul style="margin-left: 20px; margin-bottom: 15px;"><li>Contactar al candidato respecto a la vacante de interés.</li><li>Agendar entrevistas laborales.</li><li>Procesos internos de selección.</li></ul><p style="margin-bottom:5px;"><strong>4. Compartir datos:</strong></p><p style="margin-bottom:15px;">Su información de contacto será compartida únicamente con la empresa o reclutador responsable de la vacante a la que usted decida postularse voluntariamente.</p><p style="margin-bottom:5px;"><strong>5. Examen Médico:</strong></p><p style="margin-bottom:0;">Al utilizar esta plataforma, usted reconoce que algunas empresas contratantes pueden requerir, como parte de su proceso de selección y conforme a la ley, la realización de exámenes médicos y/o pruebas de detección de sustancias.</p></div></div></div>
+async function saveProgress() {
+  const pc = document.getElementById('paint-canvas');
+  try {
+    await dbSaveProgress(progressKey(IMG_SRC), pc.toDataURL());
+    toast('🔖 ¡Avance guardado!');
+  } catch { toast('⚠️ No se pudo guardar'); }
+}
 
-        <script type="module" src="app.js"></script>
+function savePaint() {
+  const rc = document.getElementById('ref-canvas');
+  const pc = document.getElementById('paint-canvas');
+  const tmp = document.createElement('canvas'); tmp.width = pc.width; tmp.height = pc.height;
+  const c = tmp.getContext('2d');
+  c.fillStyle = '#fff'; c.fillRect(0,0,tmp.width,tmp.height);
+  c.drawImage(rc,0,0); c.drawImage(pc,0,0);
+  const a = document.createElement('a');
+  a.download = 'colorear_' + Date.now() + '.png';
+  a.href = tmp.toDataURL('image/png'); a.click();
+  toast('🎉 ¡Exportado!');
+}
 
-    <div style="text-align: center; font-size: 10px; color: #666; padding: 20px 10px; opacity: 0.7;">
-    <p>
-        <strong>TuChamba Express © 2026.</strong> Plataforma de vinculación laboral. 
-        No somos responsables de las contrataciones ni condiciones laborales (NOM-035) ofrecidas por terceros.
-    </p>
-    <p>
-        Este sitio utiliza almacenamiento local para mejorar tu experiencia. 
-        No guardamos datos personales de candidatos sin consentimiento.
-        <a href="#" onclick="alert('Aviso de Privacidad Simplificado:\n\n1. No recopilamos tu nombre ni correo.\n2. Los datos de contacto son públicos bajo responsabilidad del reclutador.\n3. Usamos cookies anónimas para contar visitas.\n\nPara ejercer derechos ARCO, contacta al admin.')" style="color: #666; text-decoration: underline;">Ver Aviso de Privacidad</a>
-    </p>
-</div>
+// ── TOOLS ──
+function setTool(t) {
+  tool = t;
+  document.querySelectorAll('.cp-t').forEach(b => b.classList.remove('on'));
+  document.getElementById('tc-' + t)?.classList.add('on');
+}
 
-    </body>
-    </html>
+function setSize(s, btnId) {
+  brushSize = s;
+  document.querySelectorAll('.cp-sz').forEach(b => b.classList.remove('on'));
+  document.getElementById(btnId)?.classList.add('on');
+}
+
+// ── TOAST ──
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', async () => {
+  try { await initDB(); } catch { console.warn('IndexedDB no disponible'); }
+  // Override gallery navigation to build gallery first
+  document.querySelector('#s-source .sc-pre').onclick = nav_gallery;
+  // Splash → Home
+  setTimeout(() => { nav('s-home'); }, 1800);
+});
+</script>
+</body>
+</html>
