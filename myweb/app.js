@@ -67,7 +67,7 @@
             let activeChatId = null;
             let chatUnsubscribe = null;
             let chatNotifUnsubscribe = null;
-            let lastSeenMessageCount = {};
+            let lastSeenMessageCount = JSON.parse(localStorage.getItem('lastSeenMsgs') || '{}');
             let notifSound = null;
 
             // Inicializar sonido de notificación
@@ -2286,6 +2286,13 @@
                         resolve(null);
                     };
 
+                    overlay.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') {
+                            e.stopPropagation();
+                            document.getElementById('cdCancelar').click();
+                        }
+                    });
+
                     document.getElementById('cdTelefono').onkeydown = (e) => {
                         if (e.key === 'Enter') document.getElementById('cdConfirmar').click();
                         if (e.key === 'Escape') document.getElementById('cdCancelar').click();
@@ -2733,6 +2740,7 @@
 
             window.abrirChatReclutador = function(chatId, lastMsgAt) {
                 lastSeenMessageCount[chatId] = lastMsgAt;
+                localStorage.setItem('lastSeenMsgs', JSON.stringify(lastSeenMessageCount));
                 window.openRecruiterChat(chatId);
             }
 
