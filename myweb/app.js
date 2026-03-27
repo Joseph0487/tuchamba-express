@@ -2669,7 +2669,7 @@
                         const borderLeft = tieneNuevo ? 'border-left:3px solid #1a237e;' : '';
                         return `
                             <div style="padding:14px;border-bottom:1px solid #eee;background:${bgColor};${borderLeft}cursor:pointer;" 
-                                onclick="lastSeenMessageCount['${chatId}'] = ${lastMsgAt}; window.openRecruiterChat('${chatId}');">
+                                onclick="window.abrirChatReclutador('${chatId}', ${lastMsgAt});">
                                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
                                     <div style="flex:1;">
                                         <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -2695,6 +2695,11 @@
                         `;
                     }).join('');
                 });
+            }
+
+            window.abrirChatReclutador = function(chatId, lastMsgAt) {
+                lastSeenMessageCount[chatId] = lastMsgAt;
+                window.openRecruiterChat(chatId);
             }
 
             // Archivar chat individual (no se borra, se oculta de la bandeja)
