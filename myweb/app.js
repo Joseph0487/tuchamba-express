@@ -2554,16 +2554,15 @@
                         if (lastMsgAt > lastSeen && c.lastMessage) {
                             unread++;
 
-                            // Solo notificar si NO está el panel de chats abierto
                             const panelAbierto = document.getElementById('chatsListModal')?.classList.contains('active');
                             const esMio = activeChatId === chatId;
 
-                            if (!panelAbierto && !esMio) {
-                                // Sonido
+                            if (!esMio) {
+                                // Sonido siempre que no estés dentro del chat
                                 if (notifSound) notifSound();
 
-                                // Web Push
-                                if ('Notification' in window && Notification.permission === 'granted') {
+                                // Web Push solo si el panel está cerrado
+                                if (!panelAbierto && 'Notification' in window && Notification.permission === 'granted') {
                                     new Notification('💬 Nuevo mensaje — TuChamba', {
                                         body: `${c.candidateName}: ${c.lastMessage}`,
                                         icon: '/favicon.png',
@@ -2572,8 +2571,8 @@
                                 }
                             }
 
-                            // Marcar como visto si el chat está abierto
-                            if (esMio || panelAbierto) {
+                            // Marcar como visto solo si estás dentro del chat individual
+                            if (esMio) {
                                 lastSeenMessageCount[chatId] = lastMsgAt;
                             }
                         }
@@ -2663,18 +2662,26 @@
                     container.innerHTML = chats.map(([chatId, c]) => {
                         const timeAgo = c.lastMessageAt ? new Date(c.lastMessageAt).toLocaleString('es-MX', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
                         const diasRestantes = Math.max(0, 7 - Math.floor((Date.now() - (c.createdAt || 0)) / (1000 * 60 * 60 * 24)));
+                        const lastMsgAt = c.lastMessageAt || 0;
+                        const lastSeen = lastSeenMessageCount[chatId] || 0;
+                        const tieneNuevo = lastMsgAt > lastSeen && !!c.lastMessage;
+                        const bgColor = tieneNuevo ? '#e8f0fe' : 'white';
+                        const borderLeft = tieneNuevo ? 'border-left:3px solid #1a237e;' : '';
                         return `
-                            <div style="padding:14px;border-bottom:1px solid #eee;background:white;cursor:pointer;" onclick="window.openRecruiterChat('${chatId}')">
+                            <div style="padding:14px;border-bottom:1px solid #eee;background:${bgColor};${borderLeft}cursor:pointer;" 
+                                onclick="window.openRecruiterChat('${chatId}'); lastSeenMessageCount['${chatId}'] = ${lastMsgAt};">
                                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
                                     <div style="flex:1;">
                                         <div style="display:flex;justify-content:space-between;align-items:center;">
-                                            <div style="font-weight:700;color:#222;font-size:14px;">👤 ${c.candidateName}</div>
-                                            <div style="font-size:11px;color:#aaa;">${timeAgo}</div>
+                                            <div style="font-weight:${tieneNuevo ? '800' : '700'};color:#222;font-size:14px;">👤 ${c.candidateName}</div>
+                                            <div style="display:flex;align-items:center;gap:6px;">
+                                                ${tieneNuevo ? `<span style="background:#1a237e;color:white;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;">N</span>` : ''}
+                                                <div style="font-size:11px;color:#aaa;">${timeAgo}</div>
+                                            </div>
                                         </div>
                                         <div style="font-size:12px;color:#0a66c2;margin-top:2px;">💼 ${c.vacantTitle}</div>
                                         <div style="font-size:11px;color:#888;margin-top:1px;">🏢 ${(jobs[c.vacantId] || {}).company || ''}</div>
-                                        <div style="font-size:12px;color:#666;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.lastMessage || 'Sin mensajes'}</div>
-                                        <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
+                                        <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
                                             <span style="font-size:11px;color:#aaa;">📱 ${c.candidatePhone}</span>
                                             <span style="font-size:10px;color:${diasRestantes <= 2 ? '#e53935' : '#aaa'};">⏳ ${diasRestantes}d restantes</span>
                                         </div>
