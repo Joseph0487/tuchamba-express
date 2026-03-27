@@ -2271,45 +2271,57 @@
                 const modal = document.getElementById('chatModal');
                 if (!modal) return;
 
+                const vacantTitle = (jobs[jobId] || {}).title || jobId;
+                let chatId, candidateName, candidatePhone;
+
+                // Revisar si ya existe chat guardado en localStorage (sin teléfono aún)
                 const savedChatKey = `chat_${jobId}_${recCode}`;
                 const savedChat = localStorage.getItem(savedChatKey);
-                let chatId, candidateName, candidatePhone;
-                const vacantTitle = (jobs[jobId] || {}).title || jobId;
 
                 if (savedChat) {
+                    // Retomar conversación existente
                     const parsed = JSON.parse(savedChat);
                     chatId = parsed.chatId;
                     candidateName = parsed.candidateName;
                     candidatePhone = parsed.candidatePhone;
                 } else {
+                    // Nueva conversación — pedir datos
                     const datos = await window.pedirDatosCandidate();
                     if (!datos) return;
 
                     candidateName = datos.nombre;
                     candidatePhone = datos.telefono;
-                    chatId = `${jobId}_${recCode}_${Date.now()}`;
 
-                    const chatMeta = {
-                        vacantId: jobId,
-                        vacantTitle: vacantTitle,
-                        refCode: recCode,
-                        recruiterName: recName,
-                        candidateName: candidateName,
-                        candidatePhone: candidatePhone,
-                        createdAt: Date.now(),
-                        lastMessage: '',
-                        lastMessageAt: Date.now(),
-                        status: 'open'
-                    };
-                    set(ref(db, `chats/${chatId}`), chatMeta);
+                    // ChatId único por vacante + reclutador + teléfono (sin duplicados)
+                    const telefonoLimpio = candidatePhone.replace(/\D/g, '');
+                    chatId = `${jobId}_${recCode}_${telefonoLimpio}`;
 
+                    // Verificar si ya existe este chat en Firebase
+                    const existingSnap = await get(ref(db, `chats/${chatId}`));
+                    if (!existingSnap.exists()) {
+                        // Chat nuevo — crear metadata
+                        const chatMeta = {
+                            vacantId: jobId,
+                            vacantTitle: vacantTitle,
+                            refCode: recCode,
+                            recruiterName: recName,
+                            candidateName: candidateName,
+                            candidatePhone: candidatePhone,
+                            createdAt: Date.now(),
+                            lastMessage: '',
+                            lastMessageAt: Date.now(),
+                            status: 'open'
+                        };
+                        set(ref(db, `chats/${chatId}`), chatMeta);
+                        window.registerClick(jobId, recName);
+                    }
+
+                    // Guardar en localStorage para retomar después
                     localStorage.setItem(savedChatKey, JSON.stringify({
                         chatId,
                         candidateName,
                         candidatePhone
                     }));
-
-                    window.registerClick(jobId, recName);
                 }
 
                 activeChatId = chatId;
@@ -2324,12 +2336,10 @@
                     renderChatMessages(snap.val(), candidateName);
                 });
 
-                // Guardar info del candidato en sessionStorage para este chat
-                sessionStorage.setItem('chatCandidateName', candidateName.trim());
-                sessionStorage.setItem('chatCandidatePhone', candidatePhone.trim());
+                sessionStorage.setItem('chatCandidateName', candidateName);
+                sessionStorage.setItem('chatCandidatePhone', candidatePhone);
                 sessionStorage.setItem('activeChatId', chatId);
 
-                // Focus al input
                 setTimeout(() => {
                     const inp = document.getElementById('chatInput');
                     if (inp) inp.focus();
