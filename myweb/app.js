@@ -2216,32 +2216,55 @@
                 const modal = document.getElementById('chatModal');
                 if (!modal) return;
 
-                // Capturar datos del candidato antes de abrir el chat
-                const candidateName = prompt('¿Cuál es tu nombre?', '');
-                if (!candidateName || !candidateName.trim()) return;
-                const candidatePhone = prompt('¿Cuál es tu número de WhatsApp? (10 dígitos)', '');
-                if (!candidatePhone || !candidatePhone.trim()) return;
+                // Revisar si ya existe un chat previo para esta vacante
+                const savedChatKey = `chat_${jobId}_${recCode}`;
+                const savedChat = localStorage.getItem(savedChatKey);
+                let chatId, candidateName, candidatePhone;
 
-                const chatId = `${jobId}_${recCode}_${Date.now()}`;
+                if (savedChat) {
+                    // Retomar conversación existente
+                    const parsed = JSON.parse(savedChat);
+                    chatId = parsed.chatId;
+                    candidateName = parsed.candidateName;
+                    candidatePhone = parsed.candidatePhone;
+                } else {
+                    // Nueva conversación — pedir datos
+                    candidateName = prompt('¿Cuál es tu nombre?', '');
+                    if (!candidateName || !candidateName.trim()) return;
+                    candidatePhone = prompt('¿Cuál es tu número de WhatsApp? (10 dígitos)', '');
+                    if (!candidatePhone || !candidatePhone.trim()) return;
+
+                    chatId = `${jobId}_${recCode}_${Date.now()}`;
+
+                    // Guardar metadata de la conversación
+                    const chatMeta = {
+                        vacantId: jobId,
+                        vacantTitle: (jobs[jobId] || {}).title || jobId,
+                        refCode: recCode,
+                        recruiterName: recName,
+                        candidateName: candidateName.trim(),
+                        candidatePhone: candidatePhone.trim(),
+                        createdAt: Date.now(),
+                        lastMessage: '',
+                        lastMessageAt: Date.now(),
+                        status: 'open'
+                    };
+                    set(ref(db, `chats/${chatId}`), chatMeta);
+
+                    // Guardar en localStorage para retomar después
+                    localStorage.setItem(savedChatKey, JSON.stringify({
+                        chatId,
+                        candidateName: candidateName.trim(),
+                        candidatePhone: candidatePhone.trim()
+                    }));
+
+                    // Registrar el clic igual que antes (métricas)
+                    window.registerClick(jobId, recName);
+                }
+
                 activeChatId = chatId;
-
-                // Guardar metadata de la conversación
-                const chatMeta = {
-                    vacantId: jobId,
-                    vacantTitle: (jobs[jobId] || {}).title || jobId,
-                    refCode: recCode,
-                    recruiterName: recName,
-                    candidateName: candidateName.trim(),
-                    candidatePhone: candidatePhone.trim(),
-                    createdAt: Date.now(),
-                    lastMessage: '',
-                    lastMessageAt: Date.now(),
-                    status: 'open'
-                };
-                set(ref(db, `chats/${chatId}`), chatMeta);
-
-                // Registrar el clic igual que antes (métricas)
-                window.registerClick(jobId, recName);
+                candidateName = candidateName.trim();
+                candidatePhone = candidatePhone.trim();
 
                 // Abrir modal
                 document.getElementById('chatModalTitle').textContent = `Chat: ${chatMeta.vacantTitle}`;
