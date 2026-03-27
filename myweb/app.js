@@ -2517,17 +2517,6 @@
                         return;
                     }
 
-                    container.innerHTML = chats.map(([chatId, c]) => {perCase() === (myCode || '').toUpperCase());
-                    }
-
-                    // Ordenar por más reciente
-                    chats.sort(([,a],[,b]) => (b.lastMessageAt || 0) - (a.lastMessageAt || 0));
-
-                    if (chats.length === 0) {
-                        container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px;">No hay conversaciones aún.</p>';
-                        return;
-                    }
-
                     container.innerHTML = chats.map(([chatId, c]) => {
                         const timeAgo = c.lastMessageAt ? new Date(c.lastMessageAt).toLocaleString('es-MX', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
                         const diasRestantes = Math.max(0, 7 - Math.floor((Date.now() - (c.createdAt || 0)) / (1000 * 60 * 60 * 24)));
