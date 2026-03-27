@@ -171,7 +171,10 @@
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === "Escape") {
-                    if(document.getElementById('viewModal').classList.contains('active')) closeViewModal();
+                    if(document.getElementById('recruiterChatModal') && document.getElementById('recruiterChatModal').classList.contains('active')) { window.closeRecruiterChatModal(); return; }
+                    else if(document.getElementById('chatsListModal') && document.getElementById('chatsListModal').classList.contains('active')) { window.closeChatsPanel(); return; }
+                    else if(document.getElementById('chatModal') && document.getElementById('chatModal').classList.contains('active')) { window.closeChatModal(); return; }
+                    else if(document.getElementById('viewModal').classList.contains('active')) closeViewModal();
                     else if(document.getElementById('formModal').classList.contains('active')) closeFormModal();
                     else if(document.getElementById('metricsModal').classList.contains('active')) closeMetricsModal();
                     else if(document.getElementById('teamModal').classList.contains('active')) closeTeamModal();
