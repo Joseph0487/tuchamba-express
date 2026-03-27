@@ -2288,6 +2288,10 @@
 
                     document.getElementById('cdTelefono').onkeydown = (e) => {
                         if (e.key === 'Enter') document.getElementById('cdConfirmar').click();
+                        if (e.key === 'Escape') document.getElementById('cdCancelar').click();
+                    };
+                    document.getElementById('cdNombre').onkeydown = (e) => {
+                        if (e.key === 'Escape') document.getElementById('cdCancelar').click();
                     };
                 });
             }
