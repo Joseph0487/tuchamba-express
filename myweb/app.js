@@ -2394,9 +2394,10 @@
                     timestamp: Date.now()
                 });
 
-                // Actualizar lastMessage en el chat
+                // Actualizar lastMessage y des-archivar si estaba archivado
                 set(ref(db, `chats/${activeChatId}/lastMessage`), text);
                 set(ref(db, `chats/${activeChatId}/lastMessageAt`), Date.now());
+                set(ref(db, `chats/${activeChatId}/archived`), false);
 
                 input.value = '';
             }
@@ -2530,11 +2531,27 @@
 
                 chatsUnsubscribe = onValue(ref(db, 'chats'), snap => {
                     const all = snap.val() || {};
+                    const cutoff = Date.now() - (7 * 24 * 60 * 60 * 1000);
+
+                    // Borrado automático silencioso de chats +7 días
+                    Object.entries(all).forEach(([chatId, c]) => {
+                        if ((c.createdAt || 0) < cutoff) {
+                            remove(ref(db, `chats/${chatId}`));
+                            remove(ref(db, `messages/${chatId}`));
+                        }
+                    });
+
                     let chats = Object.entries(all);
 
-                    // Si no es superadmin, filtrar solo los chats de este reclutador
+                    // Filtrar por reclutador y excluir archivados y viejos
                     if (!isAdmin || isRecruiterMode) {
-                        chats = chats.filter(([id, c]) => (c.refCode || '').toUpperCase() === (myCode || '').toUpperCase());
+                        chats = chats.filter(([id, c]) =>
+                            (c.refCode || '').toUpperCase() === (myCode || '').toUpperCase() &&
+                            !c.archived &&
+                            (c.createdAt || 0) >= cutoff
+                        );
+                    } else {
+                        chats = chats.filter(([id, c]) => !c.archived && (c.createdAt || 0) >= cutoff);
                     }
 
                     // Ordenar por más reciente
@@ -2575,15 +2592,11 @@
                 });
             }
 
-            // Borrar chat individual
+            // Archivar chat individual (no se borra, se oculta de la bandeja)
             window.deleteChat = function(chatId) {
-                if (!confirm('¿Eliminar esta conversación? No se puede deshacer.')) return;
-                Promise.all([
-                    remove(ref(db, `chats/${chatId}`)),
-                    remove(ref(db, `messages/${chatId}`))
-                ]).then(() => {
-                    window.showToast('🗑️ Conversación eliminada');
-                    loadRecruiterChats();
+                if (!confirm('¿Archivar esta conversación? El candidato puede seguir escribiendo.')) return;
+                set(ref(db, `chats/${chatId}/archived`), true).then(() => {
+                    window.showToast('📦 Conversación archivada');
                 });
             }
 
