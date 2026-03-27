@@ -65,7 +65,28 @@
 
             // --- CHAT INTERNO ---
             let activeChatId = null;
-            let chatUnsubscribe = null; 
+            let chatUnsubscribe = null;
+            let chatNotifUnsubscribe = null;
+            let lastSeenMessageCount = {};
+            let notifSound = null;
+
+            // Inicializar sonido de notificación
+            function initNotifSound() {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    notifSound = () => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.connect(g); g.connect(ctx.destination);
+                        o.frequency.setValueAtTime(880, ctx.currentTime);
+                        o.frequency.setValueAtTime(660, ctx.currentTime + 0.1);
+                        g.gain.setValueAtTime(0.3, ctx.currentTime);
+                        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+                        o.start(ctx.currentTime);
+                        o.stop(ctx.currentTime + 0.4);
+                    };
+                } catch(e) {}
+            } 
 
             let tempReqs = [];
             let tempBens = [];
@@ -871,6 +892,10 @@
                         // Mostramos el botón de chats al reclutador
                         var btnChats = document.getElementById('btnChatsPanel');
                         if (btnChats) btnChats.style.display = 'inline-flex';
+
+                        // Arrancar notificaciones
+                        initNotifSound();
+                        startChatNotifications(activeRecruiter ? activeRecruiter.code : refCode);
                     
                     } else {
                         document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator">Super Admin</span>';
@@ -2503,12 +2528,85 @@
                 container.scrollTop = container.scrollHeight;
             }
 
+            // Iniciar escucha de notificaciones para el reclutador
+            function startChatNotifications(myCode) {
+                if (chatNotifUnsubscribe) { chatNotifUnsubscribe(); chatNotifUnsubscribe = null; }
+
+                // Pedir permiso para Web Push
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+
+                const cutoff = Date.now() - (7 * 24 * 60 * 60 * 1000);
+
+                chatNotifUnsubscribe = onValue(ref(db, 'chats'), snap => {
+                    const all = snap.val() || {};
+                    let unread = 0;
+
+                    Object.entries(all).forEach(([chatId, c]) => {
+                        if ((c.refCode || '').toUpperCase() !== myCode.toUpperCase()) return;
+                        if (c.archived) return;
+                        if ((c.createdAt || 0) < cutoff) return;
+
+                        const lastMsgAt = c.lastMessageAt || 0;
+                        const lastSeen = lastSeenMessageCount[chatId] || 0;
+
+                        if (lastMsgAt > lastSeen && c.lastMessage) {
+                            unread++;
+
+                            // Solo notificar si NO está el panel de chats abierto
+                            const panelAbierto = document.getElementById('chatsListModal')?.classList.contains('active');
+                            const esMio = activeChatId === chatId;
+
+                            if (!panelAbierto && !esMio) {
+                                // Sonido
+                                if (notifSound) notifSound();
+
+                                // Web Push
+                                if ('Notification' in window && Notification.permission === 'granted') {
+                                    new Notification('💬 Nuevo mensaje — TuChamba', {
+                                        body: `${c.candidateName}: ${c.lastMessage}`,
+                                        icon: '/favicon.png',
+                                        tag: chatId
+                                    });
+                                }
+                            }
+
+                            // Marcar como visto si el chat está abierto
+                            if (esMio || panelAbierto) {
+                                lastSeenMessageCount[chatId] = lastMsgAt;
+                            }
+                        }
+                    });
+
+                    // Actualizar badge
+                    const badge = document.getElementById('chatsBadge');
+                    if (badge) {
+                        if (unread > 0) {
+                            badge.textContent = unread > 9 ? '9+' : unread;
+                            badge.style.display = 'inline-flex';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                });
+            }
+
+            // Limpiar badge al abrir el panel
+
             // Panel de chats del reclutador
             window.openChatsPanel = function() {
                 const modal = document.getElementById('chatsListModal');
                 if (!modal) return;
                 modal.classList.add('active');
                 loadRecruiterChats();
+                // Limpiar badge al abrir
+                const badge = document.getElementById('chatsBadge');
+                if (badge) badge.style.display = 'none';
+                // Marcar todos como vistos
+                Object.keys(lastSeenMessageCount).forEach(k => {
+                    lastSeenMessageCount[k] = Date.now();
+                });
             }
 
             window.closeChatsPanel = function() {
