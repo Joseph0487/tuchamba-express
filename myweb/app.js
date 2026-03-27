@@ -2279,11 +2279,39 @@
                 const savedChat = localStorage.getItem(savedChatKey);
 
                 if (savedChat) {
-                    // Retomar conversación existente
                     const parsed = JSON.parse(savedChat);
-                    chatId = parsed.chatId;
-                    candidateName = parsed.candidateName;
-                    candidatePhone = parsed.candidatePhone;
+                    // Verificar si el chat aún existe en Firebase
+                    const existCheck = await get(ref(db, `chats/${parsed.chatId}`));
+                    if (existCheck.exists()) {
+                        // Chat existe — retomar
+                        chatId = parsed.chatId;
+                        candidateName = parsed.candidateName;
+                        candidatePhone = parsed.candidatePhone;
+                    } else {
+                        // Chat fue eliminado — limpiar localStorage y pedir datos de nuevo
+                        localStorage.removeItem(savedChatKey);
+                        const datos = await window.pedirDatosCandidate();
+                        if (!datos) return;
+                        candidateName = datos.nombre;
+                        candidatePhone = datos.telefono;
+                        const telefonoLimpio = candidatePhone.replace(/\D/g, '');
+                        chatId = `${jobId}_${recCode}_${telefonoLimpio}`;
+                        const chatMeta = {
+                            vacantId: jobId,
+                            vacantTitle: vacantTitle,
+                            refCode: recCode,
+                            recruiterName: recName,
+                            candidateName: candidateName,
+                            candidatePhone: candidatePhone,
+                            createdAt: Date.now(),
+                            lastMessage: '',
+                            lastMessageAt: Date.now(),
+                            status: 'open'
+                        };
+                        set(ref(db, `chats/${chatId}`), chatMeta);
+                        localStorage.setItem(savedChatKey, JSON.stringify({ chatId, candidateName, candidatePhone }));
+                        window.registerClick(jobId, recName);
+                    }
                 } else {
                     // Nueva conversación — pedir datos
                     const datos = await window.pedirDatosCandidate();
