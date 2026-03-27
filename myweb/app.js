@@ -2212,14 +2212,66 @@
             // MÓDULO DE CHAT INTERNO
             // ============================================================
 
-            window.openChatModal = function(jobId, recCode, recName) {
+            window.pedirDatosCandidate = function() {
+                return new Promise((resolve) => {
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+                    overlay.innerHTML = `
+                        <div style="background:white;border-radius:16px;padding:24px;width:100%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+                            <div style="font-size:22px;text-align:center;margin-bottom:4px;">💬</div>
+                            <h3 style="margin:0 0 4px;text-align:center;font-size:17px;color:#222;">¡Un paso más!</h3>
+                            <p style="margin:0 0 16px;text-align:center;font-size:13px;color:#666;">El reclutador necesita saber quién eres</p>
+                            <div style="margin-bottom:12px;">
+                                <label style="font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:4px;">👤 Tu nombre completo</label>
+                                <input id="cdNombre" type="text" placeholder="Ej. María López" autocomplete="name"
+                                    style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:15px;outline:none;">
+                            </div>
+                            <div style="margin-bottom:20px;">
+                                <label style="font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:4px;">📱 Tu WhatsApp (10 dígitos)</label>
+                                <input id="cdTelefono" type="tel" placeholder="Ej. 5512345678" maxlength="10" autocomplete="tel"
+                                    style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:15px;outline:none;">
+                            </div>
+                            <button id="cdConfirmar"
+                                style="width:100%;padding:12px;background:#0a66c2;color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">
+                                Iniciar Chat 💬
+                            </button>
+                            <button id="cdCancelar"
+                                style="width:100%;padding:10px;background:none;border:none;color:#999;font-size:13px;cursor:pointer;margin-top:8px;">
+                                Cancelar
+                            </button>
+                        </div>
+                    `;
+                    document.body.appendChild(overlay);
+                    setTimeout(() => document.getElementById('cdNombre').focus(), 100);
+
+                    document.getElementById('cdConfirmar').onclick = () => {
+                        const nombre = document.getElementById('cdNombre').value.trim();
+                        const telefono = document.getElementById('cdTelefono').value.trim();
+                        if (!nombre) { document.getElementById('cdNombre').style.borderColor = '#e53935'; return; }
+                        if (!telefono || telefono.length < 10) { document.getElementById('cdTelefono').style.borderColor = '#e53935'; return; }
+                        document.body.removeChild(overlay);
+                        resolve({ nombre, telefono });
+                    };
+
+                    document.getElementById('cdCancelar').onclick = () => {
+                        document.body.removeChild(overlay);
+                        resolve(null);
+                    };
+
+                    document.getElementById('cdTelefono').onkeydown = (e) => {
+                        if (e.key === 'Enter') document.getElementById('cdConfirmar').click();
+                    };
+                });
+            }
+
+            window.openChatModal = async function(jobId, recCode, recName) {
                 const modal = document.getElementById('chatModal');
                 if (!modal) return;
 
-                // Revisar si ya existe un chat previo para esta vacante
                 const savedChatKey = `chat_${jobId}_${recCode}`;
                 const savedChat = localStorage.getItem(savedChatKey);
                 let chatId, candidateName, candidatePhone;
+                const vacantTitle = (jobs[jobId] || {}).title || jobId;
 
                 if (savedChat) {
                     // Retomar conversación existente
@@ -2228,22 +2280,21 @@
                     candidateName = parsed.candidateName;
                     candidatePhone = parsed.candidatePhone;
                 } else {
-                    // Nueva conversación — pedir datos
-                    candidateName = prompt('¿Cuál es tu nombre?', '');
-                    if (!candidateName || !candidateName.trim()) return;
-                    candidatePhone = prompt('¿Cuál es tu número de WhatsApp? (10 dígitos)', '');
-                    if (!candidatePhone || !candidatePhone.trim()) return;
+                    // Nueva conversación — modal propio
+                    const datos = await window.pedirDatosCandidate();
+                    if (!datos) return; // Canceló — no guardamos nada
 
+                    candidateName = datos.nombre;
+                    candidatePhone = datos.telefono;
                     chatId = `${jobId}_${recCode}_${Date.now()}`;
 
-                    // Guardar metadata de la conversación
                     const chatMeta = {
                         vacantId: jobId,
-                        vacantTitle: (jobs[jobId] || {}).title || jobId,
+                        vacantTitle: vacantTitle,
                         refCode: recCode,
                         recruiterName: recName,
-                        candidateName: candidateName.trim(),
-                        candidatePhone: candidatePhone.trim(),
+                        candidateName: candidateName,
+                        candidatePhone: candidatePhone,
                         createdAt: Date.now(),
                         lastMessage: '',
                         lastMessageAt: Date.now(),
@@ -2251,40 +2302,32 @@
                     };
                     set(ref(db, `chats/${chatId}`), chatMeta);
 
-                    // Guardar en localStorage para retomar después
+                    // Guardar en localStorage solo si confirmó
                     localStorage.setItem(savedChatKey, JSON.stringify({
                         chatId,
-                        candidateName: candidateName.trim(),
-                        candidatePhone: candidatePhone.trim()
+                        candidateName,
+                        candidatePhone
                     }));
 
-                    // Registrar el clic igual que antes (métricas)
                     window.registerClick(jobId, recName);
                 }
 
                 activeChatId = chatId;
-                candidateName = candidateName.trim();
-                candidatePhone = candidatePhone.trim();
 
-                // Abrir modal
-                document.getElementById('chatModalTitle').textContent = `Chat: ${chatMeta.vacantTitle}`;
+                document.getElementById('chatModalTitle').textContent = `Chat: ${vacantTitle}`;
                 document.getElementById('chatMessages').innerHTML = '<p style="text-align:center;color:#aaa;font-size:13px;padding:20px;">Escribe tu primera pregunta 👇</p>';
                 modal.classList.add('active');
 
-                // Escuchar mensajes en tiempo real
                 if (chatUnsubscribe) chatUnsubscribe();
                 const messagesRef = ref(db, `messages/${chatId}`);
                 chatUnsubscribe = onValue(messagesRef, (snap) => {
-                    const data = snap.val();
-                    renderChatMessages(data, candidateName.trim());
+                    renderChatMessages(snap.val(), candidateName);
                 });
 
-                // Guardar info del candidato en sessionStorage para este chat
-                sessionStorage.setItem('chatCandidateName', candidateName.trim());
-                sessionStorage.setItem('chatCandidatePhone', candidatePhone.trim());
+                sessionStorage.setItem('chatCandidateName', candidateName);
+                sessionStorage.setItem('chatCandidatePhone', candidatePhone);
                 sessionStorage.setItem('activeChatId', chatId);
 
-                // Focus al input
                 setTimeout(() => {
                     const inp = document.getElementById('chatInput');
                     if (inp) inp.focus();
