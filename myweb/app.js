@@ -2485,9 +2485,23 @@
                 document.getElementById('recruiterChatModal').classList.remove('active');
                 if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
                 activeChatId = null;
-                // Re-renderizar lista para quitar el badge de "Nuevo mensaje"
-                const container = document.getElementById('chatsList');
-                if (container && document.getElementById('chatsListModal')?.classList.contains('active')) {
+                // Actualizar contador de no leídos
+                const unreadLabel = document.getElementById('unreadChatsLabel');
+                const unreadCount = document.getElementById('unreadChatsCount');
+                if (unreadLabel && unreadCount) {
+                    const sinLeer = Object.values(lastSeenMessageCount).length;
+                    // Recalcular no leídos
+                    let unread = 0;
+                    document.querySelectorAll('#chatsList [data-unread="true"]').forEach(() => unread++);
+                    if (unread > 0) {
+                        unreadCount.textContent = unread === 1 ? '1 conversación' : `${unread} conversaciones`;
+                        unreadLabel.style.display = 'inline-flex';
+                    } else {
+                        unreadLabel.style.display = 'none';
+                    }
+                }
+                // Re-renderizar lista
+                if (document.getElementById('chatsListModal')?.classList.contains('active')) {
                     loadRecruiterChats();
                 }
             }
@@ -2681,7 +2695,7 @@
                         const bgColor = tieneNuevo ? '#e8f0fe' : 'white';
                         const borderLeft = tieneNuevo ? 'border-left:3px solid #1a237e;' : '';
                         return `
-                            <div style="padding:14px;border-bottom:1px solid #eee;background:${bgColor};${borderLeft}cursor:pointer;" 
+                            <div data-unread="${tieneNuevo}" style="padding:14px;border-bottom:1px solid #eee;background:${bgColor};${borderLeft}cursor:pointer;" 
                                 onclick="window.abrirChatReclutador('${chatId}', ${lastMsgAt});">
                                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
                                     <div style="flex:1;">
