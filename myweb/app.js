@@ -61,7 +61,11 @@
             
             let activeRecruiter = null; 
             let centralPhone = ''; 
-            let editingRecruiterId = null; 
+            let editingRecruiterId = null;
+
+            // --- CHAT INTERNO ---
+            let activeChatId = null;
+            let chatUnsubscribe = null; 
 
             let tempReqs = [];
             let tempBens = [];
@@ -860,6 +864,10 @@
                         if (toggleBtn) {
                             toggleBtn.style.display = 'none';
                         }
+
+                        // Mostramos el botón de chats al reclutador
+                        var btnChats = document.getElementById('btnChatsPanel');
+                        if (btnChats) btnChats.style.display = 'inline-flex';
                     
                     } else {
                         document.getElementById('modeIndicator').innerHTML = '<span class="admin-mode-indicator">Super Admin</span>';
@@ -2100,24 +2108,20 @@
                 }
 
                if (targetPhone) {
-                    let msg = `Hola, vi la vacante de ${j.title} (Cód: ${id})\n\nEstos son mis datos:\n• Nombre: \n• Edad: \n• Municipio/Alcaldía: `;
-                    if(isReferral) msg += `\n(Referido por ${activeRecruiter.name})`;
-                    const waLink = `https://wa.me/${targetPhone}?text=${encodeURIComponent(msg)}`;
                     const recNameSafe = activeRecruiter ? activeRecruiter.name : 'Orgánico';
-                    
-                    // CAMBIO V25.7: Sándwich Compacto (Sin espacios extra)
-                    contactHtml = `<div class="sticky-footer" style="padding: 10px 15px 15px;"> <p style="font-size:11px; color:#666; margin: 0 0 4px 0; font-weight:600;">
+                    const recCodeSafe = activeRecruiter ? activeRecruiter.code : 'CENTRAL';
+
+                    contactHtml = `<div class="sticky-footer" style="padding: 10px 15px 15px;">
+                                        <p style="font-size:11px; color:#666; margin: 0 0 4px 0; font-weight:600;">
                                             👇🏻 Respuesta Inmediata 👇🏻
                                         </p>
-                                        
-                                        <button onclick="window.handleWhatsAppClick(this, '${id}', '${recNameSafe}', '${waLink}')" class="whatsapp-btn-large" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                            <span style="white-space: nowrap;">📅 ¡PIDE INFORMES Y EMPIEZA YA! CLIC</span> 
-                                            <img src="favicon_2.png" alt="WA" style="height: 26px; width: auto;"> </button>
-                                        
+                                        <button onclick="window.openChatModal('${id}', '${recCodeSafe}', '${recNameSafe}')" class="whatsapp-btn-large" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <span style="white-space: nowrap;">💬 ¡PIDE INFORMES Y EMPIEZA YA! CLIC</span>
+                                        </button>
                                         <p style="font-size:11px; color:#666; margin: 4px 0 0 0; font-weight:600;">
                                             👆🏻 ¡No pierdas tu oportunidad, postúlate ahora! 👆🏻
                                         </p>
-                                </div>`;
+                                    </div>`;
                 }
 
                 let adminInfoHtml = '';
@@ -2202,6 +2206,270 @@
                 if(canonical) canonical.href = "https://tuchamba-express.vercel.app/";
 
                 document.getElementById('viewModal').classList.remove('active'); 
+            }
+
+            // ============================================================
+            // MÓDULO DE CHAT INTERNO
+            // ============================================================
+
+            window.openChatModal = function(jobId, recCode, recName) {
+                const modal = document.getElementById('chatModal');
+                if (!modal) return;
+
+                // Capturar datos del candidato antes de abrir el chat
+                const candidateName = prompt('¿Cuál es tu nombre?', '');
+                if (!candidateName || !candidateName.trim()) return;
+                const candidatePhone = prompt('¿Cuál es tu número de WhatsApp? (10 dígitos)', '');
+                if (!candidatePhone || !candidatePhone.trim()) return;
+
+                const chatId = `${jobId}_${recCode}_${Date.now()}`;
+                activeChatId = chatId;
+
+                // Guardar metadata de la conversación
+                const chatMeta = {
+                    vacantId: jobId,
+                    vacantTitle: (jobs[jobId] || {}).title || jobId,
+                    refCode: recCode,
+                    recruiterName: recName,
+                    candidateName: candidateName.trim(),
+                    candidatePhone: candidatePhone.trim(),
+                    createdAt: Date.now(),
+                    lastMessage: '',
+                    lastMessageAt: Date.now(),
+                    status: 'open'
+                };
+                set(ref(db, `chats/${chatId}`), chatMeta);
+
+                // Registrar el clic igual que antes (métricas)
+                window.registerClick(jobId, recName);
+
+                // Abrir modal
+                document.getElementById('chatModalTitle').textContent = `Chat: ${chatMeta.vacantTitle}`;
+                document.getElementById('chatMessages').innerHTML = '<p style="text-align:center;color:#aaa;font-size:13px;padding:20px;">Escribe tu primera pregunta 👇</p>';
+                modal.classList.add('active');
+
+                // Escuchar mensajes en tiempo real
+                if (chatUnsubscribe) chatUnsubscribe();
+                const messagesRef = ref(db, `messages/${chatId}`);
+                chatUnsubscribe = onValue(messagesRef, (snap) => {
+                    const data = snap.val();
+                    renderChatMessages(data, candidateName.trim());
+                });
+
+                // Guardar info del candidato en sessionStorage para este chat
+                sessionStorage.setItem('chatCandidateName', candidateName.trim());
+                sessionStorage.setItem('chatCandidatePhone', candidatePhone.trim());
+                sessionStorage.setItem('activeChatId', chatId);
+
+                // Focus al input
+                setTimeout(() => {
+                    const inp = document.getElementById('chatInput');
+                    if (inp) inp.focus();
+                }, 300);
+            }
+
+            window.closeChatModal = function() {
+                document.getElementById('chatModal').classList.remove('active');
+                if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
+                activeChatId = null;
+            }
+
+            window.sendChatMessage = function() {
+                const input = document.getElementById('chatInput');
+                const text = input ? input.value.trim() : '';
+                if (!text || !activeChatId) return;
+
+                const candidateName = sessionStorage.getItem('chatCandidateName') || 'Candidato';
+                const msgRef = push(ref(db, `messages/${activeChatId}`));
+                set(msgRef, {
+                    sender: candidateName,
+                    senderType: 'candidate',
+                    text: text,
+                    timestamp: Date.now()
+                });
+
+                // Actualizar lastMessage en el chat
+                set(ref(db, `chats/${activeChatId}/lastMessage`), text);
+                set(ref(db, `chats/${activeChatId}/lastMessageAt`), Date.now());
+
+                input.value = '';
+            }
+
+            function renderChatMessages(data, myName) {
+                const container = document.getElementById('chatMessages');
+                if (!container) return;
+                if (!data) {
+                    container.innerHTML = '<p style="text-align:center;color:#aaa;font-size:13px;padding:20px;">Escribe tu primera pregunta 👇</p>';
+                    return;
+                }
+                const msgs = Object.values(data).sort((a, b) => a.timestamp - b.timestamp);
+                container.innerHTML = msgs.map(m => {
+                    const isMe = m.senderType === 'candidate';
+                    const time = new Date(m.timestamp).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                    return `
+                        <div style="display:flex; justify-content:${isMe ? 'flex-end' : 'flex-start'}; margin-bottom:8px;">
+                            <div style="max-width:75%; background:${isMe ? '#dcf8c6' : '#fff'}; border:1px solid #e0e0e0; border-radius:${isMe ? '12px 12px 0 12px' : '12px 12px 12px 0'}; padding:8px 12px; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+                                ${!isMe ? `<div style="font-size:11px;font-weight:700;color:#0a66c2;margin-bottom:2px;">${m.sender}</div>` : ''}
+                                <div>${m.text}</div>
+                                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px;">${time}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                container.scrollTop = container.scrollHeight;
+            }
+
+            // Chat del reclutador (responder desde el portal)
+            window.openRecruiterChat = function(chatId) {
+                const modal = document.getElementById('recruiterChatModal');
+                if (!modal) return;
+
+                activeChatId = chatId;
+
+                // Cargar metadata
+                get(ref(db, `chats/${chatId}`)).then(snap => {
+                    const meta = snap.val();
+                    if (!meta) return;
+                    document.getElementById('recruiterChatTitle').textContent = `${meta.candidateName} — ${meta.vacantTitle}`;
+                    document.getElementById('recruiterChatPhone').textContent = `📱 ${meta.candidatePhone}`;
+                });
+
+                document.getElementById('recruiterChatMessages').innerHTML = '';
+                modal.classList.add('active');
+
+                if (chatUnsubscribe) chatUnsubscribe();
+                const messagesRef = ref(db, `messages/${chatId}`);
+                chatUnsubscribe = onValue(messagesRef, (snap) => {
+                    renderRecruiterChatMessages(snap.val());
+                });
+
+                setTimeout(() => {
+                    const inp = document.getElementById('recruiterChatInput');
+                    if (inp) inp.focus();
+                }, 300);
+            }
+
+            window.closeRecruiterChatModal = function() {
+                document.getElementById('recruiterChatModal').classList.remove('active');
+                if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
+                activeChatId = null;
+            }
+
+            window.sendRecruiterMessage = function() {
+                const input = document.getElementById('recruiterChatInput');
+                const text = input ? input.value.trim() : '';
+                if (!text || !activeChatId) return;
+
+                const recruiterName = activeRecruiter ? activeRecruiter.name : 'Reclutador';
+                const msgRef = push(ref(db, `messages/${activeChatId}`));
+                set(msgRef, {
+                    sender: recruiterName,
+                    senderType: 'recruiter',
+                    text: text,
+                    timestamp: Date.now()
+                });
+
+                set(ref(db, `chats/${activeChatId}/lastMessage`), text);
+                set(ref(db, `chats/${activeChatId}/lastMessageAt`), Date.now());
+
+                input.value = '';
+            }
+
+            function renderRecruiterChatMessages(data) {
+                const container = document.getElementById('recruiterChatMessages');
+                if (!container) return;
+                if (!data) { container.innerHTML = '<p style="text-align:center;color:#aaa;font-size:13px;padding:20px;">Sin mensajes aún.</p>'; return; }
+                const msgs = Object.values(data).sort((a, b) => a.timestamp - b.timestamp);
+                container.innerHTML = msgs.map(m => {
+                    const isMe = m.senderType === 'recruiter';
+                    const time = new Date(m.timestamp).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                    return `
+                        <div style="display:flex; justify-content:${isMe ? 'flex-end' : 'flex-start'}; margin-bottom:8px;">
+                            <div style="max-width:75%; background:${isMe ? '#e3f2fd' : '#fff'}; border:1px solid #e0e0e0; border-radius:${isMe ? '12px 12px 0 12px' : '12px 12px 12px 0'}; padding:8px 12px; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+                                ${!isMe ? `<div style="font-size:11px;font-weight:700;color:#e53935;margin-bottom:2px;">${m.sender}</div>` : ''}
+                                <div>${m.text}</div>
+                                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px;">${time}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                container.scrollTop = container.scrollHeight;
+            }
+
+            // Panel de chats del reclutador
+            window.openChatsPanel = function() {
+                const modal = document.getElementById('chatsListModal');
+                if (!modal) return;
+                modal.classList.add('active');
+                loadRecruiterChats();
+            }
+
+            window.closeChatsPanel = function() {
+                document.getElementById('chatsListModal').classList.remove('active');
+            }
+
+            function loadRecruiterChats() {
+                const container = document.getElementById('chatsList');
+                if (!container) return;
+                container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px;">Cargando...</p>';
+
+                const myCode = activeRecruiter ? activeRecruiter.code : (isAdmin ? 'ALL' : null);
+                if (!myCode) return;
+
+                get(ref(db, 'chats')).then(snap => {
+                    const all = snap.val() || {};
+                    let chats = Object.entries(all);
+
+                    // Si no es superadmin, filtrar solo los chats de este reclutador
+                    if (!isAdmin || isRecruiterMode) {
+                        chats = chats.filter(([id, c]) => c.refCode === myCode);
+                    }
+
+                    // Ordenar por más reciente
+                    chats.sort(([,a],[,b]) => (b.lastMessageAt || 0) - (a.lastMessageAt || 0));
+
+                    if (chats.length === 0) {
+                        container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px;">No hay conversaciones aún.</p>';
+                        return;
+                    }
+
+                    container.innerHTML = chats.map(([chatId, c]) => {
+                        const timeAgo = c.lastMessageAt ? new Date(c.lastMessageAt).toLocaleString('es-MX', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
+                        return `
+                            <div onclick="window.openRecruiterChat('${chatId}')" style="padding:14px;border-bottom:1px solid #eee;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='white'">
+                                <div style="display:flex;justify-content:space-between;align-items:center;">
+                                    <div style="font-weight:700;color:#222;font-size:14px;">👤 ${c.candidateName}</div>
+                                    <div style="font-size:11px;color:#aaa;">${timeAgo}</div>
+                                </div>
+                                <div style="font-size:12px;color:#0a66c2;margin-top:2px;">💼 ${c.vacantTitle}</div>
+                                <div style="font-size:12px;color:#666;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.lastMessage || 'Sin mensajes'}</div>
+                                <div style="font-size:11px;color:#aaa;margin-top:2px;">📱 ${c.candidatePhone}</div>
+                            </div>
+                        `;
+                    }).join('');
+                });
+            }
+
+            // Borrar chats viejos (más de 7 días)
+            window.deleteOldChats = function() {
+                if (!confirm('¿Borrar todas las conversaciones con más de 7 días? Esta acción no se puede deshacer.')) return;
+                const cutoff = Date.now() - (7 * 24 * 60 * 60 * 1000);
+                get(ref(db, 'chats')).then(snap => {
+                    const all = snap.val() || {};
+                    let deleted = 0;
+                    const promises = [];
+                    Object.entries(all).forEach(([chatId, c]) => {
+                        if ((c.createdAt || 0) < cutoff) {
+                            promises.push(remove(ref(db, `chats/${chatId}`)));
+                            promises.push(remove(ref(db, `messages/${chatId}`)));
+                            deleted++;
+                        }
+                    });
+                    Promise.all(promises).then(() => {
+                        window.showToast(`🗑️ ${deleted} conversación(es) eliminada(s)`);
+                        loadRecruiterChats();
+                    });
+                });
             }
 
             window.closeFormModal = function() { document.getElementById('formModal').classList.remove('active'); }
