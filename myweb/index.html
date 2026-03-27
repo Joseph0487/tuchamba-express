@@ -497,7 +497,8 @@
                     <div style="color:white; font-weight:700; font-size:15px;">💬 Conversaciones</div>
                     <button onclick="window.closeChatsPanel()" style="background:none;border:none;color:white;font-size:22px;cursor:pointer;line-height:1;">×</button>
                 </div>
-                <div style="padding:10px 12px; background:#f8f8f8; border-bottom:1px solid #eee; display:flex; justify-content:flex-end;">
+                <div style="padding:10px 12px; background:#f8f8f8; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+                    <span id="unreadChatsLabel" style="font-size:12px; color:#1a237e; font-weight:700; display:none;">💬 <span id="unreadChatsCount">0</span> sin leer</span>
                     <button onclick="window.deleteOldChats()" style="background:#ffebee; color:#c62828; border:1px solid #ffcdd2; border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer;">🗑️ Borrar conv. +7 días</button>
                 </div>
                 <div id="chatsList" style="flex:1; overflow-y:auto; background:white;"></div>

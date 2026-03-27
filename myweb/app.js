@@ -2583,7 +2583,7 @@
                         }
                     });
 
-                    // Actualizar badge
+                    // Actualizar badge del botón
                     const badge = document.getElementById('chatsBadge');
                     if (badge) {
                         if (unread > 0) {
@@ -2591,6 +2591,18 @@
                             badge.style.display = 'inline-flex';
                         } else {
                             badge.style.display = 'none';
+                        }
+                    }
+
+                    // Actualizar contador dentro del panel
+                    const unreadLabel = document.getElementById('unreadChatsLabel');
+                    const unreadCount = document.getElementById('unreadChatsCount');
+                    if (unreadLabel && unreadCount) {
+                        if (unread > 0) {
+                            unreadCount.textContent = unread === 1 ? '1 conversación' : `${unread} conversaciones`;
+                            unreadLabel.style.display = 'inline-flex';
+                        } else {
+                            unreadLabel.style.display = 'none';
                         }
                     }
                 });
@@ -2604,13 +2616,9 @@
                 if (!modal) return;
                 modal.classList.add('active');
                 loadRecruiterChats();
-                // Limpiar badge al abrir
+                // Limpiar badge del botón
                 const badge = document.getElementById('chatsBadge');
                 if (badge) badge.style.display = 'none';
-                // Marcar todos como vistos
-                Object.keys(lastSeenMessageCount).forEach(k => {
-                    lastSeenMessageCount[k] = Date.now();
-                });
             }
 
             window.closeChatsPanel = function() {
