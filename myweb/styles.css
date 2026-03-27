@@ -391,9 +391,12 @@
             }
             .modal.active {
                 display: flex;
-                z-index: 3000 !important; /* <--- AGREGA ESTO */
+                align-items: center;
+                justify-content: center;
+                z-index: 3000;
             }
-            .modal.active { display: flex; align-items: center; justify-content: center; }
+            #recruiterChatModal.active { z-index: 10001; }
+            #chatsListModal.active { z-index: 10000; }
             .modal-content { background: white; border-radius: 16px; max-width: 650px; width: 100%; padding: 25px; position: relative; max-height: 90vh; overflow-y: auto; overflow-x: hidden; padding-bottom: 0; }
             .close-btn { position: absolute; top: 20px; right: 20px; background: #f0f2f5; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 20px; cursor: pointer; color: #666; z-index: 10; }
             .job-details { display: grid; gap: 15px; margin-bottom: 25px; margin-top: 15px; }
