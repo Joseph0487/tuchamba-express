@@ -2445,7 +2445,7 @@
 
                     // Si no es superadmin, filtrar solo los chats de este reclutador
                     if (!isAdmin || isRecruiterMode) {
-                        chats = chats.filter(([id, c]) => c.refCode === myCode);
+                        chats = chats.filter(([id, c]) => (c.refCode || '').toUpperCase() === (myCode || '').toUpperCase());
                     }
 
                     // Ordenar por más reciente
