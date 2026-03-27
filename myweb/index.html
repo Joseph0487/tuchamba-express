@@ -459,7 +459,7 @@
                 <div style="padding:10px 12px; background:white; border-top:1px solid #eee; display:flex; gap:8px;">
                     <input id="chatInput" type="text" placeholder="Escribe tu pregunta..." 
                         style="flex:1; padding:10px 14px; border:1px solid #ddd; border-radius:24px; font-size:14px; outline:none;"
-                        onkeydown="if(event.key==='Enter') window.sendChatMessage(); else if(event.key==='Escape') window.closeChatModal();">
+                        onkeydown="if(event.key==='Enter') window.sendChatMessage(); else if(event.key==='Escape'){event.stopPropagation(); window.closeChatModal();}">
                     <button onclick="window.sendChatMessage()" 
                         style="background:#0a66c2; color:white; border:none; border-radius:50%; width:42px; height:42px; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;">➤</button>
                 </div>
