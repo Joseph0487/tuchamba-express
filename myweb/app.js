@@ -2479,6 +2479,7 @@
                 container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px;">Cargando...</p>';
 
                 const myCode = activeRecruiter ? activeRecruiter.code : (isAdmin ? 'ALL' : null);
+                console.log('DEBUG myCode:', myCode, 'activeRecruiter:', activeRecruiter, 'isAdmin:', isAdmin, 'isRecruiterMode:', isRecruiterMode);
                 if (!myCode) return;
 
                 get(ref(db, 'chats')).then(snap => {
