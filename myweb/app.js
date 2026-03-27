@@ -2502,30 +2502,25 @@
                         const timeAgo = c.lastMessageAt ? new Date(c.lastMessageAt).toLocaleString('es-MX', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
                         const diasRestantes = Math.max(0, 7 - Math.floor((Date.now() - (c.createdAt || 0)) / (1000 * 60 * 60 * 24)));
                         return `
-                            <div style="padding:14px;border-bottom:1px solid #eee;background:white;">
+                            <div style="padding:14px;border-bottom:1px solid #eee;background:white;cursor:pointer;" onclick="window.openRecruiterChat('${chatId}')">
                                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-                                    <div style="flex:1;cursor:pointer;" onclick="window.openRecruiterChat('${chatId}')">
+                                    <div style="flex:1;">
                                         <div style="display:flex;justify-content:space-between;align-items:center;">
                                             <div style="font-weight:700;color:#222;font-size:14px;">👤 ${c.candidateName}</div>
                                             <div style="font-size:11px;color:#aaa;">${timeAgo}</div>
                                         </div>
                                         <div style="font-size:12px;color:#0a66c2;margin-top:2px;">💼 ${c.vacantTitle}</div>
+                                        <div style="font-size:11px;color:#888;margin-top:1px;">🏢 ${(jobs[c.vacantId] || {}).company || ''}</div>
                                         <div style="font-size:12px;color:#666;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.lastMessage || 'Sin mensajes'}</div>
                                         <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
                                             <span style="font-size:11px;color:#aaa;">📱 ${c.candidatePhone}</span>
                                             <span style="font-size:10px;color:${diasRestantes <= 2 ? '#e53935' : '#aaa'};">⏳ ${diasRestantes}d restantes</span>
                                         </div>
                                     </div>
-                                    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;">
-                                        <button onclick="event.stopPropagation(); window.deleteChat('${chatId}')" 
-                                            style="background:#ffebee;color:#c62828;border:1px solid #ffcdd2;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;">
-                                            🗑️ Eliminar
-                                        </button>
-                                        <a href="https://wa.me/${c.candidatePhone}" target="_blank"
-                                            style="background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;text-decoration:none;">
-                                            📱 WhatsApp
-                                        </a>
-                                    </div>
+                                    <button onclick="event.stopPropagation(); window.deleteChat('${chatId}')" 
+                                        style="background:#ffebee;color:#c62828;border:1px solid #ffcdd2;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;flex-shrink:0;">
+                                        🗑️ Eliminar
+                                    </button>
                                 </div>
                             </div>
                         `;
