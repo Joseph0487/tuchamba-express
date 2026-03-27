@@ -2669,13 +2669,13 @@
                         const borderLeft = tieneNuevo ? 'border-left:3px solid #1a237e;' : '';
                         return `
                             <div style="padding:14px;border-bottom:1px solid #eee;background:${bgColor};${borderLeft}cursor:pointer;" 
-                                onclick="window.openRecruiterChat('${chatId}'); lastSeenMessageCount['${chatId}'] = ${lastMsgAt};">
+                                onclick="lastSeenMessageCount['${chatId}'] = ${lastMsgAt}; window.openRecruiterChat('${chatId}');">
                                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
                                     <div style="flex:1;">
                                         <div style="display:flex;justify-content:space-between;align-items:center;">
                                             <div style="font-weight:${tieneNuevo ? '800' : '700'};color:#222;font-size:14px;">👤 ${c.candidateName}</div>
                                             <div style="display:flex;align-items:center;gap:6px;">
-                                                ${tieneNuevo ? `<span style="background:#1a237e;color:white;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;">N</span>` : ''}
+                                                ${tieneNuevo ? `<span style="background:#1a237e;color:white;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;">Nuevo mensaje</span>` : ''}
                                                 <div style="font-size:11px;color:#aaa;">${timeAgo}</div>
                                             </div>
                                         </div>
