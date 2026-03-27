@@ -2485,6 +2485,11 @@
                 document.getElementById('recruiterChatModal').classList.remove('active');
                 if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
                 activeChatId = null;
+                // Re-renderizar lista para quitar el badge de "Nuevo mensaje"
+                const container = document.getElementById('chatsList');
+                if (container && document.getElementById('chatsListModal')?.classList.contains('active')) {
+                    loadRecruiterChats();
+                }
             }
 
             window.sendRecruiterMessage = function() {
