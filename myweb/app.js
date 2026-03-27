@@ -2484,7 +2484,10 @@
 
             window.closeChatsPanel = function() {
                 document.getElementById('chatsListModal').classList.remove('active');
+                if (chatsUnsubscribe) { chatsUnsubscribe(); chatsUnsubscribe = null; }
             }
+
+            let chatsUnsubscribe = null;
 
             function loadRecruiterChats() {
                 const container = document.getElementById('chatsList');
@@ -2494,13 +2497,27 @@
                 const myCode = activeRecruiter ? activeRecruiter.code : (isAdmin ? 'ALL' : null);
                 if (!myCode) return;
 
-                get(ref(db, 'chats')).then(snap => {
+                // Cancelar listener anterior si existe
+                if (chatsUnsubscribe) { chatsUnsubscribe(); chatsUnsubscribe = null; }
+
+                chatsUnsubscribe = onValue(ref(db, 'chats'), snap => {
                     const all = snap.val() || {};
                     let chats = Object.entries(all);
 
                     // Si no es superadmin, filtrar solo los chats de este reclutador
                     if (!isAdmin || isRecruiterMode) {
                         chats = chats.filter(([id, c]) => (c.refCode || '').toUpperCase() === (myCode || '').toUpperCase());
+                    }
+
+                    // Ordenar por más reciente
+                    chats.sort(([,a],[,b]) => (b.lastMessageAt || 0) - (a.lastMessageAt || 0));
+
+                    if (chats.length === 0) {
+                        container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px;">No hay conversaciones aún.</p>';
+                        return;
+                    }
+
+                    container.innerHTML = chats.map(([chatId, c]) => {perCase() === (myCode || '').toUpperCase());
                     }
 
                     // Ordenar por más reciente
