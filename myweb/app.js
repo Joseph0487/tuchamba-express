@@ -2485,22 +2485,7 @@
                 document.getElementById('recruiterChatModal').classList.remove('active');
                 if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
                 activeChatId = null;
-                // Actualizar contador de no leídos
-                const unreadLabel = document.getElementById('unreadChatsLabel');
-                const unreadCount = document.getElementById('unreadChatsCount');
-                if (unreadLabel && unreadCount) {
-                    const sinLeer = Object.values(lastSeenMessageCount).length;
-                    // Recalcular no leídos
-                    let unread = 0;
-                    document.querySelectorAll('#chatsList [data-unread="true"]').forEach(() => unread++);
-                    if (unread > 0) {
-                        unreadCount.textContent = unread === 1 ? '1 conversación' : `${unread} conversaciones`;
-                        unreadLabel.style.display = 'inline-flex';
-                    } else {
-                        unreadLabel.style.display = 'none';
-                    }
-                }
-                // Re-renderizar lista
+                // Re-renderizar lista — el render recalcula no leídos con lastSeenMessageCount actualizado
                 if (document.getElementById('chatsListModal')?.classList.contains('active')) {
                     loadRecruiterChats();
                 }
@@ -2684,6 +2669,24 @@
                     if (chats.length === 0) {
                         container.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px;">No hay conversaciones aún.</p>';
                         return;
+                    }
+
+                    // Calcular no leídos para el contador del panel
+                    const totalUnread = chats.filter(([chatId, c]) => {
+                        const lastMsgAt = c.lastMessageAt || 0;
+                        const lastSeen = lastSeenMessageCount[chatId] || 0;
+                        return lastMsgAt > lastSeen && !!c.lastMessage;
+                    }).length;
+
+                    const unreadLabel = document.getElementById('unreadChatsLabel');
+                    const unreadCount = document.getElementById('unreadChatsCount');
+                    if (unreadLabel && unreadCount) {
+                        if (totalUnread > 0) {
+                            unreadCount.textContent = totalUnread === 1 ? '1 conversación' : `${totalUnread} conversaciones`;
+                            unreadLabel.style.display = 'inline-flex';
+                        } else {
+                            unreadLabel.style.display = 'none';
+                        }
                     }
 
                     container.innerHTML = chats.map(([chatId, c]) => {
