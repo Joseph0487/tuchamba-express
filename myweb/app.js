@@ -2363,6 +2363,16 @@
                         set(ref(db, `chats/${chatId}`), chatMeta);
                         localStorage.setItem(savedChatKey, JSON.stringify({ chatId, candidateName, candidatePhone }));
                         window.registerClick(jobId, recName);
+
+                        // Mensaje de bienvenida automático
+                        get(ref(db, 'settings/welcomeMessage')).then(snap => {
+                            const welcome = snap.val() || '👋 Hola, gracias por tu interés en la vacante. En breve te atendemos.';
+                            const msgRef = push(ref(db, `messages/${chatId}`));
+                            set(msgRef, { sender: recName, senderType: 'recruiter', text: welcome, timestamp: Date.now() });
+                            set(ref(db, `chats/${chatId}/lastMessage`), welcome);
+                            set(ref(db, `chats/${chatId}/lastMessageAt`), Date.now());
+                            set(ref(db, `chats/${chatId}/lastSenderType`), 'recruiter');
+                        });
                     }
                 } else {
                     // Nueva conversación — pedir datos
@@ -2394,6 +2404,16 @@
                         };
                         set(ref(db, `chats/${chatId}`), chatMeta);
                         window.registerClick(jobId, recName);
+
+                        // Mensaje de bienvenida automático
+                        get(ref(db, 'settings/welcomeMessage')).then(snap => {
+                            const welcome = snap.val() || '👋 Hola, gracias por tu interés en la vacante. En breve te atendemos.';
+                            const msgRef = push(ref(db, `messages/${chatId}`));
+                            set(msgRef, { sender: recName, senderType: 'recruiter', text: welcome, timestamp: Date.now() });
+                            set(ref(db, `chats/${chatId}/lastMessage`), welcome);
+                            set(ref(db, `chats/${chatId}/lastMessageAt`), Date.now());
+                            set(ref(db, `chats/${chatId}/lastSenderType`), 'recruiter');
+                        });
                     }
 
                     // Guardar en localStorage para retomar después
@@ -2467,11 +2487,11 @@
                     const isMe = m.senderType === 'candidate';
                     const time = new Date(m.timestamp).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
                     return `
-                        <div style="display:flex; justify-content:${isMe ? 'flex-end' : 'flex-start'}; margin-bottom:8px;">
-                            <div style="max-width:75%; background:${isMe ? '#dcf8c6' : '#fff'}; border:1px solid #e0e0e0; border-radius:${isMe ? '12px 12px 0 12px' : '12px 12px 12px 0'}; padding:8px 12px; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+                        <div style="display:flex; justify-content:${isMe ? 'flex-end' : 'flex-start'}; margin-bottom:10px;">
+                            <div class="${isMe ? 'bubble-candidate' : 'bubble-recruiter'}">
                                 ${!isMe ? `<div style="font-size:11px;font-weight:700;color:#0a66c2;margin-bottom:2px;">${m.sender}</div>` : ''}
                                 <div>${m.text}</div>
-                                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px;">${time}</div>
+                                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:4px;">${time}</div>
                             </div>
                         </div>
                     `;
@@ -2501,6 +2521,13 @@
                 const messagesRef = ref(db, `messages/${chatId}`);
                 chatUnsubscribe = onValue(messagesRef, (snap) => {
                     renderRecruiterChatMessages(snap.val());
+                });
+
+                // Escuchar si el reclutador está escribiendo (para mostrar al candidato)
+                onValue(ref(db, `chats/${activeChatId}/recruiterTyping`), (snap) => {
+                    const typing = snap.val();
+                    const indicator = document.getElementById('typingIndicator');
+                    if (indicator) indicator.style.display = typing ? 'block' : 'none';
                 });
 
                 setTimeout(() => {
@@ -2602,6 +2629,17 @@
                 }
             }
 
+            // Indicador "escribiendo" en tiempo real
+            let typingTimeout = null;
+            window.recruiterTyping = function() {
+                if (!activeChatId) return;
+                set(ref(db, `chats/${activeChatId}/recruiterTyping`), true);
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    set(ref(db, `chats/${activeChatId}/recruiterTyping`), false);
+                }, 2000);
+            }            
+
             window.sendRecruiterMessage = function() {
                 const input = document.getElementById('recruiterChatInput');
                 const text = input ? input.value.trim() : '';
@@ -2631,15 +2669,17 @@
                 if (!container) return;
                 if (!data) { container.innerHTML = '<p style="text-align:center;color:#aaa;font-size:13px;padding:20px;">Sin mensajes aún.</p>'; return; }
                 const msgs = Object.values(data).sort((a, b) => a.timestamp - b.timestamp);
-                container.innerHTML = msgs.map(m => {
+                container.innerHTML = msgs.map((m, i) => {
                     const isMe = m.senderType === 'recruiter';
                     const time = new Date(m.timestamp).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                    const isLast = i === msgs.length - 1;
+                    const palomitas = isMe ? `<span style="color:#4fc3f7;font-size:11px;margin-left:4px;">${isLast ? '✓✓' : '✓'}</span>` : '';
                     return `
-                        <div style="display:flex; justify-content:${isMe ? 'flex-end' : 'flex-start'}; margin-bottom:8px;">
-                            <div style="max-width:75%; background:${isMe ? '#e3f2fd' : '#fff'}; border:1px solid #e0e0e0; border-radius:${isMe ? '12px 12px 0 12px' : '12px 12px 12px 0'}; padding:8px 12px; font-size:14px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+                        <div style="display:flex; justify-content:${isMe ? 'flex-end' : 'flex-start'}; margin-bottom:10px;">
+                            <div class="${isMe ? 'bubble-candidate' : 'bubble-recruiter'}" style="${isMe ? 'background:#e3f2fd;' : ''}">
                                 ${!isMe ? `<div style="font-size:11px;font-weight:700;color:#e53935;margin-bottom:2px;">${m.sender}</div>` : ''}
                                 <div>${m.text}</div>
-                                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:2px;">${time}</div>
+                                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:4px;">${time}${palomitas}</div>
                             </div>
                         </div>
                     `;
