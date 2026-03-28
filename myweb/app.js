@@ -2523,7 +2523,7 @@
                             <div class="${isMe ? 'bubble-candidate' : 'bubble-recruiter'}">
                                 ${!isMe ? `<div style="font-size:11px;font-weight:700;color:#0a66c2;margin-bottom:2px;">${m.sender}</div>` : ''}
                                 <div>${m.text}</div>
-                                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:4px;">${time}</div>
+                                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:4px;">${time}${isMe ? '<span style="color:#aaa;font-size:11px;margin-left:4px;">✓</span>' : ''}</div>
                             </div>
                         </div>
                     `;
