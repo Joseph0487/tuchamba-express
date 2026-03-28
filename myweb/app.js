@@ -2545,8 +2545,8 @@
                             style="flex:1; text-align:left; background:white; border:1px solid #c5cae9; border-radius:8px; padding:7px 10px; font-size:12px; color:#1a237e; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                             ${r}
                         </button>
-                        ${isAdmin && !isRecruiterMode ? `<button onclick="window.editQuickReply(${i})" style="background:none;border:none;font-size:13px;cursor:pointer;color:#888;">✏️</button>
-                        <button onclick="window.deleteQuickReply(${i})" style="background:none;border:none;font-size:13px;cursor:pointer;color:#e53935;">🗑️</button>` : ''}
+                        <button onclick="window.editQuickReply(${i})" style="background:none;border:none;font-size:13px;cursor:pointer;color:#888;">✏️</button>
+                        <button onclick="window.deleteQuickReply(${i})" style="background:none;border:none;font-size:13px;cursor:pointer;color:#e53935;">🗑️</button>
                     </div>
                 `).join('') + `
                     <button onclick="window.addQuickReply()" 
