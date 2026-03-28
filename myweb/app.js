@@ -2442,6 +2442,7 @@
                 // Actualizar lastMessage y des-archivar si estaba archivado
                 set(ref(db, `chats/${activeChatId}/lastMessage`), text);
                 set(ref(db, `chats/${activeChatId}/lastMessageAt`), Date.now());
+                set(ref(db, `chats/${activeChatId}/lastSenderType`), 'candidate');
                 set(ref(db, `chats/${activeChatId}/archived`), false);
 
                 input.value = '';
