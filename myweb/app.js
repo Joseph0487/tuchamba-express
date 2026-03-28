@@ -70,6 +70,9 @@
             let lastSeenMessageCount = JSON.parse(localStorage.getItem('lastSeenMsgs') || '{}');
             let notifSound = null;
 
+            // ID único por pestaña/dispositivo — se regenera en cada sesión
+            const deviceSessionId = Math.random().toString(36).substring(2, 10);
+
             // Inicializar sonido de notificación
             function initNotifSound() {
                 try {
@@ -2529,6 +2532,9 @@
                 set(ref(db, `chats/${activeChatId}/lastMessage`), text);
                 set(ref(db, `chats/${activeChatId}/lastMessageAt`), Date.now());
                 set(ref(db, `chats/${activeChatId}/lastSenderType`), 'recruiter');
+                set(ref(db, `chats/${activeChatId}/lastSenderDevice`), deviceSessionId);
+                lastSeenMessageCount[activeChatId] = Date.now();
+                localStorage.setItem('lastSeenMsgs', JSON.stringify(lastSeenMessageCount));
 
                 input.value = '';
             }
@@ -2592,7 +2598,8 @@
                         const lastMsgAt = c.lastMessageAt || 0;
                         const lastSeen = lastSeenMessageCount[chatId] || 0;
 
-                        if (lastMsgAt > lastSeen && c.lastMessage && c.lastSenderType !== 'recruiter') {
+                        const fueElReclutadorDeEsteDispositivo = c.lastSenderType === 'recruiter' && c.lastSenderDevice === deviceSessionId;
+                        if (lastMsgAt > lastSeen && c.lastMessage && !fueElReclutadorDeEsteDispositivo) {
                             unread++;
 
                             const panelAbierto = document.getElementById('chatsListModal')?.classList.contains('active');
@@ -2731,7 +2738,8 @@
                         const diasRestantes = Math.max(0, 7 - Math.floor((Date.now() - (c.createdAt || 0)) / (1000 * 60 * 60 * 24)));
                         const lastMsgAt = c.lastMessageAt || 0;
                         const lastSeen = lastSeenMessageCount[chatId] || 0;
-                        const tieneNuevo = lastMsgAt > lastSeen && !!c.lastMessage && c.lastSenderType !== 'recruiter';
+                        const fueYoMismo = c.lastSenderType === 'recruiter' && c.lastSenderDevice === deviceSessionId;
+                        const tieneNuevo = lastMsgAt > lastSeen && !!c.lastMessage && !fueYoMismo;
                         const bgColor = tieneNuevo ? '#e8f0fe' : 'white';
                         const borderLeft = tieneNuevo ? 'border-left:3px solid #1a237e;' : '';
                         return `
