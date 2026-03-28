@@ -2540,9 +2540,9 @@
                 if (!panel) return;
                 const replies = getQuickReplies();
                 panel.innerHTML = replies.map((r, i) => `
-                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                    <div style="display:flex; align-items:center; gap:4px; margin-bottom:6px;">
                         <button onclick="window.useQuickReply(${i})" 
-                            style="flex:1; text-align:left; background:white; border:1px solid #c5cae9; border-radius:8px; padding:7px 10px; font-size:12px; color:#1a237e; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                            style="flex:1; text-align:left; background:white; border:1px solid #c5cae9; border-radius:8px; padding:7px 10px; font-size:12px; color:#1a237e; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;">
                             ${r}
                         </button>
                         <div style="display:flex;gap:2px;flex-shrink:0;">
