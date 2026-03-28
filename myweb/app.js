@@ -2266,12 +2266,12 @@
                             <h3 style="margin:0 0 4px;text-align:center;font-size:17px;color:#222;">¡Un paso más!</h3>
                             <p style="margin:0 0 16px;text-align:center;font-size:13px;color:#666;">El reclutador necesita saber quién eres</p>
                             <div style="margin-bottom:12px;">
-                                <label style="font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:4px;">👤 Tu nombre completo</label>
+                                <label style="font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:4px;">Hola 👋🏻 ¿Cómo te llamas?</label>
                                 <input id="cdNombre" type="text" placeholder="Ej. María López" autocomplete="name"
                                     style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:15px;outline:none;">
                             </div>
                             <div style="margin-bottom:20px;">
-                                <label style="font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:4px;">📱 Tu WhatsApp (10 dígitos)</label>
+                                <label style="font-size:12px;font-weight:700;color:#555;display:block;margin-bottom:4px;">📱 ¿Y tu WhatsApp? (10 dígitos)</label>
                                 <input id="cdTelefono" type="tel" placeholder="Ej. 5512345678" maxlength="10" autocomplete="tel"
                                     style="width:100%;box-sizing:border-box;padding:10px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:15px;outline:none;">
                             </div>
