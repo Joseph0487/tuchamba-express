@@ -1947,3 +1947,22 @@
             .chat-textarea::-webkit-scrollbar-track { background: transparent; }
             .chat-textarea::-webkit-scrollbar-thumb { background: #c5cae9; border-radius: 4px; }
             .chat-textarea::-webkit-scrollbar-thumb:hover { background: #9fa8da; }
+
+            #chatMessages, #recruiterChatMessages {
+            position: relative;
+            }
+            #chatMessages::before, #recruiterChatMessages::before {
+                content: '';
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background-image: url('imagen_chat_fond.png');
+                background-size: 300px;
+                background-repeat: repeat;
+                opacity: 0.12;
+                pointer-events: none;
+                z-index: 0;
+            }
+            #chatMessages > *, #recruiterChatMessages > * {
+                position: relative;
+                z-index: 1;
+            }
