@@ -490,7 +490,7 @@
                         style="flex:1; padding:10px 14px; border:1px solid #ddd; border-radius:16px; font-size:14px; outline:none; resize:none; overflow-y:hidden; max-height:100px; min-height:40px; height:40px; line-height:1.4; font-family:inherit;"
                         rows="1"
                         onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); window.sendRecruiterMessage();} else if(event.key==='Escape'){event.stopPropagation(); window.closeRecruiterChatModal();}"
-                        oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight, 100)+'px';"></textarea>
+                        oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight, 100)+'px'; this.style.overflowY=this.scrollHeight>100?'auto':'hidden';" class="chat-textarea"></textarea>
                     <button onclick="window.sendRecruiterMessage()" 
                         style="background:#1a237e; color:white; border:none; border-radius:50%; width:42px; height:42px; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;">➤</button>
                 </div>
