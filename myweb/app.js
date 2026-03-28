@@ -862,9 +862,9 @@
                 // Limpieza de clases (Reset)
                 document.body.classList.remove('admin-mode', 'recruiter-view');
 
-                if (enableAdmin && (!isRefMode || isRecruiterMode)) {
-                    
-                    document.body.classList.add('admin-mode');
+                // Ocultar subtítulo en modo admin/reclutador
+                    const headerSubtitle = document.getElementById('headerSubtitle');
+                    if (headerSubtitle) headerSubtitle.style.display = 'none';
 
                     if (isRecruiterMode) {
                         // ACTIVAMOS LA VISTA RECLUTADOR
@@ -2522,6 +2522,7 @@
 
                 set(ref(db, `chats/${activeChatId}/lastMessage`), text);
                 set(ref(db, `chats/${activeChatId}/lastMessageAt`), Date.now());
+                set(ref(db, `chats/${activeChatId}/lastSenderType`), 'recruiter');
 
                 input.value = '';
             }
@@ -2585,7 +2586,7 @@
                         const lastMsgAt = c.lastMessageAt || 0;
                         const lastSeen = lastSeenMessageCount[chatId] || 0;
 
-                        if (lastMsgAt > lastSeen && c.lastMessage) {
+                        if (lastMsgAt > lastSeen && c.lastMessage && c.lastSenderType !== 'recruiter') {
                             unread++;
 
                             const panelAbierto = document.getElementById('chatsListModal')?.classList.contains('active');
