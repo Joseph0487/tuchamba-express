@@ -566,6 +566,22 @@
                 });
             }
 
+            window.openWelcomeConfig = function() {
+                const myCode = activeRecruiter ? activeRecruiter.code : null;
+                if (!myCode) return;
+                get(ref(db, 'recruiters')).then(snap => {
+                    const all = snap.val() || {};
+                    const key = Object.keys(all).find(k => all[k].code === myCode);
+                    if (!key) return;
+                    const current = all[key].welcomeMessage || '';
+                    const nuevo = prompt('✏️ Mensaje de bienvenida automático:\n(Se envía cuando el candidato abre el chat por primera vez)', current);
+                    if (nuevo === null) return;
+                    set(ref(db, `recruiters/${key}/welcomeMessage`), nuevo.trim()).then(() => {
+                        window.showToast('✅ Mensaje de bienvenida guardado');
+                    });
+                });
+            }
+
             window.openSettingsModal = function() {
                 document.getElementById('settingsModal').classList.add('active');
                 if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone;
@@ -2377,8 +2393,10 @@
                         window.registerClick(jobId, recName);
 
                         // Mensaje de bienvenida automático
-                        get(ref(db, 'settings/welcomeMessage')).then(snap => {
-                            const welcome = snap.val() || '👋 Hola, gracias por tu interés en la vacante. En breve te atendemos.';
+                        get(ref(db, 'recruiters')).then(snap => {
+                            const all = snap.val() || {};
+                            const rec = Object.values(all).find(r => (r.code || '').toUpperCase() === (recCode || '').toUpperCase());
+                            const welcome = (rec && rec.welcomeMessage) || '👋 Hola, gracias por tu interés en la vacante. En breve te atendemos.';
                             const msgRef = push(ref(db, `messages/${chatId}`));
                             set(msgRef, { sender: recName, senderType: 'recruiter', text: welcome, timestamp: Date.now() });
                             set(ref(db, `chats/${chatId}/lastMessage`), welcome);
@@ -2418,8 +2436,10 @@
                         window.registerClick(jobId, recName);
 
                         // Mensaje de bienvenida automático
-                        get(ref(db, 'settings/welcomeMessage')).then(snap => {
-                            const welcome = snap.val() || '👋 Hola, gracias por tu interés en la vacante. En breve te atendemos.';
+                        get(ref(db, 'recruiters')).then(snap => {
+                            const all = snap.val() || {};
+                            const rec = Object.values(all).find(r => (r.code || '').toUpperCase() === (recCode || '').toUpperCase());
+                            const welcome = (rec && rec.welcomeMessage) || '👋 Hola, gracias por tu interés en la vacante. En breve te atendemos.';
                             const msgRef = push(ref(db, `messages/${chatId}`));
                             set(msgRef, { sender: recName, senderType: 'recruiter', text: welcome, timestamp: Date.now() });
                             set(ref(db, `chats/${chatId}/lastMessage`), welcome);
