@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "TuChambaApp",
+    "slug": "TuChambaApp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0a192d"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0a192d"
+      },
+      "package": "com.joseph87.TuChambaApp"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5b10b6dd-16f5-451b-b9d3-5eaf9ae9843a"
+      }
+    }
+  }
+}
