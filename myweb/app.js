@@ -2509,6 +2509,89 @@
                 }, 300);
             }
 
+            // Respuestas rápidas por defecto
+            const defaultQuickReplies = [
+                "Hola, gracias por tu interés en la vacante. ¿Tienes disponibilidad para una entrevista esta semana?",
+                "¿Podrías confirmarme tu nombre completo y municipio de residencia?",
+                "El proceso de selección tiene una duración aproximada de 3 días hábiles.",
+                "Te contactaremos en las próximas 24 horas para agendar tu entrevista.",
+                "¿Tienes experiencia previa en este tipo de puesto?",
+                "La entrevista es presencial. ¿Tienes facilidad de traslado a la zona?"
+            ];
+
+            function getQuickReplies() {
+                const saved = localStorage.getItem('quickReplies');
+                return saved ? JSON.parse(saved) : defaultQuickReplies;
+            }
+
+            window.toggleQuickReplies = function() {
+                const panel = document.getElementById('quickRepliesPanel');
+                if (!panel) return;
+                if (panel.style.display === 'none') {
+                    renderQuickReplies();
+                    panel.style.display = 'block';
+                } else {
+                    panel.style.display = 'none';
+                }
+            }
+
+            function renderQuickReplies() {
+                const panel = document.getElementById('quickRepliesPanel');
+                if (!panel) return;
+                const replies = getQuickReplies();
+                panel.innerHTML = replies.map((r, i) => `
+                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                        <button onclick="window.useQuickReply(${i})" 
+                            style="flex:1; text-align:left; background:white; border:1px solid #c5cae9; border-radius:8px; padding:7px 10px; font-size:12px; color:#1a237e; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                            ${r}
+                        </button>
+                        ${isAdmin && !isRecruiterMode ? `<button onclick="window.editQuickReply(${i})" style="background:none;border:none;font-size:13px;cursor:pointer;color:#888;">✏️</button>
+                        <button onclick="window.deleteQuickReply(${i})" style="background:none;border:none;font-size:13px;cursor:pointer;color:#e53935;">🗑️</button>` : ''}
+                    </div>
+                `).join('') + `
+                    <button onclick="window.addQuickReply()" 
+                        style="width:100%; background:#e8eaf6; border:1px dashed #9fa8da; border-radius:8px; padding:7px; font-size:12px; color:#1a237e; cursor:pointer; margin-top:4px;">
+                        ➕ Agregar respuesta rápida
+                    </button>
+                `;
+            }
+
+            window.useQuickReply = function(i) {
+                const replies = getQuickReplies();
+                const input = document.getElementById('recruiterChatInput');
+                if (input) {
+                    input.value = replies[i];
+                    input.focus();
+                }
+                document.getElementById('quickRepliesPanel').style.display = 'none';
+            }
+
+            window.addQuickReply = function() {
+                const texto = prompt('Escribe la nueva respuesta rápida:');
+                if (!texto || !texto.trim()) return;
+                const replies = getQuickReplies();
+                replies.push(texto.trim());
+                localStorage.setItem('quickReplies', JSON.stringify(replies));
+                renderQuickReplies();
+            }
+
+            window.editQuickReply = function(i) {
+                const replies = getQuickReplies();
+                const nuevo = prompt('Editar respuesta:', replies[i]);
+                if (!nuevo || !nuevo.trim()) return;
+                replies[i] = nuevo.trim();
+                localStorage.setItem('quickReplies', JSON.stringify(replies));
+                renderQuickReplies();
+            }
+
+            window.deleteQuickReply = function(i) {
+                if (!confirm('¿Eliminar esta respuesta rápida?')) return;
+                const replies = getQuickReplies();
+                replies.splice(i, 1);
+                localStorage.setItem('quickReplies', JSON.stringify(replies));
+                renderQuickReplies();
+            }
+
             window.closeRecruiterChatModal = function() {
                 document.getElementById('recruiterChatModal').classList.remove('active');
                 if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
