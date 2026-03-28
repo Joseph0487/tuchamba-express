@@ -862,7 +862,10 @@
                 // Limpieza de clases (Reset)
                 document.body.classList.remove('admin-mode', 'recruiter-view');
 
-                // Ocultar subtítulo en modo admin/reclutador
+                if (enableAdmin && (!isRefMode || isRecruiterMode)) {
+                    document.body.classList.add('admin-mode');
+
+                    // Ocultar subtítulo en modo admin/reclutador
                     const headerSubtitle = document.getElementById('headerSubtitle');
                     if (headerSubtitle) headerSubtitle.style.display = 'none';
 
