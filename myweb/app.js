@@ -558,9 +558,21 @@
 
             window.closeTeamModal = function() { document.getElementById('teamModal').classList.remove('active'); }
 
+            window.saveWelcomeMessage = function() {
+                const msg = document.getElementById('settingsWelcomeMsg')?.value.trim();
+                if (!msg) return window.showToast("⚠️ Escribe el mensaje de bienvenida");
+                set(ref(db, 'settings/welcomeMessage'), msg).then(() => {
+                    window.showToast("✅ Mensaje de bienvenida guardado");
+                });
+            }
+
             window.openSettingsModal = function() {
                 document.getElementById('settingsModal').classList.add('active');
                 if(document.getElementById('settingsPhoneInput')) document.getElementById('settingsPhoneInput').value = centralPhone;
+                onValue(ref(db, 'settings/welcomeMessage'), s => {
+                    const el = document.getElementById('settingsWelcomeMsg');
+                    if(el && s.val()) el.value = s.val();
+                }, { onlyOnce: true });
                 // Cargar config GitHub guardada
                 onValue(ref(db, 'settings/githubRepo'), s => {
                     const el = document.getElementById('settingsGithubRepo');
@@ -2523,11 +2535,10 @@
                     renderRecruiterChatMessages(snap.val());
                 });
 
-                // Escuchar si el reclutador está escribiendo (para mostrar al candidato)
+                // Escuchar si el reclutador está escribiendo — se muestra en el header del candidato
                 onValue(ref(db, `chats/${activeChatId}/recruiterTyping`), (snap) => {
-                    const typing = snap.val();
-                    const indicator = document.getElementById('typingIndicator');
-                    if (indicator) indicator.style.display = typing ? 'block' : 'none';
+                    const txt = document.getElementById('typingIndicatorText');
+                    if (txt) txt.textContent = snap.val() ? '✍️ Escribiendo...' : 'Tu reclutador responderá en breve';
                 });
 
                 setTimeout(() => {
@@ -2669,11 +2680,13 @@
                 if (!container) return;
                 if (!data) { container.innerHTML = '<p style="text-align:center;color:#aaa;font-size:13px;padding:20px;">Sin mensajes aún.</p>'; return; }
                 const msgs = Object.values(data).sort((a, b) => a.timestamp - b.timestamp);
+                const lastRecruiterIdx = msgs.map(m => m.senderType).lastIndexOf('recruiter');
+                const candidateRespondio = msgs.slice(lastRecruiterIdx + 1).some(m => m.senderType === 'candidate');
                 container.innerHTML = msgs.map((m, i) => {
                     const isMe = m.senderType === 'recruiter';
                     const time = new Date(m.timestamp).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-                    const isLast = i === msgs.length - 1;
-                    const palomitas = isMe ? `<span style="color:#4fc3f7;font-size:11px;margin-left:4px;">${isLast ? '✓✓' : '✓'}</span>` : '';
+                    const leido = isMe && candidateRespondio;
+                    const palomitas = isMe ? `<span style="color:${leido ? '#4fc3f7' : '#aaa'};font-size:11px;margin-left:4px;">${leido ? '✓✓' : '✓'}</span>` : '';
                     return `
                         <div style="display:flex; justify-content:${isMe ? 'flex-end' : 'flex-start'}; margin-bottom:10px;">
                             <div class="${isMe ? 'bubble-candidate' : 'bubble-recruiter'}" style="${isMe ? 'background:#e3f2fd;' : ''}">

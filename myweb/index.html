@@ -445,6 +445,12 @@
     </div>
     <p style="font-size:12px; color:#666; margin-top:5px;">El token necesita permiso <b>repo</b>. Se guarda cifrado en Firebase, solo tú puedes leerlo.</p>
 </div>
+<div class="form-group" style="margin-top:16px; padding-top:14px; border-top:1px solid #eee;">
+    <label>💬 Mensaje de Bienvenida Automático</label>
+    <textarea id="settingsWelcomeMsg" placeholder="Ej. 👋 Hola, gracias por tu interés. En breve te atendemos." style="width:100%; box-sizing:border-box; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:13px; min-height:70px; resize:vertical; margin-top:6px;"></textarea>
+    <button class="btn-primary" onclick="saveWelcomeMessage()" style="margin-top:6px;">Guardar</button>
+    <p style="font-size:12px; color:#666; margin-top:5px;">Se envía automáticamente cuando el candidato abre un chat por primera vez.</p>
+</div>
 <div class="danger-section"><h3 style="color:#d32f2f; margin-bottom:10px;">⚠️ Zona de Peligro (Admin)</h3><p style="font-size:13px; color:#666; margin-bottom:10px;">Acciones irreversibles protegidas por contraseña.</p><button class="danger-btn" onclick="performSafeAction('resetMetrics')">🗑️ Resetear Métricas (Vistas)</button><button class="danger-btn" onclick="performSafeAction('deleteJobs')">🔥 Borrar TODAS las Vacantes</button></div></div></div>
         <div class="modal" id="privacyModal"><div class="modal-content"><button class="close-btn" onclick="closePrivacyModal()">×</button><h2>🔒 Aviso de Privacidad</h2><div style="text-align: left; color: #444; line-height: 1.6; font-size: 14px; max-height: 70vh; overflow-y: auto;"><p style="font-size: 12px; color: #666; margin-bottom: 15px;"><strong>Última actualización: Enero 2026</strong></p><p style="margin-bottom: 15px;">En cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, <strong>TuChamba Express</strong> informa:</p><p style="margin-bottom:5px;"><strong>1. Responsable de los datos:</strong></p><p style="margin-bottom:15px;">TuChamba Express actúa como enlace entre candidatos y empresas reclutadoras.</p><p style="margin-bottom:5px;"><strong>2. Datos recopilados:</strong></p><p style="margin-bottom:15px;">Podemos recopilar datos de contacto (como número telefónico) con el único fin de facilitar la comunicación para procesos de reclutamiento.</p><p style="margin-bottom:5px;"><strong>3. Uso de la información:</strong></p><p style="margin-bottom:5px;">Los datos proporcionados serán utilizados exclusivamente para:</p><ul style="margin-left: 20px; margin-bottom: 15px;"><li>Contactar al candidato respecto a la vacante de interés.</li><li>Agendar entrevistas laborales.</li><li>Procesos internos de selección.</li></ul><p style="margin-bottom:5px;"><strong>4. Compartir datos:</strong></p><p style="margin-bottom:15px;">Su información de contacto será compartida únicamente con la empresa o reclutador responsable de la vacante a la que usted decida postularse voluntariamente.</p><p style="margin-bottom:5px;"><strong>5. Examen Médico:</strong></p><p style="margin-bottom:0;">Al utilizar esta plataforma, usted reconoce que algunas empresas contratantes pueden requerir, como parte de su proceso de selección y conforme a la ley, la realización de exámenes médicos y/o pruebas de detección de sustancias.</p></div></div></div>
 
@@ -454,11 +460,18 @@
                 <div style="background:#0a66c2; padding:14px 16px; display:flex; align-items:center; justify-content:space-between;">
                     <div>
                         <div id="chatModalTitle" style="color:white; font-weight:700; font-size:15px;">Chat</div>
-                        <div style="color:rgba(255,255,255,0.8); font-size:11px;">Tu reclutador responderá en breve</div>
+                        <div id="typingIndicatorText" style="color:rgba(255,255,255,0.9); font-size:11px;">Tu reclutador responderá en breve</div>
+                        <div style="color:rgba(255,255,255,0.6); font-size:10px; margin-top:1px;">🔒 Chat seguro — tus datos están protegidos</div>
                     </div>
                     <button onclick="window.closeChatModal()" style="background:none;border:none;color:white;font-size:22px;cursor:pointer;line-height:1;">×</button>
                 </div>
-                <div id="chatMessages" style="flex:1; overflow-y:auto; padding:16px; background-color:#f0f0f0; background-image:url('imagen_chat_fond.png'); background-size:350px; background-repeat:repeat; background-attachment:scroll; "></div>
+                <div id="chatMessages" style="flex:1; overflow-y:auto; padding:16px; background-color:#f0f0f0; background-image:url('imagen_chat_fond.png'); background-size:350px; background-repeat:repeat; background-attachment:scroll;"></div>
+                <div id="typingIndicator" style="display:none; padding:6px 16px; background:transparent;">
+                    <div style="display:inline-flex; align-items:center; gap:6px; background:white; border-radius:12px 12px 12px 0; padding:8px 12px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+                        <span style="font-size:11px; color:#888;">Tu reclutador está escribiendo</span>
+                        <span class="typing-dots"><span></span><span></span><span></span></span>
+                    </div>
+                </div>
                 <div style="padding:10px 12px; background:white; border-top:1px solid #eee; display:flex; gap:8px;">
                     <textarea id="chatInput" placeholder="Escribe tu pregunta..." 
                         style="flex:1; padding:10px 14px; border:1px solid #ddd; border-radius:16px; font-size:14px; outline:none; resize:none; overflow-y:hidden; max-height:100px; min-height:40px; height:40px; line-height:1.4; font-family:inherit;"
@@ -490,7 +503,7 @@
                         style="flex:1; padding:10px 14px; border:1px solid #ddd; border-radius:16px; font-size:14px; outline:none; resize:none; overflow-y:hidden; max-height:100px; min-height:40px; height:40px; line-height:1.4; font-family:inherit;"
                         rows="1"
                         onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); window.sendRecruiterMessage();} else if(event.key==='Escape'){event.stopPropagation(); window.closeRecruiterChatModal();}"
-                        oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight, 100)+'px'; this.style.overflowY=this.scrollHeight>100?'auto':'hidden';" class="chat-textarea"></textarea>
+                        oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight, 100)+'px'; this.style.overflowY=this.scrollHeight>100?'auto':'hidden'; window.recruiterTyping();" class="chat-textarea"></textarea>
                     <button onclick="window.sendRecruiterMessage()" 
                         style="background:#1a237e; color:white; border:none; border-radius:50%; width:42px; height:42px; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;">➤</button>
                 </div>
