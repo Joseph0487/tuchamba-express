@@ -2396,7 +2396,7 @@
                         get(ref(db, 'recruiters')).then(snap => {
                             const all = snap.val() || {};
                             const rec = Object.values(all).find(r => (r.code || '').toUpperCase() === (recCode || '').toUpperCase());
-                            const welcome = (rec && rec.welcomeMessage) || '👋 Hola, gracias por tu interés en la vacante. En breve te atendemos.';
+                            const welcome = (rec && rec.welcomeMessage) || '👋🏻 Hola, gracias por tu interés en la vacante. En breve te atendemos.';
                             const msgRef = push(ref(db, `messages/${chatId}`));
                             set(msgRef, { sender: recName, senderType: 'recruiter', text: welcome, timestamp: Date.now() });
                             set(ref(db, `chats/${chatId}/lastMessage`), welcome);
@@ -2439,7 +2439,7 @@
                         get(ref(db, 'recruiters')).then(snap => {
                             const all = snap.val() || {};
                             const rec = Object.values(all).find(r => (r.code || '').toUpperCase() === (recCode || '').toUpperCase());
-                            const welcome = (rec && rec.welcomeMessage) || '👋 Hola, gracias por tu interés en la vacante. En breve te atendemos.';
+                            const welcome = (rec && rec.welcomeMessage) || '👋🏻 Hola, gracias por tu interés en la vacante. En breve te atendemos.';
                             const msgRef = push(ref(db, `messages/${chatId}`));
                             set(msgRef, { sender: recName, senderType: 'recruiter', text: welcome, timestamp: Date.now() });
                             set(ref(db, `chats/${chatId}/lastMessage`), welcome);
