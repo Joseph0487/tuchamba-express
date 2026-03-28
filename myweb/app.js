@@ -893,8 +893,12 @@
                         var btnChats = document.getElementById('btnChatsPanel');
                         if (btnChats) btnChats.style.display = 'inline-flex';
 
-                        // Arrancar notificaciones
-                        initNotifSound();
+                        // Arrancar notificaciones al primer clic del usuario
+                        const arrancarNotifs = () => {
+                            initNotifSound();
+                            document.removeEventListener('click', arrancarNotifs);
+                        };
+                        document.addEventListener('click', arrancarNotifs);
                         startChatNotifications(activeRecruiter ? activeRecruiter.code : refCode);
                     
                     } else {
@@ -2553,8 +2557,23 @@
                 }
 
                 const cutoff = Date.now() - (7 * 24 * 60 * 60 * 1000);
+                let primeraVez = true;
 
                 chatNotifUnsubscribe = onValue(ref(db, 'chats'), snap => {
+                    // En la primera carga, marcar todos como vistos para no spamear al recargar
+                    if (primeraVez) {
+                        primeraVez = false;
+                        const all = snap.val() || {};
+                        Object.entries(all).forEach(([chatId, c]) => {
+                            if ((c.refCode || '').toUpperCase() !== myCode.toUpperCase()) return;
+                            if (!lastSeenMessageCount[chatId] && c.lastMessageAt) {
+                                // Solo marcar como visto si no tenemos registro previo
+                                lastSeenMessageCount[chatId] = c.lastMessageAt;
+                            }
+                        });
+                        localStorage.setItem('lastSeenMsgs', JSON.stringify(lastSeenMessageCount));
+                        return;
+                    }
                     const all = snap.val() || {};
                     let unread = 0;
 
