@@ -70,8 +70,12 @@
             let lastSeenMessageCount = JSON.parse(localStorage.getItem('lastSeenMsgs') || '{}');
             let notifSound = null;
 
-            // ID único por pestaña/dispositivo — se regenera en cada sesión
-            const deviceSessionId = Math.random().toString(36).substring(2, 10);
+            // ID único por pestaña/dispositivo — persiste en la misma pestaña
+            const deviceSessionId = sessionStorage.getItem('deviceSessionId') || (() => {
+                const id = Math.random().toString(36).substring(2, 10);
+                sessionStorage.setItem('deviceSessionId', id);
+                return id;
+            })();
 
             // Inicializar sonido de notificación
             function initNotifSound() {
