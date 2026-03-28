@@ -461,7 +461,7 @@
                 <div id="chatMessages" style="flex:1; overflow-y:auto; padding:16px; background:#f0f0f0;"></div>
                 <div style="padding:10px 12px; background:white; border-top:1px solid #eee; display:flex; gap:8px;">
                     <textarea id="chatInput" placeholder="Escribe tu pregunta..." 
-                        style="flex:1; padding:10px 14px; border:1px solid #ddd; border-radius:16px; font-size:14px; outline:none; resize:none; overflow-y:auto; max-height:100px; min-height:40px; height:40px; line-height:1.4; font-family:inherit;"
+                        style="flex:1; padding:10px 14px; border:1px solid #ddd; border-radius:16px; font-size:14px; outline:none; resize:none; overflow-y:hidden; max-height:100px; min-height:40px; height:40px; line-height:1.4; font-family:inherit;"
                         rows="1"
                         onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); window.sendChatMessage();} else if(event.key==='Escape'){event.stopPropagation(); window.closeChatModal();}"
                         oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight, 100)+'px';"></textarea>
@@ -487,7 +487,7 @@
                     <button onclick="window.toggleQuickReplies()" title="Respuestas rápidas"
                         style="background:#e8eaf6; color:#1a237e; border:none; border-radius:50%; width:36px; height:36px; font-size:16px; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center;">⚡</button>
                     <textarea id="recruiterChatInput" placeholder="Escribe tu respuesta..." 
-                        style="flex:1; padding:10px 14px; border:1px solid #ddd; border-radius:16px; font-size:14px; outline:none; resize:none; overflow-y:auto; max-height:100px; min-height:40px; height:40px; line-height:1.4; font-family:inherit;"
+                        style="flex:1; padding:10px 14px; border:1px solid #ddd; border-radius:16px; font-size:14px; outline:none; resize:none; overflow-y:hidden; max-height:100px; min-height:40px; height:40px; line-height:1.4; font-family:inherit;"
                         rows="1"
                         onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); window.sendRecruiterMessage();} else if(event.key==='Escape'){event.stopPropagation(); window.closeRecruiterChatModal();}"
                         oninput="this.style.height='auto'; this.style.height=Math.min(this.scrollHeight, 100)+'px';"></textarea>
