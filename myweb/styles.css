@@ -1948,4 +1948,6 @@
             .chat-textarea::-webkit-scrollbar-thumb { background: #c5cae9; border-radius: 4px; }
             .chat-textarea::-webkit-scrollbar-thumb:hover { background: #9fa8da; }
 
-           
+           #chatMessages, #recruiterChatMessages {
+                background-attachment: local;
+            }
