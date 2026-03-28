@@ -866,8 +866,10 @@
                     document.body.classList.add('admin-mode');
 
                     // Ocultar subtítulo en modo admin/reclutador
-                    const headerSubtitle = document.getElementById('headerSubtitle');
-                    if (headerSubtitle) headerSubtitle.style.display = 'none';
+                    setTimeout(() => {
+                        const headerSubtitle = document.getElementById('headerSubtitle');
+                        if (headerSubtitle) headerSubtitle.style.display = 'none';
+                    }, 100);
 
                     if (isRecruiterMode) {
                         // ACTIVAMOS LA VISTA RECLUTADOR
@@ -2728,7 +2730,7 @@
                         const diasRestantes = Math.max(0, 7 - Math.floor((Date.now() - (c.createdAt || 0)) / (1000 * 60 * 60 * 24)));
                         const lastMsgAt = c.lastMessageAt || 0;
                         const lastSeen = lastSeenMessageCount[chatId] || 0;
-                        const tieneNuevo = lastMsgAt > lastSeen && !!c.lastMessage;
+                        const tieneNuevo = lastMsgAt > lastSeen && !!c.lastMessage && c.lastSenderType !== 'recruiter';
                         const bgColor = tieneNuevo ? '#e8f0fe' : 'white';
                         const borderLeft = tieneNuevo ? 'border-left:3px solid #1a237e;' : '';
                         return `
