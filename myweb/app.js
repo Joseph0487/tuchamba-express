@@ -2545,8 +2545,10 @@
                             style="flex:1; text-align:left; background:white; border:1px solid #c5cae9; border-radius:8px; padding:7px 10px; font-size:12px; color:#1a237e; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                             ${r}
                         </button>
-                        <button onclick="window.editQuickReply(${i})" style="background:none;border:none;font-size:13px;cursor:pointer;color:#888;">✏️</button>
-                        <button onclick="window.deleteQuickReply(${i})" style="background:none;border:none;font-size:13px;cursor:pointer;color:#e53935;">🗑️</button>
+                        <div style="display:flex;gap:2px;flex-shrink:0;">
+                            <button onclick="window.editQuickReply(${i})" style="background:none;border:none;font-size:13px;cursor:pointer;color:#888;padding:2px;">✏️</button>
+                            <button onclick="window.deleteQuickReply(${i})" style="background:none;border:none;font-size:13px;cursor:pointer;color:#e53935;padding:2px;">🗑️</button>
+                        </div>
                     </div>
                 `).join('') + `
                     <button onclick="window.addQuickReply()" 
