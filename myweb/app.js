@@ -2523,7 +2523,7 @@
                             <div class="${isMe ? 'bubble-candidate' : 'bubble-recruiter'}">
                                 ${!isMe ? `<div style="font-size:11px;font-weight:700;color:#0a66c2;margin-bottom:2px;">${m.sender}</div>` : ''}
                                 <div>${m.text}</div>
-                                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:4px;">${time}${isMe ? '<span style="color:#aaa;font-size:11px;margin-left:4px;">✓</span>' : ''}</div>
+                                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:4px;">${time}</div>
                             </div>
                         </div>
                     `;
@@ -2700,19 +2700,17 @@
                 if (!container) return;
                 if (!data) { container.innerHTML = '<p style="text-align:center;color:#aaa;font-size:13px;padding:20px;">Sin mensajes aún.</p>'; return; }
                 const msgs = Object.values(data).sort((a, b) => a.timestamp - b.timestamp);
-                const lastRecruiterIdx = msgs.map(m => m.senderType).lastIndexOf('recruiter');
-                const candidateRespondio = msgs.slice(lastRecruiterIdx + 1).some(m => m.senderType === 'candidate');
+                
                 container.innerHTML = msgs.map((m, i) => {
                     const isMe = m.senderType === 'recruiter';
                     const time = new Date(m.timestamp).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-                    const leido = isMe && candidateRespondio;
-                    const palomitas = isMe ? `<span style="color:${leido ? '#4fc3f7' : '#aaa'};font-size:11px;margin-left:4px;">${leido ? '✓✓' : '✓'}</span>` : '';
+                    
                     return `
                         <div style="display:flex; justify-content:${isMe ? 'flex-end' : 'flex-start'}; margin-bottom:10px;">
                             <div class="${isMe ? 'bubble-candidate' : 'bubble-recruiter'}" style="${isMe ? 'background:#e3f2fd;' : ''}">
                                 ${!isMe ? `<div style="font-size:11px;font-weight:700;color:#e53935;margin-bottom:2px;">${m.sender}</div>` : ''}
                                 <div>${m.text}</div>
-                                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:4px;">${time}${palomitas}</div>
+                                <div style="font-size:10px;color:#aaa;text-align:right;margin-top:4px;">${time}</div>
                             </div>
                         </div>
                     `;
