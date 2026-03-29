@@ -1871,7 +1871,7 @@
 
             
             function renderMisChats() {
-                if (isAdmin || refCode) return; // Solo para candidatos
+                if (isAdmin) return; // Solo para candidatos
                 const misChats = [];
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
