@@ -1869,6 +1869,53 @@
                 }
             }
 
+            
+            function renderMisChats() {
+                if (isAdmin || refCode) return; // Solo para candidatos
+                const misChats = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (!key.startsWith('chat_')) continue;
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data && data.chatId && data.candidateName) misChats.push(data);
+                    } catch(e) {}
+                }
+                let banner = document.getElementById('misChatsBanner');
+                if (misChats.length === 0) {
+                    if (banner) banner.remove();
+                    return;
+                }
+                if (!banner) {
+                    banner = document.createElement('div');
+                    banner.id = 'misChatsBanner';
+                    banner.style.cssText = 'background:#1e293b;border-radius:12px;padding:14px 16px;margin:0 0 18px 0;border-left:4px solid #0a66c2;';
+                    const grid = document.getElementById('jobGrid');
+                    grid.parentNode.insertBefore(banner, grid);
+                }
+                banner.innerHTML = `
+                    <div style="font-size:13px;font-weight:700;color:#0a66c2;margin-bottom:10px;">💬 Tus conversaciones activas</div>
+                    ${misChats.map(c => `
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #334155;">
+                            <div>
+                                <div style="font-size:13px;color:#fff;font-weight:600;">${c.candidateName}</div>
+                                <div style="font-size:11px;color:#94a3b8;">${c.chatId.split('_')[0]}</div>
+                            </div>
+                            <button onclick="window.retomarChat('${c.chatId}')" style="background:#0a66c2;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-weight:600;">Retomar →</button>
+                        </div>
+                    `).join('')}
+                `;
+            }
+
+            window.retomarChat = async function(chatId) {
+                const parts = chatId.split('_');
+                const jobId = parts[0];
+                const recCode = parts[1];
+                const job = jobs[jobId];
+                if (!job) { alert('Esta vacante ya no está disponible.'); return; }
+                await window.openChatModal(jobId, recCode, job.recruiterName || '');
+            };
+
             function renderJobs() {
                 let keys = Object.keys(jobs);
                 
@@ -1893,6 +1940,7 @@
 
                 currentFilteredJobs = keys; 
                 currentPage = 1; 
+                renderMisChats();
                 applyFilterAndRender();
             }
 
