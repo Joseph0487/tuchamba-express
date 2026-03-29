@@ -1902,11 +1902,20 @@
                                 <div style="font-size:11px;color:#94a3b8;">${c.chatId.split('_')[0]}</div>
                             </div>
                             <button onclick="window.retomarChat('${c.chatId}')" style="background:#0a66c2;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-weight:600;">Retomar →</button>
+<button onclick="window.olvidarChat('${c.chatId}')" style="background:transparent;color:#ef4444;border:1px solid #ef4444;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;margin-left:6px;">✕</button>
                         </div>
                     `).join('')}
                 `;
             }
 
+            window.olvidarChat = function(chatId) {
+                const parts = chatId.split('_');
+                const jobId = parts[0];
+                const recCode = parts[1];
+                localStorage.removeItem(`chat_${jobId}_${recCode}`);
+                renderMisChats();
+            };
+            
             window.retomarChat = async function(chatId) {
                 const parts = chatId.split('_');
                 const jobId = parts[0];
