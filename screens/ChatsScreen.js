@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { db } from '../firebase';
-import { ref, onValue, set, remove } from 'firebase/database';
+import { ref, onValue, set, remove, get } from 'firebase/database';
 import ChatDetailScreen from './ChatDetailScreen';
 
 export default function ChatsScreen({ reclutador }) {
@@ -50,9 +50,7 @@ export default function ChatsScreen({ reclutador }) {
         { text: 'Cancelar', style: 'cancel' },
         { text: 'Borrar', style: 'destructive', onPress: async () => {
           const cutoff = Date.now() - (7 * 24 * 60 * 60 * 1000);
-          const snap = await new Promise(resolve => {
-            const unsub = onValue(ref(db, 'chats'), s => { unsub(); resolve(s); });
-          });
+          const snap = await get(ref(db, 'chats'));
           const all = snap.val() || {};
           const promises = [];
           let deleted = 0;
