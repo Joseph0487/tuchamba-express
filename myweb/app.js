@@ -2564,7 +2564,7 @@
                 // Notificar al reclutador
                 const activeRefCode = refCode || (activeRecruiter ? activeRecruiter.code : null);
                 if (activeRefCode) {
-                    fetch('/api/notify/', {
+                    fetch('/api/notify', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
