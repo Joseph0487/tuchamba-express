@@ -2561,6 +2561,20 @@
                 set(ref(db, `chats/${activeChatId}/lastSenderType`), 'candidate');
                 set(ref(db, `chats/${activeChatId}/archived`), false);
 
+                // Notificar al reclutador
+                const activeRefCode = refCode || (activeRecruiter ? activeRecruiter.code : null);
+                if (activeRefCode) {
+                    fetch('/api/notify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chatId: activeChatId,
+                            message: text,
+                            recruiterCode: activeRefCode.toUpperCase()
+                        })
+                    }).catch(e => console.log('Notif error:', e));
+                }
+
                 input.value = '';
             }
 
