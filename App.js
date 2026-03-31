@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import appCheck from '@react-native-firebase/app-check';
@@ -20,19 +21,14 @@ export default function App() {
     appCheck().getToken(true).catch(e => console.log('AppCheck error:', e.message));
   }, []);
 
-  if (!reclutador) {
-    return (
-      <>
-        <StatusBar style="light" />
-        <LoginScreen onLogin={setReclutador} />
-      </>
-    );
-  }
-
   return (
-    <>
+    <SafeAreaProvider>
       <StatusBar style="light" />
-      <HomeScreen reclutador={reclutador} onLogout={() => setReclutador(null)} />
-    </>
+      {!reclutador ? (
+        <LoginScreen onLogin={setReclutador} />
+      ) : (
+        <HomeScreen reclutador={reclutador} onLogout={() => setReclutador(null)} />
+      )}
+    </SafeAreaProvider>
   );
 }

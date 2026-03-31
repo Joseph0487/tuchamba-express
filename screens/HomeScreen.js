@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ChatsScreen from './ChatsScreen';
 import VacantesScreen from './VacantesScreen';
 
 export default function HomeScreen({ reclutador, onLogout }) {
   const [tab, setTab] = useState('chats');
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <Text style={styles.headerTitle}>Hola, {reclutador.name.split(' ')[0]} 👋</Text>
         <TouchableOpacity onPress={onLogout}>
           <Text style={styles.logout}>Salir</Text>
@@ -43,7 +45,7 @@ export default function HomeScreen({ reclutador, onLogout }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0f172a' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 55, backgroundColor: '#1e293b' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 16, backgroundColor: '#1e293b' },
   headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
   logout: { color: '#ef4444', fontSize: 14, fontWeight: '600' },
   tabs: { flexDirection: 'row', backgroundColor: '#1e293b', borderBottomWidth: 1, borderBottomColor: '#334155' },
@@ -51,5 +53,5 @@ const styles = StyleSheet.create({
   tabActive: { borderBottomWidth: 2, borderBottomColor: '#0a66c2' },
   tabText: { color: '#aaa', fontSize: 14, fontWeight: '600' },
   tabTextActive: { color: '#0a66c2' },
-  content: { flex: 1 },
+  content: { flex: 1, paddingBottom: 0 },
 });

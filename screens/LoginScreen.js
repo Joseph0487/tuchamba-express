@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { db } from '../firebase';
-import { ref, get, set } from 'firebase/database';
+import { ref, get } from 'firebase/database';
 
 export default function LoginScreen({ onLogin }) {
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const insets = useSafeAreaInsets();
 
   async function handleLogin() {
     if (!usuario || !password) {
@@ -39,43 +41,49 @@ export default function LoginScreen({ onLogin }) {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>TuChamba</Text>
-      <Text style={styles.subtitle}>Panel Reclutador</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Usuario"
-        placeholderTextColor="#aaa"
-        value={usuario}
-        onChangeText={setUsuario}
-        autoCapitalize="none"
-      />
-      <View style={styles.passwordContainer}>
+    <KeyboardAvoidingView
+      style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        <Text style={styles.title}>TuChamba</Text>
+        <Text style={styles.subtitle}>Panel Reclutador</Text>
         <TextInput
-          style={styles.passwordInput}
-          placeholder="Contraseña"
+          style={styles.input}
+          placeholder="Usuario"
           placeholderTextColor="#aaa"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!showPassword}
+          value={usuario}
+          onChangeText={setUsuario}
+          autoCapitalize="none"
         />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
-          <Image source={showPassword ? require('../assets/ocultar.png') : require('../assets/ver.png')} style={styles.eyeIcon} />
-        </TouchableOpacity>
-      </View>
-      {loading ? (
-        <ActivityIndicator color="#0a66c2" style={{ marginTop: 20 }} />
-      ) : (
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Entrar</Text>
-        </TouchableOpacity>
-      )}
-    </View>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Contraseña"
+            placeholderTextColor="#aaa"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
+            <Image source={showPassword ? require('../assets/ocultar.png') : require('../assets/ver.png')} style={styles.eyeIcon} />
+          </TouchableOpacity>
+        </View>
+        {loading ? (
+          <ActivityIndicator color="#0a66c2" style={{ marginTop: 20 }} />
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Entrar</Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f172a', justifyContent: 'center', padding: 30 },
+  container: { flex: 1, backgroundColor: '#0f172a' },
+  scroll: { flexGrow: 1, justifyContent: 'center', padding: 30 },
   title: { fontSize: 32, fontWeight: 'bold', color: '#0a66c2', textAlign: 'center', marginBottom: 6 },
   subtitle: { fontSize: 16, color: '#aaa', textAlign: 'center', marginBottom: 40 },
   input: { backgroundColor: '#1e293b', color: '#fff', borderRadius: 10, padding: 14, marginBottom: 16, fontSize: 15 },
