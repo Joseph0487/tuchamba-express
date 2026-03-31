@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Alert } from 'react-native';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
-import { firebase } from '@react-native-firebase/app';
 import appCheck from '@react-native-firebase/app-check';
 
 const rnfbProvider = appCheck().newReactNativeFirebaseAppCheckProvider();

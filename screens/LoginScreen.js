@@ -2,35 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Image } from 'react-native';
 import { db } from '../firebase';
 import { ref, get, set } from 'firebase/database';
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
 
 export default function LoginScreen({ onLogin }) {
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  async function registrarToken(recruiterCode) {
-    try {
-      // if (!Device.isDevice) return; // Permitir emuladores también
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== 'granted') return;
-      const tokenData = await Notifications.getExpoPushTokenAsync();
-      const token = tokenData.data;
-      await set(ref(db, `fcmTokens/${recruiterCode}`), {
-        token,
-        updatedAt: Date.now()
-      });
-    } catch (e) {
-      console.log('Error registrando token:', e.message);
-    }
-  }
 
   async function handleLogin() {
     if (!usuario || !password) {
@@ -51,7 +28,6 @@ export default function LoginScreen({ onLogin }) {
       );
       const passwordEsperada = `Express*${usuario.trim().toUpperCase()}`;
       if (match && password.trim() === passwordEsperada) {
-        await registrarToken(match.code);
         onLogin(match);
       } else {
         Alert.alert('Error', 'Usuario o contraseña incorrectos');
