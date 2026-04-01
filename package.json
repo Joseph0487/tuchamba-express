@@ -1,0 +1,25 @@
+{
+  "name": "tuchambaapp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-firebase/app": "^23.8.8",
+    "@react-native-firebase/app-check": "^23.8.8",
+    "expo": "^55.0.9",
+    "expo-device": "~55.0.10",
+    "expo-notifications": "~55.0.14",
+    "expo-status-bar": "~55.0.4",
+    "firebase": "^11.10.0",
+    "react": "19.2.0",
+    "react-native": "0.83.4",
+    "react-native-safe-area-context": "~5.6.2"
+  },
+  "private": true
+}
