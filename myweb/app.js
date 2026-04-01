@@ -3527,8 +3527,9 @@
                 if (modal) {
                     modal.classList.add('active');
                     modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden'; // evita scroll del fondo
                     resetRecruiterForm(); 
-                    renderRecruitersTable(); // <--- PINTA LA LISTA
+                    renderRecruitersTable();
                 }
             };
 
@@ -3537,6 +3538,7 @@
                 if(modal) {
                     modal.classList.remove('active');
                     modal.style.display = 'none';
+                    document.body.style.overflow = ''; // restaura scroll del fondo
                 }
             };
 
@@ -3582,6 +3584,12 @@
                 const num = document.getElementById('recPhone').value.trim();
 
                 if (!name || !num || !code) return alert('⚠️ Llena todos los campos');
+
+                // VALIDACIÓN: Código duplicado (excluyendo el reclutador que se está editando)
+                const codeExists = Object.entries(recruiters || {}).some(([id, r]) => 
+                    r.code && r.code.toUpperCase() === code && id !== editingRecruiterId
+                );
+                if (codeExists) return alert(`⚠️ El código "${code}" ya está siendo usado por otro reclutador. Usa un código diferente.`);
 
                 let cleanNum = num.replace(/\D/g, '');
                 let cleanLada = lada.replace('+', '');
